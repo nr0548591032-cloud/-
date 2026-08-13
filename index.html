@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ניהול הבניין</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --bg:#F5F3EF;
+    --card:#FFFFFF;
+    --ink:#232323;
+    --ink-soft:#6B6B65;
+    --line:#E3E0D8;
+    --brand:#2B4C5C;
+    --brand-dark:#1A333F;
+    --amber:#C1791E;
+    --amber-bg:#FBF0DE;
+    --green:#3F7D3A;
+    --green-bg:#E9F3E5;
+    --red:#B23A32;
+    --red-bg:#FBE9E7;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI","Arial Hebrew","Heebo",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    direction:rtl;
+  }
+  header{
+    background:var(--brand-dark);
+    color:#fff;
+    padding:18px 24px 0 24px;
+  }
+  header h1{
+    margin:0 0 14px 0;
+    font-size:20px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  header h1 .dot{
+    width:10px;height:10px;border-radius:50%;background:var(--amber);display:inline-block;
+  }
+  nav{
+    display:flex;
+    gap:4px;
+    overflow-x:auto;
+    padding-bottom:0;
+  }
+  nav button{
+    background:transparent;
+    border:none;
+    color:#CFDCE2;
+    padding:10px 16px;
+    font-size:14px;
+    cursor:pointer;
+    white-space:nowrap;
+    border-bottom:3px solid transparent;
+    font-family:inherit;
+  }
+  nav button.active{
+    color:#fff;
+    border-bottom:3px solid var(--amber);
+    font-weight:600;
+  }
+  main{
+    max-width:1100px;
+    margin:0 auto;
+    padding:20px 16px 60px 16px;
+  }
+  .tab{ display:none; }
+  .tab.active{ display:block; }
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:12px;
+    margin-bottom:20px;
+  }
+  .stat{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+  }
+  .stat .label{ font-size:12px; color:var(--ink-soft); margin-bottom:6px;}
+  .stat .value{ font-size:24px; font-weight:700; }
+  .stat.warn .value{ color:var(--amber); }
+  .stat.bad .value{ color:var(--red); }
+  .stat.good .value{ color:var(--green); }
+  .section-title{
+    font-size:16px;
+    font-weight:700;
+    margin:26px 0 10px 0;
+    color:var(--brand-dark);
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    margin-bottom:16px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  th{
+    text-align:right;
+    font-size:12px;
+    color:var(--ink-soft);
+    font-weight:600;
+    padding:8px 6px;
+    border-bottom:2px solid var(--line);
+    white-space:nowrap;
+  }
+  td{
+    padding:5px 6px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  tr:last-child td{ border-bottom:none; }
+  input[type=text], input[type=number], input[type=date], select{
+    width:100%;
+    border:1px solid transparent;
+    background:transparent;
+    padding:6px 4px;
+    font-size:13px;
+    font-family:inherit;
+    border-radius:6px;
+    color:var(--ink);
+  }
+  input[type=text]:hover, input[type=number]:hover, input[type=date]:hover, select:hover{
+    border-color:var(--line);
+    background:#FAF9F6;
+  }
+  input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, select:focus{
+    outline:none;
+    border-color:var(--brand);
+    background:#fff;
+  }
+  input[readonly]{ color:var(--ink-soft); }
+  .pill{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .pill.done{ background:var(--green-bg); color:var(--green); }
+  .pill.open{ background:var(--amber-bg); color:var(--amber); }
+  .pill.late{ background:var(--red-bg); color:var(--red); }
+  .row-actions{ text-align:center; width:36px; }
+  .icon-btn{
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    color:var(--ink-soft);
+    font-size:16px;
+    padding:4px;
+  }
+  .icon-btn:hover{ color:var(--red); }
+  .btn{
+    background:var(--brand);
+    color:#fff;
+    border:none;
+    padding:9px 16px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .btn:hover{ background:var(--brand-dark); }
+  .btn.ghost{
+    background:transparent;
+    color:var(--brand);
+    border:1px solid var(--line);
+  }
+  .btn.ghost:hover{ background:#EFEDE7; }
+  .toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .table-scroll{ overflow-x:auto; }
+  .total-row td{
+    font-weight:700;
+    border-top:2px solid var(--line);
+    background:#FAF9F6;
+  }
+  .installment-tabs{
+    display:flex;
+    gap:6px;
+    margin-bottom:14px;
+  }
+  .installment-tabs button{
+    border:1px solid var(--line);
+    background:var(--card);
+    padding:7px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:13px;
+    font-family:inherit;
+  }
+  .installment-tabs button.active{
+    background:var(--brand);
+    color:#fff;
+    border-color:var(--brand);
+  }
+  .hint{ font-size:12px; color:var(--ink-soft); margin:4px 0 12px 0; }
+  .saved-flag{
+    font-size:12px;
+    color:var(--green);
+    opacity:0;
+    transition:opacity .3s;
+  }
+  .saved-flag.show{ opacity:1; }
+  .sync-cell{ text-align:center; white-space:nowrap; }
+  .sync-status{ font-size:11px; color:var(--ink-soft); margin-top:2px; }
+  .sync-status.err{ color:var(--red); }
+  .sync-status.ok{ color:var(--green); }
+  @media (max-width:600px){
+    header{ padding:14px 12px 0 12px; }
+    main{ padding:14px 8px 60px 8px; }
+    table{ font-size:12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="dot"></span>ניהול הבניין</h1>
+  <nav id="navBar"></nav>
+</header>
+
+<main>
+
+  <section class="tab" id="tab-dashboard">
+    <div class="cards" id="dashCards"></div>
+    <div class="section-title">בקרה לפי סוג תחזוקה</div>
+    <div class="card"><div class="table-scroll" id="dashMaintType"></div></div>
+    <div class="section-title">משימות פתוחות קרובות</div>
+    <div class="card"><div class="table-scroll" id="dashTasks"></div></div>
+    <div class="section-title">אישורים ובדיקות לתשומת לב</div>
+    <div class="card"><div class="table-scroll" id="dashLicensing"></div></div>
+  </section>
+
+  <section class="tab" id="tab-tasks">
+    <div class="cards" id="tasksCards"></div>
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="tasksSaved">נשמר</span></div>
+        <button class="btn" onclick="addTask()">+ הוספת משימה</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>מזהה</th><th>תאריך יצירה</th><th>תחום</th><th>תיאור המשימה</th>
+            <th>סטטוס</th><th>אחראי ביצוע</th><th>תאריך יעד</th><th>סנכרון ליומן</th><th>הערות</th>
+            <th>סוג תחזוקה</th><th>קישור לחשבונית</th><th></th>
+          </tr></thead>
+          <tbody id="tasksBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-procurement">
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="procSaved">נשמר</span></div>
+        <button class="btn" onclick="addProc()">+ הוספת פריט</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>חודש</th><th>מק"ט</th><th>שם הפריט</th><th>ספק מועדף</th>
+            <th>כמות</th><th>יחידת מידה</th><th>מחיר ליחידה</th><th>סה"כ לתשלום</th>
+            <th>קטגוריה</th><th>קישור להזמנה</th><th></th>
+          </tr></thead>
+          <tbody id="procBody"></tbody>
+        </table>
+      </div>
+      <div class="table-scroll" style="margin-top:14px;">
+        <table id="procTotals"></table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-licensing">
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="licSaved">נשמר</span></div>
+        <button class="btn" onclick="addLic()">+ הוספת אישור / בדיקה</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>סוג האישור / הבדיקה</th><th>תדירות</th><th>בדיקה אחרונה</th>
+            <th>תפוגה / בדיקה הבאה</th><th>גורם בודק</th><th>סטטוס</th>
+            <th>קישור לאישור</th><th>סנכרון ליומן</th><th></th>
+          </tr></thead>
+          <tbody id="licBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-staff">
+    <div class="installment-tabs" id="installmentTabs"></div>
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="staffSaved">נשמר</span></div>
+        <button class="btn" onclick="addStaffRow()">+ הוספת שורה</button>
+      </div>
+      <p class="hint">התעריף היומי מחושב אוטומטית מהתעריף החודשי (חלקי 30). סה"כ לתשלום = (תעריף חודשי × מספר חודשים) פחות (ימי חיסור × תעריף יומי). סימון "אושר לתשלום" הוא מה שקובע אם השורה תופיע בדוח למנהל חשבונות.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>שם הבחור</th><th>תפקיד / תורנות</th><th>תעריף בסיס חודשי (₪)</th>
+            <th>תעריף יומי (₪)</th><th>ימי חיסור בחודש</th><th>מספר חודשים לתשלום</th>
+            <th>סה"כ לתשלום</th><th>אושר לתשלום</th><th>קישור לפירוט</th><th>הערות</th><th></th>
+          </tr></thead>
+          <tbody id="staffBody"></tbody>
+          <tfoot><tr class="total-row"><td colspan="6">סה"כ לתשלום לפעימה</td><td id="staffTotal"></td><td colspan="4"></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-title">פרטי בנק לפי שם</div>
+    <div class="card">
+      <div class="toolbar">
+        <div></div>
+        <button class="btn" onclick="addBankRow()">+ הוספת שורה</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>שם הבחור</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל החשבון</th><th></th></tr></thead>
+          <tbody id="bankBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-title">תשלום מרוכז לפעימה נבחרת</div>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>שם הבחור</th><th>תפקיד / תורנות</th><th>מספר חודשים לתשלום</th>
+            <th>סה"כ לתשלום</th><th>הערות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל החשבון</th>
+          </tr></thead>
+          <tbody id="paymentBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-accountant">
+    <div class="cards" id="accountantCards"></div>
+    <div class="card">
+      <p class="hint">הדוח מציג רק שורות שסומנו "אושר לתשלום" בטאב צוות ותורנים, מכל הפעימות, עם פרטי הבנק המתאימים. זה כל מה שמנהל החשבונות צריך כדי לבצע את ההעברות.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>שם</th><th>פעימה</th><th>תפקיד / תורנות</th><th>סה"כ לתשלום</th>
+            <th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל החשבון</th><th>הערות</th>
+          </tr></thead>
+          <tbody id="accountantBody"></tbody>
+          <tfoot><tr class="total-row"><td colspan="3">סה"כ להעברה</td><td id="accountantTotal"></td><td colspan="5"></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-contacts">
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="contactsSaved">נשמר</span></div>
+        <button class="btn" onclick="addContact()">+ הוספת איש קשר</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>שם חברה / איש מקצוע</th><th>תחום התמחות</th><th>טלפון</th>
+            <th>אימייל</th><th>עלות / תעריף</th><th>הערות</th><th></th>
+          </tr></thead>
+          <tbody id="contactsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ---------- FIREBASE / FIRESTORE (cross-device storage) ---------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyAK0JwkVu7BhPhTTv8RpboK5NnGKbe_Nf4",
+  authDomain: "naftali-menael.firebaseapp.com",
+  projectId: "naftali-menael",
+  storageBucket: "naftali-menael.firebasestorage.app",
+  messagingSenderId: "573438326108",
+  appId: "1:573438326108:web:8ab12e1c338b9c7ba0bd99",
+  measurementId: "G-10MXZZ7G56"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const APP_COLLECTION = "buildingApp";
+
+const appStorage = {
+  async get(key){
+    const doc = await db.collection(APP_COLLECTION).doc(key).get();
+    if(!doc.exists) return null;
+    return { value: doc.data().value };
+  },
+  async set(key, value){
+    await db.collection(APP_COLLECTION).doc(key).set({ value: value, updatedAt: Date.now() });
+    return { value };
+  }
+};
+
+let uid = 1;
+function nextId(){ return uid++; }
+
+let data = {
+  tasks: [
+    {id:1, created:"2026-07-01", category:"אינסטלטור", desc:"איתור ותיקון נזילות קומה 3 שמקומה 4", status:"בוצע", assignee:"מנחם פיליפ", due:"2026-08-20", notes:"לוודא סיום לפני הגעת הצוות", maint:"תקלות בלתי מתוכננות", link:"https://drive.google.com/file/d/1hPu9kMPQbyB2RfyGB1QI6GtMZUBkpvj7/view"},
+    {id:2, created:"2026-07-20", category:"מעליות", desc:"תיקוני קירות", status:"בוצע", assignee:"נעמן מעליות", due:"2026-07-20", notes:"", maint:"תקלות בלתי מתוכננות", link:"https://drive.google.com/file/d/1kyBV3Ui11jZPMwYk7YMb-u9MlBrOAOfn/view"},
+    {id:3, created:"2026-08-01", category:"", desc:"ניקוי פילטרים ובדיקת מזגנים", status:"טרם התחיל", assignee:"", due:"2026-08-15", notes:"הכנה לימי הקיץ החמים", maint:"", link:""},
+    {id:4, created:"2026-10-01", category:"", desc:"בדיקת מרזבים ואיטום גגות", status:"טרם התחיל", assignee:"", due:"2026-10-15", notes:"חובה לסיים לפני הגשמים", maint:"", link:""},
+    {id:5, created:"2026-11-01", category:"", desc:"תרגול פינוי מוסד בעת חירום", status:"טרם התחיל", assignee:"", due:"2026-11-10", notes:"תיאום מול ההנהלה", maint:"", link:""}
+  ],
+  procurement: [
+    {id:1, month:"אוגוסט", sku:"CLEAN-001", item:"חד פעמי וחומרי ניקיון", supplier:"ר. שמאי", qty:10, unit:"יחידה", price:45, category:"ניקיון"},
+    {id:2, month:"", sku:"DISP-002", item:"כוסות לשתייה חמה (נייר)", supplier:"ר. שמאי", qty:50, unit:"מארז", price:12, category:"חד פעמי"},
+    {id:3, month:"", sku:"CLEAN-001", item:"נוזל רצפות מקצועי 4 ליטר", supplier:"ר. שמאי", qty:8, unit:"יחידה", price:45, category:"ניקיון"},
+    {id:4, month:"ללא חודש (שנתי)", sku:"OFFC-003", item:"ציוד משרדי", supplier:"קשת", qty:30, unit:"קרטון", price:85, category:"ציוד משרדי"}
+  ],
+  licensing: [
+    {id:1, type:"בדיקת תקינות מטפים ומערכות כיבוי אש", freq:"שנתי", last:"2025-03-09", expiry:"2026-07-22", inspector:"חברת \"אש-בטוח\" בע\"מ", status:"אושר", link:"https://drive.google.com/file/d/1Tr7n27_9gKqAJ1PJXQO_jWZIeAn6Fxhr/view"},
+    {id:2, type:"אישור בטיחות", freq:"שנתי", last:"2025-04-23", expiry:"", inspector:"מהנדס בטיחות מוסמך", status:"אושר", link:"https://drive.google.com/file/d/1JsQKL8iI112jn0pj9bGzra7_oED03gpp/view"},
+    {id:3, type:"בדיקת תקינות מערכת החשמל ולוחות", freq:"שנתי", last:"2025-11-09", expiry:"", inspector:"משה בלנגה", status:"מאושר בתוקף", link:"https://drive.google.com/file/d/18OQSDLASQt8cq-bmpZ7sXTA-jzptKInY/view"},
+    {id:4, type:"אישור מצבור גז", freq:"תלת-שנתי", last:"", expiry:"", inspector:"", status:"", link:""}
+  ],
+  installments: [
+    [
+      {id:1,name:"גורי",role:"תורן מטבח ראשי",monthly:500,daily:17,missing:0,months:3,link:"https://docs.google.com/document/d/1PgU4QscJWQCFvegt76j6Ytg8SNKNw7_bYy4c6-y9rRo/edit",notes:""},
+      {id:2,name:"חיים למברג",role:"תורן מטבח משני",monthly:500,daily:17,missing:0,months:0,link:"https://docs.google.com/document/d/1fhRpfk8LwAr3j7qW71H3H05SCXNijbHW4ylU0Df2YfY/edit",notes:""},
+      {id:3,name:"ארי סגל",role:"תורן עזר בשבת",monthly:75,daily:75,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:""},
+      {id:4,name:"מנחם מנדל קורץ",role:"תורן עזר בשבת",monthly:75,daily:75,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:""},
+      {id:5,name:"לוי יצחק עוזרי",role:"תורן חדר אוכל ומפות",monthly:400,daily:13,missing:0,months:1,link:"https://docs.google.com/document/d/1yaRdxeGbC0oQ1zRSAnnTLYx7EtMHvuVA5FYjBW3-V4c/edit",notes:""},
+      {id:6,name:"יוסף יצחק לוייב",role:"ספרים ומפות",monthly:350,daily:12,missing:0,months:1,link:"",notes:""},
+      {id:7,name:"שניאור שרמן",role:"גבאי",monthly:50,daily:2,missing:0,months:1,link:"",notes:""},
+      {id:8,name:"שניאור שרמן",role:"תורן חדר קפה",monthly:170,daily:6,missing:0,months:1,link:"",notes:""}
+    ],
+    [
+      {id:1,name:"גורי",role:"מטבח",monthly:1500,daily:50,missing:0,months:1,link:"https://docs.google.com/document/d/1PgU4QscJWQCFvegt76j6Ytg8SNKNw7_bYy4c6-y9rRo/edit",notes:""},
+      {id:2,name:"",role:"מטבח",monthly:900,daily:30,missing:0,months:1,link:"https://docs.google.com/document/d/1PgU4QscJWQCFvegt76j6Ytg8SNKNw7_bYy4c6-y9rRo/edit",notes:""},
+      {id:3,name:"",role:"תורן עזר בשבת",monthly:1200,daily:40,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:"לסיים הכנת פירוט התפקיד"},
+      {id:4,name:"",role:"תורן עזר בשבת",monthly:600,daily:20,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:"לסיים הכנת פירוט התפקיד"},
+      {id:5,name:"",role:"תורן חדר אוכל",monthly:0,daily:0,missing:0,months:0,link:"https://docs.google.com/document/d/1yaRdxeGbC0oQ1zRSAnnTLYx7EtMHvuVA5FYjBW3-V4c/edit",notes:""},
+      {id:6,name:"",role:"ספרים ומפות",monthly:0,daily:0,missing:0,months:0,link:"",notes:""}
+    ],
+    [
+      {id:1,name:"גורי",role:"מטבח",monthly:1500,daily:50,missing:0,months:1,link:"https://docs.google.com/document/d/1PgU4QscJWQCFvegt76j6Ytg8SNKNw7_bYy4c6-y9rRo/edit",notes:""},
+      {id:2,name:"",role:"מטבח",monthly:900,daily:30,missing:0,months:1,link:"https://docs.google.com/document/d/1PgU4QscJWQCFvegt76j6Ytg8SNKNw7_bYy4c6-y9rRo/edit",notes:""},
+      {id:3,name:"",role:"תורן עזר בשבת",monthly:1200,daily:40,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:"לסיים הכנת פירוט התפקיד"},
+      {id:4,name:"",role:"תורן עזר בשבת",monthly:600,daily:20,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:"לסיים הכנת פירוט התפקיד"},
+      {id:5,name:"",role:"תורן חדר אוכל",monthly:0,daily:0,missing:0,months:0,link:"https://docs.google.com/document/d/1yaRdxeGbC0oQ1zRSAnnTLYx7EtMHvuVA5FYjBW3-V4c/edit",notes:""},
+      {id:6,name:"",role:"ספרים ומפות",monthly:0,daily:0,missing:0,months:0,link:"",notes:""}
+    ]
+  ],
+  bank: [
+    {id:1, name:"גורי", bank:"הפועלים", branch:"475", account:"265456", holder:""},
+    {id:2, name:"חיים למברג", bank:"", branch:"", account:"", holder:""},
+    {id:3, name:"ארי סגל", bank:"", branch:"", account:"", holder:""},
+    {id:4, name:"מנחם מנדל קורץ", bank:"", branch:"", account:"", holder:""},
+    {id:5, name:"לוי יצחק עוזרי", bank:"", branch:"", account:"", holder:""}
+  ],
+  contacts: [
+    {id:1, name:"מנחם פיליפ", specialty:"אינסטלטור", phone:"", email:"", cost:"", notes:""},
+    {id:2, name:"נעמן מעליות", specialty:"מעליות", phone:"", email:"", cost:"", notes:""},
+    {id:3, name:"שלמה", specialty:"טכנאי", phone:"", email:"", cost:"", notes:""}
+  ]
+};
+
+let activeInstallment = 0;
+const tabs = ["dashboard","tasks","procurement","licensing","staff","accountant","contacts"];
+const tabLabels = {dashboard:"לוח בקרה", tasks:"משימות", procurement:"רכש ואספקה", licensing:"רישוי ובטיחות", staff:"צוות ותורנים", accountant:"דוח למנהל חשבונות", contacts:"אנשי קשר וספקים"};
+
+function el(tag, props, children){
+  const e = document.createElement(tag);
+  if(props) for(const k in props){
+    if(k === "text") e.textContent = props[k];
+    else if(k === "html") e.innerHTML = props[k];
+    else e.setAttribute(k, props[k]);
+  }
+  (children||[]).forEach(c => e.appendChild(c));
+  return e;
+}
+
+function fmtMoney(n){
+  n = Math.round((n||0)*100)/100;
+  return "₪" + n.toLocaleString("he-IL");
+}
+
+let saveTimers = {};
+function scheduleSave(key, flagId){
+  clearTimeout(saveTimers[key]);
+  saveTimers[key] = setTimeout(async () => {
+    try{
+      await appStorage.set(key + "-data", JSON.stringify(data[key]));
+      if(flagId){
+        const f = document.getElementById(flagId);
+        if(f){ f.classList.add("show"); setTimeout(()=>f.classList.remove("show"), 1200); }
+      }
+    }catch(e){ console.error("שגיאת שמירה", e); }
+  }, 500);
+}
+
+function saveInstallments(){
+  clearTimeout(saveTimers["installments"]);
+  saveTimers["installments"] = setTimeout(async () => {
+    try{
+      await appStorage.set("staff-data", JSON.stringify({installments: data.installments, bank: data.bank}));
+      const f = document.getElementById("staffSaved");
+      if(f){ f.classList.add("show"); setTimeout(()=>f.classList.remove("show"), 1200); }
+    }catch(e){ console.error("שגיאת שמירה", e); }
+  }, 500);
+}
+
+async function loadAll(){
+  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"]];
+  for(const [dataKey, storageKey] of simpleKeys){
+    try{
+      const res = await appStorage.get(storageKey);
+      if(res && res.value){ data[dataKey] = JSON.parse(res.value); }
+    }catch(e){ /* no saved data yet, keep seed */ }
+  }
+  try{
+    const res = await appStorage.get("staff-data");
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      if(parsed.installments) data.installments = parsed.installments;
+      if(parsed.bank) data.bank = parsed.bank;
+    }
+  }catch(e){ /* keep seed */ }
+}
+
+function buildNav(){
+  const nav = document.getElementById("navBar");
+  nav.innerHTML = "";
+  tabs.forEach(t => {
+    const b = el("button", {text: tabLabels[t]});
+    b.onclick = () => switchTab(t);
+    b.dataset.tab = t;
+    nav.appendChild(b);
+  });
+}
+
+function switchTab(t){
+  tabs.forEach(x => {
+    document.getElementById("tab-"+x).classList.toggle("active", x===t);
+  });
+  document.querySelectorAll("#navBar button").forEach(b => {
+    b.classList.toggle("active", b.dataset.tab===t);
+  });
+  if(t==="dashboard") renderDashboard();
+  if(t==="accountant") renderAccountantReport();
+}
+
+/* ---------- CONTACT-DRIVEN DROPDOWNS ---------- */
+function getContactSpecialties(){
+  return [...new Set(data.contacts.map(c => c.specialty).filter(Boolean))];
+}
+function getContactNames(){
+  return [...new Set(data.contacts.map(c => c.name).filter(Boolean))];
+}
+function buildSelect(options, current, field){
+  const opts = new Set(options.filter(Boolean));
+  if(current) opts.add(current);
+  let html = `<select data-f="${field}">`;
+  html += `<option value="" ${!current ? "selected" : ""}></option>`;
+  Array.from(opts).forEach(o => {
+    html += `<option value="${o}" ${o===current ? "selected" : ""}>${o}</option>`;
+  });
+  html += `</select>`;
+  return html;
+}
+
+/* ---------- GOOGLE CALENDAR SYNC (direct Google OAuth) ---------- */
+const GOOGLE_CLIENT_ID = "573438326108-8efp6igpg462nv8uuso0g8bemjjrctt0.apps.googleusercontent.com";
+const GOOGLE_CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events";
+let gTokenClient = null;
+let gAccessToken = null;
+
+function initGoogleAuth(){
+  if(!window.google || !google.accounts || !google.accounts.oauth2){
+    setTimeout(initGoogleAuth, 300);
+    return;
+  }
+  gTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: GOOGLE_CALENDAR_SCOPE,
+    callback: () => {} // overridden per-request below
+  });
+}
+initGoogleAuth();
+
+function waitForTokenClient(timeoutMs){
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+    (function check(){
+      if(gTokenClient){ resolve(gTokenClient); return; }
+      if(Date.now() - start > timeoutMs){
+        reject(new Error("החיבור ל-Google לא נטען בזמן. רענן את הדף ונסה שוב."));
+        return;
+      }
+      setTimeout(check, 200);
+    })();
+  });
+}
+
+async function getGoogleToken(){
+  if(gAccessToken) return gAccessToken;
+  const client = await waitForTokenClient(6000);
+  return new Promise((resolve, reject) => {
+    client.callback = (resp) => {
+      if(resp.error){ reject(new Error(resp.error)); return; }
+      gAccessToken = resp.access_token;
+      resolve(gAccessToken);
+    };
+    client.requestAccessToken();
+  });
+}
+
+async function createGoogleCalendarEvent(dateStr, title, description){
+  const token = await getGoogleToken();
+  const endDate = new Date(dateStr + "T00:00:00");
+  endDate.setDate(endDate.getDate() + 1);
+  const endStr = endDate.toISOString().slice(0,10);
+  const res = await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      summary: title,
+      description: description,
+      start: { date: dateStr },
+      end: { date: endStr }
+    })
+  });
+  if(!res.ok){
+    if(res.status === 401){ gAccessToken = null; }
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err.error && err.error.message) || ("שגיאת יומן: " + res.status));
+  }
+  return await res.json();
+}
+
+async function deleteGoogleCalendarEvent(eventId){
+  const token = await getGoogleToken();
+  const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`, {
+    method: "DELETE",
+    headers: { "Authorization": "Bearer " + token }
+  });
+  if(!res.ok && res.status !== 410 && res.status !== 404){
+    if(res.status === 401){ gAccessToken = null; }
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err.error && err.error.message) || ("שגיאת מחיקה: " + res.status));
+  }
+}
+
+function updateSyncStatus(type, id, text, cls){
+  const node = document.getElementById(`sync-${type}-${id}`);
+  if(node){ node.textContent = text; node.className = "sync-status" + (cls ? " "+cls : ""); }
+}
+async function onSyncToggle(checkboxEl, row, type){
+  if(checkboxEl.checked){
+    const dateField = type==="task" ? row.due : row.expiry;
+    if(!dateField){
+      alert(type==="task" ? "יש למלא תאריך יעד לפני סנכרון ליומן." : "יש למלא תאריך תפוגה/בדיקה הבאה לפני סנכרון ליומן.");
+      checkboxEl.checked = false;
+      return;
+    }
+    row.syncing = true;
+    checkboxEl.disabled = true;
+    updateSyncStatus(type, row.id, "מסנכרן…");
+    try{
+      let title, details;
+      if(type==="task"){
+        title = row.desc || "משימת ניהול בניין";
+        details = `תחום: ${row.category||"לא צוין"}. אחראי ביצוע: ${row.assignee||"לא צוין"}. הערות: ${row.notes||"אין"}.`;
+      }else{
+        title = "תזכורת: " + (row.type || "בדיקת רישוי");
+        details = `תדירות: ${row.freq||"לא צוין"}. גורם בודק: ${row.inspector||"לא צוין"}.`;
+      }
+      const result = await createGoogleCalendarEvent(dateField, title, details);
+      row.synced = true;
+      row.syncing = false;
+      row.googleEventId = result.id;
+      checkboxEl.disabled = false;
+      updateSyncStatus(type, row.id, "✓ סונכרן ליומן", "ok");
+    }catch(e){
+      console.error(e);
+      row.synced = false;
+      row.syncing = false;
+      checkboxEl.checked = false;
+      checkboxEl.disabled = false;
+      updateSyncStatus(type, row.id, "שגיאה בסנכרון: " + e.message, "err");
+    }
+  }else{
+    if(row.googleEventId){
+      checkboxEl.disabled = true;
+      updateSyncStatus(type, row.id, "מוחק מהיומן…");
+      try{
+        await deleteGoogleCalendarEvent(row.googleEventId);
+        row.googleEventId = null;
+        updateSyncStatus(type, row.id, "");
+      }catch(e){
+        console.error(e);
+        checkboxEl.checked = true;
+        updateSyncStatus(type, row.id, "שגיאה במחיקה: " + e.message, "err");
+        checkboxEl.disabled = false;
+        if(type==="task") scheduleSave("tasks","tasksSaved"); else scheduleSave("licensing","licSaved");
+        return;
+      }
+      checkboxEl.disabled = false;
+    }
+    row.synced = false;
+  }
+  if(type==="task") scheduleSave("tasks","tasksSaved"); else scheduleSave("licensing","licSaved");
+}
+
+/* ---------- TASKS ---------- */
+function addTask(){
+  data.tasks.push({id: nextId()+1000, created:"", category:"", desc:"", status:"טרם התחיל", assignee:"", due:"", notes:"", maint:"", link:""});
+  renderTasks(); scheduleSave("tasks","tasksSaved");
+}
+function removeTask(id){
+  data.tasks = data.tasks.filter(r=>r.id!==id);
+  renderTasks(); scheduleSave("tasks","tasksSaved");
+}
+function renderTasks(){
+  const body = document.getElementById("tasksBody");
+  body.innerHTML = "";
+  data.tasks.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${row.id}" readonly style="width:40px"></td>
+      <td><input type="date" value="${row.created}" data-f="created"></td>
+      <td>${buildSelect(getContactSpecialties(), row.category, "category")}</td>
+      <td><input type="text" value="${row.desc}" data-f="desc" style="min-width:180px"></td>
+      <td><select data-f="status">
+            <option ${row.status==="בוצע"?"selected":""}>בוצע</option>
+            <option ${row.status==="בביצוע"?"selected":""}>בביצוע</option>
+            <option ${row.status==="טרם התחיל"?"selected":""}>טרם התחיל</option>
+          </select></td>
+      <td>${buildSelect(getContactNames(), row.assignee, "assignee")}</td>
+      <td><input type="date" value="${row.due}" data-f="due"></td>
+      <td class="sync-cell">
+        <input type="checkbox" data-sync="task" ${row.synced?"checked":""} ${row.syncing?"disabled":""}>
+        <div class="sync-status" id="sync-task-${row.id}">${row.syncing?"מסנכרן…":(row.synced?"✓ סונכרן":"")}</div>
+      </td>
+      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:140px"></td>
+      <td><select data-f="maint">
+            <option value="" ${!row.maint?"selected":""}></option>
+            <option value="תחזוקה מונעת" ${row.maint==="תחזוקה מונעת"?"selected":""}>תחזוקה מונעת</option>
+            <option value="תחזוקה שוטפת" ${row.maint==="תחזוקה שוטפת"?"selected":""}>תחזוקה שוטפת</option>
+            <option value="תחזוקה בלתי מתוכננת" ${row.maint==="תחזוקה בלתי מתוכננת"?"selected":""}>תחזוקה בלתי מתוכננת</option>
+          </select></td>
+      <td><input type="text" value="${row.link}" data-f="link" style="min-width:120px"></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeTask(${row.id})">✕</button></td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; scheduleSave("tasks","tasksSaved"); renderTasksCards(); renderDashboard(); });
+      inp.addEventListener("change", () => { row[inp.dataset.f] = inp.value; scheduleSave("tasks","tasksSaved"); renderTasksCards(); renderDashboard(); });
+    });
+    tr.querySelectorAll("[data-sync]").forEach(cb => {
+      cb.addEventListener("change", () => onSyncToggle(cb, row, "task"));
+    });
+    body.appendChild(tr);
+  });
+  renderTasksCards();
+}
+function renderTasksCards(){
+  const cards = document.getElementById("tasksCards");
+  const total = data.tasks.length;
+  const done = data.tasks.filter(r=>r.status==="בוצע").length;
+  const open = total - done;
+  cards.innerHTML = `
+    <div class="stat"><div class="label">סה"כ משימות</div><div class="value">${total}</div></div>
+    <div class="stat good"><div class="label">משימות שהושלמו</div><div class="value">${done}</div></div>
+    <div class="stat warn"><div class="label">משימות פתוחות</div><div class="value">${open}</div></div>
+  `;
+}
+
+/* ---------- PROCUREMENT ---------- */
+function addProc(){
+  data.procurement.push({id: nextId()+2000, month:"", sku:"", item:"", supplier:"", qty:0, unit:"", price:0, category:""});
+  renderProc(); scheduleSave("procurement","procSaved");
+}
+function removeProc(id){
+  data.procurement = data.procurement.filter(r=>r.id!==id);
+  renderProc(); scheduleSave("procurement","procSaved");
+}
+function renderProc(){
+  const body = document.getElementById("procBody");
+  body.innerHTML = "";
+  const categories = {};
+  let grand = 0;
+  data.procurement.forEach(row => {
+    const rowTotal = (parseFloat(row.qty)||0) * (parseFloat(row.price)||0);
+    grand += rowTotal;
+    const cat = row.category || "ללא קטגוריה";
+    categories[cat] = (categories[cat]||0) + rowTotal;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${row.month}" data-f="month" style="min-width:90px"></td>
+      <td><input type="text" value="${row.sku}" data-f="sku" style="min-width:90px"></td>
+      <td><input type="text" value="${row.item}" data-f="item" style="min-width:160px"></td>
+      <td><input type="text" value="${row.supplier}" data-f="supplier"></td>
+      <td><input type="number" value="${row.qty}" data-f="qty" style="width:60px"></td>
+      <td><input type="text" value="${row.unit}" data-f="unit" style="width:70px"></td>
+      <td><input type="number" value="${row.price}" data-f="price" style="width:70px"></td>
+      <td><input type="text" value="${fmtMoney(rowTotal)}" readonly style="width:80px;font-weight:600"></td>
+      <td><input type="text" value="${row.category}" data-f="category" style="width:100px"></td>
+      <td><input type="text" value="${row.link}" data-f="link" style="min-width:100px"></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeProc(${row.id})">✕</button></td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => {
+        row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+        scheduleSave("procurement","procSaved");
+        renderProc();
+      });
+    });
+    body.appendChild(tr);
+  });
+  const totalsTable = document.getElementById("procTotals");
+  let rows = "";
+  Object.keys(categories).forEach(cat => {
+    rows += `<tr><td style="padding:5px 0;color:var(--ink-soft)">סה"כ ${cat}:</td><td style="padding:5px 0;font-weight:600;text-align:left">${fmtMoney(categories[cat])}</td></tr>`;
+  });
+  rows += `<tr><td style="padding:8px 0;border-top:2px solid var(--line);font-weight:700">סה"כ כולל:</td><td style="padding:8px 0;border-top:2px solid var(--line);font-weight:700;text-align:left">${fmtMoney(grand)}</td></tr>`;
+  totalsTable.innerHTML = rows;
+}
+
+/* ---------- LICENSING ---------- */
+function addLic(){
+  data.licensing.push({id: nextId()+3000, type:"", freq:"", last:"", expiry:"", inspector:"", status:"", link:""});
+  renderLic(); scheduleSave("licensing","licSaved");
+}
+function removeLic(id){
+  data.licensing = data.licensing.filter(r=>r.id!==id);
+  renderLic(); scheduleSave("licensing","licSaved");
+}
+function licUrgency(expiry){
+  if(!expiry) return "";
+  const d = new Date(expiry);
+  const today = new Date();
+  const diffDays = (d - today) / 86400000;
+  if(diffDays < 0) return "late";
+  if(diffDays <= 30) return "open";
+  return "done";
+}
+function renderLic(){
+  const body = document.getElementById("licBody");
+  body.innerHTML = "";
+  data.licensing.forEach(row => {
+    const urgency = licUrgency(row.expiry);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${row.type}" data-f="type" style="min-width:200px"></td>
+      <td><input type="text" value="${row.freq}" data-f="freq" style="width:90px"></td>
+      <td><input type="date" value="${row.last}" data-f="last"></td>
+      <td><input type="date" value="${row.expiry}" data-f="expiry"></td>
+      <td><input type="text" value="${row.inspector}" data-f="inspector" style="min-width:140px"></td>
+      <td>${urgency ? `<span class="pill ${urgency}">${urgency==="late"?"פג תוקף":urgency==="open"?"מתקרב לתפוגה":"בתוקף"}</span>` : `<input type="text" value="${row.status}" data-f="status" style="width:100px">`}</td>
+      <td><input type="text" value="${row.link}" data-f="link" style="min-width:120px"></td>
+      <td class="sync-cell">
+        <input type="checkbox" data-sync="lic" ${row.synced?"checked":""} ${row.syncing?"disabled":""}>
+        <div class="sync-status" id="sync-lic-${row.id}">${row.syncing?"מסנכרן…":(row.synced?"✓ סונכרן":"")}</div>
+      </td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeLic(${row.id})">✕</button></td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; scheduleSave("licensing","licSaved"); renderLic(); });
+    });
+    tr.querySelectorAll("[data-sync]").forEach(cb => {
+      cb.addEventListener("change", () => onSyncToggle(cb, row, "lic"));
+    });
+    body.appendChild(tr);
+  });
+}
+
+/* ---------- STAFF / INSTALLMENTS ---------- */
+function buildInstallmentTabs(){
+  const wrap = document.getElementById("installmentTabs");
+  wrap.innerHTML = "";
+  data.installments.forEach((_, i) => {
+    const b = el("button", {text: "פעימה " + (i+1)});
+    b.className = i===activeInstallment ? "active" : "";
+    b.onclick = () => { activeInstallment = i; buildInstallmentTabs(); renderStaff(); renderPayment(); };
+    wrap.appendChild(b);
+  });
+}
+function computeStaffTotal(row){
+  const monthly = parseFloat(row.monthly)||0;
+  const daily = parseFloat(row.daily)||0;
+  const missing = parseFloat(row.missing)||0;
+  const months = parseFloat(row.months)||0;
+  const base = months > 0 ? monthly * months : monthly;
+  return Math.max(0, base - (missing * daily));
+}
+function addStaffRow(){
+  data.installments[activeInstallment].push({id: nextId()+4000, name:"", role:"", monthly:0, daily:0, missing:0, months:0, link:"", notes:"", approved:false});
+  renderStaff(); saveInstallments();
+}
+function removeStaffRow(id){
+  data.installments[activeInstallment] = data.installments[activeInstallment].filter(r=>r.id!==id);
+  renderStaff(); saveInstallments();
+}
+function renderStaff(){
+  const body = document.getElementById("staffBody");
+  body.innerHTML = "";
+  let total = 0;
+  data.installments[activeInstallment].forEach(row => {
+    const rowTotal = computeStaffTotal(row);
+    total += rowTotal;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${row.name}" data-f="name" style="min-width:110px"></td>
+      <td><input type="text" value="${row.role}" data-f="role" style="min-width:130px"></td>
+      <td><input type="number" value="${row.monthly}" data-f="monthly" style="width:80px"></td>
+      <td><input type="number" value="${row.daily}" data-f="daily" style="width:70px"></td>
+      <td><input type="number" value="${row.missing}" data-f="missing" style="width:60px"></td>
+      <td><input type="number" value="${row.months}" data-f="months" style="width:60px"></td>
+      <td><input type="text" value="${fmtMoney(rowTotal)}" readonly style="width:80px;font-weight:600"></td>
+      <td class="sync-cell"><input type="checkbox" data-approved="1" ${row.approved?"checked":""}></td>
+      <td><input type="text" value="${row.link}" data-f="link" style="min-width:100px"></td>
+      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeStaffRow(${row.id})">✕</button></td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => {
+        row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+        if(inp.dataset.f === "monthly" && (!row.daily || row.daily===0)){
+          row.daily = Math.round((parseFloat(inp.value)||0)/30);
+        }
+        saveInstallments();
+        renderStaff();
+        renderPayment();
+      });
+    });
+    tr.querySelector("[data-approved]").addEventListener("change", (e) => {
+      row.approved = e.target.checked;
+      saveInstallments();
+      renderAccountantReport();
+    });
+    body.appendChild(tr);
+  });
+  document.getElementById("staffTotal").textContent = fmtMoney(total);
+  renderStaffCards();
+}
+function renderStaffCards(){}
+
+/* ---------- BANK ---------- */
+function addBankRow(){
+  data.bank.push({id: nextId()+5000, name:"", bank:"", branch:"", account:"", holder:""});
+  renderBank(); saveInstallments();
+}
+function removeBankRow(id){
+  data.bank = data.bank.filter(r=>r.id!==id);
+  renderBank(); saveInstallments();
+}
+function renderBank(){
+  const body = document.getElementById("bankBody");
+  body.innerHTML = "";
+  data.bank.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${row.name}" data-f="name" style="min-width:110px"></td>
+      <td><input type="text" value="${row.bank}" data-f="bank"></td>
+      <td><input type="text" value="${row.branch}" data-f="branch" style="width:70px"></td>
+      <td><input type="text" value="${row.account}" data-f="account" style="width:110px"></td>
+      <td><input type="text" value="${row.holder}" data-f="holder"></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeBankRow(${row.id})">✕</button></td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; saveInstallments(); renderPayment(); renderAccountantReport(); });
+    });
+    body.appendChild(tr);
+  });
+}
+
+/* ---------- ACCOUNTANT REPORT ---------- */
+function renderAccountantReport(){
+  const body = document.getElementById("accountantBody");
+  if(!body) return;
+  body.innerHTML = "";
+  let total = 0;
+  let count = 0;
+  data.installments.forEach((inst, idx) => {
+    inst.forEach(row => {
+      if(!row.approved) return;
+      count++;
+      const rowTotal = computeStaffTotal(row);
+      total += rowTotal;
+      const bankRow = data.bank.find(b => b.name && b.name === row.name) || {};
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${row.name||"—"}</td>
+        <td>פעימה ${idx+1}</td>
+        <td>${row.role||"—"}</td>
+        <td style="font-weight:600">${fmtMoney(rowTotal)}</td>
+        <td>${bankRow.bank||"—"}</td>
+        <td>${bankRow.branch||"—"}</td>
+        <td>${bankRow.account||"—"}</td>
+        <td>${bankRow.holder||"—"}</td>
+        <td>${row.notes||""}</td>
+      `;
+      body.appendChild(tr);
+    });
+  });
+  document.getElementById("accountantTotal").textContent = fmtMoney(total);
+  const cards = document.getElementById("accountantCards");
+  if(cards){
+    cards.innerHTML = `
+      <div class="stat good"><div class="label">תשלומים מאושרים</div><div class="value">${count}</div></div>
+      <div class="stat"><div class="label">סה"כ להעברה</div><div class="value">${fmtMoney(total)}</div></div>
+    `;
+  }
+  if(count===0){
+    body.innerHTML = `<tr><td colspan="9" style="color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומים מאושרים. סמן "אושר לתשלום" בטאב צוות ותורנים כדי שיופיעו כאן.</td></tr>`;
+  }
+}
+
+/* ---------- COMBINED PAYMENT VIEW ---------- */
+function renderPayment(){
+  const body = document.getElementById("paymentBody");
+  body.innerHTML = "";
+  data.installments[activeInstallment].forEach(row => {
+    const bankRow = data.bank.find(b => b.name && b.name === row.name) || {};
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.name||"—"}</td>
+      <td>${row.role||"—"}</td>
+      <td>${row.months||0}</td>
+      <td style="font-weight:600">${fmtMoney(computeStaffTotal(row))}</td>
+      <td>${row.notes||""}</td>
+      <td>${bankRow.bank||"—"}</td>
+      <td>${bankRow.branch||"—"}</td>
+      <td>${bankRow.account||"—"}</td>
+      <td>${bankRow.holder||"—"}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+/* ---------- CONTACTS ---------- */
+function addContact(){
+  data.contacts.push({id: nextId()+6000, name:"", specialty:"", phone:"", email:"", cost:"", notes:""});
+  renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks();
+}
+function removeContact(id){
+  data.contacts = data.contacts.filter(r=>r.id!==id);
+  renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks();
+}
+function renderContacts(){
+  const body = document.getElementById("contactsBody");
+  body.innerHTML = "";
+  data.contacts.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${row.name}" data-f="name" style="min-width:130px"></td>
+      <td><input type="text" value="${row.specialty}" data-f="specialty"></td>
+      <td><input type="text" value="${row.phone}" data-f="phone" style="width:110px"></td>
+      <td><input type="text" value="${row.email}" data-f="email" style="min-width:140px"></td>
+      <td><input type="text" value="${row.cost}" data-f="cost" style="width:90px"></td>
+      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeContact(${row.id})">✕</button></td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => {
+        row[inp.dataset.f] = inp.value;
+        scheduleSave("contacts","contactsSaved");
+        if(inp.dataset.f === "specialty" || inp.dataset.f === "name"){
+          renderTasks();
+        }
+      });
+    });
+    body.appendChild(tr);
+  });
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard(){
+  const totalTasks = data.tasks.length;
+  const doneTasks = data.tasks.filter(r=>r.status==="בוצע").length;
+  const openTasks = totalTasks - doneTasks;
+  const procTotal = data.procurement.reduce((s,r)=> s + (parseFloat(r.qty)||0)*(parseFloat(r.price)||0), 0);
+  const licSoon = data.licensing.filter(r => { const u = licUrgency(r.expiry); return u==="open" || u==="late"; }).length;
+  const staffTotal = data.installments.reduce((s, inst) => s + inst.reduce((s2,r)=>s2+computeStaffTotal(r),0), 0);
+
+  document.getElementById("dashCards").innerHTML = `
+    <div class="stat warn"><div class="label">משימות פתוחות</div><div class="value">${openTasks}</div></div>
+    <div class="stat good"><div class="label">משימות שהושלמו</div><div class="value">${doneTasks}</div></div>
+    <div class="stat"><div class="label">סה"כ הזמנות רכש</div><div class="value">${fmtMoney(procTotal)}</div></div>
+    <div class="stat ${licSoon>0?'bad':'good'}"><div class="label">אישורים לתשומת לב</div><div class="value">${licSoon}</div></div>
+    <div class="stat"><div class="label">סה"כ תשלומי צוות (כל הפעימות)</div><div class="value">${fmtMoney(staffTotal)}</div></div>
+  `;
+
+  const maintTypes = ["תחזוקה מונעת","תחזוקה שוטפת","תחזוקה בלתי מתוכננת"];
+  const dashMaint = document.getElementById("dashMaintType");
+  let maintRows = "<table><thead><tr><th>סוג תחזוקה</th><th>סה\"כ משימות</th><th>הושלמו</th><th>פתוחות</th></tr></thead><tbody>";
+  maintTypes.forEach(mt => {
+    const rows = data.tasks.filter(r => r.maint === mt);
+    const doneCount = rows.filter(r => r.status==="בוצע").length;
+    maintRows += `<tr><td>${mt}</td><td>${rows.length}</td><td>${doneCount}</td><td>${rows.length-doneCount}</td></tr>`;
+  });
+  const unclassified = data.tasks.filter(r => !r.maint);
+  if(unclassified.length){
+    const doneCount = unclassified.filter(r => r.status==="בוצע").length;
+    maintRows += `<tr><td>ללא סיווג</td><td>${unclassified.length}</td><td>${doneCount}</td><td>${unclassified.length-doneCount}</td></tr>`;
+  }
+  maintRows += "</tbody></table>";
+  dashMaint.innerHTML = maintRows;
+
+  const dashTasks = document.getElementById("dashTasks");
+  const openList = data.tasks.filter(r=>r.status!=="בוצע");
+  if(openList.length===0){
+    dashTasks.innerHTML = "<p class='hint'>אין משימות פתוחות כרגע.</p>";
+  }else{
+    let rows = "<table><thead><tr><th>תיאור</th><th>אחראי</th><th>תאריך יעד</th><th>סטטוס</th></tr></thead><tbody>";
+    openList.forEach(r => {
+      rows += `<tr><td>${r.desc||"—"}</td><td>${r.assignee||"—"}</td><td>${r.due||"—"}</td><td><span class="pill open">${r.status}</span></td></tr>`;
+    });
+    rows += "</tbody></table>";
+    dashTasks.innerHTML = rows;
+  }
+
+  const dashLic = document.getElementById("dashLicensing");
+  const licList = data.licensing.filter(r => { const u = licUrgency(r.expiry); return u==="open" || u==="late"; });
+  if(licList.length===0){
+    dashLic.innerHTML = "<p class='hint'>כל האישורים בתוקף.</p>";
+  }else{
+    let rows = "<table><thead><tr><th>סוג האישור</th><th>תאריך תפוגה</th><th>סטטוס</th></tr></thead><tbody>";
+    licList.forEach(r => {
+      const u = licUrgency(r.expiry);
+      rows += `<tr><td>${r.type||"—"}</td><td>${r.expiry||"—"}</td><td><span class="pill ${u}">${u==="late"?"פג תוקף":"מתקרב לתפוגה"}</span></td></tr>`;
+    });
+    rows += "</tbody></table>";
+    dashLic.innerHTML = rows;
+  }
+}
+
+async function init(){
+  await loadAll();
+  buildNav();
+  buildInstallmentTabs();
+  renderTasks();
+  renderProc();
+  renderLic();
+  renderStaff();
+  renderBank();
+  renderPayment();
+  renderAccountantReport();
+  renderContacts();
+  switchTab("dashboard");
+}
+init();
+</script>
+</body>
+</html>
