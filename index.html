@@ -9,6 +9,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <style>
   :root{
     --bg:#F5F3EF;
@@ -264,11 +265,11 @@
 <body>
 
 <div id="roleGate">
-  <h2>מי אתה?</h2>
-  <button class="role-btn" onclick="chooseRole('admin')">מנהל — גישה מלאה</button>
-  <button class="role-btn" onclick="chooseRole('moshe')">משה כהן — רישוי ובטיחות</button>
-  <button class="role-btn" onclick="chooseRole('maintenance')">איש תחזוקה — משימות ורישוי</button>
-  <button class="role-btn" onclick="chooseRole('accountant')">מנהל חשבונות — דוח וחשבוניות</button>
+  <h2>כניסה למערכת</h2>
+  <input type="email" id="loginEmail" placeholder="אימייל" class="role-btn" autocomplete="username">
+  <input type="password" id="loginPassword" placeholder="סיסמה" class="role-btn" autocomplete="current-password">
+  <button class="role-btn" style="background:var(--amber);color:#fff" onclick="doLogin()">כניסה</button>
+  <div id="loginError" style="color:#ffb4b4;font-size:13px;min-height:16px"></div>
 </div>
 
 <header>
@@ -286,6 +287,15 @@
     <div class="card"><div class="table-scroll" id="dashTasks"></div></div>
     <div class="section-title">אישורים ובדיקות לתשומת לב</div>
     <div class="card"><div class="table-scroll" id="dashLicensing"></div></div>
+    <div class="section-title" id="loginLogTitle" style="display:none">כניסות אחרונות למערכת</div>
+    <div class="card" id="loginLogCard" style="display:none">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>משתמש</th><th>מועד כניסה</th></tr></thead>
+          <tbody id="loginLogBody"></tbody>
+        </table>
+      </div>
+    </div>
   </section>
 
   <section class="tab" id="tab-tasks">
@@ -649,7 +659,14 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
+const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
+
+const UID_TO_ROLE = {
+  "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
+  "W9hOSl2CDmN5CclHgIwE2oZl8R42": "accountant",
+  "D4dmSNOZutgJ5ty2WCYZ1Yx0gtD2": "moshe"
+};
 
 const appStorage = {
   async get(key){
@@ -733,7 +750,8 @@ let data = {
   keysInventory: [],
   keysLog: [],
   files: [],
-  projects: []
+  projects: [],
+  loginLog: []
 };
 
 let activeInstallment = 0;
@@ -751,18 +769,62 @@ function allowedTabs(){
   const r = ROLES[currentRole];
   return r.tabs ? tabs.filter(t => r.tabs.includes(t)) : tabs;
 }
-function chooseRole(role){
-  currentRole = role;
-  sessionStorage.setItem("buildingAppRole", role);
-  document.getElementById("roleGate").style.display = "none";
-  document.getElementById("roleIndicator").textContent = "מחובר כ: " + ROLES[role].label + " (החלף)";
-  buildNav();
-  switchTab(allowedTabs()[0]);
+async function doLogin(){
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const errEl = document.getElementById("loginError");
+  errEl.textContent = "";
+  if(!email || !password){ errEl.textContent = "יש למלא אימייל וסיסמה"; return; }
+  try{
+    await auth.signInWithEmailAndPassword(email, password);
+    // onAuthStateChanged handles the rest (role lookup, nav, tab switch)
+  }catch(e){
+    console.error(e);
+    errEl.textContent = "התחברות נכשלה: אימייל או סיסמה שגויים.";
+  }
 }
 function switchUser(){
-  sessionStorage.removeItem("buildingAppRole");
-  location.reload();
+  auth.signOut().finally(() => {
+    location.reload();
+  });
 }
+function recordLogin(role){
+  data.loginLog = data.loginLog || [];
+  data.loginLog.unshift({role, label: ROLES[role].label, time: new Date().toISOString()});
+  data.loginLog = data.loginLog.slice(0, 50);
+  appStorage.set("loginLog-data", JSON.stringify(data.loginLog)).catch(e=>console.error(e));
+  renderLoginLog();
+}
+function renderLoginLog(){
+  const card = document.getElementById("loginLogCard");
+  const title = document.getElementById("loginLogTitle");
+  const el = document.getElementById("loginLogBody");
+  if(!el) return;
+  const isAdmin = currentRole === "admin";
+  if(card) card.style.display = isAdmin ? "" : "none";
+  if(title) title.style.display = isAdmin ? "" : "none";
+  if(!isAdmin) return;
+  el.innerHTML = (data.loginLog||[]).slice(0,15).map(l => {
+    const d = new Date(l.time);
+    return `<tr><td>${l.label}</td><td>${d.toLocaleDateString("he-IL")} ${d.toLocaleTimeString("he-IL",{hour:'2-digit',minute:'2-digit'})}</td></tr>`;
+  }).join("") || `<tr><td colspan="2" style="color:var(--ink-soft);text-align:center;padding:12px 0">אין עדיין נתוני כניסה.</td></tr>`;
+}
+auth.onAuthStateChanged(async (user) => {
+  if(user){
+    const role = UID_TO_ROLE[user.uid];
+    if(!role){
+      document.getElementById("loginError").textContent = "משתמש זה לא מוגדר במערכת. פנה למנהל.";
+      await auth.signOut();
+      return;
+    }
+    currentRole = role;
+    document.getElementById("roleGate").style.display = "none";
+    document.getElementById("roleIndicator").textContent = "מחובר כ: " + ROLES[role].label + " (התנתקות)";
+    recordLogin(role);
+    buildNav();
+    switchTab(allowedTabs()[0]);
+  }
+});
 
 function el(tag, props, children){
   const e = document.createElement(tag);
@@ -806,7 +868,7 @@ function saveInstallments(){
 }
 
 async function loadAll(){
-  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"],["projects","projects-data"]];
+  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"],["projects","projects-data"],["loginLog","loginLog-data"]];
   for(const [dataKey, storageKey] of simpleKeys){
     try{
       const res = await appStorage.get(storageKey);
@@ -2136,6 +2198,7 @@ function printQuoteSummary(){
 
 /* ---------- DASHBOARD ---------- */
 function renderDashboard(){
+  renderLoginLog();
   const totalTasks = data.tasks.length;
   const doneTasks = data.tasks.filter(r=>r.status==="בוצע").length;
   const openTasks = totalTasks - doneTasks;
@@ -2217,12 +2280,6 @@ function backfillTaskInvoiceSync(){
 async function init(){
   await loadAll();
   backfillTaskInvoiceSync();
-  const savedRole = sessionStorage.getItem("buildingAppRole");
-  if(savedRole && ROLES[savedRole]){
-    currentRole = savedRole;
-    document.getElementById("roleGate").style.display = "none";
-    document.getElementById("roleIndicator").textContent = "מחובר כ: " + ROLES[savedRole].label + " (החלף)";
-  }
   buildNav();
   buildInstallmentTabs();
   renderTasks();
@@ -2241,10 +2298,8 @@ async function init(){
   renderKeysLog();
   renderFiles();
   renderProjects();
-  if(!savedRole){
-    return; // wait for role selection before showing a tab
-  }
-  switchTab(allowedTabs()[0]);
+  renderLoginLog();
+  // tab display is controlled by auth.onAuthStateChanged once the user is signed in
 }
 init();
 </script>
