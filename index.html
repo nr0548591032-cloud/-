@@ -820,9 +820,8 @@ auth.onAuthStateChanged(async (user) => {
     currentRole = role;
     document.getElementById("roleGate").style.display = "none";
     document.getElementById("roleIndicator").textContent = "מחובר כ: " + ROLES[role].label + " (התנתקות)";
+    await initAppData();
     recordLogin(role);
-    buildNav();
-    switchTab(allowedTabs()[0]);
   }
 });
 
@@ -2277,7 +2276,7 @@ function backfillTaskInvoiceSync(){
   }
 }
 
-async function init(){
+async function initAppData(){
   await loadAll();
   backfillTaskInvoiceSync();
   buildNav();
@@ -2298,10 +2297,8 @@ async function init(){
   renderKeysLog();
   renderFiles();
   renderProjects();
-  renderLoginLog();
-  // tab display is controlled by auth.onAuthStateChanged once the user is signed in
+  switchTab(allowedTabs()[0]);
 }
-init();
 </script>
 </body>
 </html>
