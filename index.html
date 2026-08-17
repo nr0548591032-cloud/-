@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -7,6 +8,7 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
 <style>
   :root{
     --bg:#F5F3EF;
@@ -236,12 +238,40 @@
     main{ padding:14px 8px 60px 8px; }
     table{ font-size:12px; }
   }
+  #roleGate{
+    position:fixed; inset:0; background:var(--brand-dark);
+    display:flex; align-items:center; justify-content:center; z-index:999;
+    flex-direction:column; gap:18px; padding:20px;
+  }
+  #roleGate h2{ color:#fff; font-size:20px; margin:0 0 6px 0; }
+  #roleGate .role-btn{
+    background:#fff; border:none; padding:16px 28px; border-radius:10px;
+    font-size:15px; font-weight:600; cursor:pointer; width:280px; max-width:90vw;
+    font-family:inherit;
+  }
+  #roleGate .role-btn:hover{ background:var(--amber-bg); }
+  .role-indicator{
+    font-size:12px; color:#CFDCE2; cursor:pointer; text-decoration:underline;
+    margin-right:auto;
+  }
+  .file-drop{
+    border:2px dashed var(--line); border-radius:var(--radius); padding:20px;
+    text-align:center; color:var(--ink-soft); font-size:13px;
+  }
+  .order-line-total{ font-weight:600; }
 </style>
 </head>
 <body>
 
+<div id="roleGate">
+  <h2>מי אתה?</h2>
+  <button class="role-btn" onclick="chooseRole('admin')">מנהל — גישה מלאה</button>
+  <button class="role-btn" onclick="chooseRole('moshe')">משה כהן — רישוי ובטיחות</button>
+  <button class="role-btn" onclick="chooseRole('maintenance')">איש תחזוקה — משימות ורישוי</button>
+</div>
+
 <header>
-  <h1><span class="dot"></span>ניהול הבניין</h1>
+  <h1><span class="dot"></span>ניהול הבניין <span class="role-indicator" id="roleIndicator" onclick="switchUser()"></span></h1>
   <nav id="navBar"></nav>
 </header>
 
@@ -370,7 +400,7 @@
   <section class="tab" id="tab-accountant">
     <div class="cards" id="accountantCards"></div>
     <div class="card">
-      <p class="hint">הדוח מציג רק שורות שסומנו "אושר לתשלום" בטאב צוות ותורנים, מכל הפעימות, עם פרטי הבנק המתאימים. זה כל מה שמנהל החשבונות צריך כדי לבצע את ההעברות.</p>
+      <p class="hint">הדוח מציג רק שורות שסומנו "אושר לתשלום" בטאב צוות ותורנים, מכל הפעימות, עם פרטי הבנק המתאימים.</p>
       <div class="table-scroll">
         <table>
           <thead><tr>
@@ -378,7 +408,169 @@
             <th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל החשבון</th><th>הערות</th>
           </tr></thead>
           <tbody id="accountantBody"></tbody>
-          <tfoot><tr class="total-row"><td colspan="3">סה"כ להעברה</td><td id="accountantTotal"></td><td colspan="5"></td></tr></tfoot>
+          <tfoot><tr class="total-row"><td colspan="3">סה"כ תשלומי צוות</td><td id="accountantTotal"></td><td colspan="5"></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-title">תשלומי ספקים ונותני שירות</div>
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="vendorPaySaved">נשמר</span></div>
+        <button class="btn" onclick="addVendorPay()">+ הוספת תשלום לספק</button>
+      </div>
+      <p class="hint">רק שורות שמסומנות "אושר לתשלום" נכללות בדוח למנהל חשבונות.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>ספק / נותן שירות</th><th>תיאור</th><th>סכום</th><th>אושר לתשלום</th>
+            <th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th><th></th>
+          </tr></thead>
+          <tbody id="vendorPayBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-title">דוח מרוכז למנהל חשבונות (צוות + ספקים)</div>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th></tr></thead>
+          <tbody id="combinedReportBody"></tbody>
+          <tfoot><tr class="total-row"><td colspan="2">סה"כ כולל להעברה</td><td id="combinedTotal"></td><td colspan="4"></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-food">
+    <div class="section-title">מחירון ספקי מזון</div>
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="foodPriceSaved">נשמר</span></div>
+        <button class="btn" onclick="addFoodPrice()">+ הוספת פריט</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>פריט</th><th>ספק</th><th>יחידת מידה</th><th>מחיר ליחידה (₪)</th><th></th></tr></thead>
+          <tbody id="foodPriceBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-title">בניית הזמנה לספק</div>
+    <div class="card">
+      <div class="toolbar">
+        <div>בחר ספק: <select id="orderVendorSelect" onchange="renderOrderBuilder()" style="width:180px;display:inline-block"></select></div>
+        <button class="btn" onclick="addOrderLine()">+ הוספת שורה להזמנה</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>פריט</th><th>כמות</th><th>מחיר ליחידה</th><th>סה"כ</th><th></th></tr></thead>
+          <tbody id="orderLinesBody"></tbody>
+          <tfoot><tr class="total-row"><td colspan="3">סה"כ להזמנה</td><td id="orderLineTotal"></td><td></td></tr></tfoot>
+        </table>
+      </div>
+      <div class="toolbar" style="margin-top:10px">
+        <div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="copyOrderText()">העתק טקסט להזמנה</button>
+          <button class="btn" onclick="saveOrder()">שמור הזמנה בהיסטוריה</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">היסטוריית הזמנות</div>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>תאריך</th><th>ספק</th><th>פירוט</th><th>סה"כ</th><th></th></tr></thead>
+          <tbody id="foodOrdersBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-finance">
+    <div class="cards" id="financeCards"></div>
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="financeSaved">נשמר</span></div>
+        <button class="btn" onclick="addRecurring()">+ הוספת תשלום קבוע</button>
+      </div>
+      <p class="hint">לדוגמה: תחזוקת מעליות חודשית, ביטוחים, חוזי אחזקה. לחיצה על "סמן כשולם" מקדמת את התאריך הבא אוטומטית לפי התדירות.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>שם ההתחייבות</th><th>ספק</th><th>קטגוריה</th><th>סכום (₪)</th>
+            <th>תדירות</th><th>תאריך לתשלום הבא</th><th>שולם לאחרונה</th><th>הערות</th><th></th>
+          </tr></thead>
+          <tbody id="financeBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-keys">
+    <div class="section-title">מלאי מפתחות</div>
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="keysInvSaved">נשמר</span></div>
+        <button class="btn" onclick="addKeyInv()">+ הוספת מפתח למלאי</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>קוד</th><th>מס' מפתח</th><th>קומה</th><th>מיקום</th>
+            <th>סוג</th><th>גודל</th><th>כמות במלאי</th><th>הערות</th><th></th>
+          </tr></thead>
+          <tbody id="keysInvBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-title">יומן קבלה והחזרת מפתחות</div>
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="keysLogSaved">נשמר</span></div>
+        <button class="btn" onclick="addKeyLog()">+ הוצאת מפתח</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>מפתח / מיקום</th><th>שם המחזיק</th><th>תאריך הוצאה</th>
+            <th>תאריך החזרה</th><th>סטטוס</th><th>הערות</th><th></th>
+          </tr></thead>
+          <tbody id="keysLogBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-files">
+    <div class="card">
+      <div class="toolbar">
+        <div><span class="saved-flag" id="filesSaved">נשמר</span></div>
+        <div></div>
+      </div>
+      <div class="file-drop">
+        <p style="margin:0 0 10px 0">העלאת קובץ (קבלה, אישור, חוזה וכו')</p>
+        <select id="fileCategorySelect" style="width:160px;display:inline-block;margin-bottom:10px">
+          <option value="קבלה">קבלה</option>
+          <option value="אישור">אישור</option>
+          <option value="חוזה">חוזה</option>
+          <option value="אחר">אחר</option>
+        </select><br>
+        <input type="file" id="fileInput">
+        <button class="btn" onclick="uploadFile()" style="margin-right:8px">העלאה</button>
+        <div id="uploadStatus" class="hint"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>שם הקובץ</th><th>קטגוריה</th><th>תאריך העלאה</th><th>קישור</th><th></th></tr></thead>
+          <tbody id="filesBody"></tbody>
         </table>
       </div>
     </div>
@@ -417,6 +609,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const storage = firebase.storage();
 const APP_COLLECTION = "buildingApp";
 
 const appStorage = {
@@ -493,12 +686,42 @@ let data = {
     {id:1, name:"מנחם פיליפ", specialty:"אינסטלטור", phone:"", email:"", cost:"", notes:""},
     {id:2, name:"נעמן מעליות", specialty:"מעליות", phone:"", email:"", cost:"", notes:""},
     {id:3, name:"שלמה", specialty:"טכנאי", phone:"", email:"", cost:"", notes:""}
-  ]
+  ],
+  vendorPayments: [],
+  foodPriceList: [],
+  foodOrders: [],
+  recurring: [],
+  keysInventory: [],
+  keysLog: [],
+  files: []
 };
 
 let activeInstallment = 0;
-const tabs = ["dashboard","tasks","procurement","licensing","staff","accountant","contacts"];
-const tabLabels = {dashboard:"לוח בקרה", tasks:"משימות", procurement:"רכש ואספקה", licensing:"רישוי ובטיחות", staff:"צוות ותורנים", accountant:"דוח למנהל חשבונות", contacts:"אנשי קשר וספקים"};
+const tabs = ["dashboard","tasks","procurement","licensing","staff","accountant","food","finance","keys","files","contacts"];
+const tabLabels = {dashboard:"לוח בקרה", tasks:"משימות", procurement:"רכש ואספקה", licensing:"רישוי ובטיחות", staff:"צוות ותורנים", accountant:"דוח למנהל חשבונות", food:"רכש אוכל", finance:"כספים שוטפים", keys:"מפתחות", files:"קבצים", contacts:"אנשי קשר וספקים"};
+
+const ROLES = {
+  admin: { label:"מנהל", tabs:null },
+  moshe: { label:"משה כהן", tabs:["licensing"] },
+  maintenance: { label:"איש תחזוקה", tabs:["tasks","licensing"] }
+};
+let currentRole = "admin";
+function allowedTabs(){
+  const r = ROLES[currentRole];
+  return r.tabs ? tabs.filter(t => r.tabs.includes(t)) : tabs;
+}
+function chooseRole(role){
+  currentRole = role;
+  sessionStorage.setItem("buildingAppRole", role);
+  document.getElementById("roleGate").style.display = "none";
+  document.getElementById("roleIndicator").textContent = "מחובר כ: " + ROLES[role].label + " (החלף)";
+  buildNav();
+  switchTab(allowedTabs()[0]);
+}
+function switchUser(){
+  sessionStorage.removeItem("buildingAppRole");
+  location.reload();
+}
 
 function el(tag, props, children){
   const e = document.createElement(tag);
@@ -542,7 +765,7 @@ function saveInstallments(){
 }
 
 async function loadAll(){
-  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"]];
+  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"]];
   for(const [dataKey, storageKey] of simpleKeys){
     try{
       const res = await appStorage.get(storageKey);
@@ -557,12 +780,52 @@ async function loadAll(){
       if(parsed.bank) data.bank = parsed.bank;
     }
   }catch(e){ /* keep seed */ }
+  try{
+    const res = await appStorage.get("keys-data");
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      if(parsed.inventory) data.keysInventory = parsed.inventory;
+      if(parsed.log) data.keysLog = parsed.log;
+    }
+  }catch(e){ /* keep seed */ }
+  try{
+    const res = await appStorage.get("food-data");
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      if(parsed.priceList) data.foodPriceList = parsed.priceList;
+      if(parsed.orders) data.foodOrders = parsed.orders;
+    }
+  }catch(e){ /* keep seed */ }
+}
+
+function saveKeys(){
+  clearTimeout(saveTimers["keys"]);
+  saveTimers["keys"] = setTimeout(async () => {
+    try{
+      await appStorage.set("keys-data", JSON.stringify({inventory: data.keysInventory, log: data.keysLog}));
+      ["keysInvSaved","keysLogSaved"].forEach(id => {
+        const f = document.getElementById(id);
+        if(f){ f.classList.add("show"); setTimeout(()=>f.classList.remove("show"), 1200); }
+      });
+    }catch(e){ console.error("שגיאת שמירה", e); }
+  }, 500);
+}
+
+function saveFood(){
+  clearTimeout(saveTimers["food"]);
+  saveTimers["food"] = setTimeout(async () => {
+    try{
+      await appStorage.set("food-data", JSON.stringify({priceList: data.foodPriceList, orders: data.foodOrders}));
+      const f = document.getElementById("foodPriceSaved");
+      if(f){ f.classList.add("show"); setTimeout(()=>f.classList.remove("show"), 1200); }
+    }catch(e){ console.error("שגיאת שמירה", e); }
+  }, 500);
 }
 
 function buildNav(){
   const nav = document.getElementById("navBar");
   nav.innerHTML = "";
-  tabs.forEach(t => {
+  allowedTabs().forEach(t => {
     const b = el("button", {text: tabLabels[t]});
     b.onclick = () => switchTab(t);
     b.dataset.tab = t;
@@ -579,6 +842,7 @@ function switchTab(t){
   });
   if(t==="dashboard") renderDashboard();
   if(t==="accountant") renderAccountantReport();
+  if(t==="finance") renderFinance();
 }
 
 /* ---------- CONTACT-DRIVEN DROPDOWNS ---------- */
@@ -1008,6 +1272,48 @@ function renderBank(){
   });
 }
 
+/* ---------- VENDOR PAYMENTS ---------- */
+function addVendorPay(){
+  data.vendorPayments.push({id: nextId()+7000, vendor:"", desc:"", amount:0, approved:false, bank:"", branch:"", account:"", notes:""});
+  renderVendorPay(); scheduleSave("vendorPayments","vendorPaySaved");
+}
+function removeVendorPay(id){
+  data.vendorPayments = data.vendorPayments.filter(r=>r.id!==id);
+  renderVendorPay(); scheduleSave("vendorPayments","vendorPaySaved");
+}
+function renderVendorPay(){
+  const body = document.getElementById("vendorPayBody");
+  if(!body) return;
+  body.innerHTML = "";
+  data.vendorPayments.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${buildSelect(getContactNames(), row.vendor, "vendor")}</td>
+      <td><input type="text" value="${row.desc}" data-f="desc" style="min-width:140px"></td>
+      <td><input type="number" value="${row.amount}" data-f="amount" style="width:80px"></td>
+      <td class="sync-cell"><input type="checkbox" data-approved="1" ${row.approved?"checked":""}></td>
+      <td><input type="text" value="${row.bank}" data-f="bank" style="width:90px"></td>
+      <td><input type="text" value="${row.branch}" data-f="branch" style="width:60px"></td>
+      <td><input type="text" value="${row.account}" data-f="account" style="width:100px"></td>
+      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:110px"></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeVendorPay(${row.id})">✕</button></td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => {
+        row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+        scheduleSave("vendorPayments","vendorPaySaved");
+        renderAccountantReport();
+      });
+    });
+    tr.querySelector("[data-approved]").addEventListener("change", (e) => {
+      row.approved = e.target.checked;
+      scheduleSave("vendorPayments","vendorPaySaved");
+      renderAccountantReport();
+    });
+    body.appendChild(tr);
+  });
+}
+
 /* ---------- ACCOUNTANT REPORT ---------- */
 function renderAccountantReport(){
   const body = document.getElementById("accountantBody");
@@ -1015,6 +1321,7 @@ function renderAccountantReport(){
   body.innerHTML = "";
   let total = 0;
   let count = 0;
+  const combinedRows = [];
   data.installments.forEach((inst, idx) => {
     inst.forEach(row => {
       if(!row.approved) return;
@@ -1035,19 +1342,48 @@ function renderAccountantReport(){
         <td>${row.notes||""}</td>
       `;
       body.appendChild(tr);
+      combinedRows.push({name:row.name, type:"צוות (פעימה "+(idx+1)+")", total:rowTotal, bank:bankRow.bank, branch:bankRow.branch, account:bankRow.account, notes:row.notes});
     });
   });
   document.getElementById("accountantTotal").textContent = fmtMoney(total);
   const cards = document.getElementById("accountantCards");
+
+  let vendorTotal = 0;
+  data.vendorPayments.forEach(row => {
+    if(!row.approved) return;
+    vendorTotal += (parseFloat(row.amount)||0);
+    combinedRows.push({name:row.vendor, type:"ספק", total:parseFloat(row.amount)||0, bank:row.bank, branch:row.branch, account:row.account, notes:row.notes});
+  });
+
+  const combinedBody = document.getElementById("combinedReportBody");
+  if(combinedBody){
+    combinedBody.innerHTML = "";
+    if(combinedRows.length===0){
+      combinedBody.innerHTML = `<tr><td colspan="7" style="color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומים מאושרים.</td></tr>`;
+    }else{
+      combinedRows.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.name||"—"}</td><td>${r.type}</td><td style="font-weight:600">${fmtMoney(r.total)}</td>
+          <td>${r.bank||"—"}</td><td>${r.branch||"—"}</td><td>${r.account||"—"}</td><td>${r.notes||""}</td>
+        `;
+        combinedBody.appendChild(tr);
+      });
+    }
+    document.getElementById("combinedTotal").textContent = fmtMoney(total + vendorTotal);
+  }
+
   if(cards){
     cards.innerHTML = `
-      <div class="stat good"><div class="label">תשלומים מאושרים</div><div class="value">${count}</div></div>
-      <div class="stat"><div class="label">סה"כ להעברה</div><div class="value">${fmtMoney(total)}</div></div>
+      <div class="stat good"><div class="label">תשלומי צוות מאושרים</div><div class="value">${count}</div></div>
+      <div class="stat good"><div class="label">תשלומי ספקים מאושרים</div><div class="value">${data.vendorPayments.filter(r=>r.approved).length}</div></div>
+      <div class="stat"><div class="label">סה"כ כולל להעברה</div><div class="value">${fmtMoney(total+vendorTotal)}</div></div>
     `;
   }
   if(count===0){
-    body.innerHTML = `<tr><td colspan="9" style="color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומים מאושרים. סמן "אושר לתשלום" בטאב צוות ותורנים כדי שיופיעו כאן.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="9" style="color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומי צוות מאושרים.</td></tr>`;
   }
+  renderVendorPay();
 }
 
 /* ---------- COMBINED PAYMENT VIEW ---------- */
@@ -1104,6 +1440,345 @@ function renderContacts(){
         }
       });
     });
+    body.appendChild(tr);
+  });
+}
+
+/* ---------- FOOD PROCUREMENT ---------- */
+function addFoodPrice(){
+  data.foodPriceList.push({id: nextId()+8000, item:"", vendor:"", unit:"", price:0});
+  renderFoodPrice(); saveFood();
+}
+function removeFoodPrice(id){
+  data.foodPriceList = data.foodPriceList.filter(r=>r.id!==id);
+  renderFoodPrice(); saveFood();
+}
+function renderFoodPrice(){
+  const body = document.getElementById("foodPriceBody");
+  if(!body) return;
+  body.innerHTML = "";
+  data.foodPriceList.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${row.item}" data-f="item" style="min-width:140px"></td>
+      <td><input type="text" value="${row.vendor}" data-f="vendor" style="min-width:100px"></td>
+      <td><input type="text" value="${row.unit}" data-f="unit" style="width:80px"></td>
+      <td><input type="number" value="${row.price}" data-f="price" style="width:80px"></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeFoodPrice(${row.id})">✕</button></td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => {
+        row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+        saveFood(); renderFoodPrice(); buildOrderVendorSelect();
+      });
+    });
+    body.appendChild(tr);
+  });
+}
+
+let orderLines = [];
+function buildOrderVendorSelect(){
+  const sel = document.getElementById("orderVendorSelect");
+  if(!sel) return;
+  const current = sel.value;
+  const vendors = [...new Set(data.foodPriceList.map(r=>r.vendor).filter(Boolean))];
+  sel.innerHTML = vendors.map(v => `<option value="${v}" ${v===current?"selected":""}>${v}</option>`).join("");
+  renderOrderBuilder();
+}
+function addOrderLine(){
+  const vendor = document.getElementById("orderVendorSelect").value;
+  const firstItem = data.foodPriceList.find(r=>r.vendor===vendor);
+  orderLines.push({id: nextId()+9000, item: firstItem?firstItem.item:"", qty:1, price: firstItem?firstItem.price:0});
+  renderOrderBuilder();
+}
+function removeOrderLine(id){
+  orderLines = orderLines.filter(l=>l.id!==id);
+  renderOrderBuilder();
+}
+function renderOrderBuilder(){
+  const vendor = document.getElementById("orderVendorSelect").value;
+  const vendorItems = data.foodPriceList.filter(r=>r.vendor===vendor);
+  const body = document.getElementById("orderLinesBody");
+  body.innerHTML = "";
+  let total = 0;
+  orderLines.forEach(line => {
+    const rowTotal = (parseFloat(line.qty)||0)*(parseFloat(line.price)||0);
+    total += rowTotal;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select data-f="item" style="min-width:140px">${vendorItems.map(it=>`<option value="${it.item}" ${it.item===line.item?"selected":""}>${it.item}</option>`).join("")}</select></td>
+      <td><input type="number" value="${line.qty}" data-f="qty" style="width:60px"></td>
+      <td><input type="text" value="${fmtMoney(line.price)}" readonly style="width:80px"></td>
+      <td class="order-line-total">${fmtMoney(rowTotal)}</td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeOrderLine(${line.id})">✕</button></td>
+    `;
+    tr.querySelector("[data-f='item']").addEventListener("change", (e) => {
+      line.item = e.target.value;
+      const priceItem = vendorItems.find(it=>it.item===line.item);
+      line.price = priceItem ? priceItem.price : 0;
+      renderOrderBuilder();
+    });
+    tr.querySelector("[data-f='qty']").addEventListener("input", (e) => {
+      line.qty = parseFloat(e.target.value)||0;
+      renderOrderBuilder();
+    });
+    body.appendChild(tr);
+  });
+  document.getElementById("orderLineTotal").textContent = fmtMoney(total);
+}
+function copyOrderText(){
+  const vendor = document.getElementById("orderVendorSelect").value;
+  let text = `הזמנה לספק: ${vendor}\nתאריך: ${new Date().toLocaleDateString("he-IL")}\n\n`;
+  let total = 0;
+  orderLines.forEach(line => {
+    const lineTotal = (parseFloat(line.qty)||0)*(parseFloat(line.price)||0);
+    total += lineTotal;
+    text += `${line.item} — כמות: ${line.qty} — ${fmtMoney(lineTotal)}\n`;
+  });
+  text += `\nסה"כ: ${fmtMoney(total)}`;
+  navigator.clipboard.writeText(text).then(()=>alert("הטקסט הועתק, אפשר להדביק בוואטסאפ/אימייל")).catch(()=>alert("לא ניתן להעתיק אוטומטית, יש להעתיק ידנית:\n\n"+text));
+}
+function saveOrder(){
+  const vendor = document.getElementById("orderVendorSelect").value;
+  if(orderLines.length===0){ alert("אין שורות בהזמנה"); return; }
+  let total = 0;
+  const linesSnapshot = orderLines.map(l => {
+    const lt = (parseFloat(l.qty)||0)*(parseFloat(l.price)||0);
+    total += lt;
+    return {item:l.item, qty:l.qty, price:l.price};
+  });
+  data.foodOrders.unshift({id: nextId()+9500, date: new Date().toISOString().slice(0,10), vendor, lines: linesSnapshot, total});
+  orderLines = [];
+  renderOrderBuilder();
+  renderFoodOrders();
+  saveFood();
+}
+function removeFoodOrder(id){
+  data.foodOrders = data.foodOrders.filter(o=>o.id!==id);
+  renderFoodOrders(); saveFood();
+}
+function renderFoodOrders(){
+  const body = document.getElementById("foodOrdersBody");
+  if(!body) return;
+  body.innerHTML = "";
+  if(data.foodOrders.length===0){
+    body.innerHTML = `<tr><td colspan="5" style="color:var(--ink-soft);text-align:center;padding:16px 0">אין הזמנות שמורות עדיין.</td></tr>`;
+    return;
+  }
+  data.foodOrders.forEach(order => {
+    const detail = order.lines.map(l=>`${l.item} (${l.qty})`).join(", ");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${order.date}</td><td>${order.vendor}</td><td>${detail}</td>
+      <td style="font-weight:600">${fmtMoney(order.total)}</td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeFoodOrder(${order.id})">✕</button></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+/* ---------- RECURRING FINANCE ---------- */
+function addRecurring(){
+  data.recurring.push({id: nextId()+10000, name:"", vendor:"", category:"שוטף", amount:0, freq:"חודשי", nextDue:"", lastPaid:"", notes:""});
+  renderFinance(); scheduleSave("recurring","financeSaved");
+}
+function removeRecurring(id){
+  data.recurring = data.recurring.filter(r=>r.id!==id);
+  renderFinance(); scheduleSave("recurring","financeSaved");
+}
+function markPaid(id){
+  const row = data.recurring.find(r=>r.id===id);
+  if(!row) return;
+  const today = new Date();
+  row.lastPaid = today.toISOString().slice(0,10);
+  const d = row.nextDue ? new Date(row.nextDue+"T00:00:00") : today;
+  if(row.freq==="חודשי") d.setMonth(d.getMonth()+1);
+  else if(row.freq==="רבעוני") d.setMonth(d.getMonth()+3);
+  else if(row.freq==="שנתי") d.setFullYear(d.getFullYear()+1);
+  row.nextDue = d.toISOString().slice(0,10);
+  renderFinance(); scheduleSave("recurring","financeSaved");
+}
+function renderFinance(){
+  const body = document.getElementById("financeBody");
+  if(!body) return;
+  body.innerHTML = "";
+  const today = new Date();
+  let dueSoon = 0, monthlyTotal = 0;
+  data.recurring.forEach(row => {
+    if(row.freq==="חודשי") monthlyTotal += (parseFloat(row.amount)||0);
+    if(row.nextDue){
+      const diff = (new Date(row.nextDue) - today)/86400000;
+      if(diff <= 14) dueSoon++;
+    }
+    const tr = document.createElement("tr");
+    const urgency = row.nextDue ? licUrgency(row.nextDue) : "";
+    tr.innerHTML = `
+      <td><input type="text" value="${row.name}" data-f="name" style="min-width:140px"></td>
+      <td><input type="text" value="${row.vendor}" data-f="vendor" style="min-width:100px"></td>
+      <td><select data-f="category">
+            <option ${row.category==="שוטף"?"selected":""}>שוטף</option>
+            <option ${row.category==='בלתי"ם'?"selected":""}>בלתי"ם</option>
+          </select></td>
+      <td><input type="number" value="${row.amount}" data-f="amount" style="width:80px"></td>
+      <td><select data-f="freq">
+            <option ${row.freq==="חודשי"?"selected":""}>חודשי</option>
+            <option ${row.freq==="רבעוני"?"selected":""}>רבעוני</option>
+            <option ${row.freq==="שנתי"?"selected":""}>שנתי</option>
+            <option ${row.freq==="חד פעמי"?"selected":""}>חד פעמי</option>
+          </select></td>
+      <td><input type="date" value="${row.nextDue}" data-f="nextDue"> ${urgency?`<span class="pill ${urgency}">${urgency==="late"?"באיחור":"קרוב"}</span>`:""}</td>
+      <td><input type="text" value="${row.lastPaid}" readonly style="width:90px"></td>
+      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:100px"></td>
+      <td class="row-actions" style="display:flex;gap:4px;white-space:nowrap">
+        <button class="btn ghost" style="padding:5px 8px;font-size:11px" onclick="markPaid(${row.id})">סמן כשולם</button>
+        <button class="icon-btn" title="מחיקה" onclick="removeRecurring(${row.id})">✕</button>
+      </td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => {
+        row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+        scheduleSave("recurring","financeSaved"); renderFinance();
+      });
+      inp.addEventListener("change", () => {
+        row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+        scheduleSave("recurring","financeSaved"); renderFinance();
+      });
+    });
+    body.appendChild(tr);
+  });
+  const cards = document.getElementById("financeCards");
+  if(cards){
+    cards.innerHTML = `
+      <div class="stat"><div class="label">סה"כ חודשי (התחייבויות קבועות)</div><div class="value">${fmtMoney(monthlyTotal)}</div></div>
+      <div class="stat ${dueSoon>0?'warn':'good'}"><div class="label">תשלומים קרובים (14 יום)</div><div class="value">${dueSoon}</div></div>
+    `;
+  }
+}
+
+/* ---------- KEYS MANAGEMENT ---------- */
+function addKeyInv(){
+  data.keysInventory.push({id: nextId()+11000, code:"", keyNum:"", floor:"", location:"", type:"צילינדר", size:"", qty:1, notes:""});
+  renderKeysInv(); saveKeys();
+}
+function removeKeyInv(id){
+  data.keysInventory = data.keysInventory.filter(r=>r.id!==id);
+  renderKeysInv(); saveKeys();
+}
+function renderKeysInv(){
+  const body = document.getElementById("keysInvBody");
+  if(!body) return;
+  body.innerHTML = "";
+  data.keysInventory.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${row.code}" data-f="code" style="width:70px"></td>
+      <td><input type="text" value="${row.keyNum}" data-f="keyNum" style="width:70px"></td>
+      <td><input type="text" value="${row.floor}" data-f="floor" style="width:60px"></td>
+      <td><input type="text" value="${row.location}" data-f="location" style="min-width:160px"></td>
+      <td><select data-f="type">
+            <option ${row.type==="צילינדר"?"selected":""}>צילינדר</option>
+            <option ${row.type==="מנעול"?"selected":""}>מנעול</option>
+          </select></td>
+      <td><input type="text" value="${row.size}" data-f="size" style="width:60px"></td>
+      <td><input type="number" value="${row.qty}" data-f="qty" style="width:60px"></td>
+      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:100px"></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeKeyInv(${row.id})">✕</button></td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => {
+        row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+        saveKeys(); renderKeysInv(); renderKeysLog();
+      });
+    });
+    body.appendChild(tr);
+  });
+}
+function addKeyLog(){
+  data.keysLog.push({id: nextId()+12000, keyDesc:"", holder:"", dateOut: new Date().toISOString().slice(0,10), dateIn:"", notes:""});
+  renderKeysLog(); saveKeys();
+}
+function removeKeyLog(id){
+  data.keysLog = data.keysLog.filter(r=>r.id!==id);
+  renderKeysLog(); saveKeys();
+}
+function returnKey(id){
+  const row = data.keysLog.find(r=>r.id===id);
+  if(!row) return;
+  row.dateIn = new Date().toISOString().slice(0,10);
+  renderKeysLog(); saveKeys();
+}
+function renderKeysLog(){
+  const body = document.getElementById("keysLogBody");
+  if(!body) return;
+  body.innerHTML = "";
+  const locations = data.keysInventory.map(k => `${k.location||"—"} (קוד ${k.code||"?"}${k.keyNum?"/"+k.keyNum:""})`);
+  const names = getContactNames();
+  data.keysLog.forEach(row => {
+    const status = row.dateIn ? "הוחזר" : "אצל המחזיק";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${buildSelect(locations, row.keyDesc, "keyDesc")}</td>
+      <td>${buildSelect(names, row.holder, "holder")}</td>
+      <td><input type="date" value="${row.dateOut}" data-f="dateOut"></td>
+      <td><input type="date" value="${row.dateIn}" data-f="dateIn"></td>
+      <td><span class="pill ${row.dateIn?"done":"open"}">${status}</span></td>
+      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:100px"></td>
+      <td class="row-actions" style="display:flex;gap:4px;white-space:nowrap">
+        ${!row.dateIn ? `<button class="btn ghost" style="padding:5px 8px;font-size:11px" onclick="returnKey(${row.id})">החזרה</button>` : ""}
+        <button class="icon-btn" title="מחיקה" onclick="removeKeyLog(${row.id})">✕</button>
+      </td>
+    `;
+    tr.querySelectorAll("[data-f]").forEach(inp => {
+      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; saveKeys(); renderKeysLog(); });
+      inp.addEventListener("change", () => { row[inp.dataset.f] = inp.value; saveKeys(); renderKeysLog(); });
+    });
+    body.appendChild(tr);
+  });
+}
+
+/* ---------- FILE UPLOADS ---------- */
+async function uploadFile(){
+  const input = document.getElementById("fileInput");
+  const category = document.getElementById("fileCategorySelect").value;
+  const status = document.getElementById("uploadStatus");
+  if(!input.files || input.files.length===0){ status.textContent = "יש לבחור קובץ קודם"; return; }
+  const file = input.files[0];
+  status.textContent = "מעלה...";
+  try{
+    const path = `uploads/${Date.now()}_${file.name}`;
+    const ref = storage.ref().child(path);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+    data.files.unshift({id: nextId()+13000, name:file.name, category, url, uploadedAt: new Date().toISOString().slice(0,10)});
+    scheduleSave("files","filesSaved");
+    renderFiles();
+    status.textContent = "הועלה בהצלחה ✓";
+    input.value = "";
+    setTimeout(()=>{ status.textContent=""; }, 2500);
+  }catch(e){
+    console.error(e);
+    status.textContent = "שגיאה בהעלאה: " + e.message;
+  }
+}
+function removeFile(id){
+  data.files = data.files.filter(r=>r.id!==id);
+  renderFiles(); scheduleSave("files","filesSaved");
+}
+function renderFiles(){
+  const body = document.getElementById("filesBody");
+  if(!body) return;
+  body.innerHTML = "";
+  if(data.files.length===0){
+    body.innerHTML = `<tr><td colspan="5" style="color:var(--ink-soft);text-align:center;padding:16px 0">אין קבצים שהועלו עדיין.</td></tr>`;
+    return;
+  }
+  data.files.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.name}</td><td>${row.category}</td><td>${row.uploadedAt}</td>
+      <td><a href="${row.url}" target="_blank" rel="noopener">פתיחה</a></td>
+      <td class="row-actions"><button class="icon-btn" title="הסרה מהרשימה" onclick="removeFile(${row.id})">✕</button></td>
+    `;
     body.appendChild(tr);
   });
 }
@@ -1171,6 +1846,12 @@ function renderDashboard(){
 
 async function init(){
   await loadAll();
+  const savedRole = sessionStorage.getItem("buildingAppRole");
+  if(savedRole && ROLES[savedRole]){
+    currentRole = savedRole;
+    document.getElementById("roleGate").style.display = "none";
+    document.getElementById("roleIndicator").textContent = "מחובר כ: " + ROLES[savedRole].label + " (החלף)";
+  }
   buildNav();
   buildInstallmentTabs();
   renderTasks();
@@ -1181,7 +1862,17 @@ async function init(){
   renderPayment();
   renderAccountantReport();
   renderContacts();
-  switchTab("dashboard");
+  renderFoodPrice();
+  buildOrderVendorSelect();
+  renderFoodOrders();
+  renderFinance();
+  renderKeysInv();
+  renderKeysLog();
+  renderFiles();
+  if(!savedRole){
+    return; // wait for role selection before showing a tab
+  }
+  switchTab(allowedTabs()[0]);
 }
 init();
 </script>
