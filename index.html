@@ -441,6 +441,7 @@
   <section class="tab" id="tab-dashboard">
     <div id="dashTopSlot"></div>
     <div class="cards" id="dashCards"></div>
+    <div id="dashSchoolYearAlert"></div>
     <div class="cards" style="grid-template-columns:1fr 1fr;">
       <div class="card"><div class="section-title" style="margin-top:0">משימות: הושלמו מול פתוחות</div><div id="dashDonut"></div></div>
       <div class="card"><div class="section-title" style="margin-top:0">בקרה לפי סוג תחזוקה</div><div id="dashBar"></div></div>
@@ -467,14 +468,21 @@
     <div class="cards" id="tasksCards"></div>
     <div class="card">
       <div class="toolbar">
+        <div>שנת לימודים: <select id="tasksYearFilter" onchange="renderTasks()" style="width:170px;display:inline-block"></select></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="rolloverTasksYear()">פתיחת שנת לימודים חדשה</button>
+          <button class="btn" onclick="addTask()">+ הוספת משימה</button>
+        </div>
+      </div>
+      <div class="toolbar">
         <div><span class="saved-flag" id="tasksSaved">נשמר</span></div>
-        <button class="btn" onclick="addTask()">+ הוספת משימה</button>
+        <div></div>
       </div>
       <div class="table-scroll">
         <table>
           <thead><tr>
             <th>מזהה</th><th>תאריך יצירה</th><th>תחום</th><th>תיאור המשימה</th>
-            <th>סטטוס</th><th>אחראי ביצוע</th><th>תאריך יעד</th><th>סנכרון ליומן</th><th>הערות</th>
+            <th>סטטוס</th><th>אחראי ביצוע</th><th>תאריך יעד</th><th>שנת לימודים</th><th>סנכרון ליומן</th><th>הערות</th>
             <th>סוג תחזוקה</th><th>חשבונית מצורפת</th><th></th>
           </tr></thead>
           <tbody id="tasksBody"></tbody>
@@ -491,15 +499,15 @@
         <button class="btn" onclick="addProc()">+ הוספת פריט</button>
       </div>
       <div class="toolbar">
+        <div>שנת לימודים: <select id="procYearFilter" onchange="renderProc()" style="width:170px;display:inline-block"></select></div>
         <div><span class="saved-flag" id="procSaved">נשמר</span></div>
-        <div></div>
       </div>
       <div class="table-scroll">
         <table>
           <thead><tr>
             <th>חודש</th><th>מק"ט</th><th>שם הפריט</th><th>ספק מועדף</th>
             <th>כמות</th><th>יחידת מידה</th><th>מחיר ליחידה</th><th>סה"כ לתשלום</th>
-            <th>קטגוריה</th><th>קישור להזמנה</th><th></th>
+            <th>קטגוריה</th><th>שנת לימודים</th><th>קישור להזמנה</th><th></th>
           </tr></thead>
           <tbody id="procBody"></tbody>
         </table>
@@ -563,14 +571,15 @@
         <button class="btn" onclick="addLic()">+ הוספת אישור / בדיקה</button>
       </div>
       <div class="toolbar">
+        <div>שנת לימודים: <select id="licYearFilter" onchange="renderLic()" style="width:170px;display:inline-block"></select></div>
         <div><span class="saved-flag" id="licSaved">נשמר</span></div>
-        <div></div>
       </div>
+      <p class="hint">כשמחדשים אישור, ל"חידוש לשנה חדשה" נשמר עותק חדש לשנה הבאה, והרשומה המקורית נשארת לצפייה תחת השנה הקודמת שלה במסנן.</p>
       <div class="table-scroll">
         <table>
           <thead><tr>
             <th>סוג האישור / הבדיקה</th><th>תדירות</th><th>בדיקה אחרונה</th>
-            <th>תפוגה / בדיקה הבאה</th><th>גורם בודק</th><th>סטטוס</th>
+            <th>תפוגה / בדיקה הבאה</th><th>גורם בודק</th><th>שנת לימודים</th><th>סטטוס</th>
             <th>אישור מצורף</th><th>סנכרון ליומן</th><th></th>
           </tr></thead>
           <tbody id="licBody"></tbody>
@@ -857,6 +866,35 @@ const appStorage = {
     return { value };
   }
 };
+
+/* ---------- SCHOOL YEAR HELPERS ---------- */
+const hebrewYearMap = {
+  2021:'תשפ"ב', 2022:'תשפ"ג', 2023:'תשפ"ד', 2024:'תשפ"ה', 2025:'תשפ"ו',
+  2026:'תשפ"ז', 2027:'תשפ"ח', 2028:'תשפ"ט', 2029:'תש"ץ', 2030:'תשצ"א',
+  2031:'תשצ"ב', 2032:'תשצ"ג'
+};
+function schoolYearLabel(startYear){
+  const heb = hebrewYearMap[startYear] || "";
+  return (heb ? heb + " " : "") + startYear + "-" + (startYear+1);
+}
+function currentSchoolYearStart(){
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth() + 1;
+  return m >= 9 ? y : y - 1;
+}
+function schoolYearOptions(){
+  const cur = currentSchoolYearStart();
+  const years = [];
+  for(let y = cur-2; y <= cur+2; y++) years.push(y);
+  return years;
+}
+function schoolYearSelectHTML(value){
+  const current = value || currentSchoolYearStart();
+  return `<select data-f="schoolYear">` +
+    schoolYearOptions().map(y => `<option value="${y}" ${String(y)===String(current)?"selected":""}>${schoolYearLabel(y)}</option>`).join("") +
+    `</select>`;
+}
 
 let uid = 1;
 function nextId(){ return uid++; }
@@ -1475,6 +1513,28 @@ function syncTaskInvoiceToVendorPay(taskRow){
   renderAccountantReport();
 }
 
+function rolloverTasksYear(){
+  const cur = currentSchoolYearStart();
+  const next = cur + 1;
+  const unfinished = data.tasks.filter(r => String(r.schoolYear||cur)===String(cur) && r.status!=="בוצע");
+  if(unfinished.length===0){
+    alert(`אין משימות פתוחות בשנת ${schoolYearLabel(cur)} להעביר. אפשר להמשיך ולהוסיף משימות חדשות ולבחור בהן את שנת ${schoolYearLabel(next)}.`);
+    return;
+  }
+  if(!confirm(`יועברו ${unfinished.length} משימות שטרם הושלמו משנת ${schoolYearLabel(cur)} לשנת ${schoolYearLabel(next)}, כעותקים חדשים (בסטטוס "טרם התחיל"). המשימות המקוריות יישארו בהיסטוריה. להמשיך?`)) return;
+  unfinished.forEach(orig => {
+    data.tasks.push({
+      id: nextId()+1000, created:new Date().toISOString().slice(0,10), category:orig.category,
+      desc:orig.desc, status:"טרם התחיל", assignee:orig.assignee, due:"", notes:orig.notes,
+      maint:orig.maint, link:"", schoolYear:next
+    });
+  });
+  scheduleSave("tasks","tasksSaved");
+  const yearSel = document.getElementById("tasksYearFilter");
+  if(yearSel){ yearSel.value = next; }
+  renderTasks();
+  alert(`הועברו ${unfinished.length} משימות לשנת ${schoolYearLabel(next)}.`);
+}
 function addTask(){
   data.tasks.push({id: nextId()+1000, created:"", category:"", desc:"", status:"טרם התחיל", assignee:"", due:"", notes:"", maint:"", link:""});
   renderTasks(); scheduleSave("tasks","tasksSaved");
@@ -1486,7 +1546,15 @@ function removeTask(id){
 function renderTasks(){
   const body = document.getElementById("tasksBody");
   body.innerHTML = "";
-  data.tasks.forEach(row => {
+  const yearSel = document.getElementById("tasksYearFilter");
+  if(yearSel && !yearSel.dataset.built){
+    yearSel.dataset.built = "1";
+    yearSel.innerHTML = `<option value="">כל השנים</option>` +
+      schoolYearOptions().map(y => `<option value="${y}" ${y===currentSchoolYearStart()?"selected":""}>${schoolYearLabel(y)}</option>`).join("");
+  }
+  const yearFilter = yearSel ? yearSel.value : "";
+  const visibleTasks = yearFilter ? data.tasks.filter(r => String(r.schoolYear||currentSchoolYearStart())===yearFilter) : data.tasks;
+  visibleTasks.forEach(row => {
     const tr = document.createElement("tr");
     if(row.status==="בוצע") tr.classList.add("card-ok");
     else if(row.status==="בביצוע") tr.classList.add("card-warn");
@@ -1502,6 +1570,7 @@ function renderTasks(){
           </select></td>
       <td>${buildSelect(getContactNames(), row.assignee, "assignee")}</td>
       <td><input type="date" value="${row.due}" data-f="due"></td>
+      <td>${schoolYearSelectHTML(row.schoolYear)}</td>
       <td class="sync-cell">
         <input type="checkbox" data-sync="task" ${row.synced?"checked":""} ${row.syncing?"disabled":""}>
         <div class="sync-status" id="sync-task-${row.id}">${row.syncing?"מסנכרן…":(row.synced?"✓ סונכרן":"")}</div>
@@ -1558,9 +1627,17 @@ function removeProc(id){
 function renderProc(){
   const body = document.getElementById("procBody");
   body.innerHTML = "";
+  const yearSel = document.getElementById("procYearFilter");
+  if(yearSel && !yearSel.dataset.built){
+    yearSel.dataset.built = "1";
+    yearSel.innerHTML = `<option value="">כל השנים</option>` +
+      schoolYearOptions().map(y => `<option value="${y}" ${y===currentSchoolYearStart()?"selected":""}>${schoolYearLabel(y)}</option>`).join("");
+  }
+  const yearFilter = yearSel ? yearSel.value : "";
   const categories = {};
   let grand = 0;
-  data.procurement.forEach(row => {
+  const visibleProc = yearFilter ? data.procurement.filter(r => String(r.schoolYear||currentSchoolYearStart())===yearFilter) : data.procurement;
+  visibleProc.forEach(row => {
     const rowTotal = (parseFloat(row.qty)||0) * (parseFloat(row.price)||0);
     grand += rowTotal;
     const cat = row.category || "ללא קטגוריה";
@@ -1576,6 +1653,7 @@ function renderProc(){
       <td><input type="number" value="${row.price}" data-f="price" style="width:70px"></td>
       <td><input type="text" value="${fmtMoney(rowTotal)}" readonly style="width:80px;font-weight:600"></td>
       <td><input type="text" value="${row.category}" data-f="category" style="width:100px"></td>
+      <td>${schoolYearSelectHTML(row.schoolYear)}</td>
       <td><input type="text" value="${row.link}" data-f="link" style="min-width:100px"></td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeProc(${row.id})">✕</button></td>
     `;
@@ -1583,8 +1661,8 @@ function renderProc(){
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
         scheduleSave("procurement","procSaved");
-        renderProc();
       });
+      inp.addEventListener("change", () => { renderProc(); });
     });
     body.appendChild(tr);
   });
@@ -1618,7 +1696,15 @@ function licUrgency(expiry){
 function renderLic(){
   const body = document.getElementById("licBody");
   body.innerHTML = "";
-  data.licensing.forEach(row => {
+  const yearSel = document.getElementById("licYearFilter");
+  if(yearSel && !yearSel.dataset.built){
+    yearSel.dataset.built = "1";
+    yearSel.innerHTML = `<option value="">כל השנים</option>` +
+      schoolYearOptions().map(y => `<option value="${y}" ${y===currentSchoolYearStart()?"selected":""}>${schoolYearLabel(y)}</option>`).join("");
+  }
+  const yearFilter = yearSel ? yearSel.value : "";
+  const visibleLic = yearFilter ? data.licensing.filter(r => String(r.schoolYear||currentSchoolYearStart())===yearFilter) : data.licensing;
+  visibleLic.forEach(row => {
     const urgency = licUrgency(row.expiry);
     const tr = document.createElement("tr");
     if(urgency==="late") tr.classList.add("card-bad");
@@ -1630,25 +1716,45 @@ function renderLic(){
       <td><input type="date" value="${row.last}" data-f="last"></td>
       <td><input type="date" value="${row.expiry}" data-f="expiry"></td>
       <td><input type="text" value="${row.inspector}" data-f="inspector" style="min-width:140px"></td>
+      <td>${schoolYearSelectHTML(row.schoolYear)}</td>
       <td>${urgency ? `<span class="pill ${urgency}">${urgency==="late"?"פג תוקף":urgency==="open"?"מתקרב לתפוגה":"בתוקף"}</span>` : `<input type="text" value="${row.status}" data-f="status" style="width:100px">`}</td>
       <td class="file-cell"></td>
       <td class="sync-cell">
         <input type="checkbox" data-sync="lic" ${row.synced?"checked":""} ${row.syncing?"disabled":""}>
         <div class="sync-status" id="sync-lic-${row.id}">${row.syncing?"מסנכרן…":(row.synced?"✓ סונכרן":"")}</div>
       </td>
-      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeLic(${row.id})">✕</button></td>
+      <td class="row-actions" style="display:flex;gap:4px;white-space:nowrap">
+        <button class="btn ghost" style="padding:5px 8px;font-size:11px" onclick="renewLicForNewYear(${row.id})">חידוש לשנה חדשה</button>
+        <button class="icon-btn" title="מחיקה" onclick="removeLic(${row.id})">✕</button>
+      </td>
     `;
     const fileTd = tr.querySelector(".file-cell");
     fileTd.innerHTML = renderFileCellHTML(row, "link");
     wireFileCell(fileTd, row, "link", "licensing-approvals", () => { scheduleSave("licensing","licSaved"); renderLic(); });
     tr.querySelectorAll("[data-f]").forEach(inp => {
-      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; scheduleSave("licensing","licSaved"); renderLic(); });
+      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; scheduleSave("licensing","licSaved"); });
+      inp.addEventListener("change", () => { renderLic(); });
     });
     tr.querySelectorAll("[data-sync]").forEach(cb => {
       cb.addEventListener("change", () => onSyncToggle(cb, row, "lic"));
     });
     body.appendChild(tr);
   });
+}
+function renewLicForNewYear(id){
+  const orig = data.licensing.find(r => r.id === id);
+  if(!orig) return;
+  const cur = Number(orig.schoolYear) || currentSchoolYearStart();
+  const next = cur + 1;
+  if(!confirm(`ייווצר עותק חדש של "${orig.type||"האישור"}" לשנת ${schoolYearLabel(next)}, עם תאריכי בדיקה/תפוגה ריקים למילוי. הרשומה הנוכחית תישאר כמו שהיא תחת שנת ${schoolYearLabel(cur)}. להמשיך?`)) return;
+  data.licensing.push({
+    id: nextId()+3000, type:orig.type, freq:orig.freq, last:"", expiry:"",
+    inspector:orig.inspector, status:"", link:"", schoolYear:next
+  });
+  scheduleSave("licensing","licSaved");
+  const yearSel = document.getElementById("licYearFilter");
+  if(yearSel){ yearSel.value = next; }
+  renderLic();
 }
 
 /* ---------- STAFF / INSTALLMENTS ---------- */
@@ -1712,6 +1818,8 @@ function renderStaff(){
           row.daily = Math.round((parseFloat(inp.value)||0)/30);
         }
         saveInstallments();
+      });
+      inp.addEventListener("change", () => {
         renderStaff();
         renderPayment();
       });
@@ -1792,8 +1900,8 @@ function renderVendorPay(){
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
         scheduleSave("vendorPayments","vendorPaySaved");
-        renderAccountantReport();
       });
+      inp.addEventListener("change", () => { renderAccountantReport(); });
     });
     tr.querySelector("[data-approved]").addEventListener("change", (e) => {
       row.approved = e.target.checked;
@@ -1971,8 +2079,9 @@ function renderFoodPrice(){
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
-        saveFood(); renderFoodPrice(); buildOrderVendorSelect();
+        saveFood();
       });
+      inp.addEventListener("change", () => { renderFoodPrice(); buildOrderVendorSelect(); });
     });
     body.appendChild(tr);
   });
@@ -2141,12 +2250,9 @@ function renderFinance(){
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
-        scheduleSave("recurring","financeSaved"); renderFinance();
+        scheduleSave("recurring","financeSaved");
       });
-      inp.addEventListener("change", () => {
-        row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
-        scheduleSave("recurring","financeSaved"); renderFinance();
-      });
+      inp.addEventListener("change", () => { renderFinance(); });
     });
     body.appendChild(tr);
   });
@@ -2191,8 +2297,9 @@ function renderKeysInv(){
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
-        saveKeys(); renderKeysInv(); renderKeysLog();
+        saveKeys();
       });
+      inp.addEventListener("change", () => { renderKeysInv(); renderKeysLog(); });
     });
     body.appendChild(tr);
   });
@@ -2233,7 +2340,7 @@ function renderKeysLog(){
       </td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
-      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; saveKeys(); renderKeysLog(); });
+      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; saveKeys(); });
       inp.addEventListener("change", () => { row[inp.dataset.f] = inp.value; saveKeys(); renderKeysLog(); });
     });
     body.appendChild(tr);
@@ -2673,6 +2780,31 @@ function renderDashboard(){
   }
 
   const hasExpired = data.licensing.some(r => licUrgency(r.expiry) === "late");
+
+  const today = new Date();
+  const curYear = currentSchoolYearStart();
+  const nextSchoolYearStartDate = new Date(curYear+1, 8, 1); // Sept 1
+  const renewList = data.licensing.filter(r => {
+    if(!r.expiry) return false;
+    const d = new Date(r.expiry+"T00:00:00");
+    return d >= today && d <= nextSchoolYearStartDate;
+  });
+  const schoolYearAlertEl = document.getElementById("dashSchoolYearAlert");
+  if(schoolYearAlertEl){
+    if(renewList.length === 0){
+      schoolYearAlertEl.innerHTML = "";
+    }else{
+      schoolYearAlertEl.innerHTML = `
+        <div class="card card-warn" style="margin-bottom:20px">
+          <div style="font-weight:700;margin-bottom:8px">⚠️ יש לחדש לפני תחילת שנת ${schoolYearLabel(curYear+1)} (1 בספטמבר)</div>
+          <div class="table-scroll"><table>
+            <thead><tr><th>סוג האישור</th><th>תאריך תפוגה</th></tr></thead>
+            <tbody>${renewList.map(r=>`<tr><td class="primary-field">${r.type||"—"}</td><td>${r.expiry}</td></tr>`).join("")}</tbody>
+          </table></div>
+        </div>`;
+    }
+  }
+
   const wrap = document.getElementById("dashLicensingWrap");
   const anchor = document.getElementById("dashLicensingAnchor");
   const topSlot = document.getElementById("dashTopSlot");
