@@ -37,6 +37,8 @@
     --red-bg:#F6CEC7;
     --violet:#6E5CB8;
     --violet-bg:#DCD5F3;
+    --tint-a:#FCF1DC;
+    --tint-b:#E4F1EC;
     --radius:12px;
     --font-display:"Rubik","Segoe UI","Heebo",Arial,sans-serif;
     --font-body:"Rubik","Segoe UI","Heebo",Arial,sans-serif;
@@ -107,7 +109,7 @@
     transition:background .15s ease;
   }
   nav button:hover{ background:rgba(255,255,255,.09); }
-  nav button .tab-icon{ font-size:17px; flex-shrink:0; }
+  nav button .tab-icon{ flex-shrink:0; display:inline-flex; align-items:center; }
   nav button .tab-label{ overflow:hidden; text-overflow:ellipsis; }
   nav button.active{
     background:var(--amber);
@@ -208,25 +210,35 @@
   table thead{ display:none; }
   table tbody, table tfoot{ display:block; width:100%; }
   table tr{
+    position:relative;
     display:grid;
     grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
     gap:4px 22px;
-    background:var(--card);
+    background:var(--tint-a);
     border-radius:var(--radius);
     margin-bottom:14px;
     padding:14px 18px;
     border:1px solid var(--line);
     border-right:5px solid var(--amber);
-    box-shadow:0 1px 4px rgba(16,27,36,.06);
-    transition:box-shadow .15s ease, transform .15s ease;
+    box-shadow:0 1px 2px rgba(16,27,36,.05), 0 6px 16px rgba(16,27,36,.07);
+    transition:box-shadow .18s ease, transform .18s ease;
   }
-  table tr:hover{ box-shadow:0 4px 14px rgba(16,27,36,.1); }
+  .card-badge{
+    position:absolute; top:-12px; left:14px;
+    width:28px; height:28px; border-radius:50%;
+    background:var(--brand); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 8px rgba(16,27,36,.3);
+    z-index:2;
+  }
+  table tr:nth-child(even){ background:var(--tint-b); }
+  table tr:hover{ box-shadow:0 2px 4px rgba(16,27,36,.06), 0 10px 24px rgba(16,27,36,.13); transform:translateY(-2px); }
   table tr.total-row{
-    display:flex; align-items:center; justify-content:space-between;
-    background:var(--brand); border-right-color:var(--amber);
-    color:#fff; padding:14px 18px;
+    display:flex !important; align-items:center; justify-content:space-between;
+    background:var(--brand) !important; border-right-color:var(--amber);
+    color:#fff !important; padding:14px 18px;
   }
-  table tr.total-row td{ color:#fff; padding:0; }
+  table tr.total-row td{ color:#fff !important; padding:0; background:transparent !important; }
   table tr.total-row td::before{ content:none; }
   table tr.total-row td:first-child{ font-weight:600; font-size:14px; }
   table tr.total-row td:last-child{ font-weight:800; font-size:18px; }
@@ -325,6 +337,7 @@
     margin-left:8px; font-weight:800; font-size:13px; line-height:1; flex-shrink:0;
   }
   .btn.ghost .btn-icon-badge{ background:var(--amber); color:#fff; }
+  .btn-icon-inline{ display:inline-flex; align-items:center; margin-left:6px; }
   .btn.ghost{
     background:transparent;
     color:var(--brand);
@@ -339,12 +352,18 @@
     flex-wrap:wrap;
     gap:8px;
   }
-  .table-scroll{ overflow-x:auto; }
-  .total-row td{
-    font-weight:700;
-    border-top:2px solid var(--line);
-    background:#FAF9F6;
+  .toolbar-sticky{
+    position:sticky;
+    top:0;
+    z-index:30;
+    background:var(--card);
+    padding:10px 0;
+    margin:-16px -16px 10px -16px;
+    padding-right:16px; padding-left:16px;
+    border-bottom:1px solid var(--line);
+    border-radius:var(--radius) var(--radius) 0 0;
   }
+  .table-scroll{ overflow-x:auto; }
   .installment-tabs{
     display:flex;
     gap:6px;
@@ -396,6 +415,7 @@
     nav button .tab-label{ display:inline; }
     nav button::after{ display:none; }
     .role-indicator{ display:none; }
+    .toolbar-sticky{ top:58px; }
   }
   #roleGate{
     position:fixed; inset:0; background:var(--brand-dark);
@@ -414,6 +434,14 @@
     text-align:center; color:var(--ink-soft); font-size:13px;
   }
   .order-line-total{ font-weight:600; }
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(13,25,34,.55);
+    display:flex; align-items:center; justify-content:center; z-index:500; padding:20px;
+  }
+  .modal-box{
+    background:#fff; border-radius:var(--radius); padding:22px;
+    width:100%; max-width:420px; box-shadow:0 20px 50px rgba(0,0,0,.3);
+  }
 </style>
 </head>
 <body>
@@ -467,7 +495,7 @@
   <section class="tab" id="tab-tasks">
     <div class="cards" id="tasksCards"></div>
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <div>שנת לימודים: <select id="tasksYearFilter" onchange="renderTasks()" style="width:170px;display:inline-block"></select></div>
         <div style="display:flex;gap:8px">
           <button class="btn ghost" onclick="rolloverTasksYear()">פתיחת שנת לימודים חדשה</button>
@@ -482,8 +510,8 @@
         <table>
           <thead><tr>
             <th>מזהה</th><th>תאריך יצירה</th><th>תחום</th><th>תיאור המשימה</th>
-            <th>סטטוס</th><th>אחראי ביצוע</th><th>תאריך יעד</th><th>שנת לימודים</th><th>סנכרון ליומן</th><th>הערות</th>
-            <th>סוג תחזוקה</th><th>חשבונית מצורפת</th><th></th>
+            <th>סטטוס</th><th>אחראי ביצוע</th><th>תאריך יעד</th><th>שנת לימודים</th><th>סנכרון ליומן</th><th>פירוט / הערות</th>
+            <th>סוג תחזוקה</th><th>חשבונית מצורפת</th><th>שליחה לאיש מקצוע</th><th></th>
           </tr></thead>
           <tbody id="tasksBody"></tbody>
         </table>
@@ -494,7 +522,7 @@
   <section class="tab" id="tab-procurement">
     <div class="section-title" id="procGeneralAnchor">רכש כללי</div>
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <input type="text" id="procSearchInput" placeholder="🔍 חיפוש לפי שם פריט, ספק..." oninput="filterRows('procBody', this.value)" style="max-width:280px">
         <button class="btn" onclick="addProc()">+ הוספת פריט</button>
       </div>
@@ -507,19 +535,19 @@
           <thead><tr>
             <th>חודש</th><th>מק"ט</th><th>שם הפריט</th><th>ספק מועדף</th>
             <th>כמות</th><th>יחידת מידה</th><th>מחיר ליחידה</th><th>סה"כ לתשלום</th>
-            <th>קטגוריה</th><th>שנת לימודים</th><th>קישור להזמנה</th><th></th>
+            <th>קטגוריה</th><th>שנת לימודים</th><th>מסמך הזמנה מצורף</th><th></th>
           </tr></thead>
           <tbody id="procBody"></tbody>
         </table>
       </div>
       <div class="table-scroll" style="margin-top:14px;">
-        <table id="procTotals"></table>
+        <div id="procTotals"></div>
       </div>
     </div>
 
     <div class="section-title" id="procFoodAnchor">מחירון ספקי מזון</div>
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <div><span class="saved-flag" id="foodPriceSaved">נשמר</span></div>
         <button class="btn" onclick="addFoodPrice()">+ הוספת פריט</button>
       </div>
@@ -529,11 +557,11 @@
           <tbody id="foodPriceBody"></tbody>
         </table>
       </div>
-    </div>
+      </div>
 
     <div class="section-title">בניית הזמנה לספק מזון</div>
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <div>בחר ספק: <select id="orderVendorSelect" onchange="renderOrderBuilder()" style="width:180px;display:inline-block"></select></div>
         <button class="btn" onclick="addOrderLine()">+ הוספת שורה להזמנה</button>
       </div>
@@ -546,8 +574,10 @@
       </div>
       <div class="toolbar" style="margin-top:10px">
         <div></div>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn ghost" onclick="copyOrderText()">העתק טקסט להזמנה</button>
+          <button class="btn ghost" onclick="sendOrderWhatsApp()" style="color:var(--green)"><span class="btn-icon-inline" id="orderWaIconSlot"></span>שליחת ההזמנה בוואטסאפ</button>
+          <button class="btn ghost" onclick="sendOrderEmail()"><span class="btn-icon-inline" id="orderMailIconSlot"></span>שליחת ההזמנה במייל</button>
           <button class="btn" onclick="saveOrder()">שמור הזמנה בהיסטוריה</button>
         </div>
       </div>
@@ -555,18 +585,41 @@
 
     <div class="section-title">היסטוריית הזמנות מזון</div>
     <div class="card">
+      <div class="toolbar">
+        <div>סינון לפי ספק: <select id="foodOrderVendorFilter" onchange="renderFoodOrders()" style="width:180px;display:inline-block"><option value="">כל הספקים</option></select></div>
+        <button class="btn ghost" onclick="printVendorReport()"><span class="btn-icon-inline" id="vendorReportIconSlot"></span>הפקת דוח ספק (PDF)</button>
+      </div>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>תאריך</th><th>ספק</th><th>פירוט</th><th>סה"כ</th><th></th></tr></thead>
+          <thead><tr><th>תאריך</th><th>ספק</th><th>פירוט</th><th>סה"כ</th><th>צפייה בהזמנה</th><th>הודעה לספק</th><th></th></tr></thead>
           <tbody id="foodOrdersBody"></tbody>
         </table>
       </div>
     </div>
   </section>
 
+  <div id="msgTemplateModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div style="font-weight:700;font-size:15px;margin-bottom:10px" id="msgModalTitle">הודעה לספק</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+        <button class="btn ghost" onclick="applyMsgTemplate('delivery')">מתי המשלוח יגיע?</button>
+        <button class="btn ghost" onclick="applyMsgTemplate('missing')">חסר לי מוצר / שאלה על מוצר</button>
+        <button class="btn ghost" onclick="applyMsgTemplate('blank')">טקסט חופשי</button>
+      </div>
+      <textarea id="msgTemplateText" rows="5" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit;font-size:13.5px"></textarea>
+      <div class="toolbar" style="margin-top:12px">
+        <button class="btn ghost" onclick="closeMsgTemplateModal()">ביטול</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="sendMsgTemplate('whatsapp')" style="color:var(--green)">שליחה בוואטסאפ</button>
+          <button class="btn" onclick="sendMsgTemplate('email')">שליחה במייל</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <section class="tab" id="tab-licensing">
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <input type="text" id="licSearchInput" placeholder="🔍 חיפוש לפי סוג אישור, גורם בודק..." oninput="filterRows('licBody', this.value)" style="max-width:280px">
         <button class="btn" onclick="addLic()">+ הוספת אישור / בדיקה</button>
       </div>
@@ -591,13 +644,22 @@
   <section class="tab" id="tab-staff">
     <div class="installment-tabs" id="installmentTabs"></div>
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <input type="text" id="staffSearchInput" placeholder="🔍 חיפוש שם / תפקיד (כולל בפעימות אחרות)..." oninput="searchStaff(this.value)" style="max-width:300px">
         <button class="btn" onclick="addStaffRow()">+ הוספת שורה</button>
       </div>
       <div class="toolbar">
         <div><span class="saved-flag" id="staffSaved">נשמר</span></div>
         <div></div>
+      </div>
+      <div class="toolbar">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer">
+          <input type="checkbox" id="staffRosterShowRate" checked> להציג תעריף חודשי בדוח
+        </label>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="printStaffRoster()"><span class="btn-icon-inline" id="printerIconSlot"></span>הפקת PDF מעוצב</button>
+          <button class="btn ghost" onclick="copyStaffRosterText()"><span class="btn-icon-inline" id="copyIconSlot"></span>העתקה כטקסט</button>
+        </div>
       </div>
       <p class="hint">התעריף היומי מחושב אוטומטית מהתעריף החודשי (חלקי 30). סה"כ לתשלום = (תעריף חודשי × מספר חודשים) פחות (ימי חיסור × תעריף יומי). סימון "אושר לתשלום" הוא מה שקובע אם השורה תופיע בדוח למנהל חשבונות.</p>
       <div class="table-scroll">
@@ -615,7 +677,7 @@
 
     <div class="section-title" id="bankAnchor">פרטי בנק לפי שם</div>
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <div></div>
         <button class="btn" onclick="addBankRow()">+ הוספת שורה</button>
       </div>
@@ -625,7 +687,7 @@
           <tbody id="bankBody"></tbody>
         </table>
       </div>
-    </div>
+      </div>
 
     <div class="section-title">תשלום מרוכז לפעימה נבחרת</div>
     <div class="card">
@@ -659,7 +721,7 @@
 
     <div class="section-title" id="vendorPayAnchor">תשלומי ספקים ונותני שירות</div>
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <div><span class="saved-flag" id="vendorPaySaved">נשמר</span></div>
         <button class="btn" onclick="addVendorPay()">+ הוספת תשלום לספק</button>
       </div>
@@ -673,7 +735,7 @@
           <tbody id="vendorPayBody"></tbody>
         </table>
       </div>
-    </div>
+      </div>
 
     <div class="section-title" id="combinedReportAnchor">דוח מרוכז למנהל חשבונות (צוות + ספקים)</div>
     <div class="card">
@@ -691,7 +753,7 @@
   <section class="tab" id="tab-finance">
     <div class="cards" id="financeCards"></div>
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <div><span class="saved-flag" id="financeSaved">נשמר</span></div>
         <button class="btn" onclick="addRecurring()">+ הוספת תשלום קבוע</button>
       </div>
@@ -705,13 +767,13 @@
           <tbody id="financeBody"></tbody>
         </table>
       </div>
-    </div>
+      </div>
   </section>
 
   <section class="tab" id="tab-keys">
     <div class="section-title" id="keysInvAnchor">מלאי מפתחות</div>
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <div><span class="saved-flag" id="keysInvSaved">נשמר</span></div>
         <button class="btn" onclick="addKeyInv()">+ הוספת מפתח למלאי</button>
       </div>
@@ -724,11 +786,11 @@
           <tbody id="keysInvBody"></tbody>
         </table>
       </div>
-    </div>
+      </div>
 
     <div class="section-title" id="keysLogAnchor">יומן קבלה והחזרת מפתחות</div>
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <div><span class="saved-flag" id="keysLogSaved">נשמר</span></div>
         <button class="btn" onclick="addKeyLog()">+ הוצאת מפתח</button>
       </div>
@@ -741,7 +803,7 @@
           <tbody id="keysLogBody"></tbody>
         </table>
       </div>
-    </div>
+      </div>
   </section>
 
   <section class="tab" id="tab-files">
@@ -781,7 +843,7 @@
 
   <section class="tab" id="tab-projects">
     <div class="card">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <div><span class="saved-flag" id="projectsSaved">נשמר</span></div>
         <button class="btn" onclick="addProject()">+ הוספת פרויקט</button>
       </div>
@@ -791,11 +853,11 @@
           <tbody id="projectsBody"></tbody>
         </table>
       </div>
-    </div>
+      </div>
 
     <div class="section-title" id="projectQuotesTitle">הצעות מחיר</div>
     <div class="card" id="projectQuotesCard" style="display:none">
-      <div class="toolbar">
+      <div class="toolbar toolbar-sticky">
         <div><span class="saved-flag" id="quotesSaved">נשמר</span></div>
         <div style="display:flex;gap:8px">
           <button class="btn ghost" onclick="printQuoteSummary()">הפקת סיכום מעוצב להדפסה</button>
@@ -813,15 +875,19 @@
 
   <section class="tab" id="tab-contacts">
     <div class="card">
+      <div class="toolbar toolbar-sticky">
+        <input type="text" id="contactsSearchInput" placeholder="🔍 חיפוש לפי שם, תחום..." oninput="filterRows('contactsBody', this.value)" style="max-width:260px">
+        <button class="btn" onclick="addContact()">+ הוספת איש קשר</button>
+      </div>
       <div class="toolbar">
         <div><span class="saved-flag" id="contactsSaved">נשמר</span></div>
-        <button class="btn" onclick="addContact()">+ הוספת איש קשר</button>
+        <div></div>
       </div>
       <div class="table-scroll">
         <table>
           <thead><tr>
             <th>שם חברה / איש מקצוע</th><th>תחום התמחות</th><th>טלפון</th>
-            <th>אימייל</th><th>עלות / תעריף</th><th>הערות</th><th></th>
+            <th>אימייל</th><th>סוג תמחור</th><th>מחיר קבוע</th><th>הערות</th><th>שליחת הודעה</th><th></th>
           </tr></thead>
           <tbody id="contactsBody"></tbody>
         </table>
@@ -972,7 +1038,41 @@ let data = {
 
 let activeInstallment = 0;
 const tabs = ["dashboard","tasks","procurement","licensing","staff","accountant","finance","keys","files","projects","contacts"];
-const tabIcons = {dashboard:"📊", tasks:"✅", procurement:"📦", licensing:"🛡️", staff:"👥", accountant:"💰", finance:"🔁", keys:"🔑", files:"🧾", projects:"📁", contacts:"📇"};
+const svgIconPaths = {
+  dashboard: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+  tasks: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12.5 2.5 2.5 5-5"/>',
+  procurement: '<path d="M20.5 7.5 12 3 3.5 7.5v9L12 21l8.5-4.5v-9Z"/><path d="M3.7 7.7 12 12l8.3-4.3"/><path d="M12 12v9"/>',
+  licensing: '<path d="M12 21c4-1.5 7-4.5 7-9V6l-7-3-7 3v6c0 4.5 3 7.5 7 9Z"/><path d="m9 11.5 2 2 4-4"/>',
+  staff: '<circle cx="9" cy="8" r="3.3"/><path d="M3.5 19c0-3 2.5-5.3 5.5-5.3s5.5 2.3 5.5 5.3"/><circle cx="17" cy="8.5" r="2.6"/><path d="M15.5 13.8c2.4.4 4 2.3 4 5.2"/>',
+  accountant: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M16 14.5h2.5"/><path d="M17 6V4.5A1.5 1.5 0 0 0 15.5 3h-7A1.5 1.5 0 0 0 7 4.5V6"/>',
+  finance: '<path d="M17 2.5 21 6.5 17 10.5"/><path d="M3 12V10a4 4 0 0 1 4-4h14"/><path d="m7 21.5-4-4 4-4"/><path d="M21 12v2a4 4 0 0 1-4 4H3"/>',
+  keys: '<circle cx="8" cy="15.5" r="5"/><path d="m11.8 11.7 8.4-8.4"/><path d="m16.5 7 3 3"/><path d="m19 4.5 3 3"/>',
+  files: '<path d="M5.5 2.5h9L19 7v14a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1v-17a1 1 0 0 1 1-1Z"/><path d="M14 2.5V7h4.5"/><path d="M8 12h7"/><path d="M8 15.5h7"/><path d="M8 19h4"/>',
+  projects: '<path d="M20.5 19a1.5 1.5 0 0 0 1.5-1.5V8a1.5 1.5 0 0 0-1.5-1.5h-7.4a1.5 1.5 0 0 1-1.2-.6l-1-1.4a1.5 1.5 0 0 0-1.2-.6H3.5A1.5 1.5 0 0 0 2 5.4v12.1A1.5 1.5 0 0 0 3.5 19Z"/>',
+  contacts: '<rect x="2.5" y="4.5" width="19" height="15" rx="2"/><circle cx="9" cy="10.5" r="2.2"/><path d="M5.5 16.5c.7-2 2-3 3.5-3s2.8 1 3.5 3"/><path d="M15.5 9h3"/><path d="M15.5 13h3"/>',
+  printer: '<path d="M6 9V3h12v6"/><path d="M6 18H4.5A1.5 1.5 0 0 1 3 16.5v-5A1.5 1.5 0 0 1 4.5 10h15a1.5 1.5 0 0 1 1.5 1.5v5a1.5 1.5 0 0 1-1.5 1.5H18"/><rect x="6" y="14" width="12" height="7.5"/>',
+  copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4.5A2.5 2.5 0 0 1 2 12.5v-8A2.5 2.5 0 0 1 4.5 2h8A2.5 2.5 0 0 1 15 4.5V5"/>',
+  whatsapp: '<path d="M7.5 20.5 2 22l1.6-5.3A9 9 0 1 1 7.5 20.5Z"/><path d="M8.5 8.5c0 3.5 3 6.5 6.5 6.5.7 0 1-.6.7-1.2l-.8-1.6c-.2-.4-.7-.5-1.1-.3l-.9.5a5 5 0 0 1-3-3l.5-.9c.2-.4.1-.9-.3-1.1L8.5 6.6c-.6-.3-1.2 0-1.2.7Z"/>',
+  mail: '<rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3 6.5 9 6.5 9-6.5"/>'
+};
+function svgIcon(name, size){
+  const path = svgIconPaths[name];
+  if(!path) return "";
+  return `<svg viewBox="0 0 24 24" width="${size||18}" height="${size||18}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+}
+const tabIcons = {dashboard:svgIcon("dashboard"), tasks:svgIcon("tasks"), procurement:svgIcon("procurement"), licensing:svgIcon("licensing"), staff:svgIcon("staff"), accountant:svgIcon("accountant"), finance:svgIcon("finance"), keys:svgIcon("keys"), files:svgIcon("files"), projects:svgIcon("projects"), contacts:svgIcon("contacts")};
+{
+  const printerSlot = document.getElementById("printerIconSlot");
+  const copySlot = document.getElementById("copyIconSlot");
+  const orderWaSlot = document.getElementById("orderWaIconSlot");
+  const orderMailSlot = document.getElementById("orderMailIconSlot");
+  if(printerSlot) printerSlot.innerHTML = svgIcon("printer", 15);
+  if(copySlot) copySlot.innerHTML = svgIcon("copy", 15);
+  if(orderWaSlot) orderWaSlot.innerHTML = svgIcon("whatsapp", 15);
+  if(orderMailSlot) orderMailSlot.innerHTML = svgIcon("mail", 15);
+  const vendorReportSlot = document.getElementById("vendorReportIconSlot");
+  if(vendorReportSlot) vendorReportSlot.innerHTML = svgIcon("printer", 15);
+}
 const tabLabels = {dashboard:"לוח בקרה", tasks:"משימות", procurement:"רכש ואספקה", licensing:"רישוי ובטיחות", staff:"צוות ותורנים", accountant:"דוח למנהל חשבונות", finance:"כספים שוטפים", keys:"מפתחות", files:"חשבוניות וקבלות", projects:"פרויקטים", contacts:"אנשי קשר וספקים"};
 
 const ROLES = {
@@ -1024,7 +1124,7 @@ function renderLoginLog(){
   el.innerHTML = (data.loginLog||[]).slice(0,15).map(l => {
     const d = new Date(l.time);
     return `<tr><td>${l.label}</td><td>${d.toLocaleDateString("he-IL")} ${d.toLocaleTimeString("he-IL",{hour:'2-digit',minute:'2-digit'})}</td></tr>`;
-  }).join("") || `<tr><td colspan="2" style="color:var(--ink-soft);text-align:center;padding:12px 0">אין עדיין נתוני כניסה.</td></tr>`;
+  }).join("") || `<tr><td style="grid-column:1/-1;color:var(--ink-soft);text-align:center;padding:12px 0">אין עדיין נתוני כניסה.</td></tr>`;
 }
 auth.onAuthStateChanged(async (user) => {
   if(user){
@@ -1100,14 +1200,30 @@ function colorizeStatusSelects(root){
     }
   });
 }
+function addCardBadges(root){
+  (root || document).querySelectorAll("table tbody tr").forEach(tr => {
+    if(tr.classList.contains("total-row")) return;
+    if(tr.querySelector(":scope > .card-badge")) return;
+    const tabSection = tr.closest(".tab");
+    if(!tabSection) return;
+    const tabId = tabSection.id.replace("tab-","");
+    const icon = svgIconPaths[tabId] ? svgIcon(tabId, 15) : null;
+    if(!icon) return;
+    const badge = document.createElement("span");
+    badge.className = "card-badge";
+    badge.innerHTML = icon;
+    tr.appendChild(badge);
+  });
+}
 let labelDebounce = null;
 const mainEl = document.querySelector("main");
 if(mainEl){
   styleActionButtons(mainEl);
   colorizeStatusSelects(mainEl);
+  addCardBadges(mainEl);
   const observer = new MutationObserver(() => {
     clearTimeout(labelDebounce);
-    labelDebounce = setTimeout(() => { applyResponsiveLabels(mainEl); styleActionButtons(mainEl); colorizeStatusSelects(mainEl); }, 120);
+    labelDebounce = setTimeout(() => { applyResponsiveLabels(mainEl); styleActionButtons(mainEl); colorizeStatusSelects(mainEl); addCardBadges(mainEl); }, 120);
   });
   observer.observe(mainEl, { childList:true, subtree:true });
 }
@@ -1492,6 +1608,33 @@ async function onSyncToggle(checkboxEl, row, type){
 }
 
 /* ---------- TASKS ---------- */
+function findContactByName(name){
+  return data.contacts.find(c => c.name === name);
+}
+function buildTaskMessageText(row){
+  let msg = `בעיה: ${row.desc || "—"}\n`;
+  if(row.category) msg += `תחום: ${row.category}\n`;
+  if(row.notes) msg += `פירוט / הערות: ${row.notes}\n`;
+  if(row.due) msg += `תאריך יעד: ${row.due}\n`;
+  return msg;
+}
+function sendTaskWhatsApp(taskId){
+  const row = data.tasks.find(r => r.id === taskId);
+  if(!row) return;
+  const contact = findContactByName(row.assignee);
+  if(!contact || !contact.phone){ alert("לא נמצא מספר טלפון לאיש המקצוע שנבחר כאחראי ביצוע. אפשר להוסיף טלפון בטאב אנשי קשר וספקים."); return; }
+  const text = encodeURIComponent(buildTaskMessageText(row));
+  window.open(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${text}`, "_blank");
+}
+function sendTaskEmail(taskId){
+  const row = data.tasks.find(r => r.id === taskId);
+  if(!row) return;
+  const contact = findContactByName(row.assignee);
+  if(!contact || !contact.email){ alert("לא נמצאה כתובת אימייל לאיש המקצוע שנבחר כאחראי ביצוע."); return; }
+  const subject = encodeURIComponent("משימה: " + (row.desc||""));
+  const body = encodeURIComponent(buildTaskMessageText(row));
+  window.location.href = `mailto:${contact.email}?subject=${subject}&body=${body}`;
+}
 function syncTaskInvoiceToVendorPay(taskRow){
   if(taskRow.link){
     if(taskRow.vendorPayId){
@@ -1583,6 +1726,10 @@ function renderTasks(){
             <option value="תחזוקה בלתי מתוכננת" ${row.maint==="תחזוקה בלתי מתוכננת"?"selected":""}>תחזוקה בלתי מתוכננת</option>
           </select></td>
       <td class="file-cell"></td>
+      <td class="row-actions" style="display:flex;gap:4px">
+        <button class="icon-btn" title="שליחת וואטסאפ לאיש המקצוע" onclick="sendTaskWhatsApp(${row.id})" style="color:var(--green)">${svgIcon("whatsapp",18)}</button>
+        <button class="icon-btn" title="שליחת אימייל לאיש המקצוע" onclick="sendTaskEmail(${row.id})">${svgIcon("mail",18)}</button>
+      </td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeTask(${row.id})">✕</button></td>
     `;
     const fileTd = tr.querySelector(".file-cell");
@@ -1654,9 +1801,12 @@ function renderProc(){
       <td><input type="text" value="${fmtMoney(rowTotal)}" readonly style="width:80px;font-weight:600"></td>
       <td><input type="text" value="${row.category}" data-f="category" style="width:100px"></td>
       <td>${schoolYearSelectHTML(row.schoolYear)}</td>
-      <td><input type="text" value="${row.link}" data-f="link" style="min-width:100px"></td>
+      <td class="file-cell"></td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeProc(${row.id})">✕</button></td>
     `;
+    const fileTd = tr.querySelector(".file-cell");
+    fileTd.innerHTML = renderFileCellHTML(row, "link");
+    wireFileCell(fileTd, row, "link", "procurement-orders", () => { scheduleSave("procurement","procSaved"); renderProc(); });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
@@ -1669,9 +1819,13 @@ function renderProc(){
   const totalsTable = document.getElementById("procTotals");
   let rows = "";
   Object.keys(categories).forEach(cat => {
-    rows += `<tr><td style="padding:5px 0;color:var(--ink-soft)">סה"כ ${cat}:</td><td style="padding:5px 0;font-weight:600;text-align:left">${fmtMoney(categories[cat])}</td></tr>`;
+    rows += `<div style="display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid var(--line);color:var(--ink-soft)">
+      <span>סה"כ ${cat}</span><span style="font-weight:600;color:var(--ink)">${fmtMoney(categories[cat])}</span>
+    </div>`;
   });
-  rows += `<tr><td style="padding:8px 0;border-top:2px solid var(--line);font-weight:700">סה"כ כולל:</td><td style="padding:8px 0;border-top:2px solid var(--line);font-weight:700;text-align:left">${fmtMoney(grand)}</td></tr>`;
+  rows += `<div style="display:flex;justify-content:space-between;padding:12px 4px 4px 4px;font-weight:700;font-size:15px;color:var(--brand-dark)">
+    <span>סה"כ כולל</span><span>${fmtMoney(grand)}</span>
+  </div>`;
   totalsTable.innerHTML = rows;
 }
 
@@ -1957,7 +2111,7 @@ function renderAccountantReport(){
   if(combinedBody){
     combinedBody.innerHTML = "";
     if(combinedRows.length===0){
-      combinedBody.innerHTML = `<tr><td colspan="8" style="color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומים מאושרים.</td></tr>`;
+      combinedBody.innerHTML = `<tr><td style="grid-column:1/-1;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומים מאושרים.</td></tr>`;
     }else{
       combinedRows.forEach(r => {
         const tr = document.createElement("tr");
@@ -1991,9 +2145,59 @@ function renderAccountantReport(){
     `;
   }
   if(count===0){
-    body.innerHTML = `<tr><td colspan="9" style="color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומי צוות מאושרים.</td></tr>`;
+    body.innerHTML = `<tr><td style="grid-column:1/-1;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומי צוות מאושרים.</td></tr>`;
   }
   renderVendorPay();
+}
+
+/* ---------- STAFF ROSTER REPORT (PDF + copy) ---------- */
+function getRosterList(){
+  return data.installments[activeInstallment].filter(r => (r.name||"").trim() && (r.role||"").trim());
+}
+function printStaffRoster(){
+  const showRate = document.getElementById("staffRosterShowRate").checked;
+  const list = getRosterList();
+  if(list.length===0){ alert("אין תורנים עם שם ותפקיד מוגדרים בפעימה הנוכחית."); return; }
+  const rowsHtml = list.map(r => `
+    <tr>
+      <td style="padding:12px 14px;border-bottom:1px solid #eee;font-weight:600">${r.name}</td>
+      <td style="padding:12px 14px;border-bottom:1px solid #eee">${r.role||"—"}</td>
+      ${showRate ? `<td style="padding:12px 14px;border-bottom:1px solid #eee">${fmtMoney(r.monthly)}</td>` : ""}
+    </tr>`).join("");
+  const html = `
+    <!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
+    <title>דוח תורנים ותפקידים</title>
+    <style>
+      body{ font-family:"Segoe UI",Arial,sans-serif; padding:34px; color:#211F1B; }
+      h1{ color:#0D1922; margin:0 0 4px 0; font-size:22px; }
+      .meta{ color:#6E6558; margin-bottom:22px; font-size:13px; }
+      table{ width:100%; border-collapse:collapse; margin-top:8px; border-radius:8px; overflow:hidden; }
+      th{ text-align:right; padding:12px 14px; background:#152631; color:#fff; font-size:13px; font-weight:600; }
+      tr:nth-child(even) td{ background:#FAF7F1; }
+    </style></head><body>
+    <h1>דוח תורנים ותפקידים</h1>
+    <div class="meta">פעימה ${activeInstallment+1} · תאריך הפקה: ${new Date().toLocaleDateString("he-IL")}</div>
+    <table>
+      <thead><tr><th>שם</th><th>תפקיד / תורנות</th>${showRate?"<th>תעריף חודשי</th>":""}</tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    </body></html>`;
+  const w = window.open("", "_blank");
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
+function copyStaffRosterText(){
+  const showRate = document.getElementById("staffRosterShowRate").checked;
+  const list = getRosterList();
+  if(list.length===0){ alert("אין תורנים עם שם ותפקיד מוגדרים בפעימה הנוכחית."); return; }
+  let text = `דוח תורנים ותפקידים — פעימה ${activeInstallment+1}\n${new Date().toLocaleDateString("he-IL")}\n\n`;
+  list.forEach(r => {
+    text += `${r.name} — ${r.role}` + (showRate ? ` — ${fmtMoney(r.monthly)}` : "") + "\n";
+  });
+  navigator.clipboard.writeText(text)
+    .then(() => alert("הטקסט הועתק, אפשר להדביק בוואטסאפ/אימייל"))
+    .catch(() => alert("לא ניתן להעתיק אוטומטית, יש להעתיק ידנית:\n\n" + text));
 }
 
 /* ---------- COMBINED PAYMENT VIEW ---------- */
@@ -2020,25 +2224,51 @@ function renderPayment(){
 
 /* ---------- CONTACTS ---------- */
 function addContact(){
-  data.contacts.push({id: nextId()+6000, name:"", specialty:"", phone:"", email:"", cost:"", notes:""});
+  data.contacts.push({id: nextId()+6000, name:"", specialty:"", phone:"", email:"", priceType:"", cost:"", notes:""});
   renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks();
 }
 function removeContact(id){
   data.contacts = data.contacts.filter(r=>r.id!==id);
   renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks();
 }
+function formatPhoneForWhatsApp(phone){
+  let digits = (phone||"").replace(/[^0-9]/g,"");
+  if(digits.startsWith("0")) digits = "972" + digits.slice(1);
+  return digits;
+}
+function sendContactWhatsApp(id){
+  const c = data.contacts.find(x=>x.id===id);
+  if(!c || !c.phone){ alert("אין מספר טלפון שמור לאיש קשר זה."); return; }
+  window.open(`https://wa.me/${formatPhoneForWhatsApp(c.phone)}`, "_blank");
+}
+function sendContactEmail(id){
+  const c = data.contacts.find(x=>x.id===id);
+  if(!c || !c.email){ alert("אין כתובת אימייל שמורה לאיש קשר זה."); return; }
+  window.location.href = `mailto:${c.email}`;
+}
 function renderContacts(){
   const body = document.getElementById("contactsBody");
   body.innerHTML = "";
   data.contacts.forEach(row => {
     const tr = document.createElement("tr");
+    const priceKnown = row.priceType === "מחיר קבוע";
     tr.innerHTML = `
       <td class="primary-field"><input type="text" value="${row.name}" data-f="name" style="min-width:130px"></td>
       <td><input type="text" value="${row.specialty}" data-f="specialty"></td>
       <td><input type="text" value="${row.phone}" data-f="phone" style="width:110px"></td>
       <td><input type="text" value="${row.email}" data-f="email" style="min-width:140px"></td>
-      <td><input type="text" value="${row.cost}" data-f="cost" style="width:90px"></td>
+      <td><select data-f="priceType">
+            <option value="" ${!row.priceType?"selected":""}></option>
+            <option value="מחיר קבוע" ${row.priceType==="מחיר קבוע"?"selected":""}>מחיר קבוע</option>
+            <option value="לפי קריאה" ${row.priceType==="לפי קריאה"?"selected":""}>לפי קריאה (משתנה)</option>
+            <option value="לא ידוע" ${row.priceType==="לא ידוע"?"selected":""}>לא ידוע מראש</option>
+          </select></td>
+      <td><input type="text" value="${row.cost}" data-f="cost" style="width:90px" ${priceKnown?"":"placeholder=\"—\" disabled"}></td>
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
+      <td class="row-actions" style="display:flex;gap:4px">
+        <button class="icon-btn" title="שליחת וואטסאפ" onclick="sendContactWhatsApp(${row.id})" style="color:var(--green)">${svgIcon("whatsapp",18)}</button>
+        <button class="icon-btn" title="שליחת אימייל" onclick="sendContactEmail(${row.id})">${svgIcon("mail",18)}</button>
+      </td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeContact(${row.id})">✕</button></td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
@@ -2048,6 +2278,9 @@ function renderContacts(){
         if(inp.dataset.f === "specialty" || inp.dataset.f === "name"){
           renderTasks();
         }
+      });
+      inp.addEventListener("change", () => {
+        if(inp.dataset.f === "priceType"){ renderContacts(); }
       });
     });
     body.appendChild(tr);
@@ -2137,8 +2370,7 @@ function renderOrderBuilder(){
   });
   document.getElementById("orderLineTotal").textContent = fmtMoney(total);
 }
-function copyOrderText(){
-  const vendor = document.getElementById("orderVendorSelect").value;
+function buildOrderText(vendor){
   let text = `הזמנה לספק: ${vendor}\nתאריך: ${new Date().toLocaleDateString("he-IL")}\n\n`;
   let total = 0;
   orderLines.forEach(line => {
@@ -2147,7 +2379,30 @@ function copyOrderText(){
     text += `${line.item} — כמות: ${line.qty} — ${fmtMoney(lineTotal)}\n`;
   });
   text += `\nסה"כ: ${fmtMoney(total)}`;
+  return text;
+}
+function copyOrderText(){
+  const vendor = document.getElementById("orderVendorSelect").value;
+  if(orderLines.length===0){ alert("אין שורות בהזמנה"); return; }
+  const text = buildOrderText(vendor);
   navigator.clipboard.writeText(text).then(()=>alert("הטקסט הועתק, אפשר להדביק בוואטסאפ/אימייל")).catch(()=>alert("לא ניתן להעתיק אוטומטית, יש להעתיק ידנית:\n\n"+text));
+}
+function sendOrderWhatsApp(){
+  const vendor = document.getElementById("orderVendorSelect").value;
+  if(orderLines.length===0){ alert("אין שורות בהזמנה"); return; }
+  const contact = findContactByName(vendor);
+  if(!contact || !contact.phone){ alert(`לא נמצא מספר טלפון לספק "${vendor}". אפשר להוסיף אותו בטאב אנשי קשר וספקים (עם שם זהה לשם הספק במחירון).`); return; }
+  const text = encodeURIComponent(buildOrderText(vendor));
+  window.open(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${text}`, "_blank");
+}
+function sendOrderEmail(){
+  const vendor = document.getElementById("orderVendorSelect").value;
+  if(orderLines.length===0){ alert("אין שורות בהזמנה"); return; }
+  const contact = findContactByName(vendor);
+  if(!contact || !contact.email){ alert(`לא נמצאה כתובת אימייל לספק "${vendor}". אפשר להוסיף אותה בטאב אנשי קשר וספקים (עם שם זהה לשם הספק במחירון).`); return; }
+  const subject = encodeURIComponent("הזמנה — " + vendor);
+  const body = encodeURIComponent(buildOrderText(vendor));
+  window.location.href = `mailto:${contact.email}?subject=${subject}&body=${body}`;
 }
 function saveOrder(){
   const vendor = document.getElementById("orderVendorSelect").value;
@@ -2164,6 +2419,102 @@ function saveOrder(){
   renderFoodOrders();
   saveFood();
 }
+function printVendorReport(){
+  const vendor = document.getElementById("foodOrderVendorFilter").value;
+  if(!vendor){ alert("יש לבחור ספק מהרשימה קודם."); return; }
+  const contact = findContactByName(vendor);
+  const foodOrdersForVendor = data.foodOrders.filter(o => o.vendor === vendor);
+  const procForVendor = data.procurement.filter(r => r.supplier === vendor);
+
+  const foodTotal = foodOrdersForVendor.reduce((s,o) => s + (parseFloat(o.total)||0), 0);
+  const procTotal = procForVendor.reduce((s,r) => s + (parseFloat(r.qty)||0)*(parseFloat(r.price)||0), 0);
+  const grandTotal = foodTotal + procTotal;
+  const orderCount = foodOrdersForVendor.length + procForVendor.length;
+  const avg = orderCount ? grandTotal / orderCount : 0;
+
+  if(orderCount === 0){ alert(`אין רשומות (הזמנות מזון או רכש כללי) עבור הספק "${vendor}".`); return; }
+
+  const foodRows = foodOrdersForVendor.map(o => {
+    const detail = o.lines.map(l=>`${l.item} (${l.qty})`).join(", ");
+    return `<tr><td style="padding:10px 14px;border-bottom:1px solid #eee">${o.date}</td><td style="padding:10px 14px;border-bottom:1px solid #eee">${detail}</td><td style="padding:10px 14px;border-bottom:1px solid #eee;font-weight:600">${fmtMoney(o.total)}</td></tr>`;
+  }).join("");
+  const procRows = procForVendor.map(r => {
+    const total = (parseFloat(r.qty)||0)*(parseFloat(r.price)||0);
+    return `<tr><td style="padding:10px 14px;border-bottom:1px solid #eee">${r.month||"—"}</td><td style="padding:10px 14px;border-bottom:1px solid #eee">${r.item||"—"} (כמות ${r.qty||0})</td><td style="padding:10px 14px;border-bottom:1px solid #eee;font-weight:600">${fmtMoney(total)}</td></tr>`;
+  }).join("");
+
+  const html = `
+    <!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
+    <title>דוח ספק — ${vendor}</title>
+    <style>
+      body{ font-family:"Segoe UI",Arial,sans-serif; padding:34px; color:#211F1B; }
+      h1{ color:#0D1922; margin:0 0 4px 0; font-size:22px; }
+      h2{ color:#152631; font-size:15px; margin:26px 0 6px 0; }
+      .meta{ color:#6E6558; margin-bottom:6px; font-size:13px; }
+      table{ width:100%; border-collapse:collapse; margin-top:8px; }
+      th{ text-align:right; padding:12px 14px; background:#152631; color:#fff; font-size:13px; font-weight:600; }
+      tr:nth-child(even) td{ background:#FAF7F1; }
+      .summary{ margin-top:24px; background:#F6DFA8; border-radius:8px; padding:16px 20px; }
+      .summary div{ margin-bottom:6px; font-size:14px; }
+      .summary .grand{ font-size:18px; font-weight:800; color:#0D1922; }
+      .empty{ color:#6E6558; padding:14px; font-size:13px; }
+    </style></head><body>
+    <h1>דוח ספק: ${vendor}</h1>
+    ${contact ? `<div class="meta">טלפון: ${contact.phone||"—"} · אימייל: ${contact.email||"—"}</div>` : ""}
+    <div class="meta">תאריך הפקה: ${new Date().toLocaleDateString("he-IL")}</div>
+
+    <h2>הזמנות מזון</h2>
+    ${foodRows ? `<table><thead><tr><th>תאריך</th><th>פירוט</th><th>סה"כ</th></tr></thead><tbody>${foodRows}</tbody></table>` : `<div class="empty">אין הזמנות מזון מספק זה.</div>`}
+
+    <h2>רכש כללי</h2>
+    ${procRows ? `<table><thead><tr><th>חודש</th><th>פריט</th><th>סה"כ</th></tr></thead><tbody>${procRows}</tbody></table>` : `<div class="empty">אין רשומות רכש כללי מספק זה.</div>`}
+
+    <div class="summary">
+      <div>מספר רשומות סה"כ: ${orderCount}</div>
+      <div>ממוצע לרשומה: ${fmtMoney(avg)}</div>
+      <div class="grand">סה"כ הוצא אצל הספק: ${fmtMoney(grandTotal)}</div>
+    </div>
+    </body></html>`;
+  const w = window.open("", "_blank");
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
+function printOrderView(id){
+  const order = data.foodOrders.find(o => o.id === id);
+  if(!order) return;
+  const rowsHtml = order.lines.map(l => `
+    <tr>
+      <td style="padding:10px 14px;border-bottom:1px solid #eee;font-weight:600">${l.item}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eee">${l.qty}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eee">${fmtMoney(l.price)}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eee">${fmtMoney((parseFloat(l.qty)||0)*(parseFloat(l.price)||0))}</td>
+    </tr>`).join("");
+  const html = `
+    <!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
+    <title>הזמנה — ${order.vendor}</title>
+    <style>
+      body{ font-family:"Segoe UI",Arial,sans-serif; padding:34px; color:#211F1B; }
+      h1{ color:#0D1922; margin:0 0 4px 0; font-size:22px; }
+      .meta{ color:#6E6558; margin-bottom:22px; font-size:13px; }
+      table{ width:100%; border-collapse:collapse; margin-top:8px; }
+      th{ text-align:right; padding:12px 14px; background:#152631; color:#fff; font-size:13px; font-weight:600; }
+      tr:nth-child(even) td{ background:#FAF7F1; }
+      .grand{ text-align:left; font-weight:800; font-size:16px; margin-top:16px; }
+    </style></head><body>
+    <h1>הזמנה לספק: ${order.vendor}</h1>
+    <div class="meta">תאריך הזמנה: ${order.date}</div>
+    <table>
+      <thead><tr><th>פריט</th><th>כמות</th><th>מחיר ליחידה</th><th>סה"כ</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <div class="grand">סה"כ להזמנה: ${fmtMoney(order.total)}</div>
+    </body></html>`;
+  const w = window.open("", "_blank");
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
 function removeFoodOrder(id){
   data.foodOrders = data.foodOrders.filter(o=>o.id!==id);
   renderFoodOrders(); saveFood();
@@ -2172,20 +2523,69 @@ function renderFoodOrders(){
   const body = document.getElementById("foodOrdersBody");
   if(!body) return;
   body.innerHTML = "";
-  if(data.foodOrders.length===0){
-    body.innerHTML = `<tr><td colspan="5" style="color:var(--ink-soft);text-align:center;padding:16px 0">אין הזמנות שמורות עדיין.</td></tr>`;
+  const filterSel = document.getElementById("foodOrderVendorFilter");
+  if(filterSel){
+    const vendors = [...new Set(data.foodOrders.map(o=>o.vendor).filter(Boolean))];
+    const current = filterSel.value;
+    filterSel.innerHTML = `<option value="">כל הספקים</option>` + vendors.map(v=>`<option value="${v}" ${v===current?"selected":""}>${v}</option>`).join("");
+  }
+  const filterVal = filterSel ? filterSel.value : "";
+  const list = filterVal ? data.foodOrders.filter(o=>o.vendor===filterVal) : data.foodOrders;
+  if(list.length===0){
+    body.innerHTML = `<tr><td style="grid-column:1/-1;color:var(--ink-soft);text-align:center;padding:16px 0">אין הזמנות להצגה.</td></tr>`;
     return;
   }
-  data.foodOrders.forEach(order => {
+  list.forEach(order => {
     const detail = order.lines.map(l=>`${l.item} (${l.qty})`).join(", ");
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${order.date}</td><td>${order.vendor}</td><td>${detail}</td>
       <td style="font-weight:600">${fmtMoney(order.total)}</td>
+      <td class="row-actions"><button class="btn ghost" style="padding:6px 10px;font-size:12px" onclick="printOrderView(${order.id})">${svgIcon("printer",14)} צפייה</button></td>
+      <td class="row-actions"><button class="btn ghost" style="padding:6px 10px;font-size:12px" onclick="openMsgTemplateModal('${order.vendor.replace(/'/g,"\\'")}','${order.date}')">הודעה לספק</button></td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeFoodOrder(${order.id})">✕</button></td>
     `;
     body.appendChild(tr);
   });
+}
+
+/* ---------- MESSAGE TEMPLATE MODAL ---------- */
+let msgModalVendor = null;
+let msgModalOrderDate = null;
+function openMsgTemplateModal(vendor, orderDate){
+  msgModalVendor = vendor;
+  msgModalOrderDate = orderDate || "";
+  document.getElementById("msgModalTitle").textContent = "הודעה לספק: " + vendor;
+  document.getElementById("msgTemplateText").value = "";
+  document.getElementById("msgTemplateModal").style.display = "flex";
+}
+function closeMsgTemplateModal(){
+  document.getElementById("msgTemplateModal").style.display = "none";
+}
+function applyMsgTemplate(kind){
+  const ta = document.getElementById("msgTemplateText");
+  const dateStr = msgModalOrderDate ? ` מתאריך ${msgModalOrderDate}` : "";
+  if(kind === "delivery"){
+    ta.value = `שלום, רציתי לבדוק מתי צפוי להגיע המשלוח של ההזמנה${dateStr}. תודה!`;
+  }else if(kind === "missing"){
+    ta.value = `שלום, בנוגע להזמנה${dateStr} — חסר לי מוצר / יש לי שאלה לגבי מוצר: `;
+  }else{
+    ta.value = "";
+  }
+  ta.focus();
+}
+function sendMsgTemplate(channel){
+  const text = document.getElementById("msgTemplateText").value.trim();
+  if(!text){ alert("יש לבחור תבנית או לכתוב טקסט קודם"); return; }
+  const contact = findContactByName(msgModalVendor);
+  if(channel === "whatsapp"){
+    if(!contact || !contact.phone){ alert(`לא נמצא מספר טלפון לספק "${msgModalVendor}". אפשר להוסיף אותו בטאב אנשי קשר וספקים.`); return; }
+    window.open(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${encodeURIComponent(text)}`, "_blank");
+  }else{
+    if(!contact || !contact.email){ alert(`לא נמצאה כתובת אימייל לספק "${msgModalVendor}". אפשר להוסיף אותה בטאב אנשי קשר וספקים.`); return; }
+    window.location.href = `mailto:${contact.email}?subject=${encodeURIComponent("לגבי הזמנה — "+msgModalVendor)}&body=${encodeURIComponent(text)}`;
+  }
+  closeMsgTemplateModal();
 }
 
 /* ---------- RECURRING FINANCE ---------- */
@@ -2353,7 +2753,8 @@ function filterRows(tbodyId, query){
   if(!tbody) return;
   const q = query.trim().toLowerCase();
   Array.from(tbody.children).forEach(tr => {
-    const text = tr.textContent.toLowerCase();
+    let text = tr.textContent.toLowerCase();
+    tr.querySelectorAll("input, select").forEach(el => { text += " " + (el.value||"").toLowerCase(); });
     tr.style.display = (!q || text.includes(q)) ? "" : "none";
   });
 }
@@ -2449,7 +2850,7 @@ function renderFiles(){
   const list = filterVal ? data.files.filter(f=>f.category===filterVal) : data.files;
   body.innerHTML = "";
   if(list.length===0){
-    body.innerHTML = `<tr><td colspan="5" style="color:var(--ink-soft);text-align:center;padding:16px 0">אין קבצים להצגה.</td></tr>`;
+    body.innerHTML = `<tr><td style="grid-column:1/-1;color:var(--ink-soft);text-align:center;padding:16px 0">אין קבצים להצגה.</td></tr>`;
     return;
   }
   list.forEach(row => {
