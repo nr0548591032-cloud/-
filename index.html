@@ -211,8 +211,8 @@
   table tbody, table tfoot{ display:block; width:100%; }
   table tr{
     position:relative;
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+    display:flex;
+    flex-wrap:wrap;
     gap:4px 22px;
     background:var(--tint-a);
     border-radius:var(--radius);
@@ -232,6 +232,44 @@
     z-index:2;
   }
   table tr:nth-child(even){ background:var(--tint-b); }
+  .contact-actions{
+    display:flex !important; flex-direction:row !important; align-items:center;
+    gap:8px; justify-content:flex-start;
+  }
+  .contact-action-btn{
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    border:none; cursor:pointer; color:#fff;
+    box-shadow:0 2px 5px rgba(16,27,36,.2);
+    transition:transform .12s ease;
+  }
+  .contact-action-btn:hover{ transform:translateY(-2px); }
+  .contact-action-btn.ca-call{ background:var(--brand); }
+  .contact-action-btn.ca-whatsapp{ background:var(--green); }
+  .contact-action-btn.ca-mail{ background:var(--amber); }
+  .contact-action-btn.ca-add{ background:transparent; color:var(--ink-soft); border:1.5px dashed var(--line); box-shadow:none; }
+  .contact-action-btn.ca-add:hover{ border-color:var(--amber); color:var(--amber); }
+  .extra-contact-chip{
+    display:inline-flex; align-items:center; gap:5px;
+    background:var(--bg); border:1px solid var(--line); border-radius:20px;
+    padding:4px 8px; font-size:12px; margin:3px 6px 3px 0;
+  }
+  .doc-missing-chip{ border-color:var(--red); background:var(--red-bg); }
+  .ca-mini{
+    width:20px; height:20px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(21,38,49,.08); color:var(--brand); display:inline-flex;
+    align-items:center; justify-content:center; padding:0;
+  }
+  .ca-mini:hover{ background:var(--amber); color:#fff; }
+  .cal-toggle{ display:inline-flex; cursor:pointer; }
+  .cal-toggle-icon{
+    width:30px; height:30px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--line); color:var(--ink-soft);
+    transition:background .15s ease, color .15s ease;
+  }
+  .cal-toggle input:checked + .cal-toggle-icon{ background:var(--brand); color:#fff; }
+  .cal-toggle input:disabled + .cal-toggle-icon{ opacity:.5; }
   table tr:hover{ box-shadow:0 2px 4px rgba(16,27,36,.06), 0 10px 24px rgba(16,27,36,.13); transform:translateY(-2px); }
   table tr.total-row{
     display:flex !important; align-items:center; justify-content:space-between;
@@ -249,7 +287,10 @@
     display:flex; flex-direction:column; gap:3px;
     padding:5px 0; border:none; text-align:right;
     min-width:0;
+    flex:1 1 160px;
   }
+  table td.field-narrow{ flex:0 1 110px; }
+  table td.field-xnarrow{ flex:0 1 82px; }
   table td::before{
     content:attr(data-label);
     font-size:10.5px; text-transform:uppercase; letter-spacing:.4px;
@@ -257,7 +298,7 @@
   }
   table td:not([data-label])::before, table td[data-label=""]::before{ content:none; }
   table td.primary-field{
-    grid-column:1 / -1;
+    flex:1 1 100%;
     font-family:var(--font-display);
     border-bottom:2px solid var(--amber);
     padding-bottom:9px; margin-bottom:3px;
@@ -401,7 +442,7 @@
     .table-scroll{ overflow-x:visible; }
     .cards{ grid-template-columns:1fr 1fr; }
     .installment-tabs{ overflow-x:auto; }
-    table tr{ grid-template-columns:1fr; }
+    table td{ flex:1 1 100% !important; }
     .app-shell{ flex-direction:column; }
     .sidebar{
       width:100% !important; height:auto; position:sticky; top:0;
@@ -481,6 +522,8 @@
       <div class="section-title">אישורים ובדיקות לתשומת לב</div>
       <div class="card"><div class="table-scroll" id="dashLicensing"></div></div>
     </div>
+    <div class="section-title">אישורים בתהליך (טרם התקבל אישור סופי)</div>
+    <div class="card"><div class="table-scroll" id="dashLicInProcess"></div></div>
     <div class="section-title" id="loginLogTitle" style="display:none">כניסות אחרונות למערכת</div>
     <div class="card" id="loginLogCard" style="display:none">
       <div class="table-scroll">
@@ -624,15 +667,23 @@
         <button class="btn" onclick="addLic()">+ הוספת אישור / בדיקה</button>
       </div>
       <div class="toolbar">
-        <div>שנת לימודים: <select id="licYearFilter" onchange="renderLic()" style="width:170px;display:inline-block"></select></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <span>שנת לימודים: <select id="licYearFilter" onchange="renderLic()" style="width:160px;display:inline-block"></select></span>
+          <span>מיון לפי: <select id="licSortBy" onchange="renderLic()" style="width:160px;display:inline-block">
+            <option value="expiry">תאריך תפוגה</option>
+            <option value="status">סטטוס טיפול</option>
+            <option value="priority">עדיפות</option>
+          </select></span>
+        </div>
         <div><span class="saved-flag" id="licSaved">נשמר</span></div>
       </div>
-      <p class="hint">כשמחדשים אישור, ל"חידוש לשנה חדשה" נשמר עותק חדש לשנה הבאה, והרשומה המקורית נשארת לצפייה תחת השנה הקודמת שלה במסנן.</p>
+      <p class="hint">כשמחדשים אישור, "חידוש לשנה חדשה" שומר עותק חדש לשנה הבאה, והרשומה המקורית נשארת לצפייה תחת השנה הקודמת שלה במסנן. "+ מסמך" מוסיף מסמך נדרש לאישור זה; "+ עדכון" מוסיף רישום ביומן הטיפול.</p>
       <div class="table-scroll">
         <table>
           <thead><tr>
             <th>סוג האישור / הבדיקה</th><th>תדירות</th><th>בדיקה אחרונה</th>
-            <th>תפוגה / בדיקה הבאה</th><th>גורם בודק</th><th>שנת לימודים</th><th>סטטוס</th>
+            <th>תפוגה / בדיקה הבאה</th><th>גורם בודק</th><th>שנת לימודים</th>
+            <th>סטטוס טיפול</th><th>עדיפות</th><th>סטטוס תוקף</th>
             <th>אישור מצורף</th><th>סנכרון ליומן</th><th></th>
           </tr></thead>
           <tbody id="licBody"></tbody>
@@ -886,8 +937,8 @@
       <div class="table-scroll">
         <table>
           <thead><tr>
-            <th>שם חברה / איש מקצוע</th><th>תחום התמחות</th><th>טלפון</th>
-            <th>אימייל</th><th>סוג תמחור</th><th>מחיר קבוע</th><th>הערות</th><th>שליחת הודעה</th><th></th>
+            <th>שם חברה / איש מקצוע</th><th>סיווג</th><th>תחום התמחות</th><th>טלפון</th>
+            <th>אימייל</th><th>סוג תמחור</th><th>מחיר / תעריף</th><th>הערות</th><th>יצירת קשר</th><th></th>
           </tr></thead>
           <tbody id="contactsBody"></tbody>
         </table>
@@ -962,8 +1013,11 @@ function schoolYearSelectHTML(value){
     `</select>`;
 }
 
-let uid = 1;
-function nextId(){ return uid++; }
+let uid = 0;
+function nextId(){
+  uid++;
+  return Date.now() * 1000 + (uid % 1000);
+}
 
 let data = {
   tasks: [
@@ -1053,7 +1107,11 @@ const svgIconPaths = {
   printer: '<path d="M6 9V3h12v6"/><path d="M6 18H4.5A1.5 1.5 0 0 1 3 16.5v-5A1.5 1.5 0 0 1 4.5 10h15a1.5 1.5 0 0 1 1.5 1.5v5a1.5 1.5 0 0 1-1.5 1.5H18"/><rect x="6" y="14" width="12" height="7.5"/>',
   copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4.5A2.5 2.5 0 0 1 2 12.5v-8A2.5 2.5 0 0 1 4.5 2h8A2.5 2.5 0 0 1 15 4.5V5"/>',
   whatsapp: '<path d="M7.5 20.5 2 22l1.6-5.3A9 9 0 1 1 7.5 20.5Z"/><path d="M8.5 8.5c0 3.5 3 6.5 6.5 6.5.7 0 1-.6.7-1.2l-.8-1.6c-.2-.4-.7-.5-1.1-.3l-.9.5a5 5 0 0 1-3-3l.5-.9c.2-.4.1-.9-.3-1.1L8.5 6.6c-.6-.3-1.2 0-1.2.7Z"/>',
-  mail: '<rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3 6.5 9 6.5 9-6.5"/>'
+  mail: '<rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3 6.5 9 6.5 9-6.5"/>',
+  phoneCall: '<path d="M14.5 2a1 1 0 0 1 1 .9V6a1 1 0 0 1-1 1c-.6 0-1.5-.2-1.9.2-.3.3-.1 1 .4 1.9.9 1.6 2.2 2.9 3.8 3.8.9.5 1.6.7 1.9.4.4-.4-.2-1.3-.2-1.9a1 1 0 0 1 1-1h3.1a1 1 0 0 1 .9 1c-.1 5.5-4.4 9.8-9.9 9.9C7.7 21.4 3.4 17.1 3 11.6 3 6 7.3 2 14.5 2Z"/>',
+  plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
+  check: '<path d="M20 6.5 9.5 17 4 11.5"/>',
+  calendar: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18"/><path d="M8 2.5v4"/><path d="M16 2.5v4"/>'
 };
 function svgIcon(name, size){
   const path = svgIconPaths[name];
@@ -1124,7 +1182,7 @@ function renderLoginLog(){
   el.innerHTML = (data.loginLog||[]).slice(0,15).map(l => {
     const d = new Date(l.time);
     return `<tr><td>${l.label}</td><td>${d.toLocaleDateString("he-IL")} ${d.toLocaleTimeString("he-IL",{hour:'2-digit',minute:'2-digit'})}</td></tr>`;
-  }).join("") || `<tr><td style="grid-column:1/-1;color:var(--ink-soft);text-align:center;padding:12px 0">אין עדיין נתוני כניסה.</td></tr>`;
+  }).join("") || `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:12px 0">אין עדיין נתוני כניסה.</td></tr>`;
 }
 auth.onAuthStateChanged(async (user) => {
   if(user){
@@ -1173,7 +1231,16 @@ function styleActionButtons(root){
 const selectColorMaps = {
   task: {"בוצע":["var(--green)","#fff"], "בביצוע":["var(--amber)","#fff"], "טרם התחיל":["var(--red-bg)","var(--red)"]},
   project: {"פתוח":["var(--amber-bg)","var(--amber)"], "בבדיקה":["var(--violet-bg)","var(--violet)"], "הושלם":["var(--green)","#fff"]},
-  recurring: {"שוטף":["var(--green-bg)","var(--green)"], 'בלתי"ם':["var(--violet-bg)","var(--violet)"]}
+  recurring: {"שוטף":["var(--green-bg)","var(--green)"], 'בלתי"ם':["var(--violet-bg)","var(--violet)"]},
+  licProcess: {
+    "לא התחיל":["var(--red-bg)","var(--red)"],
+    "ממתין לביקור/בדיקה":["var(--amber-bg)","var(--amber)"],
+    "דוח ליקויים התקבל - בטיפול":["var(--amber)","#fff"],
+    "תיקונים בוצעו - ממתין לאישור":["var(--violet-bg)","var(--violet)"],
+    "אישור זמני בתוקף":["var(--violet)","#fff"],
+    "אישור סופי התקבל":["var(--green)","#fff"],
+    "נדחה":["var(--red)","#fff"]
+  }
 };
 function colorizeOneSelect(sel){
   const map = selectColorMaps[sel.dataset.statusStyle];
@@ -1449,6 +1516,9 @@ function getContactSpecialties(){
 function getContactNames(){
   return [...new Set(data.contacts.map(c => c.name).filter(Boolean))];
 }
+function getSupplierNames(){
+  return [...new Set(data.contacts.filter(c => c.contactType==="ספק" || c.contactType==="שניהם").map(c => c.name).filter(Boolean))];
+}
 function buildSelect(options, current, field){
   const opts = new Set(options.filter(Boolean));
   if(current) opts.add(current);
@@ -1611,6 +1681,11 @@ async function onSyncToggle(checkboxEl, row, type){
 function findContactByName(name){
   return data.contacts.find(c => c.name === name);
 }
+function quickContactWhatsAppByName(name){
+  const c = findContactByName(name);
+  if(!c) return;
+  sendContactWhatsApp(c.id);
+}
 function buildTaskMessageText(row){
   let msg = `בעיה: ${row.desc || "—"}\n`;
   if(row.category) msg += `תחום: ${row.category}\n`;
@@ -1714,8 +1789,11 @@ function renderTasks(){
       <td>${buildSelect(getContactNames(), row.assignee, "assignee")}</td>
       <td><input type="date" value="${row.due}" data-f="due"></td>
       <td>${schoolYearSelectHTML(row.schoolYear)}</td>
-      <td class="sync-cell">
-        <input type="checkbox" data-sync="task" ${row.synced?"checked":""} ${row.syncing?"disabled":""}>
+      <td class="sync-cell field-xnarrow">
+        <label class="cal-toggle" title="${row.synced?"מסונכרן ליומן":"סנכרון ליומן"}">
+          <input type="checkbox" data-sync="task" ${row.synced?"checked":""} ${row.syncing?"disabled":""} style="display:none">
+          <span class="cal-toggle-icon">${svgIcon("calendar",15)}</span>
+        </label>
         <div class="sync-status" id="sync-task-${row.id}">${row.syncing?"מסנכרן…":(row.synced?"✓ סונכרן":"")}</div>
       </td>
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:140px"></td>
@@ -1726,9 +1804,9 @@ function renderTasks(){
             <option value="תחזוקה בלתי מתוכננת" ${row.maint==="תחזוקה בלתי מתוכננת"?"selected":""}>תחזוקה בלתי מתוכננת</option>
           </select></td>
       <td class="file-cell"></td>
-      <td class="row-actions" style="display:flex;gap:4px">
-        <button class="icon-btn" title="שליחת וואטסאפ לאיש המקצוע" onclick="sendTaskWhatsApp(${row.id})" style="color:var(--green)">${svgIcon("whatsapp",18)}</button>
-        <button class="icon-btn" title="שליחת אימייל לאיש המקצוע" onclick="sendTaskEmail(${row.id})">${svgIcon("mail",18)}</button>
+      <td class="contact-actions">
+        <button class="contact-action-btn ca-whatsapp" title="שליחת וואטסאפ לאיש המקצוע" onclick="sendTaskWhatsApp(${row.id})">${svgIcon("whatsapp",15)}</button>
+        <button class="contact-action-btn ca-mail" title="שליחת אימייל לאיש המקצוע" onclick="sendTaskEmail(${row.id})">${svgIcon("mail",15)}</button>
       </td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeTask(${row.id})">✕</button></td>
     `;
@@ -1794,7 +1872,7 @@ function renderProc(){
       <td><input type="text" value="${row.month}" data-f="month" style="min-width:90px"></td>
       <td><input type="text" value="${row.sku}" data-f="sku" style="min-width:90px"></td>
       <td class="primary-field"><input type="text" value="${row.item}" data-f="item" style="min-width:160px"></td>
-      <td><input type="text" value="${row.supplier}" data-f="supplier"></td>
+      <td style="flex-direction:row;align-items:center;gap:4px">${buildSelect(getSupplierNames(), row.supplier, "supplier")}${findContactByName(row.supplier) ? `<button type="button" class="ca-mini" title="יצירת קשר עם הספק" onclick="quickContactWhatsAppByName('${(row.supplier||"").replace(/'/g,"\\'")}')">${svgIcon("whatsapp",12)}</button>` : ""}</td>
       <td><input type="number" value="${row.qty}" data-f="qty" style="width:60px"></td>
       <td><input type="text" value="${row.unit}" data-f="unit" style="width:70px"></td>
       <td><input type="number" value="${row.price}" data-f="price" style="width:70px"></td>
@@ -1830,8 +1908,10 @@ function renderProc(){
 }
 
 /* ---------- LICENSING ---------- */
+const LIC_STATUS_ORDER = ["לא התחיל","ממתין לביקור/בדיקה","דוח ליקויים התקבל - בטיפול","תיקונים בוצעו - ממתין לאישור","אישור זמני בתוקף","אישור סופי התקבל","נדחה"];
+const LIC_PRIORITY_ORDER = {"גבוהה":0,"בינונית":1,"נמוכה":2,"":3};
 function addLic(){
-  data.licensing.push({id: nextId()+3000, type:"", freq:"", last:"", expiry:"", inspector:"", status:"", link:""});
+  data.licensing.push({id: nextId()+3000, type:"", freq:"", last:"", expiry:"", inspector:"", status:"", link:"", processStatus:"לא התחיל", priority:"בינונית", statusLog:[], requiredDocs:[]});
   renderLic(); scheduleSave("licensing","licSaved");
 }
 function removeLic(id){
@@ -1847,6 +1927,13 @@ function licUrgency(expiry){
   if(diffDays <= 30) return "open";
   return "done";
 }
+function licHasMissingDocs(row){
+  return (row.requiredDocs||[]).some(d => !d.fileUrl);
+}
+function licIsInProcess(row){
+  const ps = row.processStatus || "";
+  return ps && ps !== "אישור סופי התקבל" && ps !== "נדחה";
+}
 function renderLic(){
   const body = document.getElementById("licBody");
   body.innerHTML = "";
@@ -1857,24 +1944,50 @@ function renderLic(){
       schoolYearOptions().map(y => `<option value="${y}" ${y===currentSchoolYearStart()?"selected":""}>${schoolYearLabel(y)}</option>`).join("");
   }
   const yearFilter = yearSel ? yearSel.value : "";
-  const visibleLic = yearFilter ? data.licensing.filter(r => String(r.schoolYear||currentSchoolYearStart())===yearFilter) : data.licensing;
+  let visibleLic = yearFilter ? data.licensing.filter(r => String(r.schoolYear||currentSchoolYearStart())===yearFilter) : data.licensing.slice();
+
+  const sortBy = document.getElementById("licSortBy") ? document.getElementById("licSortBy").value : "expiry";
+  if(sortBy === "status"){
+    visibleLic.sort((a,b) => LIC_STATUS_ORDER.indexOf(a.processStatus||"לא התחיל") - LIC_STATUS_ORDER.indexOf(b.processStatus||"לא התחיל"));
+  }else if(sortBy === "priority"){
+    visibleLic.sort((a,b) => (LIC_PRIORITY_ORDER[a.priority||""]) - (LIC_PRIORITY_ORDER[b.priority||""]));
+  }else{
+    visibleLic.sort((a,b) => {
+      if(!a.expiry) return 1;
+      if(!b.expiry) return -1;
+      return new Date(a.expiry) - new Date(b.expiry);
+    });
+  }
+
   visibleLic.forEach(row => {
     const urgency = licUrgency(row.expiry);
     const tr = document.createElement("tr");
     if(urgency==="late") tr.classList.add("card-bad");
     else if(urgency==="open") tr.classList.add("card-warn");
     else if(urgency==="done") tr.classList.add("card-ok");
+    const priorityColor = row.priority==="גבוהה" ? "late" : row.priority==="בינונית" ? "open" : "done";
     tr.innerHTML = `
       <td class="primary-field"><input type="text" value="${row.type}" data-f="type" style="min-width:200px"></td>
-      <td><input type="text" value="${row.freq}" data-f="freq" style="width:90px"></td>
-      <td><input type="date" value="${row.last}" data-f="last"></td>
-      <td><input type="date" value="${row.expiry}" data-f="expiry"></td>
+      <td class="field-narrow"><input type="text" value="${row.freq}" data-f="freq"></td>
+      <td class="field-xnarrow"><input type="date" value="${row.last}" data-f="last"></td>
+      <td class="field-xnarrow"><input type="date" value="${row.expiry}" data-f="expiry"></td>
       <td><input type="text" value="${row.inspector}" data-f="inspector" style="min-width:140px"></td>
-      <td>${schoolYearSelectHTML(row.schoolYear)}</td>
-      <td>${urgency ? `<span class="pill ${urgency}">${urgency==="late"?"פג תוקף":urgency==="open"?"מתקרב לתפוגה":"בתוקף"}</span>` : `<input type="text" value="${row.status}" data-f="status" style="width:100px">`}</td>
+      <td class="field-narrow">${schoolYearSelectHTML(row.schoolYear)}</td>
+      <td><select data-f="processStatus" data-status-style="licProcess">
+            ${LIC_STATUS_ORDER.map(s=>`<option value="${s}" ${row.processStatus===s?"selected":""}>${s}</option>`).join("")}
+          </select></td>
+      <td class="field-xnarrow"><select data-f="priority">
+            <option value="גבוהה" ${row.priority==="גבוהה"?"selected":""}>גבוהה</option>
+            <option value="בינונית" ${(!row.priority||row.priority==="בינונית")?"selected":""}>בינונית</option>
+            <option value="נמוכה" ${row.priority==="נמוכה"?"selected":""}>נמוכה</option>
+          </select></td>
+      <td class="field-narrow">${urgency ? `<span class="pill ${urgency}">${urgency==="late"?"פג תוקף":urgency==="open"?"מתקרב לתפוגה":"בתוקף"}</span>` : `<input type="text" value="${row.status}" data-f="status">`}</td>
       <td class="file-cell"></td>
-      <td class="sync-cell">
-        <input type="checkbox" data-sync="lic" ${row.synced?"checked":""} ${row.syncing?"disabled":""}>
+      <td class="sync-cell field-xnarrow">
+        <label class="cal-toggle" title="${row.synced?"מסונכרן ליומן":"סנכרון ליומן"}">
+          <input type="checkbox" data-sync="lic" ${row.synced?"checked":""} ${row.syncing?"disabled":""} style="display:none">
+          <span class="cal-toggle-icon">${svgIcon("calendar",15)}</span>
+        </label>
         <div class="sync-status" id="sync-lic-${row.id}">${row.syncing?"מסנכרן…":(row.synced?"✓ סונכרן":"")}</div>
       </td>
       <td class="row-actions" style="display:flex;gap:4px;white-space:nowrap">
@@ -1892,8 +2005,83 @@ function renderLic(){
     tr.querySelectorAll("[data-sync]").forEach(cb => {
       cb.addEventListener("change", () => onSyncToggle(cb, row, "lic"));
     });
+
+    // required-documents checklist + status log — appended as a full-width block
+    const extraTd = document.createElement("td");
+    extraTd.style.flex = "1 1 100%";
+    const docs = row.requiredDocs || [];
+    const docsHtml = docs.map((d,i) => `
+      <span class="extra-contact-chip ${d.fileUrl?'':'doc-missing-chip'}">
+        <span class="ca-mini" style="background:${d.fileUrl?'var(--green)':'transparent'};color:${d.fileUrl?'#fff':'var(--red)'};border:${d.fileUrl?'none':'1.5px dashed var(--red)'}" onclick="${d.fileUrl?`window.open('${d.fileUrl}','_blank')`:`uploadRequiredDoc(${row.id},${i})`}" title="${d.fileUrl?'פתיחה':'העלאה'}">${d.fileUrl?svgIcon('check',11):svgIcon('plus',11)}</span>
+        ${d.name}
+        <button type="button" class="ca-mini" title="הסרה" onclick="removeRequiredDoc(${row.id},${i})">✕</button>
+      </span>`).join("");
+    const logEntries = (row.statusLog||[]).slice(0,3).map(l => `<div style="font-size:12px;color:var(--ink-soft);padding:2px 0">📅 ${l.date} — <b>${l.status}</b>: ${l.note}</div>`).join("");
+    extraTd.innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px">
+        <span style="font-size:11px;color:var(--ink-soft);font-weight:700">מסמכים נדרשים:</span>
+        ${docsHtml}
+        <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="addRequiredDoc(${row.id})">${svgIcon('plus',12)} מסמך</button>
+      </div>
+      <div>
+        <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="addLicStatusNote(${row.id})">${svgIcon('plus',12)} עדכון סטטוס</button>
+        <div style="margin-top:4px">${logEntries}</div>
+      </div>
+    `;
+    tr.appendChild(extraTd);
+
     body.appendChild(tr);
   });
+}
+function uploadRequiredDoc(licId, idx){
+  const input = document.createElement("input");
+  input.type = "file";
+  input.onchange = async () => {
+    if(!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const row = data.licensing.find(r=>r.id===licId);
+    if(!row) return;
+    try{
+      const path = `uploads/licensing-docs/${Date.now()}_${file.name}`;
+      const ref = storage.ref().child(path);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      row.requiredDocs[idx].fileUrl = url;
+      scheduleSave("licensing","licSaved");
+      renderLic();
+    }catch(e){
+      console.error(e);
+      alert("שגיאת העלאה: " + e.message);
+    }
+  };
+  input.click();
+}
+function removeRequiredDoc(licId, idx){
+  const row = data.licensing.find(r=>r.id===licId);
+  if(!row || !row.requiredDocs) return;
+  row.requiredDocs.splice(idx,1);
+  scheduleSave("licensing","licSaved");
+  renderLic();
+}
+function addRequiredDoc(licId){
+  const row = data.licensing.find(r=>r.id===licId);
+  if(!row) return;
+  const name = prompt("שם המסמך הנדרש (למשל: אישור משטרה, רישיון עסק):");
+  if(!name || !name.trim()) return;
+  row.requiredDocs = row.requiredDocs || [];
+  row.requiredDocs.push({name: name.trim(), fileUrl:""});
+  scheduleSave("licensing","licSaved");
+  renderLic();
+}
+function addLicStatusNote(licId){
+  const row = data.licensing.find(r=>r.id===licId);
+  if(!row) return;
+  const note = prompt(`הערה לסטטוס הנוכחי ("${row.processStatus||"—"}"):`);
+  if(note === null || !note.trim()) return;
+  row.statusLog = row.statusLog || [];
+  row.statusLog.unshift({date: new Date().toISOString().slice(0,10), status: row.processStatus||"", note: note.trim()});
+  scheduleSave("licensing","licSaved");
+  renderLic();
 }
 function renewLicForNewYear(id){
   const orig = data.licensing.find(r => r.id === id);
@@ -1903,7 +2091,8 @@ function renewLicForNewYear(id){
   if(!confirm(`ייווצר עותק חדש של "${orig.type||"האישור"}" לשנת ${schoolYearLabel(next)}, עם תאריכי בדיקה/תפוגה ריקים למילוי. הרשומה הנוכחית תישאר כמו שהיא תחת שנת ${schoolYearLabel(cur)}. להמשיך?`)) return;
   data.licensing.push({
     id: nextId()+3000, type:orig.type, freq:orig.freq, last:"", expiry:"",
-    inspector:orig.inspector, status:"", link:"", schoolYear:next
+    inspector:orig.inspector, status:"", link:"", schoolYear:next,
+    processStatus:"לא התחיל", priority:orig.priority||"בינונית", statusLog:[], requiredDocs:[]
   });
   scheduleSave("licensing","licSaved");
   const yearSel = document.getElementById("licYearFilter");
@@ -2111,7 +2300,7 @@ function renderAccountantReport(){
   if(combinedBody){
     combinedBody.innerHTML = "";
     if(combinedRows.length===0){
-      combinedBody.innerHTML = `<tr><td style="grid-column:1/-1;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומים מאושרים.</td></tr>`;
+      combinedBody.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומים מאושרים.</td></tr>`;
     }else{
       combinedRows.forEach(r => {
         const tr = document.createElement("tr");
@@ -2145,7 +2334,7 @@ function renderAccountantReport(){
     `;
   }
   if(count===0){
-    body.innerHTML = `<tr><td style="grid-column:1/-1;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומי צוות מאושרים.</td></tr>`;
+    body.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומי צוות מאושרים.</td></tr>`;
   }
   renderVendorPay();
 }
@@ -2224,12 +2413,12 @@ function renderPayment(){
 
 /* ---------- CONTACTS ---------- */
 function addContact(){
-  data.contacts.push({id: nextId()+6000, name:"", specialty:"", phone:"", email:"", priceType:"", cost:"", notes:""});
-  renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks();
+  data.contacts.push({id: nextId()+6000, name:"", contactType:"", specialty:"", phone:"", email:"", priceType:"", cost:"", notes:""});
+  renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks(); renderProc(); renderFoodPrice();
 }
 function removeContact(id){
   data.contacts = data.contacts.filter(r=>r.id!==id);
-  renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks();
+  renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks(); renderProc(); renderFoodPrice();
 }
 function formatPhoneForWhatsApp(phone){
   let digits = (phone||"").replace(/[^0-9]/g,"");
@@ -2251,26 +2440,50 @@ function renderContacts(){
   body.innerHTML = "";
   data.contacts.forEach(row => {
     const tr = document.createElement("tr");
-    const priceKnown = row.priceType === "מחיר קבוע";
+    const priceKnown = row.priceType === "מחיר קבוע" || row.priceType === "תעריף שעתי";
+    const priceLabel = row.priceType === "תעריף שעתי" ? "₪ לשעה" : "מחיר קבוע";
+    const extras = row.extraContacts || [];
     tr.innerHTML = `
       <td class="primary-field"><input type="text" value="${row.name}" data-f="name" style="min-width:130px"></td>
+      <td class="field-narrow"><select data-f="contactType">
+            <option value="" ${!row.contactType?"selected":""}></option>
+            <option value="איש מקצוע" ${row.contactType==="איש מקצוע"?"selected":""}>איש מקצוע</option>
+            <option value="ספק" ${row.contactType==="ספק"?"selected":""}>ספק</option>
+            <option value="שניהם" ${row.contactType==="שניהם"?"selected":""}>שניהם</option>
+          </select></td>
       <td><input type="text" value="${row.specialty}" data-f="specialty"></td>
       <td><input type="text" value="${row.phone}" data-f="phone" style="width:110px"></td>
       <td><input type="text" value="${row.email}" data-f="email" style="min-width:140px"></td>
       <td><select data-f="priceType">
             <option value="" ${!row.priceType?"selected":""}></option>
             <option value="מחיר קבוע" ${row.priceType==="מחיר קבוע"?"selected":""}>מחיר קבוע</option>
+            <option value="תעריף שעתי" ${row.priceType==="תעריף שעתי"?"selected":""}>תעריף שעתי</option>
             <option value="לפי קריאה" ${row.priceType==="לפי קריאה"?"selected":""}>לפי קריאה (משתנה)</option>
             <option value="לא ידוע" ${row.priceType==="לא ידוע"?"selected":""}>לא ידוע מראש</option>
           </select></td>
-      <td><input type="text" value="${row.cost}" data-f="cost" style="width:90px" ${priceKnown?"":"placeholder=\"—\" disabled"}></td>
+      <td><input type="text" value="${row.cost}" data-f="cost" style="width:90px" placeholder="${priceLabel}" ${priceKnown?"":"disabled"}></td>
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
-      <td class="row-actions" style="display:flex;gap:4px">
-        <button class="icon-btn" title="שליחת וואטסאפ" onclick="sendContactWhatsApp(${row.id})" style="color:var(--green)">${svgIcon("whatsapp",18)}</button>
-        <button class="icon-btn" title="שליחת אימייל" onclick="sendContactEmail(${row.id})">${svgIcon("mail",18)}</button>
+      <td class="contact-actions">
+        <button class="contact-action-btn ca-call" title="התקשרות" onclick="callContact(${row.id})">${svgIcon("phoneCall",15)}</button>
+        <button class="contact-action-btn ca-whatsapp" title="שליחת וואטסאפ" onclick="handleContactSend(${row.id},'whatsapp')">${svgIcon("whatsapp",15)}</button>
+        <button class="contact-action-btn ca-mail" title="שליחת אימייל" onclick="handleContactSend(${row.id},'email')">${svgIcon("mail",15)}</button>
+        <button class="contact-action-btn ca-add" title="הוספת מספר/איש קשר נוסף" onclick="addExtraContact(${row.id})">${svgIcon("plus",14)}</button>
       </td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeContact(${row.id})">✕</button></td>
     `;
+    if(extras.length){
+      const extraTd = document.createElement("td");
+      extraTd.setAttribute("data-label", "אנשי קשר נוספים");
+      extraTd.style.flex = "1 1 100%";
+      extraTd.innerHTML = extras.map((ex,i) => `
+        <span class="extra-contact-chip">
+          ${ex.label||"נוסף"}: ${ex.phone||ex.email||""}
+          <button type="button" class="ca-mini" title="התקשרות" onclick="callExtra(${row.id},${i})">${svgIcon("phoneCall",12)}</button>
+          <button type="button" class="ca-mini" title="וואטסאפ" onclick="sendExtraWhatsApp(${row.id},${i})">${svgIcon("whatsapp",12)}</button>
+          <button type="button" class="ca-mini" title="מחיקה" onclick="removeExtraContact(${row.id},${i})">✕</button>
+        </span>`).join("");
+      tr.appendChild(extraTd);
+    }
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = inp.value;
@@ -2281,10 +2494,60 @@ function renderContacts(){
       });
       inp.addEventListener("change", () => {
         if(inp.dataset.f === "priceType"){ renderContacts(); }
+        if(inp.dataset.f === "contactType" || inp.dataset.f === "name"){ renderProc(); renderFoodPrice(); }
       });
     });
     body.appendChild(tr);
   });
+}
+function callContact(id){
+  const c = data.contacts.find(x=>x.id===id);
+  if(!c || !c.phone){ alert("אין מספר טלפון שמור לאיש קשר זה."); return; }
+  window.location.href = `tel:${c.phone}`;
+}
+function handleContactSend(id, channel){
+  const c = data.contacts.find(x=>x.id===id);
+  if(!c) return;
+  const extras = c.extraContacts || [];
+  if(extras.length === 0){
+    if(channel === "whatsapp") sendContactWhatsApp(id); else sendContactEmail(id);
+    return;
+  }
+  // multiple numbers exist — ask which one
+  let msg = `שליחה עבור "${c.name}" — בחר מספר/כתובת (הראשי הוא ${c.phone||c.email||"—"}).\nלחץ אישור לשליחה לראשי, או ביטול כדי לבחור מהרשימה למטה בכרטיס.`;
+  if(confirm(msg)){
+    if(channel === "whatsapp") sendContactWhatsApp(id); else sendContactEmail(id);
+  }
+}
+function addExtraContact(id){
+  const c = data.contacts.find(x=>x.id===id);
+  if(!c) return;
+  const label = prompt("תיאור קצר (למשל: מנהל, נציג שירות):");
+  if(label === null) return;
+  const phone = prompt("מספר טלפון (אפשר להשאיר ריק אם לא רלוונטי):") || "";
+  c.extraContacts = c.extraContacts || [];
+  c.extraContacts.push({label, phone});
+  scheduleSave("contacts","contactsSaved");
+  renderContacts();
+}
+function removeExtraContact(id, idx){
+  const c = data.contacts.find(x=>x.id===id);
+  if(!c || !c.extraContacts) return;
+  c.extraContacts.splice(idx,1);
+  scheduleSave("contacts","contactsSaved");
+  renderContacts();
+}
+function callExtra(id, idx){
+  const c = data.contacts.find(x=>x.id===id);
+  const ex = c && c.extraContacts && c.extraContacts[idx];
+  if(!ex || !ex.phone){ alert("אין מספר טלפון לרשומה זו."); return; }
+  window.location.href = `tel:${ex.phone}`;
+}
+function sendExtraWhatsApp(id, idx){
+  const c = data.contacts.find(x=>x.id===id);
+  const ex = c && c.extraContacts && c.extraContacts[idx];
+  if(!ex || !ex.phone){ alert("אין מספר טלפון לרשומה זו."); return; }
+  window.open(`https://wa.me/${formatPhoneForWhatsApp(ex.phone)}`, "_blank");
 }
 
 /* ---------- FOOD PROCUREMENT ---------- */
@@ -2304,7 +2567,7 @@ function renderFoodPrice(){
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td class="primary-field"><input type="text" value="${row.item}" data-f="item" style="min-width:140px"></td>
-      <td><input type="text" value="${row.vendor}" data-f="vendor" style="min-width:100px"></td>
+      <td style="flex-direction:row;align-items:center;gap:4px">${buildSelect(getSupplierNames(), row.vendor, "vendor")}${findContactByName(row.vendor) ? `<button type="button" class="ca-mini" title="יצירת קשר עם הספק" onclick="quickContactWhatsAppByName('${(row.vendor||"").replace(/'/g,"\\'")}')">${svgIcon("whatsapp",12)}</button>` : ""}</td>
       <td><input type="text" value="${row.unit}" data-f="unit" style="width:80px"></td>
       <td><input type="number" value="${row.price}" data-f="price" style="width:80px"></td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeFoodPrice(${row.id})">✕</button></td>
@@ -2532,7 +2795,7 @@ function renderFoodOrders(){
   const filterVal = filterSel ? filterSel.value : "";
   const list = filterVal ? data.foodOrders.filter(o=>o.vendor===filterVal) : data.foodOrders;
   if(list.length===0){
-    body.innerHTML = `<tr><td style="grid-column:1/-1;color:var(--ink-soft);text-align:center;padding:16px 0">אין הזמנות להצגה.</td></tr>`;
+    body.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין הזמנות להצגה.</td></tr>`;
     return;
   }
   list.forEach(order => {
@@ -2850,7 +3113,7 @@ function renderFiles(){
   const list = filterVal ? data.files.filter(f=>f.category===filterVal) : data.files;
   body.innerHTML = "";
   if(list.length===0){
-    body.innerHTML = `<tr><td style="grid-column:1/-1;color:var(--ink-soft);text-align:center;padding:16px 0">אין קבצים להצגה.</td></tr>`;
+    body.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין קבצים להצגה.</td></tr>`;
     return;
   }
   list.forEach(row => {
@@ -3213,8 +3476,73 @@ function renderDashboard(){
     if(hasExpired) topSlot.appendChild(wrap);
     else anchor.after(wrap);
   }
+
+  const dashLicInProcess = document.getElementById("dashLicInProcess");
+  if(dashLicInProcess){
+    const inProcessList = data.licensing.filter(r => licIsInProcess(r) || licHasMissingDocs(r));
+    if(inProcessList.length === 0){
+      dashLicInProcess.innerHTML = "<p class='hint'>אין כרגע אישורים בתהליך.</p>";
+    }else{
+      let rows = "<table><thead><tr><th>סוג האישור</th><th>סטטוס טיפול</th><th>עדיפות</th><th>מסמכים</th></tr></thead><tbody>";
+      inProcessList.forEach(r => {
+        const missing = licHasMissingDocs(r);
+        rows += `<tr>
+          <td>${r.type||"—"}</td>
+          <td>${r.processStatus||"—"}</td>
+          <td><span class="pill ${r.priority==="גבוהה"?"late":r.priority==="נמוכה"?"done":"open"}">${r.priority||"בינונית"}</span></td>
+          <td>${missing ? `<span class="pill late">מסמכים חסרים</span>` : `<span class="pill done">מלא</span>`}</td>
+        </tr>`;
+      });
+      rows += "</tbody></table>";
+      dashLicInProcess.innerHTML = rows;
+    }
+  }
 }
 
+function dedupeIds(list){
+  if(!Array.isArray(list)) return false;
+  const seen = new Set();
+  let changed = false;
+  list.forEach(item => {
+    if(item && typeof item.id !== "undefined"){
+      if(seen.has(item.id)){
+        item.id = nextId();
+        changed = true;
+      }
+      seen.add(item.id);
+    }
+  });
+  return changed;
+}
+function repairDuplicateIds(){
+  dedupeIds(data.tasks);
+  dedupeIds(data.procurement);
+  dedupeIds(data.licensing);
+  dedupeIds(data.contacts);
+  dedupeIds(data.vendorPayments);
+  dedupeIds(data.recurring);
+  dedupeIds(data.files);
+  dedupeIds(data.projects);
+  (data.projects||[]).forEach(p => dedupeIds(p.quotes));
+  dedupeIds(data.keysInventory);
+  dedupeIds(data.keysLog);
+  dedupeIds(data.foodPriceList);
+  dedupeIds(data.foodOrders);
+  dedupeIds(data.bank);
+  (data.installments||[]).forEach(inst => dedupeIds(inst));
+  // persist the fix so it's corrected permanently, not just masked client-side
+  scheduleSave("tasks","tasksSaved");
+  scheduleSave("procurement","procSaved");
+  scheduleSave("licensing","licSaved");
+  scheduleSave("contacts","contactsSaved");
+  scheduleSave("vendorPayments","vendorPaySaved");
+  scheduleSave("recurring","financeSaved");
+  scheduleSave("files","filesSaved");
+  scheduleSave("projects","projectsSaved");
+  saveKeys();
+  saveFood();
+  saveInstallments();
+}
 function backfillTaskInvoiceSync(){
   let changed = false;
   data.tasks.forEach(taskRow => {
@@ -3236,6 +3564,7 @@ function backfillTaskInvoiceSync(){
 
 async function initAppData(){
   await loadAll();
+  repairDuplicateIds();
   backfillTaskInvoiceSync();
   buildNav();
   buildInstallmentTabs();
