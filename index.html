@@ -1754,7 +1754,9 @@ function rolloverTasksYear(){
   alert(`הועברו ${unfinished.length} משימות לשנת ${schoolYearLabel(next)}.`);
 }
 function addTask(){
-  data.tasks.push({id: nextId()+1000, created:"", category:"", desc:"", status:"טרם התחיל", assignee:"", due:"", notes:"", maint:"", link:""});
+  const yearSel = document.getElementById("tasksYearFilter");
+  const targetYear = (yearSel && yearSel.value) ? Number(yearSel.value) : currentSchoolYearStart();
+  data.tasks.push({id: nextId()+1000, created:"", category:"", desc:"", status:"טרם התחיל", assignee:"", due:"", notes:"", maint:"", link:"", schoolYear: targetYear});
   renderTasks(); scheduleSave("tasks","tasksSaved");
 }
 function removeTask(id){
@@ -1842,7 +1844,9 @@ function renderTasksCards(){
 
 /* ---------- PROCUREMENT ---------- */
 function addProc(){
-  data.procurement.push({id: nextId()+2000, month:"", sku:"", item:"", supplier:"", qty:0, unit:"", price:0, category:""});
+  const yearSel = document.getElementById("procYearFilter");
+  const targetYear = (yearSel && yearSel.value) ? Number(yearSel.value) : currentSchoolYearStart();
+  data.procurement.push({id: nextId()+2000, month:"", sku:"", item:"", supplier:"", qty:0, unit:"", price:0, category:"", schoolYear: targetYear});
   renderProc(); scheduleSave("procurement","procSaved");
 }
 function removeProc(id){
@@ -1911,7 +1915,9 @@ function renderProc(){
 const LIC_STATUS_ORDER = ["לא התחיל","ממתין לביקור/בדיקה","דוח ליקויים התקבל - בטיפול","תיקונים בוצעו - ממתין לאישור","אישור זמני בתוקף","אישור סופי התקבל","נדחה"];
 const LIC_PRIORITY_ORDER = {"גבוהה":0,"בינונית":1,"נמוכה":2,"":3};
 function addLic(){
-  data.licensing.push({id: nextId()+3000, type:"", freq:"", last:"", expiry:"", inspector:"", status:"", link:"", processStatus:"לא התחיל", priority:"בינונית", statusLog:[], requiredDocs:[]});
+  const yearSel = document.getElementById("licYearFilter");
+  const targetYear = (yearSel && yearSel.value) ? Number(yearSel.value) : currentSchoolYearStart();
+  data.licensing.push({id: nextId()+3000, type:"", freq:"", last:"", expiry:"", inspector:"", status:"", link:"", processStatus:"לא התחיל", priority:"בינונית", statusLog:[], requiredDocs:[], schoolYear: targetYear});
   renderLic(); scheduleSave("licensing","licSaved");
 }
 function removeLic(id){
