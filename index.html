@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -11,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ניהול הבניין">
-<meta name="theme-color" content="#101B24">
+<meta name="theme-color" content="#2b2723">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -483,6 +484,74 @@
     background:#fff; border-radius:var(--radius); padding:22px;
     width:100%; max-width:420px; box-shadow:0 20px 50px rgba(0,0,0,.3);
   }
+</style>
+<!-- ===== Organic design line — theme override. Delete this block to revert. ===== -->
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&display=swap" rel="stylesheet">
+<style id="organic-theme">
+  :root{
+    --bg:#f5ead8;
+    --card:#ebddc5;
+    --ink:#201e1d;
+    --ink-soft:#645c50;
+    --line:rgba(32,30,29,.16);
+    --brand:#c67139;
+    --brand-dark:#2b2723;
+    --amber:#c67139;
+    --amber-bg:#ffe1d0;
+    --green:#7a8a5e;
+    --green-bg:#e1eecc;
+    --red:#8c491a;
+    --red-bg:#ffc6a5;
+    --violet:#82796a;
+    --violet-bg:#eee7db;
+    --tint-a:#fff2eb;
+    --tint-b:#f0fae1;
+    --radius:16px;
+    --font-heading:"Suez One","Rubik",serif;
+  }
+  body::before{
+    background:
+      radial-gradient(circle at 0% 0%, rgba(198,113,57,.10), transparent 45%),
+      radial-gradient(circle at 100% 100%, rgba(122,138,94,.12), transparent 45%),
+      var(--bg);
+  }
+  h1,h2,h3,.sidebar .brand,.stat .value{ font-family:var(--font-heading); font-weight:400; letter-spacing:-.01em; }
+  .card,.stat{ border-radius:24px; box-shadow:0 1px 2px rgba(46,43,37,.10); }
+  .stat{ border-top-width:3px; }
+  .btn,.pill,.role-btn,.contact-action-btn,.doc-chip,.doc-missing-chip,.cal-toggle-icon{ border-radius:999px; }
+  .btn:hover{ background:#b2622d; }
+  .btn:active{ background:#8c491a; }
+  .btn.ghost{ color:#8c491a; border-color:var(--line); background:transparent; }
+  .btn.ghost:hover{ background:rgba(198,113,57,.10); color:#402310; border-color:#c67139; }
+  .btn.ghost .btn-icon-badge{ background:#c67139; }
+  .pill.done{ background:#7a8a5e; }
+  .pill.open{ background:#c67139; }
+  .pill.late{ background:#8c491a; }
+  .card-badge{ background:#c67139; }
+  .nav-flyout{ border-radius:20px; }
+  .nav-flyout-item{ border-radius:999px; }
+  .nav-flyout-item:hover{ background:#ffe1d0; }
+  input,select,textarea{ border-radius:14px; }
+  input:focus,select:focus,textarea:focus{ border-color:#c67139; }
+  :focus-visible{ outline:2px solid #c67139; outline-offset:2px; }
+  ::selection{ background:rgba(198,113,57,.30); }
+  .sidebar{ background:var(--brand-dark); }
+  .sidebar .tab-btn.active,.sidebar .nav-item.active{ background:#c67139 !important; border-right-color:#ffc6a5 !important; }
+  table tr.card-ok{ border-right-color:#7a8a5e; background:#e1eecc; }
+  table tr.card-warn{ border-right-color:#c67139; background:#ffe1d0; }
+  table tr.card-bad{ border-right-color:#402310; background:#ffc6a5; }
+  table tr.card-ok td.primary-field{ border-bottom-color:#7a8a5e; }
+  table tr.card-warn td.primary-field{ border-bottom-color:#c67139; }
+  table tr.card-bad td.primary-field{ border-bottom-color:#402310; }
+  .doc-missing-chip{ border-color:#c67139; border-style:dashed; background:transparent; color:#8c491a; }
+  .sync-status.ok{ color:#56633f; }
+  .sync-status.err{ color:#8c491a; }
+  .contact-action-btn.ca-whatsapp{ background:#7a8a5e; }
+  .contact-action-btn.ca-mail{ background:#c67139; }
+  .contact-action-btn.ca-call{ background:#c67139; }
+  .contact-action-btn.ca-add:hover{ border-color:#c67139; color:#8c491a; }
+  .ca-mini:hover{ background:#c67139; }
+  #roleGate .role-btn:hover{ background:#ffe1d0; }
 </style>
 </head>
 <body>
@@ -1711,26 +1780,20 @@ function sendTaskEmail(taskId){
   window.location.href = `mailto:${contact.email}?subject=${subject}&body=${body}`;
 }
 function syncTaskInvoiceToVendorPay(taskRow){
-  const firstDocUrl = (taskRow.docs && taskRow.docs[0]) ? taskRow.docs[0].fileUrl : "";
-  if(firstDocUrl){
+  if(taskRow.link){
     if(taskRow.vendorPayId){
       const vp = data.vendorPayments.find(v=>v.id===taskRow.vendorPayId);
-      if(vp){
-        vp.docs = vp.docs || [];
-        if(vp.docs.length===0) vp.docs.push({name:"חשבונית ממשימה", fileUrl:firstDocUrl});
-        else vp.docs[0].fileUrl = firstDocUrl;
-        scheduleSave("vendorPayments","vendorPaySaved");
-      }
+      if(vp){ vp.invoiceLink = taskRow.link; scheduleSave("vendorPayments","vendorPaySaved"); }
     }else{
       const newId = nextId()+7000;
-      data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", fileUrl:firstDocUrl}], notes:"מקור: משימה"});
+      data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", invoiceLink:taskRow.link, notes:"מקור: משימה"});
       taskRow.vendorPayId = newId;
       scheduleSave("vendorPayments","vendorPaySaved");
     }
   }else{
     if(taskRow.vendorPayId){
       const vp = data.vendorPayments.find(v=>v.id===taskRow.vendorPayId);
-      if(vp){ vp.docs = []; scheduleSave("vendorPayments","vendorPaySaved"); }
+      if(vp){ vp.invoiceLink = ""; scheduleSave("vendorPayments","vendorPaySaved"); }
     }
   }
   renderVendorPay();
@@ -1818,9 +1881,13 @@ function renderTasks(){
       </td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeTask(${row.id})">✕</button></td>
     `;
-    migrateSingleDocToArray(row, "link", "docs", "חשבונית");
     const fileTd = tr.querySelector(".file-cell");
-    fileTd.innerHTML = renderDocsChecklist(row, "docs", "tasks");
+    fileTd.innerHTML = renderFileCellHTML(row, "link");
+    wireFileCell(fileTd, row, "link", "tasks-invoices", () => {
+      scheduleSave("tasks","tasksSaved");
+      syncTaskInvoiceToVendorPay(row);
+      renderTasks();
+    });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; scheduleSave("tasks","tasksSaved"); renderTasksCards(); renderDashboard(); });
       inp.addEventListener("change", () => { row[inp.dataset.f] = inp.value; scheduleSave("tasks","tasksSaved"); renderTasksCards(); renderDashboard(); });
@@ -1888,9 +1955,9 @@ function renderProc(){
       <td class="file-cell"></td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeProc(${row.id})">✕</button></td>
     `;
-    migrateSingleDocToArray(row, "link", "docs", "מסמך הזמנה");
     const fileTd = tr.querySelector(".file-cell");
-    fileTd.innerHTML = renderDocsChecklist(row, "docs", "procurement");
+    fileTd.innerHTML = renderFileCellHTML(row, "link");
+    wireFileCell(fileTd, row, "link", "procurement-orders", () => { scheduleSave("procurement","procSaved"); renderProc(); });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
@@ -2159,9 +2226,9 @@ function renderStaff(){
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeStaffRow(${row.id})">✕</button></td>
     `;
-    migrateSingleDocToArray(row, "link", "docs", "פירוט תפקיד");
     const fileTd = tr.querySelector(".file-cell");
-    fileTd.innerHTML = renderDocsChecklist(row, "docs", "staff");
+    fileTd.innerHTML = renderFileCellHTML(row, "link");
+    wireFileCell(fileTd, row, "link", "staff-role-details", () => { saveInstallments(); renderStaff(); });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
@@ -2244,9 +2311,9 @@ function renderVendorPay(){
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:110px"></td>
       <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeVendorPay(${row.id})">✕</button></td>
     `;
-    migrateSingleDocToArray(row, "invoiceLink", "docs", "חשבונית");
     const fileTd = tr.querySelector(".file-cell");
-    fileTd.innerHTML = renderDocsChecklist(row, "docs", "vendorPayments");
+    fileTd.innerHTML = renderFileCellHTML(row, "invoiceLink");
+    wireFileCell(fileTd, row, "invoiceLink", "vendor-invoices", () => { scheduleSave("vendorPayments","vendorPaySaved"); renderVendorPay(); });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
@@ -2320,7 +2387,7 @@ function renderAccountantReport(){
         tr.querySelector("[data-paid]").addEventListener("change", (e) => {
           r.ref.paid = e.target.checked;
           if(e.target.checked){
-            const hasReceipt = (r.ref.docs||[]).some(d=>d.fileUrl);
+            const hasReceipt = r.kind==="vendor" ? r.ref.invoiceLink : r.ref.link;
             if(!hasReceipt) alert("סומן כשולם. מומלץ לצרף קבלה/חשבונית עבור תשלום זה.");
           }
           r.saveFn();
@@ -3081,105 +3148,6 @@ function wireFileCell(td, row, field, category, onDone){
   }
 }
 
-/* ---------- GENERIC MULTI-DOCUMENT CHECKLIST (for tasks/procurement/vendor-payments/staff) ---------- */
-const DOC_TABLES = {
-  tasks: {
-    find: id => data.tasks.find(r=>r.id===id),
-    save: () => scheduleSave("tasks","tasksSaved"),
-    rerender: () => renderTasks(),
-    category: "tasks-invoices"
-  },
-  procurement: {
-    find: id => data.procurement.find(r=>r.id===id),
-    save: () => scheduleSave("procurement","procSaved"),
-    rerender: () => renderProc(),
-    category: "procurement-orders"
-  },
-  vendorPayments: {
-    find: id => data.vendorPayments.find(r=>r.id===id),
-    save: () => scheduleSave("vendorPayments","vendorPaySaved"),
-    rerender: () => renderVendorPay(),
-    category: "vendor-invoices"
-  },
-  staff: {
-    find: id => {
-      for(const inst of data.installments){
-        const r = inst.find(x=>x.id===id);
-        if(r) return r;
-      }
-      return null;
-    },
-    save: () => saveInstallments(),
-    rerender: () => renderStaff(),
-    category: "staff-role-details"
-  }
-};
-function migrateSingleDocToArray(row, oldField, newField, defaultName){
-  if((!row[newField] || row[newField].length===0) && row[oldField]){
-    row[newField] = [{name: defaultName, fileUrl: row[oldField]}];
-  }
-  if(!row[newField]) row[newField] = [];
-}
-function renderDocsChecklist(row, field, tableKey){
-  const docs = row[field] || [];
-  const chips = docs.map((d,i) => `
-    <span class="extra-contact-chip ${d.fileUrl?'':'doc-missing-chip'}">
-      <span class="ca-mini" style="background:${d.fileUrl?'var(--green)':'transparent'};color:${d.fileUrl?'#fff':'var(--red)'};border:${d.fileUrl?'none':'1.5px dashed var(--red)'}" onclick="${d.fileUrl?`window.open('${d.fileUrl}','_blank')`:`uploadGenericDoc('${tableKey}',${row.id},'${field}',${i})`}" title="${d.fileUrl?'פתיחה':'העלאה'}">${d.fileUrl?svgIcon('check',11):svgIcon('plus',11)}</span>
-      ${d.name}
-      <button type="button" class="ca-mini" title="הסרה" onclick="removeGenericDoc('${tableKey}',${row.id},'${field}',${i})">✕</button>
-    </span>`).join("");
-  return `<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">
-    ${chips}
-    <button type="button" class="ca-mini" title="הוספת מסמך נוסף" onclick="addGenericDoc('${tableKey}',${row.id},'${field}')" style="width:24px;height:24px;border:1.5px dashed var(--line);background:transparent;color:var(--ink-soft)">${svgIcon('plus',12)}</button>
-  </div>`;
-}
-function addGenericDoc(tableKey, id, field){
-  const t = DOC_TABLES[tableKey];
-  const row = t.find(id);
-  if(!row) return;
-  const name = prompt("שם המסמך (למשל: חשבונית, אישור, תעודת משלוח):");
-  if(!name || !name.trim()) return;
-  row[field] = row[field] || [];
-  row[field].push({name: name.trim(), fileUrl: ""});
-  t.save();
-  if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
-  t.rerender();
-}
-function removeGenericDoc(tableKey, id, field, idx){
-  const t = DOC_TABLES[tableKey];
-  const row = t.find(id);
-  if(!row || !row[field]) return;
-  row[field].splice(idx, 1);
-  t.save();
-  if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
-  t.rerender();
-}
-function uploadGenericDoc(tableKey, id, field, idx){
-  const t = DOC_TABLES[tableKey];
-  const input = document.createElement("input");
-  input.type = "file";
-  input.onchange = async () => {
-    if(!input.files || !input.files[0]) return;
-    const file = input.files[0];
-    const row = t.find(id);
-    if(!row) return;
-    try{
-      const path = `uploads/${t.category}/${Date.now()}_${file.name}`;
-      const ref = storage.ref().child(path);
-      await ref.put(file);
-      const url = await ref.getDownloadURL();
-      row[field][idx].fileUrl = url;
-      t.save();
-      if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
-      t.rerender();
-    }catch(e){
-      console.error(e);
-      alert("שגיאת העלאה: " + e.message);
-    }
-  };
-  input.click();
-}
-
 async function uploadFile(){
   const input = document.getElementById("fileInput");
   const category = document.getElementById("fileCategorySelect").value;
@@ -3654,10 +3622,10 @@ function backfillTaskInvoiceSync(){
   let changed = false;
   data.tasks.forEach(taskRow => {
     if(taskRow.link && !taskRow.vendorPayId){
-      const alreadyLinked = data.vendorPayments.some(v => (v.docs||[]).some(d=>d.fileUrl===taskRow.link));
+      const alreadyLinked = data.vendorPayments.some(v => v.invoiceLink === taskRow.link);
       if(!alreadyLinked){
         const newId = nextId()+7000;
-        data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", fileUrl:taskRow.link}], notes:"מקור: משימה"});
+        data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", invoiceLink:taskRow.link, notes:"מקור: משימה"});
         taskRow.vendorPayId = newId;
         changed = true;
       }
