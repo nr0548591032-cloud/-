@@ -1,8 +1,15 @@
 
+
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=ai-legible&utm_source=comment&utm_medium=referral&utm_id=bcb95712-81f3-4671-a898-e537cfa02a7f
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="hosting-provider" content="Netlify">
+<meta name="netlify-deploy" content="https://netlify.new/?utm_campaign=ai-legible&amp;utm_source=meta&amp;utm_medium=referral&amp;utm_id=bcb95712-81f3-4671-a898-e537cfa02a7f">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ניהול הבניין</title>
 <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIteg15nXlNeV15wg15TXkdeg15nXmdefIiwgInNob3J0X25hbWUiOiAi16DXmdeU15XXnCDXlNeR16DXmdeZ158iLCAic3RhcnRfdXJsIjogIi4iLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgImJhY2tncm91bmRfY29sb3IiOiAiIzEwMUIyNCIsICJ0aGVtZV9jb2xvciI6ICIjMTAxQjI0IiwgImxhbmciOiAiaGUiLCAiZGlyIjogInJ0bCIsICJpY29ucyI6IFt7InNyYyI6ICJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQWdBQUFBSUFDQUlBQUFCN0drT3RBQUFMc2tsRVFWUjRuTzNkdlhFVTZSYUE0ZEd0RFVBZWhseFpHOE51Rk91UWcrSlJEamhFc2NSQUJoaGtjUTF1VVZ3RTg5Yy9YM2UvejJOdDFjTFFTRFBuN2ZNTmtoNGVuNTVQQVBUOFovUUZBRENHQUFCRUNRQkFsQUFBUkFrQVFKUUFBRVFKQUVDVUFBQkVDUUJBbEFBQVJBa0FRSlFBQUVRSkFFQ1VBQUJFQ1FCQWxBQUFSQWtBUUpRQUFFUUpBRUNVQUFCRUNRQkFsQUFBUkFrQVFKUUFBRVFKQUVDVUFBQkVDUUJBbEFBQVJBa0FRSlFBQUVRSkFFQ1VBQUJFQ1FCQWxBQUFSQWtBUUpRQUFFUUpBRUNVQUFCRUNRQkFsQUFBUkFrQVFKUUFBRVFKQUVDVUFBQkVDUUJBbEFBQVJBa0FRSlFBQUVRSkFFQ1VBQUJFQ1FCQWxBQUFSQWtBUUpRQUFFUUpBRUNVQUFCRUNRQkFsQUFBUkFrQVFKUUFBRVFKQUVDVUFBQkVDUUJBbEFBQVJBa0FRSlFBQUVRSkFFQ1VBQUJFQ1FCQWxBQUFSQWtBUUpRQUFFUUpBRUNVQUFCRUNRQkFsQUFBUkFrQVFKUUFBRVFKQUVDVUFBQkVDUUJBbEFBQVJBa0FRSlFBQUVRSkFFQ1VBQUJFQ1FCQWxBQUFSQWtBUUpRQUFFUUpBRUNVQUFCRUNRQkFsQUFBUkFrQVFKUUFBRVFKQUVDVUFBQkVDUUJBbEFBQVJBa0FRSlFBQUVRSkFFQ1VBQUJFQ1FCQWxBQUFSQWtBUUpRQWtQYmw4NmZSbHdERFBEdytQWSsrQmhqZ3A5SC85T2RmbzY0RVJyRUJVUFQyeHQ4cVFKQU5nSmFMZzk0cVFJY0FVSEhUUGI0TVVPQUlpSVJiVDNpY0NGRmdBK0RnSm81eXF3QUhaZ1BneUtiZnlGc0ZPREFiQU1jMCsrQzJDbkE4QXNEUkxIclBMZ01jaVNNZ0RtWHBFeHNuUWh5SkRZQ0RXSGswV3dVNEFBRmc5d2JlbGNzQXUrWUlpSDBiZXlialJJaGRzd0d3VjVzYXZsWUI5a2dBMko5TmpmNGZ5UUQ3NGdpSW5kbnM5RDl0KzlyZ0xSc0F1N0dqOFdvVllCZHNBT3pEanFiL2FXOVhTNVlOZ0szYjlUQzFDckJsQXNCMjdYcjAvMGdHMkNaSFFHelVZYWIvNlZoL0Y0N0VCc0RtSEhoY1dnWFlGQUZnUXc0OCtuOGtBMnlFSXlDMklqTDlUNlcvS1J0bkEyQzg3RUMwQ2pDV0RZREJzdFAvMVA2N3N3VTJBSVl4L3I2ekNqQ0VBRENBMGY5TE1zREtIQUd4TnRQL2QzeGtXSmtOZ1BVWWNGZXlDckFPQVdBTlJ2OGRaSUNsT1FKaWNhYi9mWHpjV0pvTmdBVVpZYk93Q3JBUUFXQVJSdi9zWklEWk9RSmlmcWIvRW54VW1aME5nRGtaVWl1d0NqQVhHd0N6TWYzWDRlUE1YR3dBek1CSUdzSXF3RVFDd0NSRy8zQXl3TjBjQVhFLzAzOExmQmE0bXcyQWV4ZzZHMlFWNEZZQ3dHMk0vbzJUQWE3bkNJZ2JtUDdiNTNQRTlXd0FYTVZZMlIyckFCY0pBQmNZL2JzbUE1emhDSWh6VFArOTh4bmtEQnNBdjJad0hJeFZnTGRzQVB5QzZYODhQcWU4WlFQZy94Z1RoMmNWNERzQjRIK00vaFFaNE9RSWlHOU0veHFmY1U0MkFBeUNPS3RBbVFCMEdmMThKd05Oam9DaVRIOSs1UG5RWkFQSThWTG5ES3RBaWdDRUdQMWNTUVlpSEFGVm1QNWN6N01sd2dad2ZGN00zTTBxY0d3MmdJTXovWm5DOCtmWWJBQ0g1YVhMakt3Q2h5UUFCMlQwc3hBWk9CaEhRRWRqK3JNY3o2NkRzUUVjaHhjbnE3RUtISU1BSElIUnp4QXlzSGVPZ0hiUDlHY1V6NzI5c3dIc21KY2ZHMkVWMkNrYndGNlovbXlIWitOTzJRRDJ4NHVOemJJSzdJc0E3SW5Senk3SXdGNDRBdG9OMDUrOThGemRDeHZBRG5nNXNWTldnWTBUZ0Uweitqa0FHZGdzUjBEYlpmcHpESjdKbTJVRDJDSXZHQTdKS3JBMUFyQXRSaitISndQYjRRaG9RMHgvQ2p6UHQ4TUdzQWxlRWdSWkJZYXpBWXhuK3RQa21UK2NEV0FrTHdBNFdRWEdFWUF4akg3NGlReXN6eEhRQUtZL3ZPVjFzVDRid0tvOHhlRWlxOEJxQkdBSFByeThHMzBKY0kvM3IxOUhYd0xuT0FJQ2lCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0tnL1JsOEFZN3gvL2JyT0gvVGg1ZDJVMys0NmZ4SzVUdFpoQXdDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0tpSHg2Zm4wZGZBQlI5ZTNvMitCTGpIKzlldm95K0JjMndBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCRDF4K2dMWUl6VmZscjN4SjlvN3pwL0VybE8xbUVEQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBcUlmSHArZlIxOEFGSDE3ZWpiNEV1TWY3MTYrakw0RnpiQUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVQWEg2QXRnak5WK1d2ZkVuMmp2T244U3VVN1dZUU1BaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaVBJemdZSEZmZm44NlhmLzYrblB2OWE4RW40a0FNQWkvbjc1K09YbDhpLzdzUTFpc0RJQkFHWjI1bjcvbXQ4b0E2c1JBR0EyZDQvK3R3OGlBeXNRQUdBR3M0eit0dzhvQTR2eXI0Q0FxV2FmL2lzOE1pY0JBQ1phZWtacndISUVBTGpmT3ROWkF4YmlQUURnVHRmUDVUTkgrVmMreUpmUG43d2ZNRHNCQU81eHplQytabVIvL3pVWEgxQURaaWNBd00wdUR1dC9YLys1OVRHL0RmZnpqNndCOC9JZUFIQ2JpOU4veW95KytIdTlIekFqQVFEbU5QME8zVDMrYWdRQXVNSDVHL0M1WnZmNXg3RUV6RVVBZ0huTWUrZHVEMWpCdytQVDgraHI0SUlQTCs5R1h3S2NUcWZUM3k4ZmYvZS9mdm11Ny92WHJ4UC9STjlIZWxFMkFHQ3FPLzdOejVWTStVVUpBSENWTTdmL1EzZ25ZRG9CQUNaWjd2Yi9HMHZBY2dRQUlFb0FBS0lFQUxqc2QyOEFMSDMrODgzdlRvRzhEVENSN3dVRWJNaXRNMzNHQmdUZmJMQUJBRVFKQUVDVUFBQkVDUUJBbEFBQVJBa0FRSlFBQUVRSkFIRFo3NzdnYTJ2ZklZNmIrRUl3WUVOKytkVllkM3kxMTlPZmYvbFpBaGZaQUFDaUJBQ1laT2xUSU4vd1p6a0NBRnhsbmUvN2RqM0hPTk1KQUREVmNrdUEyLzlGQ1FCd3JUTkx3QklOOEM3dTBnUUFtTWU4RFhEdnZ3SUJBRzV3L3AyQXVScHdmdnE3L1orTHJ3TUE1dlQzeThlSmJ4ZGZmKyt2QkJQWkFJRGJYSnp2VS9hQWk5UGYwSitSQUFBM3U2WUJ0MmJneStkUHB2L0tIQUVCOS9qMzlaK0xJLzc3UUQ4enVCMzREUFR3K1BROCtocTQ0TVBMdTlHWEFMKzIyamVETS8yWDRBZ0l1Tjg2WHg1cytpOUVBSUJKbG02QTZiOGNBUUNtV3E0QnB2K2l2QWtNek9CYkEyWjhTOERvWDRFQUFMT1pKUU5HLzJvRUFKalozUmt3K2xjbUFNQWkvbjM5NS8zcjEyLy83ZnQ2YnBNQUFJc3o1YmZKdndJQ2lCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlIcDRmSG9lZlEwQURHQURBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdLai9BbjFDUXY1NnZGOXBBQUFBQUVsRlRrU3VRbUNDIiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS9wbmciLCAicHVycG9zZSI6ICJhbnkgbWFza2FibGUifV19">
@@ -11,7 +18,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ניהול הבניין">
-<meta name="theme-color" content="#101B24">
+<meta name="theme-color" content="#2b2723">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -232,15 +239,6 @@
     z-index:2;
   }
   table tr:nth-child(even){ background:var(--tint-b); }
-  .card-delete-btn{
-    position:absolute; top:-12px; right:14px;
-    width:26px; height:26px; border-radius:50%;
-    background:#fff; color:var(--red); border:1.5px solid var(--red);
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; box-shadow:0 3px 8px rgba(16,27,36,.2);
-    z-index:2; transition:background .15s ease, color .15s ease;
-  }
-  .card-delete-btn:hover{ background:var(--red); color:#fff; }
   .contact-actions{
     display:flex !important; flex-direction:row !important; align-items:center;
     gap:8px; justify-content:flex-start;
@@ -492,6 +490,74 @@
     background:#fff; border-radius:var(--radius); padding:22px;
     width:100%; max-width:420px; box-shadow:0 20px 50px rgba(0,0,0,.3);
   }
+</style>
+<!-- ===== Organic design line — theme override. Delete this block to revert. ===== -->
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&display=swap" rel="stylesheet">
+<style id="organic-theme">
+  :root{
+    --bg:#f5ead8;
+    --card:#ebddc5;
+    --ink:#201e1d;
+    --ink-soft:#645c50;
+    --line:rgba(32,30,29,.16);
+    --brand:#c67139;
+    --brand-dark:#2b2723;
+    --amber:#c67139;
+    --amber-bg:#ffe1d0;
+    --green:#7a8a5e;
+    --green-bg:#e1eecc;
+    --red:#8c491a;
+    --red-bg:#ffc6a5;
+    --violet:#82796a;
+    --violet-bg:#eee7db;
+    --tint-a:#fff2eb;
+    --tint-b:#f0fae1;
+    --radius:16px;
+    --font-heading:"Suez One","Rubik",serif;
+  }
+  body::before{
+    background:
+      radial-gradient(circle at 0% 0%, rgba(198,113,57,.10), transparent 45%),
+      radial-gradient(circle at 100% 100%, rgba(122,138,94,.12), transparent 45%),
+      var(--bg);
+  }
+  h1,h2,h3,.sidebar .brand,.stat .value{ font-family:var(--font-heading); font-weight:400; letter-spacing:-.01em; }
+  .card,.stat{ border-radius:24px; box-shadow:0 1px 2px rgba(46,43,37,.10); }
+  .stat{ border-top-width:3px; }
+  .btn,.pill,.role-btn,.contact-action-btn,.doc-chip,.doc-missing-chip,.cal-toggle-icon{ border-radius:999px; }
+  .btn:hover{ background:#b2622d; }
+  .btn:active{ background:#8c491a; }
+  .btn.ghost{ color:#8c491a; border-color:var(--line); background:transparent; }
+  .btn.ghost:hover{ background:rgba(198,113,57,.10); color:#402310; border-color:#c67139; }
+  .btn.ghost .btn-icon-badge{ background:#c67139; }
+  .pill.done{ background:#7a8a5e; }
+  .pill.open{ background:#c67139; }
+  .pill.late{ background:#8c491a; }
+  .card-badge{ background:#c67139; }
+  .nav-flyout{ border-radius:20px; }
+  .nav-flyout-item{ border-radius:999px; }
+  .nav-flyout-item:hover{ background:#ffe1d0; }
+  input,select,textarea{ border-radius:14px; }
+  input:focus,select:focus,textarea:focus{ border-color:#c67139; }
+  :focus-visible{ outline:2px solid #c67139; outline-offset:2px; }
+  ::selection{ background:rgba(198,113,57,.30); }
+  .sidebar{ background:var(--brand-dark); }
+  .sidebar .tab-btn.active,.sidebar .nav-item.active{ background:#c67139 !important; border-right-color:#ffc6a5 !important; }
+  table tr.card-ok{ border-right-color:#7a8a5e; background:#e1eecc; }
+  table tr.card-warn{ border-right-color:#c67139; background:#ffe1d0; }
+  table tr.card-bad{ border-right-color:#402310; background:#ffc6a5; }
+  table tr.card-ok td.primary-field{ border-bottom-color:#7a8a5e; }
+  table tr.card-warn td.primary-field{ border-bottom-color:#c67139; }
+  table tr.card-bad td.primary-field{ border-bottom-color:#402310; }
+  .doc-missing-chip{ border-color:#c67139; border-style:dashed; background:transparent; color:#8c491a; }
+  .sync-status.ok{ color:#56633f; }
+  .sync-status.err{ color:#8c491a; }
+  .contact-action-btn.ca-whatsapp{ background:#7a8a5e; }
+  .contact-action-btn.ca-mail{ background:#c67139; }
+  .contact-action-btn.ca-call{ background:#c67139; }
+  .contact-action-btn.ca-add:hover{ border-color:#c67139; color:#8c491a; }
+  .ca-mini:hover{ background:#c67139; }
+  #roleGate .role-btn:hover{ background:#ffe1d0; }
 </style>
 </head>
 <body>
@@ -1120,8 +1186,7 @@ const svgIconPaths = {
   phoneCall: '<path d="M14.5 2a1 1 0 0 1 1 .9V6a1 1 0 0 1-1 1c-.6 0-1.5-.2-1.9.2-.3.3-.1 1 .4 1.9.9 1.6 2.2 2.9 3.8 3.8.9.5 1.6.7 1.9.4.4-.4-.2-1.3-.2-1.9a1 1 0 0 1 1-1h3.1a1 1 0 0 1 .9 1c-.1 5.5-4.4 9.8-9.9 9.9C7.7 21.4 3.4 17.1 3 11.6 3 6 7.3 2 14.5 2Z"/>',
   plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
   check: '<path d="M20 6.5 9.5 17 4 11.5"/>',
-  calendar: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18"/><path d="M8 2.5v4"/><path d="M16 2.5v4"/>',
-  trash: '<path d="M4 7h16"/><path d="M6 7V4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V7"/><path d="M19 7l-.8 12.1a2 2 0 0 1-2 1.9H7.8a2 2 0 0 1-2-1.9L5 7"/><path d="M10 11v6"/><path d="M14 11v6"/>'
+  calendar: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18"/><path d="M8 2.5v4"/><path d="M16 2.5v4"/>'
 };
 function svgIcon(name, size){
   const path = svgIconPaths[name];
@@ -1721,26 +1786,20 @@ function sendTaskEmail(taskId){
   window.location.href = `mailto:${contact.email}?subject=${subject}&body=${body}`;
 }
 function syncTaskInvoiceToVendorPay(taskRow){
-  const firstDocUrl = (taskRow.docs && taskRow.docs[0]) ? taskRow.docs[0].fileUrl : "";
-  if(firstDocUrl){
+  if(taskRow.link){
     if(taskRow.vendorPayId){
       const vp = data.vendorPayments.find(v=>v.id===taskRow.vendorPayId);
-      if(vp){
-        vp.docs = vp.docs || [];
-        if(vp.docs.length===0) vp.docs.push({name:"חשבונית ממשימה", fileUrl:firstDocUrl});
-        else vp.docs[0].fileUrl = firstDocUrl;
-        scheduleSave("vendorPayments","vendorPaySaved");
-      }
+      if(vp){ vp.invoiceLink = taskRow.link; scheduleSave("vendorPayments","vendorPaySaved"); }
     }else{
       const newId = nextId()+7000;
-      data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", fileUrl:firstDocUrl}], notes:"מקור: משימה"});
+      data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", invoiceLink:taskRow.link, notes:"מקור: משימה"});
       taskRow.vendorPayId = newId;
       scheduleSave("vendorPayments","vendorPaySaved");
     }
   }else{
     if(taskRow.vendorPayId){
       const vp = data.vendorPayments.find(v=>v.id===taskRow.vendorPayId);
-      if(vp){ vp.docs = []; scheduleSave("vendorPayments","vendorPaySaved"); }
+      if(vp){ vp.invoiceLink = ""; scheduleSave("vendorPayments","vendorPaySaved"); }
     }
   }
   renderVendorPay();
@@ -1776,7 +1835,6 @@ function addTask(){
   renderTasks(); scheduleSave("tasks","tasksSaved");
 }
 function removeTask(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.tasks = data.tasks.filter(r=>r.id!==id);
   renderTasks(); scheduleSave("tasks","tasksSaved");
 }
@@ -1827,11 +1885,15 @@ function renderTasks(){
         <button class="contact-action-btn ca-whatsapp" title="שליחת וואטסאפ לאיש המקצוע" onclick="sendTaskWhatsApp(${row.id})">${svgIcon("whatsapp",15)}</button>
         <button class="contact-action-btn ca-mail" title="שליחת אימייל לאיש המקצוע" onclick="sendTaskEmail(${row.id})">${svgIcon("mail",15)}</button>
       </td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeTask(${row.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeTask(${row.id})">✕</button></td>
     `;
-    migrateSingleDocToArray(row, "link", "docs", "חשבונית");
     const fileTd = tr.querySelector(".file-cell");
-    fileTd.innerHTML = renderDocsChecklist(row, "docs", "tasks");
+    fileTd.innerHTML = renderFileCellHTML(row, "link");
+    wireFileCell(fileTd, row, "link", "tasks-invoices", () => {
+      scheduleSave("tasks","tasksSaved");
+      syncTaskInvoiceToVendorPay(row);
+      renderTasks();
+    });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; scheduleSave("tasks","tasksSaved"); renderTasksCards(); renderDashboard(); });
       inp.addEventListener("change", () => { row[inp.dataset.f] = inp.value; scheduleSave("tasks","tasksSaved"); renderTasksCards(); renderDashboard(); });
@@ -1863,7 +1925,6 @@ function addProc(){
   renderProc(); scheduleSave("procurement","procSaved");
 }
 function removeProc(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.procurement = data.procurement.filter(r=>r.id!==id);
   renderProc(); scheduleSave("procurement","procSaved");
 }
@@ -1898,11 +1959,11 @@ function renderProc(){
       <td><input type="text" value="${row.category}" data-f="category" style="width:100px"></td>
       <td>${schoolYearSelectHTML(row.schoolYear)}</td>
       <td class="file-cell"></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeProc(${row.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeProc(${row.id})">✕</button></td>
     `;
-    migrateSingleDocToArray(row, "link", "docs", "מסמך הזמנה");
     const fileTd = tr.querySelector(".file-cell");
-    fileTd.innerHTML = renderDocsChecklist(row, "docs", "procurement");
+    fileTd.innerHTML = renderFileCellHTML(row, "link");
+    wireFileCell(fileTd, row, "link", "procurement-orders", () => { scheduleSave("procurement","procSaved"); renderProc(); });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
@@ -1935,7 +1996,6 @@ function addLic(){
   renderLic(); scheduleSave("licensing","licSaved");
 }
 function removeLic(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.licensing = data.licensing.filter(r=>r.id!==id);
   renderLic(); scheduleSave("licensing","licSaved");
 }
@@ -2011,9 +2071,9 @@ function renderLic(){
         </label>
         <div class="sync-status" id="sync-lic-${row.id}">${row.syncing?"מסנכרן…":(row.synced?"✓ סונכרן":"")}</div>
       </td>
-      <td class="row-actions">
+      <td class="row-actions" style="display:flex;gap:4px;white-space:nowrap">
         <button class="btn ghost" style="padding:5px 8px;font-size:11px" onclick="renewLicForNewYear(${row.id})">חידוש לשנה חדשה</button>
-        <button class="card-delete-btn" title="מחיקה" onclick="removeLic(${row.id})">${svgIcon('trash',13)}</button>
+        <button class="icon-btn" title="מחיקה" onclick="removeLic(${row.id})">✕</button>
       </td>
     `;
     const fileTd = tr.querySelector(".file-cell");
@@ -2145,7 +2205,6 @@ function addStaffRow(){
   renderStaff(); saveInstallments();
 }
 function removeStaffRow(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.installments[activeInstallment] = data.installments[activeInstallment].filter(r=>r.id!==id);
   renderStaff(); saveInstallments();
 }
@@ -2171,11 +2230,11 @@ function renderStaff(){
       <td class="sync-cell">${row.paid?'<span class="pill done">שולם</span>':'<span class="pill open">ממתין</span>'}</td>
       <td class="file-cell"></td>
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeStaffRow(${row.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeStaffRow(${row.id})">✕</button></td>
     `;
-    migrateSingleDocToArray(row, "link", "docs", "פירוט תפקיד");
     const fileTd = tr.querySelector(".file-cell");
-    fileTd.innerHTML = renderDocsChecklist(row, "docs", "staff");
+    fileTd.innerHTML = renderFileCellHTML(row, "link");
+    wireFileCell(fileTd, row, "link", "staff-role-details", () => { saveInstallments(); renderStaff(); });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
@@ -2207,7 +2266,6 @@ function addBankRow(){
   renderBank(); saveInstallments();
 }
 function removeBankRow(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.bank = data.bank.filter(r=>r.id!==id);
   renderBank(); saveInstallments();
 }
@@ -2222,7 +2280,7 @@ function renderBank(){
       <td><input type="text" value="${row.branch}" data-f="branch" style="width:70px"></td>
       <td><input type="text" value="${row.account}" data-f="account" style="width:110px"></td>
       <td><input type="text" value="${row.holder}" data-f="holder"></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeBankRow(${row.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeBankRow(${row.id})">✕</button></td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; saveInstallments(); renderPayment(); renderAccountantReport(); });
@@ -2237,7 +2295,6 @@ function addVendorPay(){
   renderVendorPay(); scheduleSave("vendorPayments","vendorPaySaved");
 }
 function removeVendorPay(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.vendorPayments = data.vendorPayments.filter(r=>r.id!==id);
   renderVendorPay(); scheduleSave("vendorPayments","vendorPaySaved");
 }
@@ -2258,11 +2315,11 @@ function renderVendorPay(){
       <td><input type="text" value="${row.account}" data-f="account" style="width:100px"></td>
       <td class="file-cell"></td>
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:110px"></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeVendorPay(${row.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeVendorPay(${row.id})">✕</button></td>
     `;
-    migrateSingleDocToArray(row, "invoiceLink", "docs", "חשבונית");
     const fileTd = tr.querySelector(".file-cell");
-    fileTd.innerHTML = renderDocsChecklist(row, "docs", "vendorPayments");
+    fileTd.innerHTML = renderFileCellHTML(row, "invoiceLink");
+    wireFileCell(fileTd, row, "invoiceLink", "vendor-invoices", () => { scheduleSave("vendorPayments","vendorPaySaved"); renderVendorPay(); });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
@@ -2336,7 +2393,7 @@ function renderAccountantReport(){
         tr.querySelector("[data-paid]").addEventListener("change", (e) => {
           r.ref.paid = e.target.checked;
           if(e.target.checked){
-            const hasReceipt = (r.ref.docs||[]).some(d=>d.fileUrl);
+            const hasReceipt = r.kind==="vendor" ? r.ref.invoiceLink : r.ref.link;
             if(!hasReceipt) alert("סומן כשולם. מומלץ לצרף קבלה/חשבונית עבור תשלום זה.");
           }
           r.saveFn();
@@ -2441,7 +2498,6 @@ function addContact(){
   renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks(); renderProc(); renderFoodPrice();
 }
 function removeContact(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.contacts = data.contacts.filter(r=>r.id!==id);
   renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks(); renderProc(); renderFoodPrice();
 }
@@ -2494,7 +2550,7 @@ function renderContacts(){
         <button class="contact-action-btn ca-mail" title="שליחת אימייל" onclick="handleContactSend(${row.id},'email')">${svgIcon("mail",15)}</button>
         <button class="contact-action-btn ca-add" title="הוספת מספר/איש קשר נוסף" onclick="addExtraContact(${row.id})">${svgIcon("plus",14)}</button>
       </td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeContact(${row.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeContact(${row.id})">✕</button></td>
     `;
     if(extras.length){
       const extraTd = document.createElement("td");
@@ -2581,7 +2637,6 @@ function addFoodPrice(){
   renderFoodPrice(); saveFood();
 }
 function removeFoodPrice(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.foodPriceList = data.foodPriceList.filter(r=>r.id!==id);
   renderFoodPrice(); saveFood();
 }
@@ -2596,7 +2651,7 @@ function renderFoodPrice(){
       <td style="flex-direction:row;align-items:center;gap:4px">${buildSelect(getSupplierNames(), row.vendor, "vendor")}${findContactByName(row.vendor) ? `<button type="button" class="ca-mini" title="יצירת קשר עם הספק" onclick="quickContactWhatsAppByName('${(row.vendor||"").replace(/'/g,"\\'")}')">${svgIcon("whatsapp",12)}</button>` : ""}</td>
       <td><input type="text" value="${row.unit}" data-f="unit" style="width:80px"></td>
       <td><input type="number" value="${row.price}" data-f="price" style="width:80px"></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeFoodPrice(${row.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeFoodPrice(${row.id})">✕</button></td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
@@ -2643,7 +2698,7 @@ function renderOrderBuilder(){
       <td><input type="number" value="${line.qty}" data-f="qty" style="width:60px"></td>
       <td><input type="text" value="${fmtMoney(line.price)}" readonly style="width:80px"></td>
       <td class="order-line-total">${fmtMoney(rowTotal)}</td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeOrderLine(${line.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeOrderLine(${line.id})">✕</button></td>
     `;
     tr.querySelector("[data-f='item']").addEventListener("change", (e) => {
       line.item = e.target.value;
@@ -2805,7 +2860,6 @@ function printOrderView(id){
   setTimeout(() => w.print(), 400);
 }
 function removeFoodOrder(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.foodOrders = data.foodOrders.filter(o=>o.id!==id);
   renderFoodOrders(); saveFood();
 }
@@ -2833,7 +2887,7 @@ function renderFoodOrders(){
       <td style="font-weight:600">${fmtMoney(order.total)}</td>
       <td class="row-actions"><button class="btn ghost" style="padding:6px 10px;font-size:12px" onclick="printOrderView(${order.id})">${svgIcon("printer",14)} צפייה</button></td>
       <td class="row-actions"><button class="btn ghost" style="padding:6px 10px;font-size:12px" onclick="openMsgTemplateModal('${order.vendor.replace(/'/g,"\\'")}','${order.date}')">הודעה לספק</button></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeFoodOrder(${order.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeFoodOrder(${order.id})">✕</button></td>
     `;
     body.appendChild(tr);
   });
@@ -2884,7 +2938,6 @@ function addRecurring(){
   renderFinance(); scheduleSave("recurring","financeSaved");
 }
 function removeRecurring(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.recurring = data.recurring.filter(r=>r.id!==id);
   renderFinance(); scheduleSave("recurring","financeSaved");
 }
@@ -2933,9 +2986,9 @@ function renderFinance(){
       <td><input type="date" value="${row.nextDue}" data-f="nextDue"> ${urgency?`<span class="pill ${urgency}">${urgency==="late"?"באיחור":"קרוב"}</span>`:""}</td>
       <td><input type="text" value="${row.lastPaid}" readonly style="width:90px"></td>
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:100px"></td>
-      <td class="row-actions">
+      <td class="row-actions" style="display:flex;gap:4px;white-space:nowrap">
         <button class="btn ghost" style="padding:5px 8px;font-size:11px" onclick="markPaid(${row.id})">סמן כשולם</button>
-        <button class="card-delete-btn" title="מחיקה" onclick="removeRecurring(${row.id})">${svgIcon('trash',13)}</button>
+        <button class="icon-btn" title="מחיקה" onclick="removeRecurring(${row.id})">✕</button>
       </td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
@@ -2962,7 +3015,6 @@ function addKeyInv(){
   renderKeysInv(); saveKeys();
 }
 function removeKeyInv(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.keysInventory = data.keysInventory.filter(r=>r.id!==id);
   renderKeysInv(); saveKeys();
 }
@@ -2984,7 +3036,7 @@ function renderKeysInv(){
       <td><input type="text" value="${row.size}" data-f="size" style="width:60px"></td>
       <td><input type="number" value="${row.qty}" data-f="qty" style="width:60px"></td>
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:100px"></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeKeyInv(${row.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeKeyInv(${row.id})">✕</button></td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
@@ -3001,7 +3053,6 @@ function addKeyLog(){
   renderKeysLog(); saveKeys();
 }
 function removeKeyLog(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.keysLog = data.keysLog.filter(r=>r.id!==id);
   renderKeysLog(); saveKeys();
 }
@@ -3027,9 +3078,9 @@ function renderKeysLog(){
       <td><input type="date" value="${row.dateIn}" data-f="dateIn"></td>
       <td><span class="pill ${row.dateIn?"done":"open"}">${status}</span></td>
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:100px"></td>
-      <td class="row-actions">
+      <td class="row-actions" style="display:flex;gap:4px;white-space:nowrap">
         ${!row.dateIn ? `<button class="btn ghost" style="padding:5px 8px;font-size:11px" onclick="returnKey(${row.id})">החזרה</button>` : ""}
-        <button class="card-delete-btn" title="מחיקה" onclick="removeKeyLog(${row.id})">${svgIcon('trash',13)}</button>
+        <button class="icon-btn" title="מחיקה" onclick="removeKeyLog(${row.id})">✕</button>
       </td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
@@ -3103,105 +3154,6 @@ function wireFileCell(td, row, field, category, onDone){
   }
 }
 
-/* ---------- GENERIC MULTI-DOCUMENT CHECKLIST (for tasks/procurement/vendor-payments/staff) ---------- */
-const DOC_TABLES = {
-  tasks: {
-    find: id => data.tasks.find(r=>r.id===id),
-    save: () => scheduleSave("tasks","tasksSaved"),
-    rerender: () => renderTasks(),
-    category: "tasks-invoices"
-  },
-  procurement: {
-    find: id => data.procurement.find(r=>r.id===id),
-    save: () => scheduleSave("procurement","procSaved"),
-    rerender: () => renderProc(),
-    category: "procurement-orders"
-  },
-  vendorPayments: {
-    find: id => data.vendorPayments.find(r=>r.id===id),
-    save: () => scheduleSave("vendorPayments","vendorPaySaved"),
-    rerender: () => renderVendorPay(),
-    category: "vendor-invoices"
-  },
-  staff: {
-    find: id => {
-      for(const inst of data.installments){
-        const r = inst.find(x=>x.id===id);
-        if(r) return r;
-      }
-      return null;
-    },
-    save: () => saveInstallments(),
-    rerender: () => renderStaff(),
-    category: "staff-role-details"
-  }
-};
-function migrateSingleDocToArray(row, oldField, newField, defaultName){
-  if((!row[newField] || row[newField].length===0) && row[oldField]){
-    row[newField] = [{name: defaultName, fileUrl: row[oldField]}];
-  }
-  if(!row[newField]) row[newField] = [];
-}
-function renderDocsChecklist(row, field, tableKey){
-  const docs = row[field] || [];
-  const chips = docs.map((d,i) => `
-    <span class="extra-contact-chip ${d.fileUrl?'':'doc-missing-chip'}">
-      <span class="ca-mini" style="background:${d.fileUrl?'var(--green)':'transparent'};color:${d.fileUrl?'#fff':'var(--red)'};border:${d.fileUrl?'none':'1.5px dashed var(--red)'}" onclick="${d.fileUrl?`window.open('${d.fileUrl}','_blank')`:`uploadGenericDoc('${tableKey}',${row.id},'${field}',${i})`}" title="${d.fileUrl?'פתיחה':'העלאה'}">${d.fileUrl?svgIcon('check',11):svgIcon('plus',11)}</span>
-      ${d.name}
-      <button type="button" class="ca-mini" title="הסרה" onclick="removeGenericDoc('${tableKey}',${row.id},'${field}',${i})">✕</button>
-    </span>`).join("");
-  return `<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">
-    ${chips}
-    <button type="button" class="ca-mini" title="הוספת מסמך נוסף" onclick="addGenericDoc('${tableKey}',${row.id},'${field}')" style="width:24px;height:24px;border:1.5px dashed var(--line);background:transparent;color:var(--ink-soft)">${svgIcon('plus',12)}</button>
-  </div>`;
-}
-function addGenericDoc(tableKey, id, field){
-  const t = DOC_TABLES[tableKey];
-  const row = t.find(id);
-  if(!row) return;
-  const name = prompt("שם המסמך (למשל: חשבונית, אישור, תעודת משלוח):");
-  if(!name || !name.trim()) return;
-  row[field] = row[field] || [];
-  row[field].push({name: name.trim(), fileUrl: ""});
-  t.save();
-  if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
-  t.rerender();
-}
-function removeGenericDoc(tableKey, id, field, idx){
-  const t = DOC_TABLES[tableKey];
-  const row = t.find(id);
-  if(!row || !row[field]) return;
-  row[field].splice(idx, 1);
-  t.save();
-  if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
-  t.rerender();
-}
-function uploadGenericDoc(tableKey, id, field, idx){
-  const t = DOC_TABLES[tableKey];
-  const input = document.createElement("input");
-  input.type = "file";
-  input.onchange = async () => {
-    if(!input.files || !input.files[0]) return;
-    const file = input.files[0];
-    const row = t.find(id);
-    if(!row) return;
-    try{
-      const path = `uploads/${t.category}/${Date.now()}_${file.name}`;
-      const ref = storage.ref().child(path);
-      await ref.put(file);
-      const url = await ref.getDownloadURL();
-      row[field][idx].fileUrl = url;
-      t.save();
-      if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
-      t.rerender();
-    }catch(e){
-      console.error(e);
-      alert("שגיאת העלאה: " + e.message);
-    }
-  };
-  input.click();
-}
-
 async function uploadFile(){
   const input = document.getElementById("fileInput");
   const category = document.getElementById("fileCategorySelect").value;
@@ -3226,7 +3178,6 @@ async function uploadFile(){
   }
 }
 function removeFile(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.files = data.files.filter(r=>r.id!==id);
   renderFiles(); scheduleSave("files","filesSaved");
 }
@@ -3251,7 +3202,7 @@ function renderFiles(){
     tr.innerHTML = `
       <td class="primary-field">${row.name}</td><td>${row.category}</td><td>${row.uploadedAt}</td>
       <td><a href="${row.url}" target="_blank" rel="noopener">פתיחה</a></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="הסרה מהרשימה" onclick="removeFile(${row.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="הסרה מהרשימה" onclick="removeFile(${row.id})">✕</button></td>
     `;
     body.appendChild(tr);
   });
@@ -3265,7 +3216,6 @@ function addProject(){
   renderProjects(); scheduleSave("projects","projectsSaved");
 }
 function removeProject(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.projects = data.projects.filter(r=>r.id!==id);
   if(activeProjectId===id){ activeProjectId=null; document.getElementById("projectQuotesCard").style.display="none"; }
   renderProjects(); scheduleSave("projects","projectsSaved");
@@ -3297,9 +3247,9 @@ function renderProjects(){
             <option ${row.status==="בבדיקה"?"selected":""}>בבדיקה</option>
             <option ${row.status==="הושלם"?"selected":""}>הושלם</option>
           </select></td>
-      <td class="row-actions">
+      <td class="row-actions" style="display:flex;gap:4px;white-space:nowrap">
         <button class="btn ghost" style="padding:5px 8px;font-size:11px" onclick="openProjectQuotes(${row.id})">הצעות מחיר (${row.quotes.length})</button>
-        <button class="card-delete-btn" title="מחיקה" onclick="removeProject(${row.id})">${svgIcon('trash',13)}</button>
+        <button class="icon-btn" title="מחיקה" onclick="removeProject(${row.id})">✕</button>
       </td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
@@ -3316,7 +3266,6 @@ function addQuote(){
   renderQuotes(); scheduleSave("projects","projectsSaved");
 }
 function removeQuote(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   const p = data.projects.find(r=>r.id===activeProjectId);
   if(!p) return;
   p.quotes = p.quotes.filter(q=>q.id!==id);
@@ -3373,7 +3322,7 @@ function renderQuotes(){
       <td><input type="number" value="${q.price}" data-f="price" style="width:90px"></td>
       <td><input type="text" value="${q.notes}" data-f="notes" style="min-width:140px"></td>
       <td class="file-cell"></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeQuote(${q.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions"><button class="icon-btn" title="מחיקה" onclick="removeQuote(${q.id})">✕</button></td>
     `;
     const fileTd = tr.querySelector(".file-cell");
     if(q.fileUrl){
@@ -3679,10 +3628,10 @@ function backfillTaskInvoiceSync(){
   let changed = false;
   data.tasks.forEach(taskRow => {
     if(taskRow.link && !taskRow.vendorPayId){
-      const alreadyLinked = data.vendorPayments.some(v => (v.docs||[]).some(d=>d.fileUrl===taskRow.link));
+      const alreadyLinked = data.vendorPayments.some(v => v.invoiceLink === taskRow.link);
       if(!alreadyLinked){
         const newId = nextId()+7000;
-        data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", fileUrl:taskRow.link}], notes:"מקור: משימה"});
+        data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", invoiceLink:taskRow.link, notes:"מקור: משימה"});
         taskRow.vendorPayId = newId;
         changed = true;
       }
