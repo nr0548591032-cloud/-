@@ -264,6 +264,19 @@
     padding:4px 8px; font-size:12px; margin:3px 6px 3px 0;
   }
   .doc-missing-chip{ border-color:var(--red); background:var(--red-bg); }
+  .role-summary-line{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:5px 2px; font-size:13px; border-bottom:1px dashed var(--line);
+  }
+  .role-edit-form{
+    display:flex; flex-wrap:wrap; gap:8px; align-items:flex-start;
+    background:var(--bg); border-radius:8px; padding:8px 10px; margin:2px 0 6px 0;
+  }
+  .role-summary-total{
+    display:flex; justify-content:space-between; align-items:center;
+    font-weight:700; font-size:13.5px; color:var(--brand-dark);
+    padding-top:6px; margin-top:2px;
+  }
   .ca-mini{
     width:20px; height:20px; border-radius:50%; border:none; cursor:pointer;
     background:rgba(21,38,49,.08); color:var(--brand); display:inline-flex;
@@ -299,6 +312,12 @@
     flex:1 1 160px;
   }
   table td.field-narrow{ flex:0 1 110px; }
+  table td.bank-line-field{ flex:0 1 23% !important; min-width:0 !important; padding-left:4px; }
+  table td.bank-line-field input{ font-size:13px; padding:6px 5px; }
+  @media (max-width:760px){
+    table td.bank-line-field{ flex:0 1 23% !important; }
+    table td.bank-line-field input{ font-size:11.5px; padding:5px 3px; }
+  }
   table td.field-xnarrow{ flex:0 1 82px; }
   table td::before{
     content:attr(data-label);
@@ -687,6 +706,31 @@
     </div>
   </div>
 
+  <div id="docTopicModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div style="font-weight:700;font-size:15px;margin-bottom:14px">הוספת מסמך</div>
+      <label style="display:block;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:4px">שם המסמך</div>
+        <input type="text" id="docTopicModalName" placeholder="למשל: חשבונית, אישור, תעודת משלוח" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit">
+      </label>
+      <label style="display:block;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:4px">נושא (לצורך ריכוז בטאב חשבוניות וקבלות)</div>
+        <select id="docTopicModalTopic" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit"></select>
+      </label>
+      <label style="display:block;margin-bottom:6px">
+        <div style="font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:4px">סוג המסמך</div>
+        <select id="docTopicModalType" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit">
+          <option value="חשבונית/קבלה">חשבונית / קבלה (יופיע בטאב חשבוניות וקבלות)</option>
+          <option value="אחר">אישור / מסמך אחר (לא קשור לתשלומים)</option>
+        </select>
+      </label>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="btn ghost" onclick="closeDocTopicModal()">ביטול</button>
+        <button class="btn" onclick="confirmDocTopicModal()">הוספה</button>
+      </div>
+    </div>
+  </div>
+
   <section class="tab" id="tab-licensing">
     <div class="card">
       <div class="toolbar toolbar-sticky">
@@ -784,7 +828,25 @@
   <section class="tab" id="tab-accountant">
     <div class="cards" id="accountantCards"></div>
 
+    <div class="card">
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px">פרטי יצירת קשר עם מנהל החשבונות (לשליחת הודעות)</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <label style="flex:1;min-width:160px">
+          <div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px">טלפון (וואטסאפ)</div>
+          <input type="text" id="accountantPhone" value="" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px">
+        </label>
+        <label style="flex:1;min-width:160px">
+          <div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px">אימייל</div>
+          <input type="text" id="accountantEmail" value="" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px">
+        </label>
+      </div>
+    </div>
+
     <div class="section-title" id="vendorPayAnchor">תשלומי ספקים ונותני שירות</div>
+    <div class="toolbar">
+      <div></div>
+      <button class="btn ghost" onclick="sendCategorySummary('vendor-pay')"><span class="btn-icon-inline" id="sendVendorPaySlot"></span>שליחת סיכום למנהל חשבונות</button>
+    </div>
     <div class="card">
       <div class="toolbar toolbar-sticky">
         <div><span class="saved-flag" id="vendorPaySaved">נשמר</span></div>
@@ -794,22 +856,58 @@
       <div class="table-scroll">
         <table>
           <thead><tr>
-            <th>ספק / נותן שירות</th><th>תיאור</th><th>סכום</th><th>אושר לתשלום</th><th>סטטוס תשלום</th>
-            <th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>חשבונית מצורפת</th><th>הערות</th><th></th>
+            <th>ספק / נותן שירות</th><th>סוג</th><th>תיאור</th><th>סכום</th><th>אושר לתשלום</th><th>סטטוס תשלום</th>
+            <th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שליחת הודעה</th><th>חשבונית מצורפת</th><th>הערות</th><th></th>
           </tr></thead>
           <tbody id="vendorPayBody"></tbody>
         </table>
       </div>
       </div>
 
-    <div class="section-title" id="combinedReportAnchor">דוח מרוכז למנהל חשבונות (צוות + ספקים)</div>
+    <div class="section-title" id="combinedReportAnchor">דוח מרוכז למנהל חשבונות</div>
+    <p class="hint">סימון סטטוס כאן מעדכן אוטומטית גם את הטבלת המקור (צוות ותורנים / תשלומי ספקים). ניתן גם לכתוב הערה אישית של מנהל החשבונות לכל תשלום, ולשלוח הודעה מנוסחת ישירות ממכאן.</p>
+
+    <div class="section-title" style="font-size:15px">צוות ותורנים</div>
+    <div class="toolbar">
+      <div></div>
+      <button class="btn ghost" onclick="sendCategorySummary('staff')"><span class="btn-icon-inline" id="sendStaffSlot"></span>שליחת סיכום למנהל חשבונות</button>
+    </div>
     <div class="card">
-      <p class="hint">סימון סטטוס כאן מעדכן אוטומטית גם את הטבלת המקור (צוות ותורנים / תשלומי ספקים). ניתן גם לכתוב הערה אישית של מנהל החשבונות לכל תשלום.</p>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th></tr></thead>
-          <tbody id="combinedReportBody"></tbody>
-          <tfoot><tr class="total-row"><td>סה"כ כולל להעברה</td><td id="combinedTotal"></td></tr></tfoot>
+          <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
+          <tbody id="combinedReportBodyStaff"></tbody>
+          <tfoot><tr class="total-row"><td>סה"כ צוות ותורנים</td><td id="combinedTotalStaff"></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:15px">אנשי מקצוע</div>
+    <div class="toolbar">
+      <div></div>
+      <button class="btn ghost" onclick="sendCategorySummary('professional')"><span class="btn-icon-inline" id="sendProfessionalSlot"></span>שליחת סיכום למנהל חשבונות</button>
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
+          <tbody id="combinedReportBodyProfessional"></tbody>
+          <tfoot><tr class="total-row"><td>סה"כ אנשי מקצוע</td><td id="combinedTotalProfessional"></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:15px">רכש וספקים</div>
+    <div class="toolbar">
+      <div></div>
+      <button class="btn ghost" onclick="sendCategorySummary('vendor')"><span class="btn-icon-inline" id="sendVendorSlot"></span>שליחת סיכום למנהל חשבונות</button>
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
+          <tbody id="combinedReportBodyVendor"></tbody>
+          <tfoot><tr class="total-row"><td>סה"כ רכש וספקים</td><td id="combinedTotalVendor"></td></tr></tfoot>
         </table>
       </div>
     </div>
@@ -895,11 +993,11 @@
     <div class="card">
       <div class="toolbar">
         <div>סינון לפי נושא: <select id="fileFilterSelect" onchange="renderFiles()" style="width:150px;display:inline-block"><option value="">הכל</option></select></div>
-        <div></div>
+        <button class="btn ghost" onclick="printFilesSummary()"><span class="btn-icon-inline" id="filesPrintIconSlot"></span>הפקת סיכום PDF לנושא</button>
       </div>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>שם הקובץ</th><th>נושא</th><th>תאריך העלאה</th><th>קישור</th><th></th></tr></thead>
+          <thead><tr><th>שם הקובץ</th><th>נושא</th><th>מקור</th><th>סכום</th><th>תאריך העלאה</th><th>קישור</th><th></th></tr></thead>
           <tbody id="filesBody"></tbody>
         </table>
       </div>
@@ -1105,7 +1203,8 @@ let data = {
   files: [],
   projects: [],
   loginLog: [],
-  uiPrefs: {}
+  uiPrefs: {},
+  accountantContact: {phone:"", email:""}
 };
 
 let activeInstallment = 0;
@@ -1149,6 +1248,12 @@ const tabIcons = {dashboard:svgIcon("dashboard"), tasks:svgIcon("tasks"), procur
   if(copySlot) copySlot.innerHTML = svgIcon("copy", 15);
   if(orderWaSlot) orderWaSlot.innerHTML = svgIcon("whatsapp", 15);
   if(orderMailSlot) orderMailSlot.innerHTML = svgIcon("mail", 15);
+  const filesPrintSlot = document.getElementById("filesPrintIconSlot");
+  if(filesPrintSlot) filesPrintSlot.innerHTML = svgIcon("printer", 15);
+  ["sendVendorPaySlot","sendStaffSlot","sendProfessionalSlot","sendVendorSlot"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = svgIcon("whatsapp", 15);
+  });
   const vendorReportSlot = document.getElementById("vendorReportIconSlot");
   if(vendorReportSlot) vendorReportSlot.innerHTML = svgIcon("printer", 15);
 }
@@ -1431,7 +1536,7 @@ function saveInstallments(){
 }
 
 async function loadAll(){
-  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"],["projects","projects-data"],["loginLog","loginLog-data"],["uiPrefs","uiPrefs-data"]];
+  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"],["projects","projects-data"],["loginLog","loginLog-data"],["uiPrefs","uiPrefs-data"],["accountantContact","accountantContact-data"]];
   for(const [dataKey, storageKey] of simpleKeys){
     try{
       const res = await appStorage.get(storageKey);
@@ -1803,6 +1908,35 @@ function sendTaskEmail(taskId){
   const body = encodeURIComponent(buildTaskMessageText(row));
   window.location.href = `mailto:${contact.email}?subject=${subject}&body=${body}`;
 }
+function syncProcInvoiceToVendorPay(procRow){
+  const firstDocUrl = (procRow.docs && procRow.docs[0]) ? procRow.docs[0].fileUrl : "";
+  const amount = (parseFloat(procRow.qty)||0) * (parseFloat(procRow.price)||0);
+  if(firstDocUrl){
+    if(procRow.vendorPayId){
+      const vp = data.vendorPayments.find(v=>v.id===procRow.vendorPayId);
+      if(vp){
+        vp.docs = vp.docs || [];
+        if(vp.docs.length===0) vp.docs.push({name:"מסמך הזמנה", fileUrl:firstDocUrl});
+        else vp.docs[0].fileUrl = firstDocUrl;
+        vp.amount = amount;
+        scheduleSave("vendorPayments","vendorPaySaved");
+      }
+    }else{
+      const newId = nextId()+7000;
+      data.vendorPayments.push({id:newId, vendor:procRow.supplier||"", desc:procRow.item||"", amount:amount, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"מסמך הזמנה", fileUrl:firstDocUrl}], notes:"מקור: רכש כללי", sourceType:"רכש/ספק"});
+      procRow.vendorPayId = newId;
+      scheduleSave("vendorPayments","vendorPaySaved");
+      scheduleSave("procurement","procSaved");
+    }
+  }else{
+    if(procRow.vendorPayId){
+      const vp = data.vendorPayments.find(v=>v.id===procRow.vendorPayId);
+      if(vp){ vp.docs = []; scheduleSave("vendorPayments","vendorPaySaved"); }
+    }
+  }
+  renderVendorPay();
+  renderAccountantReport();
+}
 function syncTaskInvoiceToVendorPay(taskRow){
   const firstDocUrl = (taskRow.docs && taskRow.docs[0]) ? taskRow.docs[0].fileUrl : "";
   if(firstDocUrl){
@@ -1816,7 +1950,7 @@ function syncTaskInvoiceToVendorPay(taskRow){
       }
     }else{
       const newId = nextId()+7000;
-      data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", fileUrl:firstDocUrl}], notes:"מקור: משימה"});
+      data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", fileUrl:firstDocUrl}], notes:"מקור: משימה", sourceType:"איש מקצוע"});
       taskRow.vendorPayId = newId;
       scheduleSave("vendorPayments","vendorPaySaved");
     }
@@ -2173,15 +2307,43 @@ function removeRequiredDoc(licId, idx){
   scheduleSave("licensing","licSaved");
   renderLic();
 }
+const DOC_TOPICS = ["בטיחות","ביטחון","מטבח","רכוש כללי","תחזוקה","אחר"];
+let docTopicModalCallback = null;
+function openDocTopicModal(defaultName, callback){
+  const nameInput = document.getElementById("docTopicModalName");
+  const topicSelect = document.getElementById("docTopicModalTopic");
+  nameInput.value = defaultName || "";
+  if(!topicSelect.dataset.built){
+    topicSelect.dataset.built = "1";
+    topicSelect.innerHTML = DOC_TOPICS.map(t=>`<option value="${t}">${t}</option>`).join("");
+  }
+  topicSelect.value = "רכוש כללי";
+  docTopicModalCallback = callback;
+  document.getElementById("docTopicModal").style.display = "flex";
+  setTimeout(() => nameInput.focus(), 50);
+}
+function closeDocTopicModal(){
+  document.getElementById("docTopicModal").style.display = "none";
+  docTopicModalCallback = null;
+}
+function confirmDocTopicModal(){
+  const name = document.getElementById("docTopicModalName").value.trim();
+  const topic = document.getElementById("docTopicModalTopic").value;
+  const docType = document.getElementById("docTopicModalType").value;
+  if(!name){ alert("יש להזין שם למסמך"); return; }
+  const cb = docTopicModalCallback;
+  closeDocTopicModal();
+  if(cb) cb(name, topic, docType);
+}
 function addRequiredDoc(licId){
   const row = data.licensing.find(r=>r.id===licId);
   if(!row) return;
-  const name = prompt("שם המסמך הנדרש (למשל: אישור משטרה, רישיון עסק):");
-  if(!name || !name.trim()) return;
-  row.requiredDocs = row.requiredDocs || [];
-  row.requiredDocs.push({name: name.trim(), fileUrl:""});
-  scheduleSave("licensing","licSaved");
-  renderLic();
+  openDocTopicModal("", (name, topic, docType) => {
+    row.requiredDocs = row.requiredDocs || [];
+    row.requiredDocs.push({name, topic, docType, fileUrl:""});
+    scheduleSave("licensing","licSaved");
+    renderLic();
+  });
 }
 function addLicStatusNote(licId){
   const row = data.licensing.find(r=>r.id===licId);
@@ -2242,29 +2404,36 @@ function computeStaffTotal(row){
   (row.extraRoles||[]).forEach(er => { total += computeExtraRoleTotal(er); });
   return total;
 }
+function withScrollPreserved(fn){
+  const scrollY = window.scrollY;
+  fn();
+  requestAnimationFrame(() => window.scrollTo(0, scrollY));
+}
 function addExtraRole(id){
   const row = DOC_TABLES.staff.find(id);
   if(!row) return;
   row.extraRoles = row.extraRoles || [];
   row.extraRoles.push({role:"", monthly:0, daily:0, missing:0, months:0});
   saveInstallments();
-  renderStaff();
+  withScrollPreserved(() => renderStaff());
 }
 function removeExtraRole(id, idx){
   const row = DOC_TABLES.staff.find(id);
   if(!row || !row.extraRoles) return;
   row.extraRoles.splice(idx, 1);
   saveInstallments();
-  renderStaff();
+  withScrollPreserved(() => renderStaff());
 }
 function addStaffRow(){
   data.installments[activeInstallment].push({id: nextId()+4000, name:"", role:"", monthly:0, daily:0, missing:0, months:0, link:"", notes:"", approved:false});
-  renderStaff(); saveInstallments();
+  withScrollPreserved(() => renderStaff());
+  saveInstallments();
 }
 function removeStaffRow(id){
   if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
   data.installments[activeInstallment] = data.installments[activeInstallment].filter(r=>r.id!==id);
-  renderStaff(); saveInstallments();
+  withScrollPreserved(() => renderStaff());
+  saveInstallments();
 }
 function renderStaff(){
   const body = document.getElementById("staffBody");
@@ -2298,11 +2467,14 @@ function renderStaff(){
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
         if(inp.dataset.f === "monthly" && (!row.daily || row.daily===0)){
           row.daily = Math.round((parseFloat(inp.value)||0)/30);
+          const dailyInput = tr.querySelector('[data-f="daily"]');
+          if(dailyInput) dailyInput.value = row.daily;
         }
         saveInstallments();
       });
       inp.addEventListener("change", () => {
-        renderStaff();
+        if(inp.dataset.f === "name"){ ensureBankEntry(inp.value); }
+        patchRoleTotalsDisplay();
         renderPayment();
       });
     });
@@ -2316,25 +2488,68 @@ function renderStaff(){
     extraTd.style.flex = "1 1 100%";
     const baseTotal = computeBaseRoleTotal(row);
     const extraRoles = row.extraRoles || [];
+    const fieldLabel = (label, inputHtml) => `<label style="display:flex;flex-direction:column;gap:2px;font-size:10px;color:var(--ink-soft);font-weight:700">${label}${inputHtml}</label>`;
     const extraRolesHtml = extraRoles.map((er,i) => {
       const erTotal = computeExtraRoleTotal(er);
-      return `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:var(--bg);border-radius:8px;padding:6px 10px;margin-bottom:5px">
-        <input type="text" placeholder="שם תפקיד" value="${er.role}" data-erf="role" data-eridx="${i}" style="width:120px;border:1px solid var(--line);border-radius:6px;padding:5px 7px">
-        <input type="number" placeholder="תעריף חודשי" value="${er.monthly}" data-erf="monthly" data-eridx="${i}" style="width:80px;border:1px solid var(--line);border-radius:6px;padding:5px 7px">
-        <input type="number" placeholder="תעריף יומי" value="${er.daily}" data-erf="daily" data-eridx="${i}" style="width:75px;border:1px solid var(--line);border-radius:6px;padding:5px 7px">
-        <input type="number" placeholder="ימי חיסור" value="${er.missing}" data-erf="missing" data-eridx="${i}" style="width:75px;border:1px solid var(--line);border-radius:6px;padding:5px 7px">
-        <input type="number" placeholder="חודשים" value="${er.months}" data-erf="months" data-eridx="${i}" style="width:65px;border:1px solid var(--line);border-radius:6px;padding:5px 7px">
-        <span style="font-weight:700;font-size:12.5px;color:var(--brand-dark)">סה"כ: ${fmtMoney(erTotal)}</span>
-        <button type="button" class="ca-mini" title="הסרה" onclick="removeExtraRole(${row.id},${i})">✕</button>
+      return `
+      <div class="role-summary-line">
+        <span>${er.role || ("תפקיד נוסף "+(i+1))}</span>
+        <span style="display:flex;align-items:center;gap:6px">
+          <b>${fmtMoney(erTotal)}</b>
+          <button type="button" class="ca-mini role-edit-toggle" title="עריכה">${svgIcon('edit',11)}</button>
+          <button type="button" class="ca-mini" title="הסרה" onclick="removeExtraRole(${row.id},${i})">✕</button>
+        </span>
+      </div>
+      <div class="role-edit-form" style="display:none">
+        ${fieldLabel("שם תפקיד", `<input type="text" value="${er.role}" data-erf="role" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:110px">`)}
+        ${fieldLabel("תעריף חודשי", `<input type="number" value="${er.monthly}" data-erf="monthly" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:80px">`)}
+        ${fieldLabel("תעריף יומי", `<input type="number" value="${er.daily}" data-erf="daily" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:75px">`)}
+        ${fieldLabel("ימי חיסור", `<input type="number" value="${er.missing}" data-erf="missing" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:75px">`)}
+        ${fieldLabel("חודשים", `<input type="number" value="${er.months}" data-erf="months" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:65px">`)}
       </div>`;
     }).join("");
     extraTd.innerHTML = `
-      <div style="font-size:11px;font-weight:700;color:var(--ink-soft);margin:4px 0 6px">
-        תפקיד ראשי: ${fmtMoney(baseTotal)}${extraRoles.length ? ` &nbsp;•&nbsp; סה"כ לכל התפקידים ביחד: ${fmtMoney(rowTotal)}` : ""}
+      <div class="role-summary-line">
+        <span>תפקיד ראשי${row.role ? " — "+row.role : ""}</span>
+        <span><b>${fmtMoney(baseTotal)}</b></span>
       </div>
       ${extraRolesHtml}
-      <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="addExtraRole(${row.id})">${svgIcon('plus',12)} הוספת תפקיד נוסף</button>
+      <div class="role-summary-total">
+        <span>סה"כ לתשלום (כל התפקידים)</span><span>${fmtMoney(rowTotal)}</span>
+      </div>
+      <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px;margin-top:6px" onclick="addExtraRole(${row.id})">${svgIcon('plus',12)} הוספת תפקיד נוסף</button>
     `;
+    extraTd.querySelectorAll(".role-edit-toggle").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const form = btn.closest(".role-summary-line").nextElementSibling;
+        if(!form || !form.classList.contains("role-edit-form")) return;
+        const isOpen = form.classList.contains("open");
+        document.querySelectorAll(".role-edit-form.open").forEach(f => {
+          f.classList.remove("open");
+          f.style.display = "none";
+        });
+        if(!isOpen){
+          form.classList.add("open");
+          form.style.display = "flex";
+        }
+      });
+    });
+    function patchRoleTotalsDisplay(){
+      const lines = extraTd.querySelectorAll(".role-summary-line");
+      if(lines[0]){
+        lines[0].querySelector("span:first-child").textContent = "תפקיד ראשי" + (row.role ? " — "+row.role : "");
+        lines[0].querySelector("b").textContent = fmtMoney(computeBaseRoleTotal(row));
+      }
+      (row.extraRoles||[]).forEach((er,i) => {
+        const line = lines[i+1];
+        if(line){
+          line.querySelector("span:first-child").textContent = er.role || ("תפקיד נוסף "+(i+1));
+          line.querySelector("b").textContent = fmtMoney(computeExtraRoleTotal(er));
+        }
+      });
+      const totalLine = extraTd.querySelector(".role-summary-total");
+      if(totalLine) totalLine.querySelector("span:last-child").textContent = fmtMoney(computeStaffTotal(row));
+    }
     extraTd.querySelectorAll("[data-erf]").forEach(inp => {
       inp.addEventListener("input", () => {
         const idx = parseInt(inp.dataset.eridx, 10);
@@ -2342,10 +2557,13 @@ function renderStaff(){
         row.extraRoles[idx][field] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
         if(field==="monthly" && (!row.extraRoles[idx].daily || row.extraRoles[idx].daily===0)){
           row.extraRoles[idx].daily = Math.round((parseFloat(inp.value)||0)/30);
+          const dailyInput = extraTd.querySelector(`[data-erf="daily"][data-eridx="${idx}"]`);
+          if(dailyInput) dailyInput.value = row.extraRoles[idx].daily;
         }
         saveInstallments();
+        patchRoleTotalsDisplay();
       });
-      inp.addEventListener("change", () => { renderStaff(); renderPayment(); });
+      inp.addEventListener("change", () => { renderPayment(); });
     });
     tr.appendChild(extraTd);
 
@@ -2357,6 +2575,16 @@ function renderStaff(){
 function renderStaffCards(){}
 
 /* ---------- BANK ---------- */
+function ensureBankEntry(name){
+  const trimmed = (name||"").trim();
+  if(!trimmed) return;
+  const exists = data.bank.some(b => (b.name||"").trim() === trimmed);
+  if(!exists){
+    data.bank.push({id: nextId()+5000, name:trimmed, bank:"", branch:"", account:"", holder:""});
+    renderBank();
+    saveInstallments();
+  }
+}
 function addBankRow(){
   data.bank.push({id: nextId()+5000, name:"", bank:"", branch:"", account:"", holder:""});
   renderBank(); saveInstallments();
@@ -2373,10 +2601,10 @@ function renderBank(){
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td class="primary-field"><input type="text" value="${row.name}" data-f="name" style="min-width:110px"></td>
-      <td><input type="text" value="${row.bank}" data-f="bank"></td>
-      <td><input type="text" value="${row.branch}" data-f="branch" style="width:70px"></td>
-      <td><input type="text" value="${row.account}" data-f="account" style="width:110px"></td>
-      <td><input type="text" value="${row.holder}" data-f="holder"></td>
+      <td class="bank-line-field"><input type="text" value="${row.bank}" data-f="bank"></td>
+      <td class="bank-line-field"><input type="text" value="${row.branch}" data-f="branch"></td>
+      <td class="bank-line-field"><input type="text" value="${row.account}" data-f="account"></td>
+      <td class="bank-line-field"><input type="text" value="${row.holder}" data-f="holder"></td>
       <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeBankRow(${row.id})">${svgIcon('trash',13)}</button></td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
@@ -2404,6 +2632,10 @@ function renderVendorPay(){
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td class="primary-field">${buildSelect(getContactNames(), row.vendor, "vendor")}</td>
+      <td><select data-f="sourceType">
+            <option value="רכש/ספק" ${(!row.sourceType||row.sourceType==="רכש/ספק")?"selected":""}>רכש/ספק</option>
+            <option value="איש מקצוע" ${row.sourceType==="איש מקצוע"?"selected":""}>איש מקצוע</option>
+          </select></td>
       <td><input type="text" value="${row.desc}" data-f="desc" style="min-width:140px"></td>
       <td><input type="number" value="${row.amount}" data-f="amount" style="width:80px"></td>
       <td class="sync-cell"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-approved="1" ${row.approved?"checked":""}><span class="pill ${row.approved?'done':'open'}">${row.approved?"מאושר":"לא מאושר"}</span></label></td>
@@ -2416,6 +2648,10 @@ function renderVendorPay(){
       <td><input type="text" value="${row.bank}" data-f="bank" style="width:90px"></td>
       <td><input type="text" value="${row.branch}" data-f="branch" style="width:60px"></td>
       <td><input type="text" value="${row.account}" data-f="account" style="width:100px"></td>
+      <td class="contact-actions">
+        <button class="contact-action-btn ca-whatsapp" title="שליחת הודעה בוואטסאפ" onclick="sendPaymentReminder('vendor',${row.id},'whatsapp')">${svgIcon("whatsapp",15)}</button>
+        <button class="contact-action-btn ca-mail" title="שליחת הודעה במייל" onclick="sendPaymentReminder('vendor',${row.id},'email')">${svgIcon("mail",15)}</button>
+      </td>
       <td class="file-cell"></td>
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:110px"></td>
       <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeVendorPay(${row.id})">${svgIcon('trash',13)}</button></td>
@@ -2459,7 +2695,107 @@ function paymentStatusPill(row){
   const cls = status==="שולם" ? "done" : status==="חסר פרטים" ? "late" : "open";
   return `<span class="pill ${cls}">${status}</span>`;
 }
+function getAccountantContact(){
+  const phoneInput = document.getElementById("accountantPhone");
+  const emailInput = document.getElementById("accountantEmail");
+  return {
+    phone: phoneInput ? phoneInput.value.trim() : (data.accountantContact.phone||""),
+    email: emailInput ? emailInput.value.trim() : (data.accountantContact.email||"")
+  };
+}
+function saveAccountantContact(){
+  data.accountantContact = getAccountantContact();
+  appStorage.set("accountantContact-data", JSON.stringify(data.accountantContact)).catch(e=>console.error(e));
+}
+function buildPaymentMessageText(name, desc, amount, status){
+  return `שלום\nמה שלומך?\nאשמח שתטפל בתשלום הבא:\n\nשם: ${name}\nתיאור: ${desc}\nסכום: ${fmtMoney(amount)}\nסטטוס נוכחי: ${status||"ממתין"}\n\nתודה רבה!`;
+}
+function buildCategorySummaryText(categoryLabel, items){
+  let text = `שלום\nמה שלומך?\nאשמח שתטפל בתשלומים הבאים (${categoryLabel}):\n\n`;
+  items.forEach((it,i) => {
+    text += `${i+1}. ${it.name} — ${it.desc} — ${fmtMoney(it.amount)} — ${it.status}\n`;
+  });
+  text += `\nתודה רבה!`;
+  return text;
+}
+function sendToAccountant(text, channel){
+  const contact = getAccountantContact();
+  if(channel === "whatsapp"){
+    if(!contact.phone){ alert("לא הוזן מספר טלפון למנהל החשבונות. אפשר להזין אותו בראש טאב \"דוח למנהל חשבונות\"."); return; }
+    window.open(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${encodeURIComponent(text)}`, "_blank");
+  }else{
+    if(!contact.email){ alert("לא הוזנה כתובת אימייל למנהל החשבונות. אפשר להזין אותה בראש טאב \"דוח למנהל חשבונות\"."); return; }
+    window.location.href = `mailto:${contact.email}?subject=${encodeURIComponent("תשלומים לטיפול")}&body=${encodeURIComponent(text)}`;
+  }
+}
+function sendPaymentReminder(kind, id, channel){
+  let name, desc, amount, status;
+  if(kind === "staff"){
+    const row = DOC_TABLES.staff.find(id);
+    if(!row) return;
+    name = row.name;
+    desc = row.role || "תשלום עבור תפקיד";
+    amount = computeStaffTotal(row);
+    status = row.paymentStatus || (row.paid ? "שולם" : "ממתין");
+  }else{
+    const row = data.vendorPayments.find(r=>r.id===id);
+    if(!row) return;
+    name = row.vendor;
+    desc = row.desc || "תשלום לספק";
+    amount = parseFloat(row.amount)||0;
+    status = row.paymentStatus || (row.paid ? "שולם" : "ממתין");
+  }
+  const text = buildPaymentMessageText(name, desc, amount, status);
+  sendToAccountant(text, channel);
+}
+function sendCategorySummary(category){
+  let items = [];
+  let label = "";
+  if(category === "staff"){
+    label = "צוות ותורנים";
+    data.installments.forEach((inst, idx) => {
+      inst.forEach(row => {
+        if(row.approved){
+          items.push({name:row.name, desc:(row.role||"—")+" (פעימה "+(idx+1)+")", amount:computeStaffTotal(row), status:row.paymentStatus||(row.paid?"שולם":"ממתין")});
+        }
+      });
+    });
+  }else if(category === "professional"){
+    label = "אנשי מקצוע";
+    data.vendorPayments.forEach(row => {
+      if(row.approved && (row.sourceType||"רכש/ספק")==="איש מקצוע"){
+        items.push({name:row.vendor, desc:row.desc||"—", amount:parseFloat(row.amount)||0, status:row.paymentStatus||(row.paid?"שולם":"ממתין")});
+      }
+    });
+  }else if(category === "vendor" || category === "vendor-pay"){
+    label = "רכש וספקים";
+    data.vendorPayments.forEach(row => {
+      if(category==="vendor-pay" || (row.approved && (row.sourceType||"רכש/ספק")!=="איש מקצוע")){
+        if(category==="vendor-pay" || row.approved) items.push({name:row.vendor, desc:row.desc||"—", amount:parseFloat(row.amount)||0, status:row.paymentStatus||(row.paid?"שולם":"ממתין")});
+      }
+    });
+  }
+  if(items.length===0){ alert("אין כרגע פריטים לשליחה בקטגוריה זו."); return; }
+  const text = buildCategorySummaryText(label, items);
+  if(confirm(`ישלח סיכום של ${items.length} פריטים למנהל חשבונות. לשלוח בוואטסאפ? (ביטול = שליחה במייל)`)){
+    sendToAccountant(text, "whatsapp");
+  }else{
+    sendToAccountant(text, "email");
+  }
+}
 function renderAccountantReport(){
+  const acctPhoneEl = document.getElementById("accountantPhone");
+  const acctEmailEl = document.getElementById("accountantEmail");
+  if(acctPhoneEl && !acctPhoneEl.dataset.wired){
+    acctPhoneEl.dataset.wired = "1";
+    acctPhoneEl.value = data.accountantContact.phone || "";
+    acctPhoneEl.addEventListener("change", saveAccountantContact);
+  }
+  if(acctEmailEl && !acctEmailEl.dataset.wired){
+    acctEmailEl.dataset.wired = "1";
+    acctEmailEl.value = data.accountantContact.email || "";
+    acctEmailEl.addEventListener("change", saveAccountantContact);
+  }
   let total = 0;
   let count = 0;
   const combinedRows = [];
@@ -2479,48 +2815,76 @@ function renderAccountantReport(){
   data.vendorPayments.forEach(row => {
     if(!row.approved) return;
     vendorTotal += (parseFloat(row.amount)||0);
-    combinedRows.push({ref:row, kind:"vendor", saveFn:()=>scheduleSave("vendorPayments","vendorPaySaved"), name:row.vendor, type:"ספק", total:parseFloat(row.amount)||0, bank:row.bank, branch:row.branch, account:row.account, notes:row.notes});
+    combinedRows.push({ref:row, kind:"vendor", saveFn:()=>scheduleSave("vendorPayments","vendorPaySaved"), name:row.vendor, type:row.sourceType||"רכש/ספק", total:parseFloat(row.amount)||0, bank:row.bank, branch:row.branch, account:row.account, notes:row.notes});
   });
 
-  const combinedBody = document.getElementById("combinedReportBody");
-  if(combinedBody){
-    combinedBody.innerHTML = "";
-    if(combinedRows.length===0){
-      combinedBody.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומים מאושרים.</td></tr>`;
+  const staffBody = document.getElementById("combinedReportBodyStaff");
+  const professionalBody = document.getElementById("combinedReportBodyProfessional");
+  const vendorBody = document.getElementById("combinedReportBodyVendor");
+  function buildCombinedRow(r){
+    const tr = document.createElement("tr");
+    const curStatus = r.ref.paymentStatus || (r.ref.paid ? "שולם" : "ממתין");
+    tr.innerHTML = `
+      <td class="primary-field">${r.name||"—"}</td><td>${r.type}</td><td style="font-weight:600">${fmtMoney(r.total)}</td>
+      <td><select class="payment-status-select" data-status-style="paymentStatus">
+            <option value="ממתין" ${curStatus==="ממתין"?"selected":""}>ממתין</option>
+            <option value="שולם" ${curStatus==="שולם"?"selected":""}>שולם</option>
+            <option value="חסר פרטים" ${curStatus==="חסר פרטים"?"selected":""}>חסר פרטים</option>
+          </select></td>
+      <td><input type="text" class="accountant-note-input" value="${r.ref.accountantNote||""}" placeholder="הערת מנהל חשבונות" style="min-width:140px"></td>
+      <td>${r.bank||"—"}</td><td>${r.branch||"—"}</td><td>${r.account||"—"}</td><td>${r.notes||""}</td>
+      <td class="contact-actions">
+        <button class="contact-action-btn ca-whatsapp" title="שליחת הודעה בוואטסאפ" onclick="sendPaymentReminder('${r.kind}',${r.ref.id},'whatsapp')">${svgIcon("whatsapp",15)}</button>
+        <button class="contact-action-btn ca-mail" title="שליחת הודעה במייל" onclick="sendPaymentReminder('${r.kind}',${r.ref.id},'email')">${svgIcon("mail",15)}</button>
+      </td>
+    `;
+    tr.querySelector(".payment-status-select").addEventListener("change", (e) => {
+      const newStatus = e.target.value;
+      r.ref.paymentStatus = newStatus;
+      r.ref.paid = (newStatus === "שולם");
+      if(newStatus === "שולם"){
+        const hasReceipt = (r.ref.docs||[]).some(d=>d.fileUrl);
+        if(!hasReceipt) alert("סומן כשולם. מומלץ לצרף קבלה/חשבונית עבור תשלום זה.");
+      }
+      r.saveFn();
+      withScrollPreserved(() => { renderStaff(); renderVendorPay(); renderAccountantReport(); });
+    });
+    const noteInput = tr.querySelector(".accountant-note-input");
+    noteInput.addEventListener("input", () => { r.ref.accountantNote = noteInput.value; });
+    noteInput.addEventListener("change", () => { r.saveFn(); });
+    return tr;
+  }
+  if(staffBody){
+    staffBody.innerHTML = "";
+    const staffRows = combinedRows.filter(r => r.kind === "staff");
+    if(staffRows.length === 0){
+      staffBody.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומי צוות מאושרים.</td></tr>`;
     }else{
-      combinedRows.forEach(r => {
-        const tr = document.createElement("tr");
-        const curStatus = r.ref.paymentStatus || (r.ref.paid ? "שולם" : "ממתין");
-        tr.innerHTML = `
-          <td>${r.name||"—"}</td><td>${r.type}</td><td style="font-weight:600">${fmtMoney(r.total)}</td>
-          <td><select class="payment-status-select" data-status-style="paymentStatus">
-                <option value="ממתין" ${curStatus==="ממתין"?"selected":""}>ממתין</option>
-                <option value="שולם" ${curStatus==="שולם"?"selected":""}>שולם</option>
-                <option value="חסר פרטים" ${curStatus==="חסר פרטים"?"selected":""}>חסר פרטים</option>
-              </select></td>
-          <td><input type="text" class="accountant-note-input" value="${r.ref.accountantNote||""}" placeholder="הערת מנהל חשבונות" style="min-width:140px"></td>
-          <td>${r.bank||"—"}</td><td>${r.branch||"—"}</td><td>${r.account||"—"}</td><td>${r.notes||""}</td>
-        `;
-        tr.querySelector(".payment-status-select").addEventListener("change", (e) => {
-          const newStatus = e.target.value;
-          r.ref.paymentStatus = newStatus;
-          r.ref.paid = (newStatus === "שולם");
-          if(newStatus === "שולם"){
-            const hasReceipt = (r.ref.docs||[]).some(d=>d.fileUrl);
-            if(!hasReceipt) alert("סומן כשולם. מומלץ לצרף קבלה/חשבונית עבור תשלום זה.");
-          }
-          r.saveFn();
-          renderStaff();
-          renderVendorPay();
-          renderAccountantReport();
-        });
-        const noteInput = tr.querySelector(".accountant-note-input");
-        noteInput.addEventListener("input", () => { r.ref.accountantNote = noteInput.value; });
-        noteInput.addEventListener("change", () => { r.saveFn(); });
-        combinedBody.appendChild(tr);
-      });
+      staffRows.forEach(r => staffBody.appendChild(buildCombinedRow(r)));
     }
-    document.getElementById("combinedTotal").textContent = fmtMoney(total + vendorTotal);
+    document.getElementById("combinedTotalStaff").textContent = fmtMoney(total);
+  }
+  if(professionalBody){
+    professionalBody.innerHTML = "";
+    const proRows = combinedRows.filter(r => r.kind === "vendor" && r.type === "איש מקצוע");
+    let proTotal = 0;
+    if(proRows.length === 0){
+      professionalBody.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומים מאושרים לאנשי מקצוע.</td></tr>`;
+    }else{
+      proRows.forEach(r => { proTotal += r.total; professionalBody.appendChild(buildCombinedRow(r)); });
+    }
+    document.getElementById("combinedTotalProfessional").textContent = fmtMoney(proTotal);
+  }
+  if(vendorBody){
+    vendorBody.innerHTML = "";
+    const vendorRows = combinedRows.filter(r => r.kind === "vendor" && r.type !== "איש מקצוע");
+    let vTotal = 0;
+    if(vendorRows.length === 0){
+      vendorBody.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומי ספקים/רכש מאושרים.</td></tr>`;
+    }else{
+      vendorRows.forEach(r => { vTotal += r.total; vendorBody.appendChild(buildCombinedRow(r)); });
+    }
+    document.getElementById("combinedTotalVendor").textContent = fmtMoney(vTotal);
   }
 
   if(cards){
@@ -2589,12 +2953,14 @@ function renderPayment(){
   body.innerHTML = "";
   data.installments[activeInstallment].forEach(row => {
     const bankRow = data.bank.find(b => b.name && b.name === row.name) || {};
+    const roleParts = [row.role].concat((row.extraRoles||[]).map(er=>er.role)).filter(Boolean);
+    const rolesText = roleParts.length ? roleParts.join(" + ") : "—";
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${row.name||"—"}</td>
+      <td class="primary-field">${row.name||"—"}${roleParts.length ? " — "+rolesText : ""}</td>
       <td>${row.role||"—"}</td>
       <td>${row.months||0}</td>
-      <td style="font-weight:600">${fmtMoney(computeStaffTotal(row))}</td>
+      <td><span class="pill done" style="font-weight:700">${fmtMoney(computeStaffTotal(row))}</span></td>
       <td>${row.notes||""}</td>
       <td>${bankRow.bank||"—"}</td>
       <td>${bankRow.branch||"—"}</td>
@@ -3329,13 +3695,14 @@ function addGenericDoc(tableKey, id, field){
   const t = DOC_TABLES[tableKey];
   const row = t.find(id);
   if(!row) return;
-  const name = prompt("שם המסמך (למשל: חשבונית, אישור, תעודת משלוח):");
-  if(!name || !name.trim()) return;
-  row[field] = row[field] || [];
-  row[field].push({name: name.trim(), fileUrl: ""});
-  t.save();
-  if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
-  t.rerender();
+  openDocTopicModal("", (name, topic, docType) => {
+    row[field] = row[field] || [];
+    row[field].push({name, topic, docType, fileUrl: ""});
+    t.save();
+    if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
+    if(tableKey==="procurement" && field==="docs") syncProcInvoiceToVendorPay(row);
+    t.rerender();
+  });
 }
 function removeGenericDoc(tableKey, id, field, idx){
   const t = DOC_TABLES[tableKey];
@@ -3344,6 +3711,7 @@ function removeGenericDoc(tableKey, id, field, idx){
   row[field].splice(idx, 1);
   t.save();
   if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
+  if(tableKey==="procurement" && field==="docs") syncProcInvoiceToVendorPay(row);
   t.rerender();
 }
 function uploadGenericDoc(tableKey, id, field, idx){
@@ -3363,6 +3731,7 @@ function uploadGenericDoc(tableKey, id, field, idx){
       row[field][idx].fileUrl = url;
       t.save();
       if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
+  if(tableKey==="procurement" && field==="docs") syncProcInvoiceToVendorPay(row);
       t.rerender();
     }catch(e){
       console.error(e);
@@ -3400,17 +3769,74 @@ function removeFile(id){
   data.files = data.files.filter(r=>r.id!==id);
   renderFiles(); scheduleSave("files","filesSaved");
 }
+function getAllDocumentsAggregated(){
+  const result = [];
+  data.files.forEach(f => result.push({name:f.name, category:f.category||"", uploadedAt:f.uploadedAt||"", url:f.url, source:"קבצים כלליים", nativeId:f.id, deletable:true, amount:null}));
+  data.tasks.forEach(t => (t.docs||[]).forEach(d => {
+    if(d.fileUrl && (d.docType||"חשבונית/קבלה") === "חשבונית/קבלה"){
+      result.push({name:d.name, category:d.topic||"", uploadedAt:t.created||"", url:d.fileUrl, source:"משימה: "+(t.desc||"—"), deletable:false, amount:null});
+    }
+  }));
+  data.procurement.forEach(p => (p.docs||[]).forEach(d => {
+    if(d.fileUrl && (d.docType||"חשבונית/קבלה") === "חשבונית/קבלה"){
+      result.push({name:d.name, category:d.topic||"", uploadedAt:"", url:d.fileUrl, source:"רכש: "+(p.item||"—"), deletable:false, amount:(parseFloat(p.qty)||0)*(parseFloat(p.price)||0)});
+    }
+  }));
+  data.vendorPayments.forEach(v => (v.docs||[]).forEach(d => {
+    if(d.fileUrl && (d.docType||"חשבונית/קבלה") === "חשבונית/קבלה"){
+      result.push({name:d.name, category:d.topic||"", uploadedAt:"", url:d.fileUrl, source:"תשלום ספק: "+(v.vendor||"—"), deletable:false, amount:parseFloat(v.amount)||0});
+    }
+  }));
+  return result;
+}
+function printFilesSummary(){
+  const filterSel = document.getElementById("fileFilterSelect");
+  const topic = filterSel ? filterSel.value : "";
+  const all = getAllDocumentsAggregated();
+  const list = topic ? all.filter(f=>f.category===topic) : all;
+  if(list.length===0){ alert("אין מסמכים להצגה" + (topic?` בנושא "${topic}"`:"") + "."); return; }
+  const rowsHtml = list.map(f => `
+    <tr>
+      <td style="padding:10px 14px;border-bottom:1px solid #eee;font-weight:600">${f.name}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eee">${f.category||"—"}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eee">${f.source}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eee">${f.amount!==null && f.amount!==undefined ? fmtMoney(f.amount) : "—"}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eee">${f.uploadedAt||"—"}</td>
+    </tr>`).join("");
+  const html = `
+    <!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
+    <title>סיכום חשבוניות וקבלות${topic?" — "+topic:""}</title>
+    <style>
+      body{ font-family:"Segoe UI",Arial,sans-serif; padding:34px; color:#211F1B; }
+      h1{ color:#0D1922; margin:0 0 4px 0; font-size:22px; }
+      .meta{ color:#6E6558; margin-bottom:22px; font-size:13px; }
+      table{ width:100%; border-collapse:collapse; margin-top:8px; }
+      th{ text-align:right; padding:12px 14px; background:#152631; color:#fff; font-size:13px; font-weight:600; }
+      tr:nth-child(even) td{ background:#FAF7F1; }
+    </style></head><body>
+    <h1>סיכום חשבוניות וקבלות${topic?" — "+topic:" (כל הנושאים)"}</h1>
+    <div class="meta">תאריך הפקה: ${new Date().toLocaleDateString("he-IL")} · סה"כ מסמכים: ${list.length}</div>
+    <table>
+      <thead><tr><th>שם הקובץ</th><th>נושא</th><th>מקור</th><th>סכום</th><th>תאריך העלאה</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    </body></html>`;
+  const w = window.open("", "_blank");
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
 function renderFiles(){
   const body = document.getElementById("filesBody");
   if(!body) return;
+  const all = getAllDocumentsAggregated();
   const filterSel = document.getElementById("fileFilterSelect");
-  if(filterSel){
-    const cats = [...new Set(data.files.map(f=>f.category).filter(Boolean))];
-    const current = filterSel.value;
-    filterSel.innerHTML = `<option value="">הכל</option>` + cats.map(c=>`<option value="${c}" ${c===current?"selected":""}>${c}</option>`).join("");
+  if(filterSel && !filterSel.dataset.built){
+    filterSel.dataset.built = "1";
+    filterSel.innerHTML = `<option value="">הכל</option>` + DOC_TOPICS.map(c=>`<option value="${c}">${c}</option>`).join("");
   }
   const filterVal = filterSel ? filterSel.value : "";
-  const list = filterVal ? data.files.filter(f=>f.category===filterVal) : data.files;
+  const list = filterVal ? all.filter(f=>f.category===filterVal) : all;
   body.innerHTML = "";
   if(list.length===0){
     body.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין קבצים להצגה.</td></tr>`;
@@ -3419,9 +3845,11 @@ function renderFiles(){
   list.forEach(row => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td class="primary-field">${row.name}</td><td>${row.category}</td><td>${row.uploadedAt}</td>
+      <td class="primary-field">${row.name}</td><td>${row.category||"—"}</td><td>${row.source}</td>
+      <td>${row.amount!==null && row.amount!==undefined ? fmtMoney(row.amount) : "—"}</td>
+      <td>${row.uploadedAt||"—"}</td>
       <td><a href="${row.url}" target="_blank" rel="noopener">פתיחה</a></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="הסרה מהרשימה" onclick="removeFile(${row.id})">${svgIcon('trash',13)}</button></td>
+      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible">${row.deletable?`<button class="card-delete-btn" title="הסרה מהרשימה" onclick="removeFile(${row.nativeId})">${svgIcon('trash',13)}</button>`:""}</td>
     `;
     body.appendChild(tr);
   });
@@ -3850,6 +4278,21 @@ function dedupeIds(list){
   });
   return changed;
 }
+function backfillBankEntries(){
+  let changed = false;
+  data.installments.forEach(inst => {
+    inst.forEach(row => {
+      const trimmed = (row.name||"").trim();
+      if(!trimmed) return;
+      const exists = data.bank.some(b => (b.name||"").trim() === trimmed);
+      if(!exists){
+        data.bank.push({id: nextId()+5000, name:trimmed, bank:"", branch:"", account:"", holder:""});
+        changed = true;
+      }
+    });
+  });
+  if(changed) saveInstallments();
+}
 function repairDuplicateIds(){
   dedupeIds(data.tasks);
   dedupeIds(data.procurement);
@@ -3886,7 +4329,7 @@ function backfillTaskInvoiceSync(){
       const alreadyLinked = data.vendorPayments.some(v => (v.docs||[]).some(d=>d.fileUrl===taskRow.link));
       if(!alreadyLinked){
         const newId = nextId()+7000;
-        data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", fileUrl:taskRow.link}], notes:"מקור: משימה"});
+        data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", fileUrl:taskRow.link}], notes:"מקור: משימה", sourceType:"איש מקצוע"});
         taskRow.vendorPayId = newId;
         changed = true;
       }
@@ -3897,11 +4340,33 @@ function backfillTaskInvoiceSync(){
     scheduleSave("vendorPayments","vendorPaySaved");
   }
 }
+function backfillProcInvoiceSync(){
+  let changed = false;
+  data.procurement.forEach(procRow => {
+    const firstDocUrl = (procRow.docs && procRow.docs[0]) ? procRow.docs[0].fileUrl : (procRow.link || "");
+    if(firstDocUrl && !procRow.vendorPayId){
+      const alreadyLinked = data.vendorPayments.some(v => (v.docs||[]).some(d=>d.fileUrl===firstDocUrl));
+      if(!alreadyLinked){
+        const newId = nextId()+7000;
+        const amount = (parseFloat(procRow.qty)||0) * (parseFloat(procRow.price)||0);
+        data.vendorPayments.push({id:newId, vendor:procRow.supplier||"", desc:procRow.item||"", amount:amount, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"מסמך הזמנה", fileUrl:firstDocUrl}], notes:"מקור: רכש כללי", sourceType:"רכש/ספק"});
+        procRow.vendorPayId = newId;
+        changed = true;
+      }
+    }
+  });
+  if(changed){
+    scheduleSave("procurement","procSaved");
+    scheduleSave("vendorPayments","vendorPaySaved");
+  }
+}
 
 async function initAppData(){
   await loadAll();
   repairDuplicateIds();
+  backfillBankEntries();
   backfillTaskInvoiceSync();
+  backfillProcInvoiceSync();
   buildNav();
   buildInstallmentTabs();
   renderTasks();
