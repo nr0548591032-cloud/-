@@ -1,6 +1,4 @@
 
-
-
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -13,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ניהול הבניין">
-<meta name="theme-color" content="#2b2723">
+<meta name="theme-color" content="#101B24">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -508,8 +506,6 @@
     width:100%; max-width:420px; box-shadow:0 20px 50px rgba(0,0,0,.3);
   }
 </style>
-<!-- Organic design line — two lines only. Keep them across app versions. -->
-<link href="https://fonts.googleapis.com/css2?family=Suez+One&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="theme.css">
 </head>
 <body>
@@ -551,6 +547,10 @@
     </div>
     <div class="section-title">אישורים בתהליך (טרם התקבל אישור סופי)</div>
     <div class="card"><div class="table-scroll" id="dashLicInProcess"></div></div>
+    <div id="dashPaymentAlertWrap" style="display:none">
+      <div class="section-title">תשלומים עם פרטים חסרים ⚠️</div>
+      <div class="card"><div class="table-scroll" id="dashPaymentAlert"></div></div>
+    </div>
     <div class="section-title" id="loginLogTitle" style="display:none">כניסות אחרונות למערכת</div>
     <div class="card" id="loginLogCard" style="display:none">
       <div class="table-scroll">
@@ -783,19 +783,6 @@
 
   <section class="tab" id="tab-accountant">
     <div class="cards" id="accountantCards"></div>
-    <div class="card">
-      <p class="hint">הדוח מציג רק שורות שסומנו "אושר לתשלום" בטאב צוות ותורנים, מכל הפעימות, עם פרטי הבנק המתאימים.</p>
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>שם</th><th>פעימה</th><th>תפקיד / תורנות</th><th>סה"כ לתשלום</th>
-            <th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל החשבון</th><th>הערות</th>
-          </tr></thead>
-          <tbody id="accountantBody"></tbody>
-          <tfoot><tr class="total-row"><td>סה"כ תשלומי צוות</td><td id="accountantTotal"></td></tr></tfoot>
-        </table>
-      </div>
-    </div>
 
     <div class="section-title" id="vendorPayAnchor">תשלומי ספקים ונותני שירות</div>
     <div class="card">
@@ -807,8 +794,8 @@
       <div class="table-scroll">
         <table>
           <thead><tr>
-            <th>ספק / נותן שירות</th><th>תיאור</th><th>סכום</th><th>אושר לתשלום</th><th>שולם</th>
-            <th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>חשבונית מצורפת</th><th>הערות</th><th></th>
+            <th>ספק / נותן שירות</th><th>תיאור</th><th>סכום</th><th>אושר לתשלום</th><th>סטטוס תשלום</th>
+            <th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>חשבונית מצורפת</th><th>הערות</th><th></th>
           </tr></thead>
           <tbody id="vendorPayBody"></tbody>
         </table>
@@ -817,10 +804,10 @@
 
     <div class="section-title" id="combinedReportAnchor">דוח מרוכז למנהל חשבונות (צוות + ספקים)</div>
     <div class="card">
-      <p class="hint">סימון "שולם" כאן מעדכן אוטומטית את הסטטוס גם בטבלת המקור (צוות ותורנים / תשלומי ספקים).</p>
+      <p class="hint">סימון סטטוס כאן מעדכן אוטומטית גם את הטבלת המקור (צוות ותורנים / תשלומי ספקים). ניתן גם לכתוב הערה אישית של מנהל החשבונות לכל תשלום.</p>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>שולם</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th></tr></thead>
+          <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th></tr></thead>
           <tbody id="combinedReportBody"></tbody>
           <tfoot><tr class="total-row"><td>סה"כ כולל להעברה</td><td id="combinedTotal"></td></tr></tfoot>
         </table>
@@ -1142,6 +1129,7 @@ const svgIconPaths = {
   phoneCall: '<path d="M14.5 2a1 1 0 0 1 1 .9V6a1 1 0 0 1-1 1c-.6 0-1.5-.2-1.9.2-.3.3-.1 1 .4 1.9.9 1.6 2.2 2.9 3.8 3.8.9.5 1.6.7 1.9.4.4-.4-.2-1.3-.2-1.9a1 1 0 0 1 1-1h3.1a1 1 0 0 1 .9 1c-.1 5.5-4.4 9.8-9.9 9.9C7.7 21.4 3.4 17.1 3 11.6 3 6 7.3 2 14.5 2Z"/>',
   plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
   check: '<path d="M20 6.5 9.5 17 4 11.5"/>',
+  chevronDown: '<path d="m6 9 6 6 6-6"/>',
   calendar: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18"/><path d="M8 2.5v4"/><path d="M16 2.5v4"/>',
   trash: '<path d="M4 7h16"/><path d="M6 7V4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V7"/><path d="M19 7l-.8 12.1a2 2 0 0 1-2 1.9H7.8a2 2 0 0 1-2-1.9L5 7"/><path d="M10 11v6"/><path d="M14 11v6"/>',
   edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/>'
@@ -1214,7 +1202,8 @@ function renderLoginLog(){
   if(!isAdmin) return;
   el.innerHTML = (data.loginLog||[]).slice(0,15).map(l => {
     const d = new Date(l.time);
-    return `<tr><td>${l.label}</td><td>${d.toLocaleDateString("he-IL")} ${d.toLocaleTimeString("he-IL",{hour:'2-digit',minute:'2-digit'})}</td></tr>`;
+    const who = l.label || (ROLES[l.role] && ROLES[l.role].label) || l.role || "לא ידוע";
+    return `<tr><td class="primary-field">${who}</td><td>${d.toLocaleDateString("he-IL")} ${d.toLocaleTimeString("he-IL",{hour:'2-digit',minute:'2-digit'})}</td></tr>`;
   }).join("") || `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:12px 0">אין עדיין נתוני כניסה.</td></tr>`;
 }
 auth.onAuthStateChanged(async (user) => {
@@ -1273,6 +1262,11 @@ const selectColorMaps = {
     "אישור זמני בתוקף":["var(--violet)","#fff"],
     "אישור סופי התקבל":["var(--green)","#fff"],
     "נדחה":["var(--red)","#fff"]
+  },
+  paymentStatus: {
+    "שולם":["var(--green)","#fff"],
+    "ממתין":["var(--amber-bg)","var(--amber)"],
+    "חסר פרטים":["var(--red-bg)","var(--red)"]
   }
 };
 function colorizeOneSelect(sel){
@@ -1313,6 +1307,19 @@ function addCardBadges(root){
     badge.className = "card-badge";
     badge.innerHTML = icon;
     tr.appendChild(badge);
+  });
+}
+function addMobileToggles(root){
+  (root || document).querySelectorAll("table tbody tr").forEach(tr => {
+    if(tr.classList.contains("total-row")) return;
+    if(tr.querySelector(":scope > .mob-toggle")) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "mob-toggle";
+    btn.title = "הצג/הסתר פרטים";
+    btn.innerHTML = svgIcon("chevronDown", 16);
+    btn.addEventListener("click", () => { tr.classList.toggle("mob-open"); });
+    tr.appendChild(btn);
   });
 }
 function makePrimaryFieldsToggleable(root){
@@ -1373,10 +1380,11 @@ if(mainEl){
   styleActionButtons(mainEl);
   colorizeStatusSelects(mainEl);
   addCardBadges(mainEl);
+  addMobileToggles(mainEl);
   makePrimaryFieldsToggleable(mainEl);
   const observer = new MutationObserver(() => {
     clearTimeout(labelDebounce);
-    labelDebounce = setTimeout(() => { applyResponsiveLabels(mainEl); styleActionButtons(mainEl); colorizeStatusSelects(mainEl); addCardBadges(mainEl); makePrimaryFieldsToggleable(mainEl); }, 120);
+    labelDebounce = setTimeout(() => { applyResponsiveLabels(mainEl); styleActionButtons(mainEl); colorizeStatusSelects(mainEl); addCardBadges(mainEl); addMobileToggles(mainEl); makePrimaryFieldsToggleable(mainEl); }, 120);
   });
   observer.observe(mainEl, { childList:true, subtree:true });
 }
@@ -1515,7 +1523,6 @@ const tabQuickLinks = {
     {label:"🏦 פרטי בנק", action: () => scrollToId("bankAnchor")}
   ],
   accountant: [
-    {label:"👥 דוח צוות", action: () => window.scrollTo({top:0, behavior:"smooth"})},
     {label:"🧾 תשלומי ספקים", action: () => scrollToId("vendorPayAnchor")},
     {label:"📊 דוח מרוכז", action: () => scrollToId("combinedReportAnchor")}
   ],
@@ -2214,13 +2221,41 @@ function buildInstallmentTabs(){
     wrap.appendChild(b);
   });
 }
-function computeStaffTotal(row){
+function computeBaseRoleTotal(row){
   const monthly = parseFloat(row.monthly)||0;
   const daily = parseFloat(row.daily)||0;
   const missing = parseFloat(row.missing)||0;
   const months = parseFloat(row.months)||0;
   const base = months > 0 ? monthly * months : monthly;
   return Math.max(0, base - (missing * daily));
+}
+function computeExtraRoleTotal(er){
+  const monthly = parseFloat(er.monthly)||0;
+  const daily = parseFloat(er.daily)||0;
+  const missing = parseFloat(er.missing)||0;
+  const months = parseFloat(er.months)||0;
+  const base = months > 0 ? monthly * months : monthly;
+  return Math.max(0, base - (missing * daily));
+}
+function computeStaffTotal(row){
+  let total = computeBaseRoleTotal(row);
+  (row.extraRoles||[]).forEach(er => { total += computeExtraRoleTotal(er); });
+  return total;
+}
+function addExtraRole(id){
+  const row = DOC_TABLES.staff.find(id);
+  if(!row) return;
+  row.extraRoles = row.extraRoles || [];
+  row.extraRoles.push({role:"", monthly:0, daily:0, missing:0, months:0});
+  saveInstallments();
+  renderStaff();
+}
+function removeExtraRole(id, idx){
+  const row = DOC_TABLES.staff.find(id);
+  if(!row || !row.extraRoles) return;
+  row.extraRoles.splice(idx, 1);
+  saveInstallments();
+  renderStaff();
 }
 function addStaffRow(){
   data.installments[activeInstallment].push({id: nextId()+4000, name:"", role:"", monthly:0, daily:0, missing:0, months:0, link:"", notes:"", approved:false});
@@ -2250,7 +2285,7 @@ function renderStaff(){
       <td><input type="number" value="${row.months}" data-f="months" style="width:60px"></td>
       <td><input type="text" value="${fmtMoney(rowTotal)}" readonly style="width:80px;font-weight:600"></td>
       <td class="sync-cell"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-approved="1" ${row.approved?"checked":""}><span class="pill ${row.approved?'done':'open'}">${row.approved?"מאושר":"לא מאושר"}</span></label></td>
-      <td class="sync-cell">${row.paid?'<span class="pill done">שולם</span>':'<span class="pill open">ממתין</span>'}</td>
+      <td class="sync-cell">${paymentStatusPill(row)}</td>
       <td class="file-cell"></td>
       <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
       <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeStaffRow(${row.id})">${svgIcon('trash',13)}</button></td>
@@ -2276,6 +2311,44 @@ function renderStaff(){
       saveInstallments();
       renderAccountantReport();
     });
+
+    const extraTd = document.createElement("td");
+    extraTd.style.flex = "1 1 100%";
+    const baseTotal = computeBaseRoleTotal(row);
+    const extraRoles = row.extraRoles || [];
+    const extraRolesHtml = extraRoles.map((er,i) => {
+      const erTotal = computeExtraRoleTotal(er);
+      return `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:var(--bg);border-radius:8px;padding:6px 10px;margin-bottom:5px">
+        <input type="text" placeholder="שם תפקיד" value="${er.role}" data-erf="role" data-eridx="${i}" style="width:120px;border:1px solid var(--line);border-radius:6px;padding:5px 7px">
+        <input type="number" placeholder="תעריף חודשי" value="${er.monthly}" data-erf="monthly" data-eridx="${i}" style="width:80px;border:1px solid var(--line);border-radius:6px;padding:5px 7px">
+        <input type="number" placeholder="תעריף יומי" value="${er.daily}" data-erf="daily" data-eridx="${i}" style="width:75px;border:1px solid var(--line);border-radius:6px;padding:5px 7px">
+        <input type="number" placeholder="ימי חיסור" value="${er.missing}" data-erf="missing" data-eridx="${i}" style="width:75px;border:1px solid var(--line);border-radius:6px;padding:5px 7px">
+        <input type="number" placeholder="חודשים" value="${er.months}" data-erf="months" data-eridx="${i}" style="width:65px;border:1px solid var(--line);border-radius:6px;padding:5px 7px">
+        <span style="font-weight:700;font-size:12.5px;color:var(--brand-dark)">סה"כ: ${fmtMoney(erTotal)}</span>
+        <button type="button" class="ca-mini" title="הסרה" onclick="removeExtraRole(${row.id},${i})">✕</button>
+      </div>`;
+    }).join("");
+    extraTd.innerHTML = `
+      <div style="font-size:11px;font-weight:700;color:var(--ink-soft);margin:4px 0 6px">
+        תפקיד ראשי: ${fmtMoney(baseTotal)}${extraRoles.length ? ` &nbsp;•&nbsp; סה"כ לכל התפקידים ביחד: ${fmtMoney(rowTotal)}` : ""}
+      </div>
+      ${extraRolesHtml}
+      <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="addExtraRole(${row.id})">${svgIcon('plus',12)} הוספת תפקיד נוסף</button>
+    `;
+    extraTd.querySelectorAll("[data-erf]").forEach(inp => {
+      inp.addEventListener("input", () => {
+        const idx = parseInt(inp.dataset.eridx, 10);
+        const field = inp.dataset.erf;
+        row.extraRoles[idx][field] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+        if(field==="monthly" && (!row.extraRoles[idx].daily || row.extraRoles[idx].daily===0)){
+          row.extraRoles[idx].daily = Math.round((parseFloat(inp.value)||0)/30);
+        }
+        saveInstallments();
+      });
+      inp.addEventListener("change", () => { renderStaff(); renderPayment(); });
+    });
+    tr.appendChild(extraTd);
+
     body.appendChild(tr);
   });
   document.getElementById("staffTotal").textContent = fmtMoney(total);
@@ -2334,7 +2407,12 @@ function renderVendorPay(){
       <td><input type="text" value="${row.desc}" data-f="desc" style="min-width:140px"></td>
       <td><input type="number" value="${row.amount}" data-f="amount" style="width:80px"></td>
       <td class="sync-cell"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-approved="1" ${row.approved?"checked":""}><span class="pill ${row.approved?'done':'open'}">${row.approved?"מאושר":"לא מאושר"}</span></label></td>
-      <td class="sync-cell">${row.paid?'<span class="pill done">שולם</span>':'<span class="pill open">ממתין</span>'}</td>
+      <td><select class="payment-status-select" data-status-style="paymentStatus">
+            <option value="ממתין" ${(row.paymentStatus||(row.paid?"שולם":"ממתין"))==="ממתין"?"selected":""}>ממתין</option>
+            <option value="שולם" ${(row.paymentStatus||(row.paid?"שולם":"ממתין"))==="שולם"?"selected":""}>שולם</option>
+            <option value="חסר פרטים" ${row.paymentStatus==="חסר פרטים"?"selected":""}>חסר פרטים</option>
+          </select></td>
+      <td><input type="text" class="accountant-note-input" value="${row.accountantNote||""}" placeholder="הערת מנהל חשבונות" style="min-width:130px"></td>
       <td><input type="text" value="${row.bank}" data-f="bank" style="width:90px"></td>
       <td><input type="text" value="${row.branch}" data-f="branch" style="width:60px"></td>
       <td><input type="text" value="${row.account}" data-f="account" style="width:100px"></td>
@@ -2345,6 +2423,20 @@ function renderVendorPay(){
     migrateSingleDocToArray(row, "invoiceLink", "docs", "חשבונית");
     const fileTd = tr.querySelector(".file-cell");
     fileTd.innerHTML = renderDocsChecklist(row, "docs", "vendorPayments");
+    tr.querySelector(".payment-status-select").addEventListener("change", (e) => {
+      const newStatus = e.target.value;
+      row.paymentStatus = newStatus;
+      row.paid = (newStatus === "שולם");
+      if(newStatus === "שולם"){
+        const hasReceipt = (row.docs||[]).some(d=>d.fileUrl);
+        if(!hasReceipt) alert("סומן כשולם. מומלץ לצרף קבלה/חשבונית עבור תשלום זה.");
+      }
+      scheduleSave("vendorPayments","vendorPaySaved");
+      renderAccountantReport();
+    });
+    const acctNoteInput = tr.querySelector(".accountant-note-input");
+    acctNoteInput.addEventListener("input", () => { row.accountantNote = acctNoteInput.value; });
+    acctNoteInput.addEventListener("change", () => { scheduleSave("vendorPayments","vendorPaySaved"); renderAccountantReport(); });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
@@ -2362,10 +2454,12 @@ function renderVendorPay(){
 }
 
 /* ---------- ACCOUNTANT REPORT ---------- */
+function paymentStatusPill(row){
+  const status = row.paymentStatus || (row.paid ? "שולם" : "ממתין");
+  const cls = status==="שולם" ? "done" : status==="חסר פרטים" ? "late" : "open";
+  return `<span class="pill ${cls}">${status}</span>`;
+}
 function renderAccountantReport(){
-  const body = document.getElementById("accountantBody");
-  if(!body) return;
-  body.innerHTML = "";
   let total = 0;
   let count = 0;
   const combinedRows = [];
@@ -2376,23 +2470,9 @@ function renderAccountantReport(){
       const rowTotal = computeStaffTotal(row);
       total += rowTotal;
       const bankRow = data.bank.find(b => b.name && b.name === row.name) || {};
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${row.name||"—"}</td>
-        <td>פעימה ${idx+1}</td>
-        <td>${row.role||"—"}</td>
-        <td style="font-weight:600">${fmtMoney(rowTotal)}</td>
-        <td>${bankRow.bank||"—"}</td>
-        <td>${bankRow.branch||"—"}</td>
-        <td>${bankRow.account||"—"}</td>
-        <td>${bankRow.holder||"—"}</td>
-        <td>${row.notes||""}</td>
-      `;
-      body.appendChild(tr);
       combinedRows.push({ref:row, kind:"staff", saveFn:saveInstallments, name:row.name, type:"צוות (פעימה "+(idx+1)+")", total:rowTotal, bank:bankRow.bank, branch:bankRow.branch, account:bankRow.account, notes:row.notes});
     });
   });
-  document.getElementById("accountantTotal").textContent = fmtMoney(total);
   const cards = document.getElementById("accountantCards");
 
   let vendorTotal = 0;
@@ -2410,14 +2490,22 @@ function renderAccountantReport(){
     }else{
       combinedRows.forEach(r => {
         const tr = document.createElement("tr");
+        const curStatus = r.ref.paymentStatus || (r.ref.paid ? "שולם" : "ממתין");
         tr.innerHTML = `
           <td>${r.name||"—"}</td><td>${r.type}</td><td style="font-weight:600">${fmtMoney(r.total)}</td>
-          <td class="sync-cell"><input type="checkbox" data-paid="1" ${r.ref.paid?"checked":""}></td>
+          <td><select class="payment-status-select" data-status-style="paymentStatus">
+                <option value="ממתין" ${curStatus==="ממתין"?"selected":""}>ממתין</option>
+                <option value="שולם" ${curStatus==="שולם"?"selected":""}>שולם</option>
+                <option value="חסר פרטים" ${curStatus==="חסר פרטים"?"selected":""}>חסר פרטים</option>
+              </select></td>
+          <td><input type="text" class="accountant-note-input" value="${r.ref.accountantNote||""}" placeholder="הערת מנהל חשבונות" style="min-width:140px"></td>
           <td>${r.bank||"—"}</td><td>${r.branch||"—"}</td><td>${r.account||"—"}</td><td>${r.notes||""}</td>
         `;
-        tr.querySelector("[data-paid]").addEventListener("change", (e) => {
-          r.ref.paid = e.target.checked;
-          if(e.target.checked){
+        tr.querySelector(".payment-status-select").addEventListener("change", (e) => {
+          const newStatus = e.target.value;
+          r.ref.paymentStatus = newStatus;
+          r.ref.paid = (newStatus === "שולם");
+          if(newStatus === "שולם"){
             const hasReceipt = (r.ref.docs||[]).some(d=>d.fileUrl);
             if(!hasReceipt) alert("סומן כשולם. מומלץ לצרף קבלה/חשבונית עבור תשלום זה.");
           }
@@ -2426,6 +2514,9 @@ function renderAccountantReport(){
           renderVendorPay();
           renderAccountantReport();
         });
+        const noteInput = tr.querySelector(".accountant-note-input");
+        noteInput.addEventListener("input", () => { r.ref.accountantNote = noteInput.value; });
+        noteInput.addEventListener("change", () => { r.saveFn(); });
         combinedBody.appendChild(tr);
       });
     }
@@ -2438,9 +2529,6 @@ function renderAccountantReport(){
       <div class="stat good"><div class="label">תשלומי ספקים מאושרים</div><div class="value">${data.vendorPayments.filter(r=>r.approved).length}</div></div>
       <div class="stat"><div class="label">סה"כ כולל להעברה</div><div class="value">${fmtMoney(total+vendorTotal)}</div></div>
     `;
-  }
-  if(count===0){
-    body.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומי צוות מאושרים.</td></tr>`;
   }
   renderVendorPay();
 }
@@ -3637,7 +3725,7 @@ function renderDashboard(){
   }else{
     let rows = "<table><thead><tr><th>תיאור</th><th>אחראי</th><th>תאריך יעד</th><th>סטטוס</th></tr></thead><tbody>";
     openList.forEach(r => {
-      rows += `<tr><td>${r.desc||"—"}</td><td>${r.assignee||"—"}</td><td>${r.due||"—"}</td><td><span class="pill open">${r.status}</span></td></tr>`;
+      rows += `<tr><td class="primary-field">${r.desc||"—"}</td><td>${r.assignee||"—"}</td><td>${r.due||"—"}</td><td><span class="pill open">${r.status}</span></td></tr>`;
     });
     rows += "</tbody></table>";
     dashTasks.innerHTML = rows;
@@ -3651,7 +3739,7 @@ function renderDashboard(){
     let rows = "<table><thead><tr><th>סוג האישור</th><th>תאריך תפוגה</th><th>סטטוס</th></tr></thead><tbody>";
     licList.forEach(r => {
       const u = licUrgency(r.expiry);
-      rows += `<tr><td>${r.type||"—"}</td><td>${r.expiry||"—"}</td><td><span class="pill ${u}">${u==="late"?"פג תוקף":"מתקרב לתפוגה"}</span></td></tr>`;
+      rows += `<tr><td class="primary-field">${r.type||"—"}</td><td>${r.expiry||"—"}</td><td><span class="pill ${u}">${u==="late"?"פג תוקף":"מתקרב לתפוגה"}</span></td></tr>`;
     });
     rows += "</tbody></table>";
     dashLic.innerHTML = rows;
@@ -3701,7 +3789,7 @@ function renderDashboard(){
       inProcessList.forEach(r => {
         const missing = licHasMissingDocs(r);
         rows += `<tr>
-          <td>${r.type||"—"}</td>
+          <td class="primary-field">${r.type||"—"}</td>
           <td>${r.processStatus||"—"}</td>
           <td><span class="pill ${r.priority==="גבוהה"?"late":r.priority==="נמוכה"?"done":"open"}">${r.priority||"בינונית"}</span></td>
           <td>${missing ? `<span class="pill late">מסמכים חסרים</span>` : `<span class="pill done">מלא</span>`}</td>
@@ -3709,6 +3797,40 @@ function renderDashboard(){
       });
       rows += "</tbody></table>";
       dashLicInProcess.innerHTML = rows;
+    }
+  }
+
+  const dashPaymentAlertWrap = document.getElementById("dashPaymentAlertWrap");
+  const dashPaymentAlert = document.getElementById("dashPaymentAlert");
+  if(dashPaymentAlertWrap && dashPaymentAlert){
+    const missingList = [];
+    data.installments.forEach((inst, idx) => {
+      inst.forEach(row => {
+        if(row.approved && row.paymentStatus === "חסר פרטים"){
+          missingList.push({name:row.name||"—", type:"צוות (פעימה "+(idx+1)+")", total:computeStaffTotal(row), note:row.accountantNote||""});
+        }
+      });
+    });
+    data.vendorPayments.forEach(row => {
+      if(row.approved && row.paymentStatus === "חסר פרטים"){
+        missingList.push({name:row.vendor||"—", type:"ספק", total:parseFloat(row.amount)||0, note:row.accountantNote||""});
+      }
+    });
+    if(missingList.length === 0){
+      dashPaymentAlertWrap.style.display = "none";
+    }else{
+      dashPaymentAlertWrap.style.display = "";
+      let rows = "<table><thead><tr><th>שם</th><th>סוג</th><th>סכום</th><th>הערת מנהל חשבונות</th></tr></thead><tbody>";
+      missingList.forEach(m => {
+        rows += `<tr class="card-bad">
+          <td class="primary-field">${m.name}</td>
+          <td>${m.type}</td>
+          <td style="font-weight:600">${fmtMoney(m.total)}</td>
+          <td>${m.note || "—"}</td>
+        </tr>`;
+      });
+      rows += "</tbody></table>";
+      dashPaymentAlert.innerHTML = rows;
     }
   }
 }
@@ -3801,7 +3923,6 @@ async function initAppData(){
   switchTab(allowedTabs()[0]);
 }
 </script>
-
 <script src="theme.js"></script>
 </body>
 </html>
