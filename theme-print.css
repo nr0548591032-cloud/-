@@ -1,0 +1,21 @@
+/* Organic design line — print sheet. Linked after theme.css. */
+
+@media print{
+  .sidebar,.sidebar-toggle,.nav-flyout,.toolbar,.mob-toggle,
+  .saved-flag,.btn,.icon-btn,.card-delete-btn,.primary-field-edit-btn,
+  .role-indicator,.hint{ display:none !important; }
+  .card,.stat,.modal-box{
+    box-shadow:none !important; border:1px solid rgba(0,0,0,.18) !important;
+    border-radius:10px !important; break-inside:avoid;
+  }
+  .section-title{
+    border-bottom:2px solid #000; color:#000;
+    padding-bottom:6px; margin:16px 0 10px; break-after:avoid;
+  }
+  .section-title::before{ display:none; }
+  .table-scroll{ overflow:visible !important; }
+  .table-scroll .pill{
+    background:transparent !important; color:#000 !important;
+    border:1px solid #000 !important; padding:1px 7px !important; font-size:9pt;
+  }
+}
