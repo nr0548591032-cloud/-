@@ -121,8 +121,8 @@ input:focus,select:focus,textarea:focus{
   border-color:var(--brand); border-width:2px;
   box-shadow:0 0 0 3px rgba(198,113,57,.16);
 }
-input:placeholder-shown:not(:focus),
-textarea:placeholder-shown:not(:focus){
+.tab input:placeholder-shown:not(:focus),
+.tab textarea:placeholder-shown:not(:focus){
   border-style:dashed; border-color:rgba(198,113,57,.5);
   background:rgba(255,242,235,.5);
 }
@@ -191,6 +191,7 @@ table tr:hover{ box-shadow:0 2px 4px rgba(46,43,37,.07), 0 10px 24px rgba(46,43,
 
 /* ==== 04 floating save toast ==== */
 .saved-flag{
+  opacity:0;
   position:fixed; z-index:400;
   bottom:24px; inset-inline-start:50%;
   transform:translate(50%, 14px);
@@ -246,3 +247,131 @@ table tr:hover{ box-shadow:0 2px 4px rgba(46,43,37,.07), 0 10px 24px rgba(46,43,
 }
 
 /* xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */
+
+/* ==== רכיבים חדשים מגרסת האפליקציה (30.8) ==== */
+.payment-status-select{ border-radius:999px !important; font-weight:600; }
+.accountant-note-input::placeholder{ color:rgba(32,30,29,.42); }
+.accountant-note-input:placeholder-shown:not(:focus){
+  border-style:dashed; border-color:rgba(198,113,57,.45);
+  background:rgba(255,242,235,.5);
+}
+.role-edit-toggle:hover{ background:var(--amber); color:#f9f4ed; }
+.role-summary-line{ border-radius:14px; }
+table td.bank-line-field input{ border-radius:12px; }
+.doc-chip{ background:var(--clay-200); color:var(--clay-600b); }
+.doc-chip:hover{ background:var(--amber); color:#f9f4ed; }
+nav button .tab-icon{ opacity:.9; }
+nav button.active .tab-icon{ opacity:1; }
+
+/* ================= סבב 2 · סדר וארגון ================= */
+
+/* --- 4 · כרטיס פתוח: הרקע נשאר, המסגרת יורדת --- */
+.tab .card{
+  border-color:transparent;
+  box-shadow:none;
+  background:color-mix(in srgb, var(--card) 62%, transparent);
+}
+.tab .card .card{ background:transparent; }
+
+/* --- 1 · שורת פקדים אחת --- */
+.tab .card > .toolbar > div:empty{ display:none; }
+.tab .card > .toolbar:empty{ display:none; }
+.toolbar-sticky{
+  background:color-mix(in srgb, var(--card) 92%, transparent);
+  backdrop-filter:blur(8px);
+  gap:10px 14px;
+  border-bottom:1px solid var(--line);
+}
+.toolbar-sticky > *{ margin:0; }
+.toolbar-sticky select{ width:auto !important; min-width:104px; max-width:150px; }
+.toolbar-sticky input[type=text]{ min-width:130px; }
+.toolbar-merged{ row-gap:8px; }
+.toolbar-merged > div{ display:flex; align-items:center; gap:7px; font-size:13px; }
+.toolbar-merged{ justify-content:flex-start; }
+.toolbar-merged .toolbar-grow{ flex:1 1 150px; min-width:0; }
+.toolbar-merged .toolbar-push{ margin-inline-start:auto; }
+
+/* --- 2 · כותרת מסך --- */
+.tab-head{
+  display:flex; align-items:baseline; flex-wrap:wrap;
+  gap:8px 12px; margin:0 0 16px;
+  padding-bottom:11px; border-bottom:1px solid var(--line);
+}
+.tab-head h2{
+  font-family:var(--font-heading); font-weight:400;
+  font-size:26px; line-height:1.15; margin:0; color:var(--ink);
+}
+.tab-head .tab-head-count{
+  font-size:12.5px; color:var(--ink-soft);
+  margin-inline-start:auto; font-variant-numeric:tabular-nums;
+}
+.tab-head .tab-head-pill{
+  border-radius:999px; padding:3px 11px;
+  font-size:11px; font-weight:700; line-height:1.6;
+  background:var(--clay-200); color:var(--clay-600b);
+}
+.tab-head .tab-head-pill.urgent{ background:var(--red-bg); color:#643312; }
+@media (max-width:720px){
+  .tab-head{ margin-bottom:12px; }
+  .tab-head h2{ font-size:21px; }
+  .tab-head .tab-head-count{ margin-inline-start:0; flex-basis:100%; }
+}
+
+/* --- 3 · אייקון חיפוש במקום אמוג'י --- */
+.search-wrap{ position:relative; display:inline-flex; align-items:center; }
+.search-wrap input{ padding-inline-start:32px !important; }
+.search-wrap::before{
+  content:""; position:absolute; inset-inline-start:12px;
+  width:13px; height:13px; border-radius:999px;
+  border:1.8px solid var(--clay-600b); opacity:.65;
+  pointer-events:none;
+}
+.search-wrap::after{
+  content:""; position:absolute; inset-inline-start:11px; bottom:11px;
+  width:6px; height:1.8px; border-radius:2px;
+  background:var(--clay-600b); opacity:.65;
+  transform:rotate(45deg); transform-origin:right center;
+  pointer-events:none;
+}
+
+/* --- 6 · חיפוש כללי --- */
+.gsearch{ margin:0 0 14px; position:relative; }
+.sidebar.collapsed .gsearch{ display:none; }
+.sidebar .gsearch input,
+.sidebar .gsearch input:placeholder-shown:not(:focus){
+  width:100%; border:none; border-radius:999px;
+  background:rgba(255,255,255,.11); color:#f4ece0;
+  padding:9px 14px; font-size:13px; font-family:inherit;
+}
+.sidebar .gsearch input::placeholder{ color:rgba(244,236,224,.55); }
+.sidebar .gsearch input:focus{
+  outline:2px solid var(--amber); outline-offset:1px;
+  background:rgba(255,255,255,.17);
+}
+.gsearch-results{
+  position:absolute; inset-inline:0; top:calc(100% + 6px);
+  background:var(--card); border-radius:16px; padding:6px;
+  box-shadow:0 14px 34px rgba(16,20,24,.34);
+  max-height:340px; overflow-y:auto; z-index:220; display:none;
+}
+.gsearch-results.show{ display:block; }
+.gsearch-item{
+  display:flex; align-items:center; gap:8px;
+  width:100%; text-align:right; background:transparent; border:none;
+  padding:9px 11px; border-radius:12px; cursor:pointer;
+  font-family:inherit; font-size:13px; color:var(--ink);
+}
+.gsearch-item:hover, .gsearch-item.sel{ background:var(--clay-100); }
+.gsearch-item .gs-tag{
+  flex:0 0 auto; border-radius:999px; padding:2px 8px;
+  font-size:9.5px; font-weight:700;
+  background:var(--amber); color:#fff;
+}
+.gsearch-item .gs-text{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.gsearch-empty{ padding:12px; font-size:12.5px; color:var(--ink-soft); text-align:center; }
+
+@keyframes gsFlash{
+  0%,100%{ box-shadow:0 1px 2px rgba(46,43,37,.1); }
+  35%{ box-shadow:0 0 0 3px var(--amber), 0 8px 22px rgba(198,113,57,.35); }
+}
+tr.gs-hit{ animation:gsFlash 1.5s ease 2; }
