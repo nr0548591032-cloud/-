@@ -733,6 +733,34 @@
     </div>
   </div>
 
+  <div id="createVendorPayModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div id="cvpStep1">
+        <div style="font-weight:700;font-size:15px;margin-bottom:10px">✓ החשבונית הועלתה בהצלחה</div>
+        <p class="hint" style="margin-bottom:16px">ליצור גם רישום תשלום לספק, כדי שזה יופיע גם בדוח למנהל חשבונות?</p>
+        <div class="toolbar">
+          <button class="btn ghost" onclick="closeCreateVendorPayModal()">לא, תודה</button>
+          <button class="btn" onclick="showCvpStep2()">כן, ליצור רישום</button>
+        </div>
+      </div>
+      <div id="cvpStep2" style="display:none">
+        <div style="font-weight:700;font-size:15px;margin-bottom:14px">יצירת רישום תשלום לספק</div>
+        <label style="display:block;margin-bottom:12px">
+          <div style="font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:4px">שם הספק / נותן השירות</div>
+          <input type="text" id="cvpVendorName" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit">
+        </label>
+        <label style="display:block;margin-bottom:6px">
+          <div style="font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:4px">סכום לתשלום (₪)</div>
+          <input type="number" id="cvpAmount" value="0" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit">
+        </label>
+        <div class="toolbar" style="margin-top:14px">
+          <button class="btn ghost" onclick="closeCreateVendorPayModal()">ביטול</button>
+          <button class="btn" onclick="confirmCreateVendorPay()">יצירת רישום</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <section class="tab" id="tab-licensing">
     <div class="card">
       <div class="toolbar toolbar-sticky">
@@ -3771,6 +3799,41 @@ function uploadGenericDoc(tableKey, id, field, idx){
   input.click();
 }
 
+let cvpContext = null;
+function openCreateVendorPayModal(fileName, category, url){
+  cvpContext = {fileName, category, url};
+  document.getElementById("cvpStep1").style.display = "block";
+  document.getElementById("cvpStep2").style.display = "none";
+  document.getElementById("cvpVendorName").value = "";
+  document.getElementById("cvpAmount").value = "0";
+  document.getElementById("createVendorPayModal").style.display = "flex";
+}
+function showCvpStep2(){
+  document.getElementById("cvpStep1").style.display = "none";
+  document.getElementById("cvpStep2").style.display = "block";
+  setTimeout(() => document.getElementById("cvpVendorName").focus(), 50);
+}
+function closeCreateVendorPayModal(){
+  document.getElementById("createVendorPayModal").style.display = "none";
+  cvpContext = null;
+}
+function confirmCreateVendorPay(){
+  const vendorName = document.getElementById("cvpVendorName").value.trim();
+  const amount = parseFloat(document.getElementById("cvpAmount").value) || 0;
+  if(!vendorName){ alert("יש להזין שם ספק"); return; }
+  const ctx = cvpContext;
+  data.vendorPayments.push({
+    id: nextId()+7000, vendor: vendorName, desc: ctx.fileName, amount, approved:false, paid:false,
+    bank:"", branch:"", account:"", holder:"", sourceType:"רכש/ספק",
+    docs:[{name:ctx.fileName, topic:ctx.category, docType:"חשבונית/קבלה", fileUrl:ctx.url}],
+    notes:"מקור: חשבוניות וקבלות"
+  });
+  scheduleSave("vendorPayments","vendorPaySaved");
+  renderVendorPay();
+  renderAccountantReport();
+  closeCreateVendorPayModal();
+  alert('נוצרה רשומת תשלום ב"תשלומי ספקים" (לא מאושרת עדיין) — היא תופיע בדוח למנהל חשבונות לאחר שתסמן אותה כמאושרת.');
+}
 async function uploadFile(){
   const input = document.getElementById("fileInput");
   const category = document.getElementById("fileCategorySelect").value;
@@ -3789,6 +3852,7 @@ async function uploadFile(){
     status.textContent = "הועלה בהצלחה ✓";
     input.value = "";
     setTimeout(()=>{ status.textContent=""; }, 2500);
+    openCreateVendorPayModal(file.name, category, url);
   }catch(e){
     console.error(e);
     status.textContent = "שגיאה בהעלאה: " + e.message;
