@@ -1924,10 +1924,14 @@ function quickContactWhatsAppByName(name){
   sendContactWhatsApp(c.id);
 }
 function buildTaskMessageText(row){
-  let msg = `בעיה: ${row.desc || "—"}\n`;
-  if(row.category) msg += `תחום: ${row.category}\n`;
-  if(row.notes) msg += `פירוט / הערות: ${row.notes}\n`;
-  if(row.due) msg += `תאריך יעד: ${row.due}\n`;
+  const contact = findContactByName(row.assignee);
+  const personName = (contact && contact.name) || row.assignee || "";
+  let msg = `שלום ${personName} 👋\nמה שלומך?\nמצורף לך הפרטים של מה שאני צריך ממך:\n\n`;
+  msg += `📋 *פירוט:*\n`;
+  if(row.category) msg += `🏷️ *תחום:* ${row.category}\n`;
+  msg += `📝 ${row.desc || "—"}\n`;
+  if(row.notes) msg += `💬 *הערות:* ${row.notes}\n`;
+  msg += `\nמתי תוכל לבוא? 🙏`;
   return msg;
 }
 function sendTaskWhatsApp(taskId){
@@ -2020,15 +2024,24 @@ function rolloverTasksYear(){
     });
   });
   scheduleSave("tasks","tasksSaved");
+  backfillTaskNumbers();
   const yearSel = document.getElementById("tasksYearFilter");
   if(yearSel){ yearSel.value = next; }
   renderTasks();
   alert(`הועברו ${unfinished.length} משימות לשנת ${schoolYearLabel(next)}.`);
 }
+function nextTaskNumberForYear(year){
+  const nums = data.tasks.filter(t => Number(t.schoolYear)===Number(year)).map(t => t.taskNumber || 0);
+  return (nums.length ? Math.max(...nums) : 0) + 1;
+}
+function taskCodeDisplay(row){
+  const yy = String(row.schoolYear || currentSchoolYearStart()).slice(-2);
+  return `${yy}-${row.taskNumber || row.id}`;
+}
 function addTask(){
   const yearSel = document.getElementById("tasksYearFilter");
   const targetYear = (yearSel && yearSel.value) ? Number(yearSel.value) : currentSchoolYearStart();
-  data.tasks.push({id: nextId()+1000, created:"", category:"", desc:"", status:"טרם התחיל", assignee:"", due:"", notes:"", maint:"", link:"", schoolYear: targetYear});
+  data.tasks.push({id: nextId()+1000, taskNumber: nextTaskNumberForYear(targetYear), created:"", category:"", desc:"", status:"טרם התחיל", assignee:"", due:"", notes:"", maint:"", link:"", schoolYear: targetYear});
   renderTasks(); scheduleSave("tasks","tasksSaved");
 }
 function removeTask(id){
@@ -2054,7 +2067,7 @@ function renderTasks(){
     if(row.status==="בוצע") tr.classList.add("card-ok");
     else if(row.status==="בביצוע") tr.classList.add("card-warn");
     tr.innerHTML = `
-      <td><input type="text" value="${row.id}" readonly style="width:40px"></td>
+      <td><input type="text" value="${taskCodeDisplay(row)}" readonly style="width:56px"></td>
       <td><input type="date" value="${row.created}" data-f="created"></td>
       <td>${buildSelect(getContactSpecialties(), row.category, "category")}</td>
       <td class="primary-field"><input type="text" value="${row.desc}" data-f="desc" style="min-width:180px"></td>
@@ -2258,6 +2271,8 @@ function renderLic(){
       <td class="field-narrow">${schoolYearSelectHTML(row.schoolYear)}</td>
       <td><select data-f="processStatus" data-status-style="licProcess">
             ${LIC_STATUS_ORDER.map(s=>`<option value="${s}" ${row.processStatus===s?"selected":""}>${s}</option>`).join("")}
+            ${(row.processStatus && !LIC_STATUS_ORDER.includes(row.processStatus)) ? `<option value="${row.processStatus}" selected>${row.processStatus}</option>` : ""}
+            <option value="__custom__">✏️ כתיבה חופשית...</option>
           </select></td>
       <td class="field-xnarrow"><select data-f="priority">
             <option value="גבוהה" ${row.priority==="גבוהה"?"selected":""}>גבוהה</option>
@@ -2283,7 +2298,14 @@ function renderLic(){
     wireFileCell(fileTd, row, "link", "licensing-approvals", () => { scheduleSave("licensing","licSaved"); renderLic(); });
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; scheduleSave("licensing","licSaved"); });
-      inp.addEventListener("change", () => { renderLic(); });
+      inp.addEventListener("change", () => {
+        if(inp.dataset.f === "processStatus" && inp.value === "__custom__"){
+          const text = prompt("כתוב סטטוס מותאם אישית:", "");
+          row.processStatus = (text && text.trim()) ? text.trim() : "לא התחיל";
+          scheduleSave("licensing","licSaved");
+        }
+        renderLic();
+      });
     });
     tr.querySelectorAll("[data-sync]").forEach(cb => {
       cb.addEventListener("change", () => onSyncToggle(cb, row, "lic"));
@@ -2748,20 +2770,32 @@ function saveAccountantContact(){
   data.accountantContact = getAccountantContact();
   appStorage.set("accountantContact-data", JSON.stringify(data.accountantContact)).catch(e=>console.error(e));
 }
-function buildPaymentMessageText(name, desc, amount, status, docUrl){
-  let text = `שלום\nמה שלומך?\nאשמח שתטפל בתשלום הבא:\n\nשם: ${name}\nתיאור: ${desc}\nסכום: ${fmtMoney(amount)}\nסטטוס נוכחי: ${status||"ממתין"}`;
-  if(docUrl) text += `\nקישור לחשבונית: ${docUrl}`;
-  text += `\n\nתודה רבה!`;
+function buildPaymentMessageText(name, desc, amount, status, docUrl, bankInfo){
+  let text = `שלום 👋\nמה שלומך?\nאשמח שתטפל בתשלום הבא:\n\n`;
+  text += `📌 *שם:* ${name}\n`;
+  text += `📝 *תיאור:* ${desc}\n`;
+  text += `💰 *סכום:* ${fmtMoney(amount)}\n`;
+  text += `📊 *סטטוס:* ${status||"ממתין"}\n`;
+  if(bankInfo && (bankInfo.bank || bankInfo.account)){
+    text += `🏦 *בנק:* ${bankInfo.bank||"—"}\n`;
+    text += `🏢 *סניף:* ${bankInfo.branch||"—"}\n`;
+    text += `🔢 *מספר חשבון:* ${bankInfo.account||"—"}\n`;
+    text += `👤 *ע"ש:* ${bankInfo.holder||"—"}\n`;
+  }
+  if(docUrl) text += `📎 *קישור לחשבונית:* ${docUrl}\n`;
+  text += `\nתודה רבה! 🙏`;
   return text;
 }
 function buildCategorySummaryText(categoryLabel, items){
-  let text = `שלום\nמה שלומך?\nאשמח שתטפל בתשלומים הבאים (${categoryLabel}):\n\n`;
+  let text = `שלום 👋\nמה שלומך?\nאשמח שתטפל בתשלומים הבאים (*${categoryLabel}*):\n`;
   items.forEach((it,i) => {
-    text += `${i+1}. ${it.name} — ${it.desc} — ${fmtMoney(it.amount)} — ${it.status}`;
-    if(it.docUrl) text += `\n   קישור לחשבונית: ${it.docUrl}`;
-    text += `\n`;
+    text += `\n${i+1}. 📌 *${it.name}* — ${it.desc}\n   💰 ${fmtMoney(it.amount)}  |  📊 ${it.status}`;
+    if(it.bankInfo && (it.bankInfo.bank || it.bankInfo.account)){
+      text += `\n   🏦 ${it.bankInfo.bank||"—"} | 🏢 ${it.bankInfo.branch||"—"} | 🔢 ${it.bankInfo.account||"—"} | 👤 ${it.bankInfo.holder||"—"}`;
+    }
+    if(it.docUrl) text += `\n   📎 חשבונית: ${it.docUrl}`;
   });
-  text += `\nתודה רבה!`;
+  text += `\n\nתודה רבה! 🙏`;
   return text;
 }
 function sendToAccountant(text, channel){
@@ -2775,7 +2809,7 @@ function sendToAccountant(text, channel){
   }
 }
 function sendPaymentReminder(kind, id, channel){
-  let name, desc, amount, status, docUrl;
+  let name, desc, amount, status, docUrl, bankInfo;
   if(kind === "staff"){
     const row = DOC_TABLES.staff.find(id);
     if(!row) return;
@@ -2784,6 +2818,7 @@ function sendPaymentReminder(kind, id, channel){
     amount = computeStaffTotal(row);
     status = row.paymentStatus || (row.paid ? "שולם" : "ממתין");
     docUrl = (row.docs && row.docs[0]) ? row.docs[0].fileUrl : "";
+    bankInfo = data.bank.find(b => b.name && b.name === row.name) || null;
   }else{
     const row = data.vendorPayments.find(r=>r.id===id);
     if(!row) return;
@@ -2792,8 +2827,9 @@ function sendPaymentReminder(kind, id, channel){
     amount = parseFloat(row.amount)||0;
     status = row.paymentStatus || (row.paid ? "שולם" : "ממתין");
     docUrl = (row.docs && row.docs[0]) ? row.docs[0].fileUrl : "";
+    bankInfo = {bank:row.bank, branch:row.branch, account:row.account, holder:row.holder};
   }
-  const text = buildPaymentMessageText(name, desc, amount, status, docUrl);
+  const text = buildPaymentMessageText(name, desc, amount, status, docUrl, bankInfo);
   sendToAccountant(text, channel);
 }
 function sendCategorySummary(category){
@@ -2804,7 +2840,11 @@ function sendCategorySummary(category){
     data.installments.forEach((inst, idx) => {
       inst.forEach(row => {
         if(row.approved){
-          items.push({name:row.name, desc:(row.role||"—")+" (פעימה "+(idx+1)+")", amount:computeStaffTotal(row), status:row.paymentStatus||(row.paid?"שולם":"ממתין"), docUrl:(row.docs&&row.docs[0])?row.docs[0].fileUrl:""});
+          items.push({
+            name:row.name, desc:(row.role||"—")+" (פעימה "+(idx+1)+")", amount:computeStaffTotal(row),
+            status:row.paymentStatus||(row.paid?"שולם":"ממתין"), docUrl:(row.docs&&row.docs[0])?row.docs[0].fileUrl:"",
+            bankInfo: data.bank.find(b => b.name && b.name === row.name) || null
+          });
         }
       });
     });
@@ -2812,14 +2852,22 @@ function sendCategorySummary(category){
     label = "אנשי מקצוע";
     data.vendorPayments.forEach(row => {
       if(row.approved && (row.sourceType||"רכש/ספק")==="איש מקצוע"){
-        items.push({name:row.vendor, desc:row.desc||"—", amount:parseFloat(row.amount)||0, status:row.paymentStatus||(row.paid?"שולם":"ממתין"), docUrl:(row.docs&&row.docs[0])?row.docs[0].fileUrl:""});
+        items.push({
+          name:row.vendor, desc:row.desc||"—", amount:parseFloat(row.amount)||0,
+          status:row.paymentStatus||(row.paid?"שולם":"ממתין"), docUrl:(row.docs&&row.docs[0])?row.docs[0].fileUrl:"",
+          bankInfo:{bank:row.bank, branch:row.branch, account:row.account, holder:row.holder}
+        });
       }
     });
   }else if(category === "vendor" || category === "vendor-pay"){
     label = "רכש וספקים";
     data.vendorPayments.forEach(row => {
       if(category==="vendor-pay" || (row.approved && (row.sourceType||"רכש/ספק")!=="איש מקצוע")){
-        if(category==="vendor-pay" || row.approved) items.push({name:row.vendor, desc:row.desc||"—", amount:parseFloat(row.amount)||0, status:row.paymentStatus||(row.paid?"שולם":"ממתין"), docUrl:(row.docs&&row.docs[0])?row.docs[0].fileUrl:""});
+        if(category==="vendor-pay" || row.approved) items.push({
+          name:row.vendor, desc:row.desc||"—", amount:parseFloat(row.amount)||0,
+          status:row.paymentStatus||(row.paid?"שולם":"ממתין"), docUrl:(row.docs&&row.docs[0])?row.docs[0].fileUrl:"",
+          bankInfo:{bank:row.bank, branch:row.branch, account:row.account, holder:row.holder}
+        });
       }
     });
   }
@@ -4213,16 +4261,18 @@ function renderBarChart(containerId, items){
 
 function renderDashboard(){
   renderLoginLog();
-  const totalTasks = data.tasks.length;
-  const doneTasks = data.tasks.filter(r=>r.status==="בוצע").length;
+  const curYear0 = currentSchoolYearStart();
+  const yearTasks = data.tasks.filter(r => Number(r.schoolYear||curYear0) === curYear0);
+  const totalTasks = yearTasks.length;
+  const doneTasks = yearTasks.filter(r=>r.status==="בוצע").length;
   const openTasks = totalTasks - doneTasks;
   const procTotal = data.procurement.reduce((s,r)=> s + (parseFloat(r.qty)||0)*(parseFloat(r.price)||0), 0);
   const licSoon = data.licensing.filter(r => { const u = licUrgency(r.expiry); return u==="open" || u==="late"; }).length;
   const staffTotal = data.installments.reduce((s, inst) => s + inst.reduce((s2,r)=>s2+computeStaffTotal(r),0), 0);
 
   document.getElementById("dashCards").innerHTML = `
-    <div class="stat warn"><div class="label">משימות פתוחות</div><div class="value">${openTasks}</div></div>
-    <div class="stat good"><div class="label">משימות שהושלמו</div><div class="value">${doneTasks}</div></div>
+    <div class="stat warn"><div class="label">משימות פתוחות (${schoolYearLabel(curYear0)})</div><div class="value">${openTasks}</div></div>
+    <div class="stat good"><div class="label">משימות שהושלמו (${schoolYearLabel(curYear0)})</div><div class="value">${doneTasks}</div></div>
     <div class="stat"><div class="label">סה"כ הזמנות רכש</div><div class="value">${fmtMoney(procTotal)}</div></div>
     <div class="stat ${licSoon>0?'bad':'good'}"><div class="label">אישורים לתשומת לב</div><div class="value">${licSoon}</div></div>
     <div class="stat"><div class="label">סה"כ תשלומי צוות (כל הפעימות)</div><div class="value">${fmtMoney(staffTotal)}</div></div>
@@ -4235,13 +4285,13 @@ function renderDashboard(){
 
   const maintTypes = ["תחזוקה מונעת","תחזוקה שוטפת","תחזוקה בלתי מתוכננת"];
   const maintColors = ["var(--green)","var(--violet)","var(--red)"];
-  const barData = maintTypes.map((mt,i) => ({label:mt.replace("תחזוקה ",""), value:data.tasks.filter(r=>r.maint===mt).length, color:maintColors[i]}));
-  const unclassifiedCount = data.tasks.filter(r=>!r.maint).length;
+  const barData = maintTypes.map((mt,i) => ({label:mt.replace("תחזוקה ",""), value:yearTasks.filter(r=>r.maint===mt).length, color:maintColors[i]}));
+  const unclassifiedCount = yearTasks.filter(r=>!r.maint).length;
   if(unclassifiedCount) barData.push({label:"ללא סיווג", value:unclassifiedCount, color:"var(--ink-soft)"});
   renderBarChart("dashBar", barData);
 
   const dashTasks = document.getElementById("dashTasks");
-  const openList = data.tasks.filter(r=>r.status!=="בוצע");
+  const openList = yearTasks.filter(r=>r.status!=="בוצע");
   if(openList.length===0){
     dashTasks.innerHTML = "<p class='hint'>אין משימות פתוחות כרגע.</p>";
   }else{
@@ -4372,6 +4422,19 @@ function dedupeIds(list){
   });
   return changed;
 }
+function backfillTaskNumbers(){
+  const byYear = {};
+  let changed = false;
+  data.tasks.slice().sort((a,b) => a.id - b.id).forEach(t => {
+    const y = t.schoolYear || currentSchoolYearStart();
+    byYear[y] = (byYear[y] || 0) + 1;
+    if(t.taskNumber !== byYear[y]){
+      t.taskNumber = byYear[y];
+      changed = true;
+    }
+  });
+  if(changed) scheduleSave("tasks","tasksSaved");
+}
 function backfillBankEntries(){
   let changed = false;
   data.installments.forEach(inst => {
@@ -4459,6 +4522,7 @@ async function initAppData(){
   await loadAll();
   repairDuplicateIds();
   backfillBankEntries();
+  backfillTaskNumbers();
   backfillTaskInvoiceSync();
   backfillProcInvoiceSync();
   buildNav();
