@@ -761,6 +761,19 @@
     </div>
   </div>
 
+  <div id="confirmModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <span style="width:38px;height:38px;border-radius:50%;background:var(--red-bg);color:var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span id="confirmModalIconSlot"></span></span>
+        <div style="font-weight:700;font-size:15px" id="confirmModalMessage">האם למחוק?</div>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost" onclick="closeConfirmModal()">ביטול</button>
+        <button class="btn" style="background:var(--red)" onclick="confirmModalYes()">מחיקה</button>
+      </div>
+    </div>
+  </div>
+
   <section class="tab" id="tab-licensing">
     <div class="card">
       <div class="toolbar toolbar-sticky">
@@ -2045,9 +2058,10 @@ function addTask(){
   renderTasks(); scheduleSave("tasks","tasksSaved");
 }
 function removeTask(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.tasks = data.tasks.filter(r=>r.id!==id);
-  renderTasks(); scheduleSave("tasks","tasksSaved");
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.tasks = data.tasks.filter(r=>r.id!==id);
+    renderTasks(); scheduleSave("tasks","tasksSaved");
+  });
 }
 function renderTasks(){
   const body = document.getElementById("tasksBody");
@@ -2134,9 +2148,10 @@ function addProc(){
   renderProc(); scheduleSave("procurement","procSaved");
 }
 function removeProc(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.procurement = data.procurement.filter(r=>r.id!==id);
-  renderProc(); scheduleSave("procurement","procSaved");
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.procurement = data.procurement.filter(r=>r.id!==id);
+    renderProc(); scheduleSave("procurement","procSaved");
+  });
 }
 function renderProc(){
   const body = document.getElementById("procBody");
@@ -2208,9 +2223,10 @@ function addLic(){
   renderLic(); scheduleSave("licensing","licSaved");
 }
 function removeLic(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.licensing = data.licensing.filter(r=>r.id!==id);
-  renderLic(); scheduleSave("licensing","licSaved");
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.licensing = data.licensing.filter(r=>r.id!==id);
+    renderLic(); scheduleSave("licensing","licSaved");
+  });
 }
 function licUrgency(expiry){
   if(!expiry) return "";
@@ -2446,7 +2462,7 @@ function buildInstallmentTabs(){
 }
 function computeBaseRoleTotal(row){
   const monthly = parseFloat(row.monthly)||0;
-  const daily = parseFloat(row.daily)||0;
+  const daily = monthly / 30;
   const missing = parseFloat(row.missing)||0;
   const months = parseFloat(row.months)||0;
   const base = months > 0 ? monthly * months : monthly;
@@ -2454,7 +2470,7 @@ function computeBaseRoleTotal(row){
 }
 function computeExtraRoleTotal(er){
   const monthly = parseFloat(er.monthly)||0;
-  const daily = parseFloat(er.daily)||0;
+  const daily = monthly / 30;
   const missing = parseFloat(er.missing)||0;
   const months = parseFloat(er.months)||0;
   const base = months > 0 ? monthly * months : monthly;
@@ -2476,14 +2492,14 @@ function addExtraRole(id){
   row.extraRoles = row.extraRoles || [];
   row.extraRoles.push({role:"", monthly:0, daily:0, missing:0, months:0});
   saveInstallments();
-  withScrollPreserved(() => renderStaff());
+  refreshSingleStaffRow(id);
 }
 function removeExtraRole(id, idx){
   const row = DOC_TABLES.staff.find(id);
   if(!row || !row.extraRoles) return;
   row.extraRoles.splice(idx, 1);
   saveInstallments();
-  withScrollPreserved(() => renderStaff());
+  refreshSingleStaffRow(id);
 }
 function addStaffRow(){
   data.installments[activeInstallment].push({id: nextId()+4000, name:"", role:"", monthly:0, daily:0, missing:0, months:0, link:"", notes:"", approved:false});
@@ -2491,147 +2507,173 @@ function addStaffRow(){
   saveInstallments();
 }
 function removeStaffRow(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.installments[activeInstallment] = data.installments[activeInstallment].filter(r=>r.id!==id);
-  withScrollPreserved(() => renderStaff());
-  saveInstallments();
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.installments[activeInstallment] = data.installments[activeInstallment].filter(r=>r.id!==id);
+    withScrollPreserved(() => renderStaff());
+    saveInstallments();
+  });
+}
+function buildStaffRowElement(row){
+  const rowTotal = computeStaffTotal(row);
+  const tr = document.createElement("tr");
+  tr.dataset.rowId = row.id;
+  if(row.paid) tr.classList.add("card-ok");
+  else if(row.approved) tr.classList.add("card-warn");
+  tr.innerHTML = `
+    <td class="primary-field"><input type="text" value="${row.name}" data-f="name" style="min-width:110px"></td>
+    <td><input type="text" value="${row.role}" data-f="role" style="min-width:130px"></td>
+    <td><input type="number" value="${row.monthly}" data-f="monthly" style="width:80px"></td>
+    <td><input type="text" class="staff-daily-display" value="${fmtMoney((parseFloat(row.monthly)||0)/30)}" readonly style="width:75px;color:var(--ink-soft)"></td>
+    <td><input type="number" value="${row.missing}" data-f="missing" style="width:60px"></td>
+    <td><input type="number" value="${row.months}" data-f="months" style="width:60px"></td>
+    <td><input type="text" class="staff-total-display" value="${fmtMoney(rowTotal)}" readonly style="width:80px;font-weight:600"></td>
+    <td class="sync-cell"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-approved="1" ${row.approved?"checked":""}><span class="pill ${row.approved?'done':'open'}">${row.approved?"מאושר":"לא מאושר"}</span></label></td>
+    <td class="sync-cell">${paymentStatusPill(row)}</td>
+    <td class="file-cell"></td>
+    <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
+    <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeStaffRow(${row.id})">${svgIcon('trash',13)}</button></td>
+  `;
+  migrateSingleDocToArray(row, "link", "docs", "פירוט תפקיד");
+  const fileTd = tr.querySelector(".file-cell");
+  fileTd.innerHTML = renderDocsChecklist(row, "docs", "staff");
+  tr.querySelectorAll("[data-f]").forEach(inp => {
+    inp.addEventListener("input", () => {
+      row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+      if(inp.dataset.f === "monthly"){
+        const dailyDisplay = tr.querySelector(".staff-daily-display");
+        if(dailyDisplay) dailyDisplay.value = fmtMoney((parseFloat(inp.value)||0)/30);
+      }
+      saveInstallments();
+    });
+    inp.addEventListener("change", () => {
+      if(inp.dataset.f === "name"){ ensureBankEntry(inp.value); }
+      patchRoleTotalsDisplay();
+      renderPayment();
+    });
+  });
+  tr.querySelector("[data-approved]").addEventListener("change", (e) => {
+    row.approved = e.target.checked;
+    saveInstallments();
+    renderAccountantReport();
+  });
+
+  const extraTd = document.createElement("td");
+  extraTd.style.flex = "1 1 100%";
+  const baseTotal = computeBaseRoleTotal(row);
+  const extraRoles = row.extraRoles || [];
+  const fieldLabel = (label, inputHtml) => `<label style="display:flex;flex-direction:column;gap:2px;font-size:10px;color:var(--ink-soft);font-weight:700">${label}${inputHtml}</label>`;
+  const extraRolesHtml = extraRoles.map((er,i) => {
+    const erTotal = computeExtraRoleTotal(er);
+    return `
+    <div class="role-summary-line">
+      <span>${er.role || ("תפקיד נוסף "+(i+1))}</span>
+      <span style="display:flex;align-items:center;gap:6px">
+        <b>${fmtMoney(erTotal)}</b>
+        <button type="button" class="ca-mini role-edit-toggle" title="עריכה">${svgIcon('edit',11)}</button>
+        <button type="button" class="ca-mini" title="הסרה" onclick="removeExtraRole(${row.id},${i})">✕</button>
+      </span>
+    </div>
+    <div class="role-edit-form" style="display:none">
+      ${fieldLabel("שם תפקיד", `<input type="text" value="${er.role}" data-erf="role" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:110px">`)}
+      ${fieldLabel("תעריף חודשי", `<input type="number" value="${er.monthly}" data-erf="monthly" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:80px">`)}
+      ${fieldLabel("תעריף יומי", `<input type="text" class="extra-daily-display" data-eridx="${i}" value="${fmtMoney((parseFloat(er.monthly)||0)/30)}" readonly style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:80px;color:var(--ink-soft)">`)}
+      ${fieldLabel("ימי חיסור", `<input type="number" value="${er.missing}" data-erf="missing" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:75px">`)}
+      ${fieldLabel("חודשים", `<input type="number" value="${er.months}" data-erf="months" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:65px">`)}
+    </div>`;
+  }).join("");
+  extraTd.innerHTML = `
+    <div class="role-summary-line">
+      <span>תפקיד ראשי${row.role ? " — "+row.role : ""}</span>
+      <span><b>${fmtMoney(baseTotal)}</b></span>
+    </div>
+    ${extraRolesHtml}
+    <div class="role-summary-total">
+      <span>סה"כ לתשלום (כל התפקידים)</span><span>${fmtMoney(rowTotal)}</span>
+    </div>
+    <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px;margin-top:6px" onclick="addExtraRole(${row.id})">${svgIcon('plus',12)} הוספת תפקיד נוסף</button>
+  `;
+  extraTd.querySelectorAll(".role-edit-toggle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const form = btn.closest(".role-summary-line").nextElementSibling;
+      if(!form || !form.classList.contains("role-edit-form")) return;
+      const isOpen = form.classList.contains("open");
+      document.querySelectorAll(".role-edit-form.open").forEach(f => {
+        f.classList.remove("open");
+        f.style.display = "none";
+      });
+      if(!isOpen){
+        form.classList.add("open");
+        form.style.display = "flex";
+      }
+    });
+  });
+  function patchRoleTotalsDisplay(){
+    const lines = extraTd.querySelectorAll(".role-summary-line");
+    if(lines[0]){
+      lines[0].querySelector("span:first-child").textContent = "תפקיד ראשי" + (row.role ? " — "+row.role : "");
+      lines[0].querySelector("b").textContent = fmtMoney(computeBaseRoleTotal(row));
+    }
+    (row.extraRoles||[]).forEach((er,i) => {
+      const line = lines[i+1];
+      if(line){
+        line.querySelector("span:first-child").textContent = er.role || ("תפקיד נוסף "+(i+1));
+        line.querySelector("b").textContent = fmtMoney(computeExtraRoleTotal(er));
+      }
+    });
+    const totalLine = extraTd.querySelector(".role-summary-total");
+    const newTotal = computeStaffTotal(row);
+    if(totalLine) totalLine.querySelector("span:last-child").textContent = fmtMoney(newTotal);
+    const mainTotalInput = tr.querySelector(".staff-total-display");
+    if(mainTotalInput) mainTotalInput.value = fmtMoney(newTotal);
+    const staffTotalEl = document.getElementById("staffTotal");
+    if(staffTotalEl){
+      const sumAll = data.installments[activeInstallment].reduce((s,r)=>s+computeStaffTotal(r),0);
+      staffTotalEl.textContent = fmtMoney(sumAll);
+    }
+  }
+  extraTd.querySelectorAll("[data-erf]").forEach(inp => {
+    inp.addEventListener("input", () => {
+      const idx = parseInt(inp.dataset.eridx, 10);
+      const field = inp.dataset.erf;
+      row.extraRoles[idx][field] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+      if(field==="monthly"){
+        const dailyDisplay = extraTd.querySelector(`.extra-daily-display[data-eridx="${idx}"]`);
+        if(dailyDisplay) dailyDisplay.value = fmtMoney((parseFloat(inp.value)||0)/30);
+      }
+      saveInstallments();
+      patchRoleTotalsDisplay();
+    });
+    inp.addEventListener("change", () => { renderPayment(); });
+  });
+  tr.appendChild(extraTd);
+  return tr;
 }
 function renderStaff(){
   const body = document.getElementById("staffBody");
   body.innerHTML = "";
   let total = 0;
   data.installments[activeInstallment].forEach(row => {
-    const rowTotal = computeStaffTotal(row);
-    total += rowTotal;
-    const tr = document.createElement("tr");
-    if(row.paid) tr.classList.add("card-ok");
-    else if(row.approved) tr.classList.add("card-warn");
-    tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${row.name}" data-f="name" style="min-width:110px"></td>
-      <td><input type="text" value="${row.role}" data-f="role" style="min-width:130px"></td>
-      <td><input type="number" value="${row.monthly}" data-f="monthly" style="width:80px"></td>
-      <td><input type="number" value="${row.daily}" data-f="daily" style="width:70px"></td>
-      <td><input type="number" value="${row.missing}" data-f="missing" style="width:60px"></td>
-      <td><input type="number" value="${row.months}" data-f="months" style="width:60px"></td>
-      <td><input type="text" value="${fmtMoney(rowTotal)}" readonly style="width:80px;font-weight:600"></td>
-      <td class="sync-cell"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-approved="1" ${row.approved?"checked":""}><span class="pill ${row.approved?'done':'open'}">${row.approved?"מאושר":"לא מאושר"}</span></label></td>
-      <td class="sync-cell">${paymentStatusPill(row)}</td>
-      <td class="file-cell"></td>
-      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeStaffRow(${row.id})">${svgIcon('trash',13)}</button></td>
-    `;
-    migrateSingleDocToArray(row, "link", "docs", "פירוט תפקיד");
-    const fileTd = tr.querySelector(".file-cell");
-    fileTd.innerHTML = renderDocsChecklist(row, "docs", "staff");
-    tr.querySelectorAll("[data-f]").forEach(inp => {
-      inp.addEventListener("input", () => {
-        row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
-        if(inp.dataset.f === "monthly" && (!row.daily || row.daily===0)){
-          row.daily = Math.round((parseFloat(inp.value)||0)/30);
-          const dailyInput = tr.querySelector('[data-f="daily"]');
-          if(dailyInput) dailyInput.value = row.daily;
-        }
-        saveInstallments();
-      });
-      inp.addEventListener("change", () => {
-        if(inp.dataset.f === "name"){ ensureBankEntry(inp.value); }
-        patchRoleTotalsDisplay();
-        renderPayment();
-      });
-    });
-    tr.querySelector("[data-approved]").addEventListener("change", (e) => {
-      row.approved = e.target.checked;
-      saveInstallments();
-      renderAccountantReport();
-    });
-
-    const extraTd = document.createElement("td");
-    extraTd.style.flex = "1 1 100%";
-    const baseTotal = computeBaseRoleTotal(row);
-    const extraRoles = row.extraRoles || [];
-    const fieldLabel = (label, inputHtml) => `<label style="display:flex;flex-direction:column;gap:2px;font-size:10px;color:var(--ink-soft);font-weight:700">${label}${inputHtml}</label>`;
-    const extraRolesHtml = extraRoles.map((er,i) => {
-      const erTotal = computeExtraRoleTotal(er);
-      return `
-      <div class="role-summary-line">
-        <span>${er.role || ("תפקיד נוסף "+(i+1))}</span>
-        <span style="display:flex;align-items:center;gap:6px">
-          <b>${fmtMoney(erTotal)}</b>
-          <button type="button" class="ca-mini role-edit-toggle" title="עריכה">${svgIcon('edit',11)}</button>
-          <button type="button" class="ca-mini" title="הסרה" onclick="removeExtraRole(${row.id},${i})">✕</button>
-        </span>
-      </div>
-      <div class="role-edit-form" style="display:none">
-        ${fieldLabel("שם תפקיד", `<input type="text" value="${er.role}" data-erf="role" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:110px">`)}
-        ${fieldLabel("תעריף חודשי", `<input type="number" value="${er.monthly}" data-erf="monthly" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:80px">`)}
-        ${fieldLabel("תעריף יומי", `<input type="number" value="${er.daily}" data-erf="daily" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:75px">`)}
-        ${fieldLabel("ימי חיסור", `<input type="number" value="${er.missing}" data-erf="missing" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:75px">`)}
-        ${fieldLabel("חודשים", `<input type="number" value="${er.months}" data-erf="months" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:65px">`)}
-      </div>`;
-    }).join("");
-    extraTd.innerHTML = `
-      <div class="role-summary-line">
-        <span>תפקיד ראשי${row.role ? " — "+row.role : ""}</span>
-        <span><b>${fmtMoney(baseTotal)}</b></span>
-      </div>
-      ${extraRolesHtml}
-      <div class="role-summary-total">
-        <span>סה"כ לתשלום (כל התפקידים)</span><span>${fmtMoney(rowTotal)}</span>
-      </div>
-      <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px;margin-top:6px" onclick="addExtraRole(${row.id})">${svgIcon('plus',12)} הוספת תפקיד נוסף</button>
-    `;
-    extraTd.querySelectorAll(".role-edit-toggle").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const form = btn.closest(".role-summary-line").nextElementSibling;
-        if(!form || !form.classList.contains("role-edit-form")) return;
-        const isOpen = form.classList.contains("open");
-        document.querySelectorAll(".role-edit-form.open").forEach(f => {
-          f.classList.remove("open");
-          f.style.display = "none";
-        });
-        if(!isOpen){
-          form.classList.add("open");
-          form.style.display = "flex";
-        }
-      });
-    });
-    function patchRoleTotalsDisplay(){
-      const lines = extraTd.querySelectorAll(".role-summary-line");
-      if(lines[0]){
-        lines[0].querySelector("span:first-child").textContent = "תפקיד ראשי" + (row.role ? " — "+row.role : "");
-        lines[0].querySelector("b").textContent = fmtMoney(computeBaseRoleTotal(row));
-      }
-      (row.extraRoles||[]).forEach((er,i) => {
-        const line = lines[i+1];
-        if(line){
-          line.querySelector("span:first-child").textContent = er.role || ("תפקיד נוסף "+(i+1));
-          line.querySelector("b").textContent = fmtMoney(computeExtraRoleTotal(er));
-        }
-      });
-      const totalLine = extraTd.querySelector(".role-summary-total");
-      if(totalLine) totalLine.querySelector("span:last-child").textContent = fmtMoney(computeStaffTotal(row));
-    }
-    extraTd.querySelectorAll("[data-erf]").forEach(inp => {
-      inp.addEventListener("input", () => {
-        const idx = parseInt(inp.dataset.eridx, 10);
-        const field = inp.dataset.erf;
-        row.extraRoles[idx][field] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
-        if(field==="monthly" && (!row.extraRoles[idx].daily || row.extraRoles[idx].daily===0)){
-          row.extraRoles[idx].daily = Math.round((parseFloat(inp.value)||0)/30);
-          const dailyInput = extraTd.querySelector(`[data-erf="daily"][data-eridx="${idx}"]`);
-          if(dailyInput) dailyInput.value = row.extraRoles[idx].daily;
-        }
-        saveInstallments();
-        patchRoleTotalsDisplay();
-      });
-      inp.addEventListener("change", () => { renderPayment(); });
-    });
-    tr.appendChild(extraTd);
-
-    body.appendChild(tr);
+    total += computeStaffTotal(row);
+    body.appendChild(buildStaffRowElement(row));
   });
   document.getElementById("staffTotal").textContent = fmtMoney(total);
   renderStaffCards();
+}
+function refreshSingleStaffRow(id){
+  const body = document.getElementById("staffBody");
+  if(!body) return;
+  const row = data.installments[activeInstallment].find(r=>r.id===id);
+  const oldTr = body.querySelector(`tr[data-row-id="${id}"]`);
+  if(!row){
+    if(oldTr) oldTr.remove();
+  }else{
+    const newTr = buildStaffRowElement(row);
+    if(oldTr) oldTr.replaceWith(newTr);
+    else body.appendChild(newTr);
+  }
+  const total = data.installments[activeInstallment].reduce((s,r)=>s+computeStaffTotal(r),0);
+  const totalEl = document.getElementById("staffTotal");
+  if(totalEl) totalEl.textContent = fmtMoney(total);
 }
 function renderStaffCards(){}
 
@@ -2651,9 +2693,10 @@ function addBankRow(){
   renderBank(); saveInstallments();
 }
 function removeBankRow(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.bank = data.bank.filter(r=>r.id!==id);
-  renderBank(); saveInstallments();
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.bank = data.bank.filter(r=>r.id!==id);
+    renderBank(); saveInstallments();
+  });
 }
 function renderBank(){
   const body = document.getElementById("bankBody");
@@ -2682,9 +2725,10 @@ function addVendorPay(){
   renderVendorPay(); scheduleSave("vendorPayments","vendorPaySaved");
 }
 function removeVendorPay(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.vendorPayments = data.vendorPayments.filter(r=>r.id!==id);
-  renderVendorPay(); scheduleSave("vendorPayments","vendorPaySaved");
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.vendorPayments = data.vendorPayments.filter(r=>r.id!==id);
+    renderVendorPay(); scheduleSave("vendorPayments","vendorPaySaved");
+  });
 }
 function renderVendorPay(){
   const body = document.getElementById("vendorPayBody");
@@ -3083,9 +3127,10 @@ function addContact(){
   renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks(); renderProc(); renderFoodPrice();
 }
 function removeContact(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.contacts = data.contacts.filter(r=>r.id!==id);
-  renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks(); renderProc(); renderFoodPrice();
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.contacts = data.contacts.filter(r=>r.id!==id);
+    renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks(); renderProc(); renderFoodPrice();
+  });
 }
 function formatPhoneForWhatsApp(phone){
   let digits = (phone||"").replace(/[^0-9]/g,"");
@@ -3223,9 +3268,10 @@ function addFoodPrice(){
   renderFoodPrice(); saveFood();
 }
 function removeFoodPrice(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.foodPriceList = data.foodPriceList.filter(r=>r.id!==id);
-  renderFoodPrice(); saveFood();
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.foodPriceList = data.foodPriceList.filter(r=>r.id!==id);
+    renderFoodPrice(); saveFood();
+  });
 }
 function renderFoodPrice(){
   const body = document.getElementById("foodPriceBody");
@@ -3447,9 +3493,10 @@ function printOrderView(id){
   setTimeout(() => w.print(), 400);
 }
 function removeFoodOrder(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.foodOrders = data.foodOrders.filter(o=>o.id!==id);
-  renderFoodOrders(); saveFood();
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.foodOrders = data.foodOrders.filter(o=>o.id!==id);
+    renderFoodOrders(); saveFood();
+  });
 }
 function renderFoodOrders(){
   const body = document.getElementById("foodOrdersBody");
@@ -3526,9 +3573,10 @@ function addRecurring(){
   renderFinance(); scheduleSave("recurring","financeSaved");
 }
 function removeRecurring(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.recurring = data.recurring.filter(r=>r.id!==id);
-  renderFinance(); scheduleSave("recurring","financeSaved");
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.recurring = data.recurring.filter(r=>r.id!==id);
+    renderFinance(); scheduleSave("recurring","financeSaved");
+  });
 }
 function markPaid(id){
   const row = data.recurring.find(r=>r.id===id);
@@ -3604,9 +3652,10 @@ function addKeyInv(){
   renderKeysInv(); saveKeys();
 }
 function removeKeyInv(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.keysInventory = data.keysInventory.filter(r=>r.id!==id);
-  renderKeysInv(); saveKeys();
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.keysInventory = data.keysInventory.filter(r=>r.id!==id);
+    renderKeysInv(); saveKeys();
+  });
 }
 function renderKeysInv(){
   const body = document.getElementById("keysInvBody");
@@ -3643,9 +3692,10 @@ function addKeyLog(){
   renderKeysLog(); saveKeys();
 }
 function removeKeyLog(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.keysLog = data.keysLog.filter(r=>r.id!==id);
-  renderKeysLog(); saveKeys();
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.keysLog = data.keysLog.filter(r=>r.id!==id);
+    renderKeysLog(); saveKeys();
+  });
 }
 function returnKey(id){
   const row = data.keysLog.find(r=>r.id===id);
@@ -3882,6 +3932,23 @@ function confirmCreateVendorPay(){
   closeCreateVendorPayModal();
   alert('נוצרה רשומת תשלום ב"תשלומי ספקים" (לא מאושרת עדיין) — היא תופיע בדוח למנהל חשבונות לאחר שתסמן אותה כמאושרת.');
 }
+let confirmModalCallback = null;
+function openConfirmModal(message, onConfirm){
+  document.getElementById("confirmModalMessage").textContent = message;
+  const iconSlot = document.getElementById("confirmModalIconSlot");
+  if(iconSlot && !iconSlot.innerHTML) iconSlot.innerHTML = svgIcon("trash", 18);
+  confirmModalCallback = onConfirm;
+  document.getElementById("confirmModal").style.display = "flex";
+}
+function closeConfirmModal(){
+  document.getElementById("confirmModal").style.display = "none";
+  confirmModalCallback = null;
+}
+function confirmModalYes(){
+  const cb = confirmModalCallback;
+  closeConfirmModal();
+  if(cb) cb();
+}
 async function uploadFile(){
   const input = document.getElementById("fileInput");
   const category = document.getElementById("fileCategorySelect").value;
@@ -3907,9 +3974,10 @@ async function uploadFile(){
   }
 }
 function removeFile(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.files = data.files.filter(r=>r.id!==id);
-  renderFiles(); scheduleSave("files","filesSaved");
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.files = data.files.filter(r=>r.id!==id);
+    renderFiles(); scheduleSave("files","filesSaved");
+  });
 }
 function getAllDocumentsAggregated(){
   const result = [];
@@ -4005,10 +4073,11 @@ function addProject(){
   renderProjects(); scheduleSave("projects","projectsSaved");
 }
 function removeProject(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  data.projects = data.projects.filter(r=>r.id!==id);
-  if(activeProjectId===id){ activeProjectId=null; document.getElementById("projectQuotesCard").style.display="none"; }
-  renderProjects(); scheduleSave("projects","projectsSaved");
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    data.projects = data.projects.filter(r=>r.id!==id);
+    if(activeProjectId===id){ activeProjectId=null; document.getElementById("projectQuotesCard").style.display="none"; }
+    renderProjects(); scheduleSave("projects","projectsSaved");
+  });
 }
 function openProjectQuotes(id){
   activeProjectId = id;
@@ -4056,11 +4125,12 @@ function addQuote(){
   renderQuotes(); scheduleSave("projects","projectsSaved");
 }
 function removeQuote(id){
-  if(!confirm("למחוק? לא ניתן לשחזר את הפעולה.")) return;
-  const p = data.projects.find(r=>r.id===activeProjectId);
-  if(!p) return;
-  p.quotes = p.quotes.filter(q=>q.id!==id);
-  renderQuotes(); renderProjects(); scheduleSave("projects","projectsSaved");
+  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+    const p = data.projects.find(r=>r.id===activeProjectId);
+    if(!p) return;
+    p.quotes = p.quotes.filter(q=>q.id!==id);
+    renderQuotes(); renderProjects(); scheduleSave("projects","projectsSaved");
+  });
 }
 /* ---------- AI QUOTE ANALYSIS ---------- */
 function fileToBase64(file){
