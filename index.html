@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -1166,6 +1167,28 @@ function currentSchoolYearStart(){
   const y = now.getFullYear();
   const m = now.getMonth() + 1;
   return m >= 9 ? y : y - 1;
+}
+// שנת הלימודים שאליה שייכות רשומות ישנות שנוצרו לפני שנוסף מעקב שנת-לימודים לכל שורה.
+// תיקון חד-פעמי: רשומות (משימות/רכש/רישוי) בלי שדה schoolYear מפורש היו "צפות" על
+// currentSchoolYearStart() החי, ולכן קפצו לבד לשנה הבאה ברגע שהתאריך עבר 1 בספטמבר.
+// מכאן ואילך כל רשומה מקבלת שנה מפורשת וקבועה בעת היצירה, ולא מחושבת מחדש בכל טעינה.
+const LEGACY_SCHOOL_YEAR = 2025; // תשפ"ו
+function backfillSchoolYear(){
+  let changed = false;
+  [data.tasks, data.procurement, data.licensing].forEach(list => {
+    (list||[]).forEach(row => {
+      if(row.schoolYear === undefined || row.schoolYear === null || row.schoolYear === ""){
+        row.schoolYear = LEGACY_SCHOOL_YEAR;
+        changed = true;
+      }
+    });
+  });
+  if(changed){
+    scheduleSave("tasks","tasksSaved");
+    scheduleSave("procurement","procSaved");
+    scheduleSave("licensing","licSaved");
+  }
+  return changed;
 }
 function schoolYearOptions(){
   const cur = currentSchoolYearStart();
@@ -4591,6 +4614,7 @@ function backfillProcInvoiceSync(){
 async function initAppData(){
   await loadAll();
   repairDuplicateIds();
+  backfillSchoolYear();
   backfillBankEntries();
   backfillTaskNumbers();
   backfillTaskInvoiceSync();
