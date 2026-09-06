@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -387,6 +388,22 @@
   .pill.done{ background:var(--green); color:#fff; }
   .pill.open{ background:var(--amber); color:#fff; }
   .pill.late{ background:var(--red); color:#fff; }
+  .acct-subtabs{ display:flex; flex-wrap:wrap; gap:6px; }
+  .pill-tab{
+    font-family:inherit; cursor:pointer; border:1px solid var(--line); background:#fff; color:var(--ink-soft);
+    padding:7px 16px; border-radius:20px; font-size:13px; font-weight:700; transition:all .15s ease;
+  }
+  .pill-tab:hover{ border-color:var(--brand); color:var(--brand); }
+  .pill-tab.active{ background:var(--brand); border-color:var(--brand); color:#fff; }
+  .doc-send-group{ display:inline-flex; gap:3px; align-items:center; margin-inline-start:4px; padding-inline-start:6px; border-inline-start:1px solid var(--line); }
+  .doc-send-group .contact-action-btn{ width:22px; height:22px; }
+  details.source-collapse{ margin-top:6px; }
+  details.source-collapse > summary{
+    cursor:pointer; font-weight:700; font-size:13px; color:var(--brand); padding:10px 0; list-style:none;
+  }
+  details.source-collapse > summary::-webkit-details-marker{ display:none; }
+  details.source-collapse > summary::before{ content:"▸ "; }
+  details.source-collapse[open] > summary::before{ content:"▾ "; }
   .row-actions{ text-align:center; }
   .icon-btn{
     background:transparent;
@@ -723,7 +740,8 @@
       <label style="display:block;margin-bottom:6px">
         <div style="font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:4px">סוג המסמך</div>
         <select id="docTopicModalType" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit">
-          <option value="חשבונית/קבלה">חשבונית / קבלה (יופיע בטאב חשבוניות וקבלות)</option>
+          <option value="חשבונית">חשבונית (דורש תשלום, יופיע בדוח למנהל חשבונות)</option>
+          <option value="קבלה">קבלה (כבר שולם, לתיוק בלבד)</option>
           <option value="אחר">אישור / מסמך אחר (לא קשור לתשלומים)</option>
         </select>
       </label>
@@ -886,84 +904,97 @@
       </div>
     </div>
 
-    <div class="section-title" id="vendorPayAnchor">תשלומי ספקים ונותני שירות</div>
-    <div class="toolbar">
-      <div></div>
-      <button class="btn ghost" onclick="sendCategorySummary('vendor-pay')"><span class="btn-icon-inline" id="sendVendorPaySlot"></span>שליחת סיכום למנהל חשבונות</button>
-    </div>
-    <div class="card">
-      <div class="toolbar toolbar-sticky">
-        <div><span class="saved-flag" id="vendorPaySaved">נשמר</span></div>
-        <button class="btn" onclick="addVendorPay()">+ הוספת תשלום לספק</button>
-      </div>
-      <p class="hint">רק שורות שמסומנות "אושר לתשלום" נכללות בדוח למנהל חשבונות.</p>
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>ספק / נותן שירות</th><th>סוג</th><th>תיאור</th><th>סכום</th><th>אושר לתשלום</th><th>סטטוס תשלום</th>
-            <th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל חשבון</th><th>שליחת הודעה</th><th>חשבונית מצורפת</th><th>הערות</th><th></th>
-          </tr></thead>
-          <tbody id="vendorPayBody"></tbody>
-        </table>
-      </div>
-      </div>
-
     <div class="section-title" id="combinedReportAnchor">דוח מרוכז למנהל חשבונות</div>
-    <p class="hint">סימון סטטוס כאן מעדכן אוטומטית גם את הטבלת המקור (צוות ותורנים / תשלומי ספקים). ניתן גם לכתוב הערה אישית של מנהל החשבונות לכל תשלום, ולשלוח הודעה מנוסחת ישירות ממכאן.</p>
+    <p class="hint">סימון סטטוס, פרטי בנק והערה כאן מעדכנים אוטומטית גם את הטבלת המקור. ניתן לשלוח הודעה מנוסחת ישירות מכאן.</p>
     <div class="toolbar">
-      <div>תצוגה: <select id="paymentStatusFilter" onchange="renderAccountantReport()" style="width:230px;display:inline-block">
+      <div class="acct-subtabs" id="acctSubtabs">
+        <button type="button" class="pill-tab active" data-subtab="all" onclick="setAccountantSubTab('all')">הכל</button>
+        <button type="button" class="pill-tab" data-subtab="staff" onclick="setAccountantSubTab('staff')">צוות ותורנים</button>
+        <button type="button" class="pill-tab" data-subtab="professional" onclick="setAccountantSubTab('professional')">אנשי מקצוע</button>
+        <button type="button" class="pill-tab" data-subtab="vendor" onclick="setAccountantSubTab('vendor')">רכש וספקים</button>
+      </div>
+      <div>תצוגה: <select id="paymentStatusFilter" onchange="renderAccountantReport()" style="width:200px;display:inline-block">
         <option value="">הכל (חסר פרטים / ממתין קודם)</option>
         <option value="חסר פרטים">רק חסר פרטים</option>
         <option value="ממתין">רק ממתין</option>
         <option value="שולם">רק שולם</option>
       </select></div>
-      <div></div>
     </div>
 
-    <div class="section-title" style="font-size:15px">צוות ותורנים</div>
-    <div class="toolbar">
-      <div></div>
-      <button class="btn ghost" onclick="sendCategorySummary('staff')"><span class="btn-icon-inline" id="sendStaffSlot"></span>שליחת סיכום למנהל חשבונות</button>
-    </div>
-    <div class="card">
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
-          <tbody id="combinedReportBodyStaff"></tbody>
-          <tfoot><tr class="total-row"><td>סה"כ צוות ותורנים</td><td id="combinedTotalStaff"></td></tr></tfoot>
-        </table>
+    <div id="acctSubStaff">
+      <div class="section-title" style="font-size:15px">צוות ותורנים</div>
+      <div class="toolbar">
+        <div></div>
+        <button class="btn ghost" onclick="sendCategorySummary('staff')"><span class="btn-icon-inline" id="sendStaffSlot"></span>שליחת סיכום למנהל חשבונות</button>
+      </div>
+      <div class="card">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
+            <tbody id="combinedReportBodyStaff"></tbody>
+            <tfoot><tr class="total-row"><td>סה"כ צוות ותורנים</td><td id="combinedTotalStaff"></td></tr></tfoot>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div class="section-title" style="font-size:15px">אנשי מקצוע</div>
-    <div class="toolbar">
-      <div></div>
-      <button class="btn ghost" onclick="sendCategorySummary('professional')"><span class="btn-icon-inline" id="sendProfessionalSlot"></span>שליחת סיכום למנהל חשבונות</button>
-    </div>
-    <div class="card">
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
-          <tbody id="combinedReportBodyProfessional"></tbody>
-          <tfoot><tr class="total-row"><td>סה"כ אנשי מקצוע</td><td id="combinedTotalProfessional"></td></tr></tfoot>
-        </table>
+    <div id="acctSubProfessional">
+      <div class="section-title" style="font-size:15px">אנשי מקצוע</div>
+      <div class="toolbar">
+        <div></div>
+        <button class="btn ghost" onclick="sendCategorySummary('professional')"><span class="btn-icon-inline" id="sendProfessionalSlot"></span>שליחת סיכום למנהל חשבונות</button>
+      </div>
+      <div class="card">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
+            <tbody id="combinedReportBodyProfessional"></tbody>
+            <tfoot><tr class="total-row"><td>סה"כ אנשי מקצוע</td><td id="combinedTotalProfessional"></td></tr></tfoot>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div class="section-title" style="font-size:15px">רכש וספקים</div>
-    <div class="toolbar">
-      <div></div>
-      <button class="btn ghost" onclick="sendCategorySummary('vendor')"><span class="btn-icon-inline" id="sendVendorSlot"></span>שליחת סיכום למנהל חשבונות</button>
-    </div>
-    <div class="card">
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
-          <tbody id="combinedReportBodyVendor"></tbody>
-          <tfoot><tr class="total-row"><td>סה"כ רכש וספקים</td><td id="combinedTotalVendor"></td></tr></tfoot>
-        </table>
+    <div id="acctSubVendor">
+      <div class="section-title" style="font-size:15px">רכש וספקים</div>
+      <div class="toolbar">
+        <div></div>
+        <button class="btn ghost" onclick="sendCategorySummary('vendor')"><span class="btn-icon-inline" id="sendVendorSlot"></span>שליחת סיכום למנהל חשבונות</button>
+      </div>
+      <div class="card">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
+            <tbody id="combinedReportBodyVendor"></tbody>
+            <tfoot><tr class="total-row"><td>סה"כ רכש וספקים</td><td id="combinedTotalVendor"></td></tr></tfoot>
+          </table>
+        </div>
       </div>
     </div>
+
+    <details class="source-collapse" id="vendorPayAnchor">
+      <summary>עריכת מקור: תשלומי ספקים ונותני שירות (הוספה / אישור לתשלום)</summary>
+      <div class="toolbar">
+        <div></div>
+        <button class="btn ghost" onclick="sendCategorySummary('vendor-pay')"><span class="btn-icon-inline" id="sendVendorPaySlot"></span>שליחת סיכום למנהל חשבונות</button>
+      </div>
+      <div class="card">
+        <div class="toolbar toolbar-sticky">
+          <div><span class="saved-flag" id="vendorPaySaved">נשמר</span></div>
+          <button class="btn" onclick="addVendorPay()">+ הוספת תשלום לספק</button>
+        </div>
+        <p class="hint">רק שורות שמסומנות "אושר לתשלום" נכללות בדוח למנהל חשבונות.</p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th>ספק / נותן שירות</th><th>סוג</th><th>תיאור</th><th>סכום</th><th>אושר לתשלום</th><th>סטטוס תשלום</th>
+              <th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל חשבון</th><th>שליחת הודעה</th><th>חשבונית מצורפת</th><th>הערות</th><th></th>
+            </tr></thead>
+            <tbody id="vendorPayBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </details>
   </section>
 
   <section class="tab" id="tab-finance">
@@ -1037,9 +1068,14 @@
           <option value="רכוש כללי">רכוש כללי</option>
           <option value="תחזוקה">תחזוקה</option>
           <option value="אחר">אחר</option>
+        </select>
+        <select id="fileDocTypeSelect" style="width:180px;display:inline-block;margin-bottom:10px;margin-right:8px">
+          <option value="חשבונית">חשבונית (דורש תשלום)</option>
+          <option value="קבלה">קבלה (כבר שולם)</option>
+          <option value="אחר">אחר</option>
         </select><br>
         <input type="file" id="fileInput">
-        <button class="btn" onclick="uploadFile()" style="margin-right:8px">העלאה</button>
+        <button class="btn" id="uploadFileBtn" onclick="uploadFile()" style="margin-right:8px">העלאה</button>
         <div id="uploadStatus" class="hint"></div>
       </div>
     </div>
@@ -1306,7 +1342,8 @@ const svgIconPaths = {
   chevronDown: '<path d="m6 9 6 6 6-6"/>',
   calendar: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18"/><path d="M8 2.5v4"/><path d="M16 2.5v4"/>',
   trash: '<path d="M4 7h16"/><path d="M6 7V4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V7"/><path d="M19 7l-.8 12.1a2 2 0 0 1-2 1.9H7.8a2 2 0 0 1-2-1.9L5 7"/><path d="M10 11v6"/><path d="M14 11v6"/>',
-  edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/>'
+  edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/>',
+  receipt: '<path d="M6 2.5h12v18.5l-2.3-1.4-2 1.4-2-1.4-2 1.4-2-1.4-1.7 1.4V2.5Z"/><path d="M8.5 7.5h7"/><path d="M8.5 11h7"/><path d="M8.5 14.5h4"/>'
 };
 function svgIcon(name, size){
   const path = svgIconPaths[name];
@@ -1677,7 +1714,9 @@ function toggleSidebar(){
 }
 function scrollToId(id){
   const el = document.getElementById(id);
-  if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+  if(!el) return;
+  if(el.tagName === "DETAILS") el.open = true;
+  el.scrollIntoView({behavior:"smooth", block:"start"});
 }
 function selectInstallment(idx){
   activeInstallment = idx;
@@ -1987,8 +2026,11 @@ function sendTaskEmail(taskId){
   const body = encodeURIComponent(buildTaskMessageText(row));
   window.location.href = `mailto:${contact.email}?subject=${subject}&body=${body}`;
 }
+function isInvoiceDocType(t){ return t === "חשבונית" || t === "חשבונית/קבלה" || !t; }
+function isReceiptDocType(t){ return t === "קבלה"; }
 function syncProcInvoiceToVendorPay(procRow){
-  const firstDocUrl = (procRow.docs && procRow.docs[0]) ? procRow.docs[0].fileUrl : "";
+  const invoiceDoc = (procRow.docs||[]).find(d => d.fileUrl && isInvoiceDocType(d.docType));
+  const firstDocUrl = invoiceDoc ? invoiceDoc.fileUrl : "";
   const amount = (parseFloat(procRow.qty)||0) * (parseFloat(procRow.price)||0);
   if(firstDocUrl){
     if(procRow.vendorPayId){
@@ -2017,7 +2059,8 @@ function syncProcInvoiceToVendorPay(procRow){
   renderAccountantReport();
 }
 function syncTaskInvoiceToVendorPay(taskRow){
-  const firstDocUrl = (taskRow.docs && taskRow.docs[0]) ? taskRow.docs[0].fileUrl : "";
+  const invoiceDoc = (taskRow.docs||[]).find(d => d.fileUrl && isInvoiceDocType(d.docType));
+  const firstDocUrl = invoiceDoc ? invoiceDoc.fileUrl : "";
   if(firstDocUrl){
     if(taskRow.vendorPayId){
       const vp = data.vendorPayments.find(v=>v.id===taskRow.vendorPayId);
@@ -2969,7 +3012,7 @@ function renderAccountantReport(){
       const rowTotal = computeStaffTotal(row);
       total += rowTotal;
       const bankRow = data.bank.find(b => b.name && b.name === row.name) || {};
-      combinedRows.push({ref:row, kind:"staff", saveFn:saveInstallments, name:row.name, type:"צוות (פעימה "+(idx+1)+")", total:rowTotal, bank:bankRow.bank, branch:bankRow.branch, account:bankRow.account, notes:row.notes});
+      combinedRows.push({ref:row, kind:"staff", saveFn:saveInstallments, name:row.name, type:"צוות (פעימה "+(idx+1)+")", total:rowTotal, bank:bankRow.bank, branch:bankRow.branch, account:bankRow.account, holder:bankRow.holder, notes:row.notes});
     });
   });
   const cards = document.getElementById("accountantCards");
@@ -2978,7 +3021,7 @@ function renderAccountantReport(){
   data.vendorPayments.forEach(row => {
     if(!row.approved) return;
     vendorTotal += (parseFloat(row.amount)||0);
-    combinedRows.push({ref:row, kind:"vendor", saveFn:()=>scheduleSave("vendorPayments","vendorPaySaved"), name:row.vendor, type:row.sourceType||"רכש/ספק", total:parseFloat(row.amount)||0, bank:row.bank, branch:row.branch, account:row.account, notes:row.notes});
+    combinedRows.push({ref:row, kind:"vendor", saveFn:()=>scheduleSave("vendorPayments","vendorPaySaved"), name:row.vendor, type:row.sourceType||"רכש/ספק", total:parseFloat(row.amount)||0, bank:row.bank, branch:row.branch, account:row.account, holder:row.holder, notes:row.notes});
   });
 
   const staffBody = document.getElementById("combinedReportBodyStaff");
@@ -3005,7 +3048,11 @@ function renderAccountantReport(){
             <option value="חסר פרטים" ${curStatus==="חסר פרטים"?"selected":""}>חסר פרטים</option>
           </select></td>
       <td><input type="text" class="accountant-note-input" value="${r.ref.accountantNote||""}" placeholder="הערת מנהל חשבונות" style="min-width:140px"></td>
-      <td>${r.bank||"—"}</td><td>${r.branch||"—"}</td><td>${r.account||"—"}</td><td>${r.notes||""}</td>
+      <td><input type="text" class="acct-bank-input" data-bf="bank" value="${r.bank||""}" style="width:75px"></td>
+      <td><input type="text" class="acct-bank-input" data-bf="branch" value="${r.branch||""}" style="width:55px"></td>
+      <td><input type="text" class="acct-bank-input" data-bf="account" value="${r.account||""}" style="width:95px"></td>
+      <td><input type="text" class="acct-bank-input" data-bf="holder" value="${r.holder||""}" style="min-width:100px" placeholder="שם בעל חשבון"></td>
+      <td>${r.notes||""}</td>
       <td class="contact-actions">
         <button class="contact-action-btn ca-whatsapp" title="שליחת הודעה בוואטסאפ" onclick="sendPaymentReminder('${r.kind}',${r.ref.id},'whatsapp')">${svgIcon("whatsapp",15)}</button>
         <button class="contact-action-btn ca-mail" title="שליחת הודעה במייל" onclick="sendPaymentReminder('${r.kind}',${r.ref.id},'email')">${svgIcon("mail",15)}</button>
@@ -3025,6 +3072,22 @@ function renderAccountantReport(){
     const noteInput = tr.querySelector(".accountant-note-input");
     noteInput.addEventListener("input", () => { r.ref.accountantNote = noteInput.value; });
     noteInput.addEventListener("change", () => { r.saveFn(); });
+    tr.querySelectorAll(".acct-bank-input").forEach(inp => {
+      inp.addEventListener("input", () => {
+        const f = inp.dataset.bf;
+        if(r.kind === "staff"){
+          let bankRow = data.bank.find(b => b.name && b.name === r.ref.name);
+          if(!bankRow){ bankRow = {id: nextId()+8000, name:r.ref.name, bank:"", branch:"", account:"", holder:""}; data.bank.push(bankRow); }
+          bankRow[f] = inp.value;
+        }else{
+          r.ref[f] = inp.value;
+        }
+      });
+      inp.addEventListener("change", () => {
+        r.saveFn();
+        withScrollPreserved(() => { renderStaff(); renderVendorPay(); renderAccountantReport(); });
+      });
+    });
     return tr;
   }
   if(staffBody){
@@ -3067,7 +3130,21 @@ function renderAccountantReport(){
       <div class="stat"><div class="label">סה"כ כולל להעברה</div><div class="value">${fmtMoney(total+vendorTotal)}</div></div>
     `;
   }
+  const activeSub = data.uiPrefs.accountantSubTab || "all";
+  document.querySelectorAll("#acctSubtabs .pill-tab").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.subtab === activeSub);
+  });
+  const subSections = {staff:"acctSubStaff", professional:"acctSubProfessional", vendor:"acctSubVendor"};
+  Object.keys(subSections).forEach(key => {
+    const el = document.getElementById(subSections[key]);
+    if(el) el.style.display = (activeSub === "all" || activeSub === key) ? "" : "none";
+  });
   renderVendorPay();
+}
+function setAccountantSubTab(key){
+  data.uiPrefs.accountantSubTab = key;
+  saveUiPrefs();
+  renderAccountantReport();
 }
 
 /* ---------- STAFF ROSTER REPORT (PDF + copy) ---------- */
@@ -3857,17 +3934,79 @@ function migrateSingleDocToArray(row, oldField, newField, defaultName){
   }
   if(!row[newField]) row[newField] = [];
 }
+function getRowMessageInfo(tableKey, row){
+  if(tableKey==="vendorPayments"){
+    return {name: row.vendor||"—", desc: row.desc||"—", amount: parseFloat(row.amount)||0, bankInfo:{bank:row.bank, branch:row.branch, account:row.account, holder:row.holder}};
+  }
+  if(tableKey==="procurement"){
+    const amount = (parseFloat(row.qty)||0) * (parseFloat(row.price)||0);
+    return {name: row.supplier||"—", desc: row.item||"—", amount, bankInfo:null};
+  }
+  if(tableKey==="tasks"){
+    return {name: row.assignee||"—", desc: row.desc||"—", amount:0, bankInfo:null};
+  }
+  if(tableKey==="staff"){
+    const bankRow = data.bank.find(b => b.name && b.name === row.name) || {};
+    return {name: row.name||"—", desc: row.role||"—", amount: computeStaffTotal(row), bankInfo:bankRow};
+  }
+  return {name:"—", desc:"—", amount:0, bankInfo:null};
+}
+function buildInvoiceGroupMessageText(info, docs){
+  let text = `שלום 👋\nמה שלומך?\nאשמח שתטפל בתשלום הבא:\n\n`;
+  text += `📌 *שם:* ${info.name}\n`;
+  text += `📝 *תיאור:* ${info.desc}\n`;
+  if(info.amount) text += `💰 *סכום:* ${fmtMoney(info.amount)}\n`;
+  if(info.bankInfo && (info.bankInfo.bank || info.bankInfo.account)){
+    text += `🏦 *בנק:* ${info.bankInfo.bank||"—"}\n🏢 *סניף:* ${info.bankInfo.branch||"—"}\n🔢 *מספר חשבון:* ${info.bankInfo.account||"—"}\n👤 *ע"ש:* ${info.bankInfo.holder||"—"}\n`;
+  }
+  docs.forEach((d,i) => { if(d.fileUrl) text += `📎 *חשבונית${docs.length>1?" "+(i+1):""}:* ${d.fileUrl}\n`; });
+  text += `\nתודה רבה! 🙏`;
+  return text;
+}
+function buildReceiptGroupMessageText(info, docs){
+  const subject = (info.desc && info.desc !== "—") ? info.desc : info.name;
+  let text = `שלום 👋\nמה שלומך?\nמצורף לך קבלה עבור ${subject}:\n\n`;
+  docs.forEach((d,i) => { if(d.fileUrl) text += `🧾 *קבלה${docs.length>1?" "+(i+1):""}:* ${d.fileUrl}\n`; });
+  text += `\n🙏 תודה!`;
+  return text;
+}
+function sendDocGroupMessage(tableKey, id, field, kind, channel){
+  const t = DOC_TABLES[tableKey];
+  const row = t.find(id);
+  if(!row) return;
+  const docs = (row[field]||[]).filter(d => d.fileUrl && (kind==="invoice" ? isInvoiceDocType(d.docType) : isReceiptDocType(d.docType)));
+  if(docs.length===0) return;
+  const info = getRowMessageInfo(tableKey, row);
+  const text = kind==="invoice" ? buildInvoiceGroupMessageText(info, docs) : buildReceiptGroupMessageText(info, docs);
+  sendToAccountant(text, channel);
+}
 function renderDocsChecklist(row, field, tableKey){
   const docs = row[field] || [];
-  const chips = docs.map((d,i) => `
+  const chips = docs.map((d,i) => {
+    const typeTag = isReceiptDocType(d.docType) ? '<span style="color:var(--teal);font-weight:700">קבלה · </span>' : "";
+    return `
     <span class="extra-contact-chip ${d.fileUrl?'':'doc-missing-chip'}">
       <span class="ca-mini" style="background:${d.fileUrl?'var(--green)':'transparent'};color:${d.fileUrl?'#fff':'var(--red)'};border:${d.fileUrl?'none':'1.5px dashed var(--red)'}" onclick="${d.fileUrl?`window.open('${d.fileUrl}','_blank')`:`uploadGenericDoc('${tableKey}',${row.id},'${field}',${i})`}" title="${d.fileUrl?'פתיחה':'העלאה'}">${d.fileUrl?svgIcon('check',11):svgIcon('plus',11)}</span>
-      ${d.name}
+      ${typeTag}${d.name}
       <button type="button" class="ca-mini" title="הסרה" onclick="removeGenericDoc('${tableKey}',${row.id},'${field}',${i})">✕</button>
-    </span>`).join("");
+    </span>`;
+  }).join("");
+  const invoiceDocs = docs.filter(d => d.fileUrl && isInvoiceDocType(d.docType));
+  const receiptDocs = docs.filter(d => d.fileUrl && isReceiptDocType(d.docType));
+  const invoiceBtns = invoiceDocs.length ? `
+    <span class="doc-send-group" title="שליחת חשבונית למנהל חשבונות">
+      <button type="button" class="contact-action-btn ca-whatsapp" onclick="sendDocGroupMessage('${tableKey}',${row.id},'${field}','invoice','whatsapp')">${svgIcon("whatsapp",12)}</button>
+      <button type="button" class="contact-action-btn ca-mail" onclick="sendDocGroupMessage('${tableKey}',${row.id},'${field}','invoice','email')">${svgIcon("mail",12)}</button>
+    </span>` : "";
+  const receiptBtns = receiptDocs.length ? `
+    <span class="doc-send-group" title="שליחת קבלה למנהל חשבונות">
+      <button type="button" class="contact-action-btn ca-whatsapp" onclick="sendDocGroupMessage('${tableKey}',${row.id},'${field}','receipt','whatsapp')">${svgIcon("receipt",12)}</button>
+      <button type="button" class="contact-action-btn ca-mail" onclick="sendDocGroupMessage('${tableKey}',${row.id},'${field}','receipt','email')">${svgIcon("mail",12)}</button>
+    </span>` : "";
   return `<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">
     ${chips}
     <button type="button" class="ca-mini" title="הוספת מסמך נוסף" onclick="addGenericDoc('${tableKey}',${row.id},'${field}')" style="width:24px;height:24px;border:1.5px dashed var(--line);background:transparent;color:var(--ink-soft)">${svgIcon('plus',12)}</button>
+    ${invoiceBtns}${receiptBtns}
   </div>`;
 }
 function addGenericDoc(tableKey, id, field){
@@ -3943,10 +4082,15 @@ function confirmCreateVendorPay(){
   const amount = parseFloat(document.getElementById("cvpAmount").value) || 0;
   if(!vendorName){ alert("יש להזין שם ספק"); return; }
   const ctx = cvpContext;
+  const dup = data.vendorPayments.find(v => !v.approved && (v.vendor||"")===vendorName && (v.desc||"")===ctx.fileName && Math.abs((parseFloat(v.amount)||0)-amount)<0.01);
+  if(dup && !confirm(`כבר קיימת רשומת תשלום דומה לספק "${vendorName}" באותו תיאור וסכום (כנראה מהעלאה קודמת). ליצור בכל זאת רשומה נוספת?`)){
+    closeCreateVendorPayModal();
+    return;
+  }
   data.vendorPayments.push({
     id: nextId()+7000, vendor: vendorName, desc: ctx.fileName, amount, approved:false, paid:false,
     bank:"", branch:"", account:"", holder:"", sourceType:"רכש/ספק",
-    docs:[{name:ctx.fileName, topic:ctx.category, docType:"חשבונית/קבלה", fileUrl:ctx.url}],
+    docs:[{name:ctx.fileName, topic:ctx.category, docType:"חשבונית", fileUrl:ctx.url}],
     notes:"מקור: חשבוניות וקבלות"
   });
   scheduleSave("vendorPayments","vendorPaySaved");
@@ -3973,10 +4117,15 @@ function confirmModalYes(){
   if(cb) cb();
 }
 async function uploadFile(){
+  const btn = document.getElementById("uploadFileBtn");
   const input = document.getElementById("fileInput");
   const category = document.getElementById("fileCategorySelect").value;
+  const docTypeSel = document.getElementById("fileDocTypeSelect");
+  const docType = docTypeSel ? docTypeSel.value : "חשבונית";
   const status = document.getElementById("uploadStatus");
   if(!input.files || input.files.length===0){ status.textContent = "יש לבחור קובץ קודם"; return; }
+  if(btn && btn.disabled) return;
+  if(btn) btn.disabled = true;
   const file = input.files[0];
   status.textContent = "מעלה...";
   try{
@@ -3984,16 +4133,25 @@ async function uploadFile(){
     const ref = storage.ref().child(path);
     await ref.put(file);
     const url = await ref.getDownloadURL();
-    data.files.unshift({id: nextId()+13000, name:file.name, category, url, uploadedAt: new Date().toISOString().slice(0,10)});
+    data.files.unshift({id: nextId()+13000, name:file.name, category, docType, url, uploadedAt: new Date().toISOString().slice(0,10)});
     scheduleSave("files","filesSaved");
     renderFiles();
     status.textContent = "הועלה בהצלחה ✓";
     input.value = "";
     setTimeout(()=>{ status.textContent=""; }, 2500);
-    openCreateVendorPayModal(file.name, category, url);
+    if(docType === "חשבונית"){
+      openCreateVendorPayModal(file.name, category, url);
+    }else if(docType === "קבלה"){
+      if(confirm('הקובץ נשמר כ"קבלה". לשלוח כעת למנהל חשבונות הודעה שקבלה מוכנה (לידיעה בלבד, ללא צורך בטיפול)?')){
+        const text = buildReceiptGroupMessageText({name:file.name, desc:file.name}, [{fileUrl:url}]);
+        if(confirm("לשלוח בוואטסאפ? (ביטול = שליחה במייל)")) sendToAccountant(text, "whatsapp"); else sendToAccountant(text, "email");
+      }
+    }
   }catch(e){
     console.error(e);
     status.textContent = "שגיאה בהעלאה: " + e.message;
+  }finally{
+    if(btn) btn.disabled = false;
   }
 }
 function removeFile(id){
@@ -4006,18 +4164,18 @@ function getAllDocumentsAggregated(){
   const result = [];
   data.files.forEach(f => result.push({name:f.name, category:f.category||"", uploadedAt:f.uploadedAt||"", url:f.url, source:"קבצים כלליים", nativeId:f.id, deletable:true, amount:null}));
   data.tasks.forEach(t => (t.docs||[]).forEach(d => {
-    if(d.fileUrl && (d.docType||"חשבונית/קבלה") === "חשבונית/קבלה"){
-      result.push({name:d.name, category:d.topic||"", uploadedAt:t.created||"", url:d.fileUrl, source:"משימה: "+(t.desc||"—"), deletable:false, amount:null});
+    if(d.fileUrl && (isInvoiceDocType(d.docType) || isReceiptDocType(d.docType))){
+      result.push({name:d.name, category:d.topic||"", uploadedAt:t.created||"", url:d.fileUrl, source:"משימה: "+(t.desc||"—"), deletable:false, amount:null, docType:d.docType||"חשבונית"});
     }
   }));
   data.procurement.forEach(p => (p.docs||[]).forEach(d => {
-    if(d.fileUrl && (d.docType||"חשבונית/קבלה") === "חשבונית/קבלה"){
-      result.push({name:d.name, category:d.topic||"", uploadedAt:"", url:d.fileUrl, source:"רכש: "+(p.item||"—"), deletable:false, amount:(parseFloat(p.qty)||0)*(parseFloat(p.price)||0)});
+    if(d.fileUrl && (isInvoiceDocType(d.docType) || isReceiptDocType(d.docType))){
+      result.push({name:d.name, category:d.topic||"", uploadedAt:"", url:d.fileUrl, source:"רכש: "+(p.item||"—"), deletable:false, amount:(parseFloat(p.qty)||0)*(parseFloat(p.price)||0), docType:d.docType||"חשבונית"});
     }
   }));
   data.vendorPayments.forEach(v => (v.docs||[]).forEach(d => {
-    if(d.fileUrl && (d.docType||"חשבונית/קבלה") === "חשבונית/קבלה"){
-      result.push({name:d.name, category:d.topic||"", uploadedAt:"", url:d.fileUrl, source:"תשלום ספק: "+(v.vendor||"—"), deletable:false, amount:parseFloat(v.amount)||0});
+    if(d.fileUrl && (isInvoiceDocType(d.docType) || isReceiptDocType(d.docType))){
+      result.push({name:d.name, category:d.topic||"", uploadedAt:"", url:d.fileUrl, source:"תשלום ספק: "+(v.vendor||"—"), deletable:false, amount:parseFloat(v.amount)||0, docType:d.docType||"חשבונית"});
     }
   }));
   return result;
