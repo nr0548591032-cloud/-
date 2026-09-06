@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -566,6 +567,7 @@
   </div>
   <nav id="navBar"></nav>
   <span class="role-indicator" id="roleIndicator" onclick="switchUser()"></span>
+  <span class="role-indicator" id="backupLink" onclick="openBackupModal()" style="display:none;border-top:none;padding-top:4px;margin-top:4px">שחזור מגיבוי</span>
 </aside>
 <main>
 
@@ -789,6 +791,17 @@
       <div class="toolbar">
         <button class="btn ghost" onclick="closeConfirmModal()">ביטול</button>
         <button class="btn" style="background:var(--red)" onclick="confirmModalYes()">מחיקה</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="backupModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px">שחזור נתונים מגיבוי</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:12px">לפני כל שמירה לענן נשמר העותק הקודם. בחירת "שחזור" מחזירה את העותק הקודם של אותה לשונית ומרעננת את הדף.</div>
+      <div id="backupModalList" style="display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow:auto">טוען...</div>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="btn ghost" onclick="document.getElementById('backupModal').style.display='none'">סגירה</button>
       </div>
     </div>
   </div>
@@ -1173,17 +1186,173 @@ const UID_TO_ROLE = {
   "D4dmSNOZutgJ5ty2WCYZ1Yx0gtD2": "moshe"
 };
 
+/* =====================================================================
+   שכבת אחסון מוגנת (ענן / Firestore)
+   עקרונות:
+   1. שום דבר לא נשמר לענן לפני שכל הנתונים נטענו ממנו בהצלחה (cloudReady).
+   2. אם טעינה נכשלת - האפליקציה נחסמת במסך שגיאה ולא מוצגת עם נתוני התחלה.
+   3. לפני כל שמירה נשמרות גרסאות קודמות (עד 10) - ניתנות לשחזור מהתפריט.
+   4. שמירה שמוחקת חלק גדול מהרשומות נעצרת ודורשת אישור מפורש.
+   ===================================================================== */
+const loadStatus = {};          // key -> "ok" | "failed"
+let cloudReady = false;         // true רק אחרי שכל המפתחות נטענו בהצלחה
+const BACKUP_MAX_VERSIONS = 10;
+const BACKUP_MAX_BYTES = 800000; // מתחת למגבלת 1MB של Firestore למסמך
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function showCloudBlock(title, msg){
+  let el = document.getElementById("cloudBlock");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "cloudBlock";
+    el.style.cssText = "position:fixed;inset:0;z-index:10000;background:var(--brand-dark);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:inherit";
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `<div style="max-width:520px">
+    <div style="font-size:22px;font-weight:700;margin-bottom:10px">${title}</div>
+    <div style="font-size:14.5px;line-height:1.6;color:#CFDCE2;margin-bottom:20px">${msg}</div>
+    <button type="button" onclick="location.reload()" style="background:var(--amber);color:#101B24;border:none;border-radius:999px;padding:10px 26px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit">נסה שוב</button>
+  </div>`;
+  el.style.display = "flex";
+}
+function showCloudError(msg){
+  let bar = document.getElementById("cloudErrorBar");
+  if(!bar){
+    bar = document.createElement("div");
+    bar.id = "cloudErrorBar";
+    bar.style.cssText = "position:fixed;top:0;right:0;left:0;z-index:9999;background:var(--red);color:#fff;padding:10px 16px;font-size:14px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,.25)";
+    document.body.appendChild(bar);
+  }
+  bar.innerHTML = `<span>${msg}</span><button type="button" onclick="location.reload()" style="background:#fff;color:var(--red);border:none;border-radius:999px;padding:5px 14px;font-weight:700;cursor:pointer;font-family:inherit">רענון הדף</button>`;
+  bar.style.display = "flex";
+}
+
+/* ספירת רשומות בערך שמור (מערך, או אובייקט שמכיל מערכים) - לצורך בדיקת שפיות לפני שמירה */
+function countRecords(jsonText){
+  const countArr = arr => arr.reduce((n, x) => n + (Array.isArray(x) ? countArr(x) : 1), 0);
+  try{
+    const v = JSON.parse(jsonText);
+    if(Array.isArray(v)) return countArr(v);
+    if(v && typeof v === "object") return Object.values(v).reduce((n, x) => n + (Array.isArray(x) ? countArr(x) : 0), 0);
+  }catch(e){}
+  return null;
+}
+
 const appStorage = {
   async get(key){
-    const doc = await db.collection(APP_COLLECTION).doc(key).get();
-    if(!doc.exists) return null;
-    return { value: doc.data().value };
+    let lastErr = null;
+    for(let attempt = 1; attempt <= 3; attempt++){
+      try{
+        const doc = await db.collection(APP_COLLECTION).doc(key).get({ source: "server" });
+        loadStatus[key] = "ok";
+        if(!doc.exists) return null;
+        return { value: doc.data().value };
+      }catch(e){
+        lastErr = e;
+        console.warn("טעינה נכשלה (" + key + "), ניסיון " + attempt, e);
+        if(attempt < 3) await sleep(attempt * 1000);
+      }
+    }
+    loadStatus[key] = "failed";
+    throw lastErr;
   },
-  async set(key, value){
-    await db.collection(APP_COLLECTION).doc(key).set({ value: value, updatedAt: Date.now() });
+  async set(key, value, opts){
+    opts = opts || {};
+    if(!cloudReady || loadStatus[key] === "failed"){
+      const msg = "השמירה נחסמה: הנתונים לא נטענו מהענן במלואם, ולכן לא נשמור כדי לא לדרוס נתונים קיימים. רענן את הדף.";
+      showCloudError(msg);
+      throw new Error(msg);
+    }
+    const ref = db.collection(APP_COLLECTION).doc(key);
+    const prev = await ref.get({ source: "server" });   // אם זה נכשל - השמירה נכשלת, ולא דורסים
+    const prevValue = prev.exists ? prev.data().value : null;
+    if(prevValue === value) return { value };           // אין שינוי
+
+    // בדיקת שפיות: מחיקה של יותר מחצי מהרשומות (ולפחות 3) דורשת אישור מפורש
+    if(prevValue !== null && !opts.force){
+      const before = countRecords(prevValue), after = countRecords(value);
+      if(before !== null && after !== null && before >= 3 && after < before / 2){
+        const label = (typeof BACKUP_KEY_LABELS !== "undefined" && BACKUP_KEY_LABELS[key]) || key;
+        openConfirmModal(`שים לב: השמירה ב"${label}" תמחק ${before - after} מתוך ${before} רשומות שקיימות בענן. לאשר?`,
+          () => appStorage.set(key, value, { force: true }).catch(e => console.error(e)));
+        throw new Error("שמירה ממתינה לאישור המשתמש (" + key + ")");
+      }
+    }
+
+    // גיבוי: שומרים את הגרסה הקודמת ברשימת גרסאות (עד 10, מוגבל בגודל)
+    if(prevValue !== null){
+      const bref = db.collection(APP_COLLECTION).doc(key + "__backup");
+      let versions = [];
+      try{
+        const b = await bref.get({ source: "server" });
+        if(b.exists && Array.isArray(b.data().versions)) versions = b.data().versions;
+      }catch(e){ console.warn("קריאת גיבוי נכשלה", e); }
+      versions.unshift({ value: prevValue, updatedAt: prev.data().updatedAt || null, backedUpAt: Date.now() });
+      while(versions.length > BACKUP_MAX_VERSIONS) versions.pop();
+      while(versions.length > 1 && JSON.stringify(versions).length > BACKUP_MAX_BYTES) versions.pop();
+      if(JSON.stringify(versions).length > BACKUP_MAX_BYTES){
+        console.warn("הגיבוי גדול מדי למסמך אחד - נשמר בלי גיבוי", key);
+      }else{
+        await bref.set({ versions });                      // אם הגיבוי נכשל - לא שומרים
+      }
+    }
+    await ref.set({ value: value, updatedAt: Date.now() });
     return { value };
   }
 };
+
+const BACKUP_KEY_LABELS = {
+  "tasks-data":"משימות", "procurement-data":"רכש ואספקה", "licensing-data":"רישוי ובטיחות",
+  "contacts-data":"אנשי קשר וספקים", "vendorPayments-data":"תשלומי ספקים", "recurring-data":"כספים שוטפים",
+  "files-data":"קבצים", "projects-data":"פרויקטים", "staff-data":"צוות ותורנים", "keys-data":"מפתחות",
+  "food-data":"רכש אוכל", "accountantContact-data":"פרטי מנהל חשבונות", "uiPrefs-data":"העדפות תצוגה", "loginLog-data":"יומן כניסות"
+};
+function fmtWhen(ts){
+  if(!ts) return "";
+  const d = new Date(ts);
+  return d.toLocaleDateString("he-IL") + " " + d.toLocaleTimeString("he-IL", {hour:'2-digit', minute:'2-digit'});
+}
+async function openBackupModal(){
+  const modal = document.getElementById("backupModal");
+  const list = document.getElementById("backupModalList");
+  modal.style.display = "flex";
+  list.textContent = "טוען...";
+  const rows = [];
+  for(const key of Object.keys(BACKUP_KEY_LABELS)){
+    try{
+      const b = await db.collection(APP_COLLECTION).doc(key + "__backup").get({ source: "server" });
+      if(!b.exists || !Array.isArray(b.data().versions) || !b.data().versions.length) continue;
+      const versions = b.data().versions;
+      const items = versions.map((v, i) => {
+        const n = countRecords(v.value);
+        return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px dashed var(--line)">
+          <span style="flex:1;font-size:12px;color:var(--ink-soft)">${fmtWhen(v.backedUpAt)}${n !== null ? " · " + n + " רשומות" : ""}</span>
+          <button class="btn ghost" style="padding:4px 12px;font-size:12px" onclick="openConfirmModal('לשחזר את ${BACKUP_KEY_LABELS[key]} לגרסה מ־${fmtWhen(v.backedUpAt)}? המצב הנוכחי יישמר בגיבוי.', () => restoreFromBackup('${key}', ${i}))">שחזור</button>
+        </div>`;
+      }).join("");
+      rows.push(`<div style="border:1px solid var(--line);border-radius:10px;padding:8px 12px">
+        <div style="font-weight:700;margin-bottom:4px">${BACKUP_KEY_LABELS[key]}</div>${items}</div>`);
+    }catch(e){ console.warn("בדיקת גיבוי נכשלה", key, e); }
+  }
+  list.innerHTML = rows.length ? rows.join("") : `<div style="color:var(--ink-soft);text-align:center;padding:14px">אין עדיין גיבויים. גיבוי נוצר אוטומטית בכל שמירה.</div>`;
+}
+/* שחזור גרסה מהגיבוי (index 0 = האחרונה). המצב הנוכחי נשמר בעצמו כגיבוי לפני השחזור. */
+async function restoreFromBackup(key, index){
+  index = index || 0;
+  try{
+    const b = await db.collection(APP_COLLECTION).doc(key + "__backup").get({ source: "server" });
+    const versions = (b.exists && b.data().versions) || [];
+    if(!versions[index]){ showCloudError("אין גיבוי עבור " + (BACKUP_KEY_LABELS[key] || key)); return false; }
+    await appStorage.set(key, versions[index].value, { force: true });
+    const m = document.getElementById("backupModal"); if(m) m.style.display = "none";
+    location.reload();
+    return true;
+  }catch(e){
+    console.error(e);
+    showCloudError("השחזור נכשל: " + (e.message || e));
+    return false;
+  }
+}
 
 /* ---------- SCHOOL YEAR HELPERS ---------- */
 const hebrewYearMap = {
@@ -1434,6 +1603,8 @@ auth.onAuthStateChanged(async (user) => {
     currentRole = role;
     document.getElementById("roleGate").style.display = "none";
     document.getElementById("roleIndicator").textContent = "מחובר כ: " + ROLES[role].label + " (התנתקות)";
+    const backupLink = document.getElementById("backupLink");
+    if(backupLink) backupLink.style.display = role === "admin" ? "block" : "none";
     await initAppData();
     recordLogin(role);
   }
@@ -1647,14 +1818,17 @@ function saveInstallments(){
   }, 500);
 }
 
+function anyLoadFailed(){ return Object.values(loadStatus).includes("failed"); }
 async function loadAll(){
   const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"],["projects","projects-data"],["loginLog","loginLog-data"],["uiPrefs","uiPrefs-data"],["accountantContact","accountantContact-data"]];
   for(const [dataKey, storageKey] of simpleKeys){
+    if(anyLoadFailed()) return;
     try{
       const res = await appStorage.get(storageKey);
       if(res && res.value){ data[dataKey] = JSON.parse(res.value); }
     }catch(e){ /* no saved data yet, keep seed */ }
   }
+  if(anyLoadFailed()) return;
   try{
     const res = await appStorage.get("staff-data");
     if(res && res.value){
@@ -1663,6 +1837,7 @@ async function loadAll(){
       if(parsed.bank) data.bank = parsed.bank;
     }
   }catch(e){ /* keep seed */ }
+  if(anyLoadFailed()) return;
   try{
     const res = await appStorage.get("keys-data");
     if(res && res.value){
@@ -1671,6 +1846,7 @@ async function loadAll(){
       if(parsed.log) data.keysLog = parsed.log;
     }
   }catch(e){ /* keep seed */ }
+  if(anyLoadFailed()) return;
   try{
     const res = await appStorage.get("food-data");
     if(res && res.value){
@@ -4771,6 +4947,16 @@ function backfillProcInvoiceSync(){
 
 async function initAppData(){
   await loadAll();
+  const failedKeys = Object.keys(loadStatus).filter(k => loadStatus[k] === "failed");
+  if(failedKeys.length){
+    // טעינה נכשלה: לא מציגים את האפליקציה עם נתוני התחלה ולא שומרים כלום. מסך חסימה עם "נסה שוב".
+    cloudReady = false;
+    console.error("טעינה מהענן נכשלה", failedKeys);
+    showCloudBlock("לא הצלחנו לטעון את הנתונים מהענן",
+      "כדי לא לפגוע בנתונים הקיימים, האפליקציה לא תיפתח עד שהטעינה תצליח. בדוק את חיבור האינטרנט ונסה שוב.<br><span style=\"font-size:12px;opacity:.8\">נכשל: " + failedKeys.map(k => BACKUP_KEY_LABELS[k] || k).join(", ") + "</span>");
+    return;
+  }
+  cloudReady = true;
   repairDuplicateIds();
   backfillSchoolYear();
   backfillBankEntries();
