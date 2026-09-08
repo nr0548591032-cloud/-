@@ -569,6 +569,7 @@
   <span class="role-indicator" id="roleIndicator" onclick="switchUser()"></span>
   <span class="role-indicator" id="backupLink" onclick="openBackupModal()" style="display:none;border-top:none;padding-top:4px;margin-top:4px">שחזור מגיבוי</span>
   <span class="role-indicator" id="importLink" onclick="openImportModal()" style="display:none;border-top:none;padding-top:2px;margin-top:0">ייבוא נתונים מקובץ</span>
+  <span class="role-indicator" id="downloadBackupLink" onclick="downloadBackupFile()" style="display:none;border-top:none;padding-top:2px;margin-top:0">הורדת גיבוי לקובץ עכשיו</span>
 </aside>
 <main>
 
@@ -1210,6 +1211,7 @@ const UID_TO_ROLE = {
    4. שמירה שמוחקת חלק גדול מהרשומות נעצרת ודורשת אישור מפורש.
    ===================================================================== */
 const loadStatus = {};          // key -> "ok" | "failed"
+const originalLoad = {};        // key -> הערך שהיה בענן כשהמכשיר הזה טען אותו (לזיהוי שינוי ממכשיר אחר)
 let cloudReady = false;         // true רק אחרי שכל המפתחות נטענו בהצלחה
 const BACKUP_MAX_VERSIONS = 10;
 const BACKUP_MAX_BYTES = 800000; // מתחת למגבלת 1MB של Firestore למסמך
@@ -1241,6 +1243,19 @@ function showCloudError(msg){
   bar.innerHTML = `<span>${msg}</span><button type="button" onclick="location.reload()" style="background:#fff;color:var(--red);border:none;border-radius:999px;padding:5px 14px;font-weight:700;cursor:pointer;font-family:inherit">רענון הדף</button>`;
   bar.style.display = "flex";
 }
+function showToast(msg){
+  let t = document.getElementById("infoToast");
+  if(!t){
+    t = document.createElement("div");
+    t.id = "infoToast";
+    t.style.cssText = "position:fixed;bottom:24px;right:50%;transform:translateX(50%);z-index:9999;background:var(--green);color:#fff;padding:9px 18px;border-radius:999px;font-size:13.5px;box-shadow:0 6px 18px rgba(0,0,0,.25);opacity:0;transition:opacity .2s ease";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = "1";
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => { t.style.opacity = "0"; }, 3200);
+}
 
 /* ספירת רשומות בערך שמור (מערך, או אובייקט שמכיל מערכים) - לצורך בדיקת שפיות לפני שמירה */
 function countRecords(jsonText){
@@ -1260,6 +1275,7 @@ const appStorage = {
       try{
         const doc = await db.collection(APP_COLLECTION).doc(key).get({ source: "server" });
         loadStatus[key] = "ok";
+        originalLoad[key] = doc.exists ? doc.data().value : null;
         if(!doc.exists) return null;
         return { value: doc.data().value };
       }catch(e){
@@ -1282,6 +1298,14 @@ const appStorage = {
     const prev = await ref.get({ source: "server" });   // אם זה נכשל - השמירה נכשלת, ולא דורסים
     const prevValue = prev.exists ? prev.data().value : null;
     if(prevValue === value) return { value };           // אין שינוי
+
+    // זיהוי עדכון ממכשיר אחר: אם הערך בענן שונה ממה שהמכשיר הזה טען, מישהו אחר שמר בינתיים
+    if(!opts.force && originalLoad.hasOwnProperty(key) && prevValue !== originalLoad[key]){
+      const label = (typeof BACKUP_KEY_LABELS !== "undefined" && BACKUP_KEY_LABELS[key]) || key;
+      openConfirmModal(`שים לב: מכשיר אחר שמר עדכון ב"${label}" מאז שפתחת את הדף כאן. אם תמשיך, השינוי שלך יחליף את מה שנשמר שם (גיבוי אוטומטי יישמר קודם). מומלץ לרענן ולבדוק לפני שממשיכים. להמשיך בכל זאת?`,
+        () => { originalLoad[key] = prevValue; appStorage.set(key, value, opts).catch(e => console.error(e)); });
+      throw new Error("שמירה ממתינה לאישור המשתמש - זוהה עדכון ממכשיר אחר (" + key + ")");
+    }
 
     // בדיקת שפיות: מחיקה של יותר מחצי מהרשומות (ולפחות 3) דורשת אישור מפורש
     if(prevValue !== null && !opts.force){
@@ -1312,6 +1336,7 @@ const appStorage = {
       }
     }
     await ref.set({ value: value, updatedAt: Date.now() });
+    originalLoad[key] = value;   // הבסיס של המכשיר הזה מתעדכן, כדי לא להתריע שוב על השינוי של עצמו
     return { value };
   }
 };
@@ -1676,6 +1701,8 @@ auth.onAuthStateChanged(async (user) => {
     if(backupLink) backupLink.style.display = role === "admin" ? "block" : "none";
     const importLink = document.getElementById("importLink");
     if(importLink) importLink.style.display = role === "admin" ? "block" : "none";
+    const downloadBackupLink = document.getElementById("downloadBackupLink");
+    if(downloadBackupLink) downloadBackupLink.style.display = role === "admin" ? "block" : "none";
     await initAppData();
     recordLogin(role);
   }
@@ -5053,6 +5080,45 @@ async function initAppData(){
   renderFiles();
   renderProjects();
   switchTab(allowedTabs()[0]);
+  if(currentRole === "admin") autoBackupIfDue();
+}
+
+/* ---------- גיבוי מקומי לקובץ (הורדה לדיסק, בלתי תלוי בענן) ---------- */
+function buildFullExportObject(){
+  const map = {
+    "tasks-data":"tasks", "procurement-data":"procurement", "licensing-data":"licensing", "contacts-data":"contacts",
+    "vendorPayments-data":"vendorPayments", "recurring-data":"recurring", "files-data":"files", "projects-data":"projects",
+    "loginLog-data":"loginLog", "uiPrefs-data":"uiPrefs", "accountantContact-data":"accountantContact"
+  };
+  const out = {};
+  for(const sk in map) out[sk] = JSON.stringify(data[map[sk]]);
+  out["staff-data"] = JSON.stringify({ installments: data.installments, bank: data.bank });
+  out["keys-data"] = JSON.stringify({ inventory: data.keysInventory, log: data.keysLog });
+  out["food-data"] = JSON.stringify({ priceList: data.foodPriceList, orders: data.foodOrders });
+  return out;
+}
+function downloadBackupFile(silent){
+  const out = buildFullExportObject();
+  const blob = new Blob([JSON.stringify(out)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "building-backup-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  if(!silent) showToast("קובץ הגיבוי ירד לתיקיית ההורדות");
+}
+const AUTO_BACKUP_MIN_HOURS = 20; // הורדה אוטומטית פעם ביממה לכל היותר, בכניסה הראשונה של מנהל באותו יום
+async function autoBackupIfDue(){
+  try{
+    const ref = db.collection(APP_COLLECTION).doc("autoBackupMeta");
+    const doc = await ref.get({ source: "server" });
+    const last = (doc.exists && doc.data().lastRunAt) || 0;
+    const hoursSince = (Date.now() - last) / 3600000;
+    if(hoursSince < AUTO_BACKUP_MIN_HOURS) return;
+    downloadBackupFile(true);
+    await ref.set({ lastRunAt: Date.now() }); // best-effort - אם זה נכשל, פשוט תרד עוד גיבוי בכניסה הבאה, לא נזק
+  }catch(e){
+    console.warn("גיבוי אוטומטי יומי נכשל (לא חוסם את האפליקציה)", e);
+  }
 }
 </script>
 <script src="theme.js"></script>
