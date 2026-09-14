@@ -3,6 +3,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -570,6 +571,66 @@
   .ws-task .ws-meta{ font-size:12px; color:var(--ink-soft); margin-top:3px; display:flex; flex-wrap:wrap; gap:6px 12px; }
   .ws-task .ws-sent{ display:inline-block; font-size:11px; padding:2px 8px; border-radius:999px; background:var(--green-bg); color:var(--green); font-weight:600; }
   .ws-empty{ padding:16px; text-align:center; color:var(--ink-soft); font-size:13px; border:2px dashed var(--line); border-radius:12px; }
+
+  /* ==== טאב מפתחות: כרטיסים ==== */
+  .key-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr));
+    gap:14px; margin-top:6px;
+  }
+  .key-card, .holder-card{
+    background:var(--tint-a); border:1px solid var(--line); border-right:5px solid var(--amber);
+    border-radius:var(--radius); padding:14px 16px; cursor:pointer;
+    box-shadow:0 1px 2px rgba(16,27,36,.05), 0 6px 16px rgba(16,27,36,.07);
+    transition:box-shadow .18s ease, transform .18s ease;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .key-card:nth-child(even), .holder-card:nth-child(even){ background:var(--tint-b); }
+  .key-card:hover, .holder-card:hover{ transform:translateY(-3px); box-shadow:0 4px 10px rgba(16,27,36,.1), 0 12px 26px rgba(16,27,36,.12); }
+  .key-card.mismatch{ border-right-color:var(--red); }
+  .key-card .kc-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .key-card .kc-code{ font-weight:800; font-size:15.5px; color:var(--brand-dark); }
+  .key-card .kc-loc{ font-size:13.5px; font-weight:600; color:var(--ink); }
+  .key-card .kc-meta{ font-size:11.5px; color:var(--ink-soft); display:flex; gap:8px; flex-wrap:wrap; }
+  .key-card .kc-foot{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-soft); border-top:1px dashed var(--line); padding-top:7px; margin-top:2px; }
+  .holder-card{ align-items:center; text-align:center; border-right-width:0; border-top:3px solid var(--brand); }
+  .holder-avatar{
+    width:44px; height:44px; border-radius:50%; background:var(--brand-dark); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; margin:0 auto;
+  }
+  .holder-card .hc-name{ font-weight:700; font-size:14px; }
+  .loglist{ display:flex; flex-direction:column; gap:9px; }
+  .log-row{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    background:var(--tint-a); border-radius:14px; padding:11px 16px;
+    box-shadow:0 1px 2px rgba(16,27,36,.05);
+  }
+  .log-row:nth-child(even){ background:var(--tint-b); }
+  .log-row .lr-date{ font-size:11.5px; color:var(--ink-soft); width:76px; flex-shrink:0; }
+  .log-row .lr-who{ font-weight:700; font-size:13.5px; min-width:120px; }
+  .log-row .lr-key{ color:var(--brand-dark); font-weight:700; font-size:13px; min-width:100px; }
+  .log-row .lr-note{ color:var(--ink-soft); font-size:12.5px; flex:1; }
+  .alert-card{
+    background:var(--red-bg); border-radius:14px; padding:13px 16px;
+    display:flex; align-items:center; gap:14px; margin-bottom:10px;
+    border-right:4px solid var(--red);
+  }
+  .alert-card .ac-icon{ color:var(--red); flex-shrink:0; }
+  .alert-card .ac-txt{ flex:1; font-size:13.5px; }
+  .alert-card .ac-txt b{ color:var(--red); }
+  .alert-card .ac-sub{ font-size:12px; color:var(--ink-soft); }
+  .master-badges{ display:flex; gap:6px; flex-wrap:wrap; }
+  .master-badge{ background:var(--brand-dark); color:#fff; font-size:11px; font-weight:700; padding:4px 10px; border-radius:8px; }
+  .checkgroup{ display:flex; flex-wrap:wrap; gap:7px; margin-top:4px; }
+  .check-chip{
+    display:flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--line);
+    border-radius:9px; padding:6px 10px; font-size:12.5px; font-weight:600; cursor:pointer;
+  }
+  .check-chip input{ accent-color:var(--brand); width:14px; height:14px; cursor:pointer; }
+  .check-chip.checked{ background:var(--brand); color:#fff; border-color:var(--brand); }
+  .mk-row{ display:flex; align-items:center; gap:8px; background:var(--tint-a); border-radius:10px; padding:8px 10px; }
+  .mk-row .mk-id{ font-weight:700; font-size:12.5px; color:var(--brand-dark); width:50px; flex-shrink:0; }
+  .mk-row .mk-label{ font-size:13px; flex:1; }
+  .empty-hint{ font-size:12.5px; color:var(--ink-soft); text-align:center; padding:14px 0; }
 </style>
 <link rel="stylesheet" href="theme.css">
 </head>
@@ -1152,40 +1213,197 @@
   </section>
 
   <section class="tab" id="tab-keys">
-    <div class="section-title" id="keysInvAnchor">מלאי מפתחות</div>
-    <div class="card">
-      <div class="toolbar toolbar-sticky">
-        <div><span class="saved-flag" id="keysInvSaved">נשמר</span></div>
-        <button class="btn" onclick="addKeyInv()">+ הוספת מפתח למלאי</button>
-      </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>קוד</th><th>מס' מפתח</th><th>קומה</th><th>מיקום</th>
-            <th>סוג</th><th>גודל</th><th>כמות במלאי</th><th>הערות</th><th></th>
-          </tr></thead>
-          <tbody id="keysInvBody"></tbody>
-        </table>
-      </div>
-      </div>
+    <div class="tab-head">
+      <h2>ניהול מפתחות</h2>
+      <span class="tab-head-pill" id="keysYearPill"></span>
+    </div>
 
-    <div class="section-title" id="keysLogAnchor">יומן קבלה והחזרת מפתחות</div>
-    <div class="card">
-      <div class="toolbar toolbar-sticky">
-        <div><span class="saved-flag" id="keysLogSaved">נשמר</span></div>
-        <button class="btn" onclick="addKeyLog()">+ הוצאת מפתח</button>
+    <div class="cards" id="keysStatCards"></div>
+
+    <div class="toolbar">
+      <div class="acct-subtabs" id="keysSubtabs">
+        <button type="button" class="pill-tab active" data-subtab="inv" onclick="setKeysSubTab('inv')">מלאי מפתחות</button>
+        <button type="button" class="pill-tab" data-subtab="holders" onclick="setKeysSubTab('holders')">אנשי מפתח</button>
+        <button type="button" class="pill-tab" data-subtab="log" onclick="setKeysSubTab('log')">יומן פעילות</button>
+        <button type="button" class="pill-tab" data-subtab="alerts" onclick="setKeysSubTab('alerts')">מעקב החזרות<span class="nav-count urgent" id="keysAlertCount" style="display:none"></span></button>
       </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>מפתח / מיקום</th><th>שם המחזיק</th><th>תאריך הוצאה</th>
-            <th>תאריך החזרה</th><th>סטטוס</th><th>הערות</th><th></th>
-          </tr></thead>
-          <tbody id="keysLogBody"></tbody>
-        </table>
+    </div>
+
+    <div id="keysSubInv">
+      <div class="card">
+        <div class="toolbar toolbar-sticky toolbar-merged">
+          <div class="search-wrap toolbar-grow"><input type="text" id="keysInvSearch" placeholder="חיפוש לפי קוד, מיקום או מזהה..." oninput="renderKeyCards()"></div>
+          <select id="keysFloorFilter" onchange="renderKeyCards()"><option value="">כל הקומות</option></select>
+          <select id="keysRawFilter" onchange="renderKeyCards()"><option value="">כל הגלמים</option></select>
+          <select id="keysStatusFilter" onchange="renderKeyCards()">
+            <option value="">כל הסטטוסים</option>
+            <option value="available">זמין</option>
+            <option value="partial">בהשאלה חלקית</option>
+            <option value="out">אזל במלאי</option>
+            <option value="mismatch">לבדוק ספירה</option>
+          </select>
+          <div class="toolbar-push" style="display:flex;gap:8px">
+            <span class="saved-flag" id="keysInvSaved">נשמר</span>
+            <button class="btn ghost" onclick="openMasterKeysModal()">ניהול מפתחות אב</button>
+            <button class="btn" onclick="openKeyFormModal()">+ מפתח חדש</button>
+          </div>
+        </div>
+        <div class="key-grid" id="keysGrid"></div>
       </div>
+    </div>
+
+    <div id="keysSubHolders" style="display:none">
+      <div class="card">
+        <div class="toolbar toolbar-sticky toolbar-merged">
+          <div class="search-wrap toolbar-grow"><input type="text" id="holderSearch" placeholder="חיפוש איש מפתח..." oninput="renderHolderCards()"></div>
+          <select id="holderStatusFilter" onchange="renderHolderCards()"><option value="">הכול</option><option value="active">פעילים</option><option value="inactive">לא פעילים</option></select>
+          <div class="toolbar-push"><button class="btn" onclick="openHolderFormModal()">+ איש מפתח חדש</button></div>
+        </div>
+        <div class="key-grid" id="holdersGrid"></div>
       </div>
+    </div>
+
+    <div id="keysSubLog" style="display:none">
+      <div class="card">
+        <div class="toolbar toolbar-sticky">
+          <div><span class="saved-flag" id="keysLogSaved">נשמר</span></div>
+          <button class="btn" onclick="openLoanModal()">+ מסירת מפתח</button>
+        </div>
+        <div class="loglist" id="keysLogList"></div>
+      </div>
+    </div>
+
+    <div id="keysSubAlerts" style="display:none">
+      <p class="hint">מפתחות שנמסרו לאנשים שסומנו כ"לא פעיל" ולא נרשמה החזרה — כדאי לבדוק ולתאם החזרה.</p>
+      <div id="keysAlertsList"></div>
+    </div>
   </section>
+
+  <!-- ===== מודאל: פרטי מפתח ===== -->
+  <div id="keyDetailModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:460px;max-height:86vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-weight:700;font-size:16px" id="kdTitle">מפתח</div>
+        <button class="icon-btn" onclick="closeKeyDetailModal()">✕</button>
+      </div>
+      <div class="report-form" id="kdInfo" style="margin-bottom:14px"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--brand-dark);margin-bottom:6px">מחזיקים כרגע</div>
+      <div id="kdHolders" style="margin-bottom:14px"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--brand-dark);margin-bottom:6px">נפתח גם באמצעות מפתחות אב</div>
+      <div class="master-badges" id="kdMasters" style="margin-bottom:6px"></div>
+      <div class="toolbar" style="margin-top:16px">
+        <button class="btn ghost" onclick="openStockCountModal()">עדכון ספירת מלאי</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="editKeyFromDetail()">עריכת פרטים</button>
+          <button class="btn" onclick="openLoanModalFor()">מסירת מפתח</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== מודאל: הוספה/עריכה של מפתח ===== -->
+  <div id="keyFormModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:460px;max-height:86vh;overflow-y:auto">
+      <div style="font-weight:700;font-size:16px;margin-bottom:14px" id="kfTitle">מפתח חדש</div>
+      <div class="report-form">
+        <label>קוד<input type="text" id="kfCode" placeholder="לדוגמה: 5TA"></label>
+        <label>מס' מפתח<input type="text" id="kfNum"></label>
+        <label>קומה<input type="text" id="kfFloor"></label>
+        <label>גלם<input type="text" id="kfRaw"></label>
+        <label>סוג נעילה<select id="kfType"><option>צילינדר</option><option>מנעול</option></select></label>
+        <label>גודל<input type="text" id="kfSize"></label>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:10px">מיקום<input type="text" id="kfLoc" placeholder="לדוגמה: מחסן ציוד ניקיון"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:10px">כמות בארון כרגע (לפי ספירה ידנית)<input type="number" id="kfQty" value="1"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:10px">מפתחות אב שפותחים דלת זו
+        <div class="checkgroup" id="kfMasters"></div>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:14px">הערות<input type="text" id="kfNotes"></label>
+      <div class="toolbar">
+        <button class="btn ghost" onclick="closeKeyFormModal()">ביטול</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" id="kfDeleteBtn" style="display:none;color:var(--red);border-color:var(--red-bg)" onclick="deleteKeyFromForm()">מחיקת מפתח</button>
+          <button class="btn" id="kfSubmitBtn" onclick="submitKeyForm()">הוספה</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== מודאל: עדכון ספירת מלאי ===== -->
+  <div id="stockCountModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:380px">
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px">עדכון ספירת מלאי</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px" id="scHint"></div>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:14px">כמות שנספרה בפועל בארון<input type="number" id="scQty"></label>
+      <div class="toolbar">
+        <button class="btn ghost" onclick="closeModalOverlay('stockCountModal')">ביטול</button>
+        <button class="btn" onclick="submitStockCount()">עדכון</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== מודאל: הוספה/עריכה של איש מפתח ===== -->
+  <div id="holderFormModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:380px">
+      <div style="font-weight:700;font-size:15px;margin-bottom:14px" id="hfTitle">איש מפתח חדש</div>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">שם מלא<input type="text" id="hfName" placeholder="לדוגמה: משה כהן"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">טלפון (לא חובה, לשליחת תזכורות בוואטסאפ)<input type="text" id="hfPhone" placeholder="05X-XXXXXXX"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:14px">סטטוס<select id="hfActive"><option value="1">פעיל</option><option value="0">לא פעיל</option></select></label>
+      <div class="toolbar">
+        <button class="btn ghost" onclick="closeModalOverlay('holderFormModal')">ביטול</button>
+        <button class="btn" id="hfSubmitBtn" onclick="submitHolderForm()">הוספה</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== מודאל: פרטי איש מפתח ===== -->
+  <div id="holderDetailModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:420px;max-height:82vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-weight:700;font-size:16px" id="hdTitle">שם</div>
+        <button class="icon-btn" onclick="closeModalOverlay('holderDetailModal')">✕</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <span class="pill" id="hdStatusPill"></span>
+        <button class="btn ghost" style="padding:5px 12px;font-size:12px;margin-inline-start:auto" onclick="toggleHolderActive()">שינוי סטטוס</button>
+        <button class="btn ghost" style="padding:5px 12px;font-size:12px" onclick="editHolderFromDetail()">עריכה</button>
+      </div>
+      <div style="font-weight:700;font-size:13px;color:var(--brand-dark);margin-bottom:6px">מפתחות המוחזקים כרגע</div>
+      <div id="hdKeys"></div>
+    </div>
+  </div>
+
+  <!-- ===== מודאל: מסירת מפתח ===== -->
+  <div id="loanModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:400px">
+      <div style="font-weight:700;font-size:16px;margin-bottom:14px">מסירת מפתח</div>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">איש מפתח<select id="lnHolder"></select></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">מזהה מפתח<select id="lnKey"></select></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">תאריך מסירה<input type="date" id="lnDate"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:14px">הערות<input type="text" id="lnNotes" placeholder="לא חובה"></label>
+      <div class="toolbar">
+        <button class="btn ghost" onclick="closeModalOverlay('loanModal')">ביטול</button>
+        <button class="btn" onclick="submitLoan()">שמירה</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== מודאל: ניהול מפתחות אב ===== -->
+  <div id="masterKeysModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:400px;max-height:80vh;overflow-y:auto">
+      <div style="font-weight:700;font-size:16px;margin-bottom:6px">ניהול מפתחות אב</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">הרשימה כאן היא רשימת המפתחות (הגלמים) שיכולים לפתוח כמה דלתות בבת אחת. לכל דלת בודדת מגדירים בנפרד אילו מהם פותחים אותה.</div>
+      <div id="mkList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <input type="text" id="mkNewId" placeholder="קיצור, לדוגמה: M2" style="width:90px">
+        <input type="text" id="mkNewLabel" placeholder="תיאור, לדוגמה: מאסטר קומה 2" style="flex:1">
+        <button class="btn" onclick="addMasterKeyDef()">הוספה</button>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost" onclick="closeModalOverlay('masterKeysModal')">סגירה</button>
+      </div>
+    </div>
+  </div>
 
   <section class="tab" id="tab-files">
     <div class="card">
@@ -1679,6 +1897,10 @@ let data = {
   recurring: [],
   keysInventory: [],
   keysLog: [],
+  keysHolders: [],
+  masterKeys: [{id:"GM", label:"מאסטר כללי (GM)"}],
+  keysImportDone: false,
+  codeMasterKeysDone: false,
   files: [],
   projects: [],
   loginLog: [],
@@ -1712,7 +1934,8 @@ const svgIconPaths = {
   calendar: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18"/><path d="M8 2.5v4"/><path d="M16 2.5v4"/>',
   trash: '<path d="M4 7h16"/><path d="M6 7V4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V7"/><path d="M19 7l-.8 12.1a2 2 0 0 1-2 1.9H7.8a2 2 0 0 1-2-1.9L5 7"/><path d="M10 11v6"/><path d="M14 11v6"/>',
   edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/>',
-  receipt: '<path d="M6 2.5h12v18.5l-2.3-1.4-2 1.4-2-1.4-2 1.4-2-1.4-1.7 1.4V2.5Z"/><path d="M8.5 7.5h7"/><path d="M8.5 11h7"/><path d="M8.5 14.5h4"/>'
+  receipt: '<path d="M6 2.5h12v18.5l-2.3-1.4-2 1.4-2-1.4-2 1.4-2-1.4-1.7 1.4V2.5Z"/><path d="M8.5 7.5h7"/><path d="M8.5 11h7"/><path d="M8.5 14.5h4"/>',
+  alert: '<path d="M12 9v4M12 17h.01M10.3 3.9L2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>'
 };
 function svgIcon(name, size){
   const path = svgIconPaths[name];
@@ -2052,6 +2275,10 @@ async function loadAll(){
       const parsed = JSON.parse(res.value);
       if(parsed.inventory) data.keysInventory = parsed.inventory;
       if(parsed.log) data.keysLog = parsed.log;
+      if(parsed.holders) data.keysHolders = parsed.holders;
+      if(parsed.masters) data.masterKeys = parsed.masters;
+      if(parsed.importDone) data.keysImportDone = parsed.importDone;
+      if(parsed.codeMastersDone) data.codeMasterKeysDone = parsed.codeMastersDone;
     }
   }catch(e){ /* keep seed */ }
   if(anyLoadFailed()) return;
@@ -2069,7 +2296,7 @@ function saveKeys(){
   clearTimeout(saveTimers["keys"]);
   saveTimers["keys"] = setTimeout(async () => {
     try{
-      await appStorage.set("keys-data", JSON.stringify({inventory: data.keysInventory, log: data.keysLog}));
+      await appStorage.set("keys-data", JSON.stringify({inventory: data.keysInventory, log: data.keysLog, holders: data.keysHolders, masters: data.masterKeys, importDone: data.keysImportDone, codeMastersDone: data.codeMasterKeysDone}));
       ["keysInvSaved","keysLogSaved"].forEach(id => {
         const f = document.getElementById(id);
         if(f){ f.classList.add("show"); setTimeout(()=>f.classList.remove("show"), 1200); }
@@ -2133,9 +2360,11 @@ const tabQuickLinks = {
     {label:"➕ הוספת התחייבות", action: () => addRecurring()}
   ],
   keys: [
-    {label:"🗄️ מלאי מפתחות", action: () => scrollToId("keysInvAnchor")},
-    {label:"📒 יומן קבלה והחזרה", action: () => scrollToId("keysLogAnchor")},
-    {label:"➕ הוצאת מפתח", action: () => addKeyLog()}
+    {label:"🗄️ מלאי מפתחות", action: () => setKeysSubTab("inv")},
+    {label:"👤 אנשי מפתח", action: () => setKeysSubTab("holders")},
+    {label:"📒 יומן פעילות", action: () => setKeysSubTab("log")},
+    {label:"⚠️ מעקב החזרות", action: () => setKeysSubTab("alerts")},
+    {label:"➕ מסירת מפתח", action: () => openLoanModal()}
   ],
   files: [
     {label:"➕ העלאת קובץ", action: () => { const i=document.getElementById("fileInput"); if(i) i.scrollIntoView({behavior:"smooth", block:"center"}); }}
@@ -4547,90 +4776,489 @@ function renderFinance(){
   }
 }
 
+
+/* ---------- ייבוא חד-פעמי של נתוני המפתחות מהאקסל המקורי ---------- */
+const KEYS_IMPORT_DATA = {"keys": [{"code": "5TA", "keyNum": "4", "raw": "8", "floor": "2", "location": "ארון חימום לשבת", "type": "מנעול", "size": "", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "5", "raw": "8", "floor": "1", "location": "חדר חונכים קטן", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "6", "raw": "8", "floor": "10", "location": "ספר ( היה בחירום 2)", "type": "צילינדר", "size": "75", "qty": 0.0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "5TA", "keyNum": "8", "raw": "8", "floor": "1", "location": "כננת פיר מעלית בצד מדרגות", "type": "צילינדר", "size": "75", "qty": 1.0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "5TA", "keyNum": "9", "raw": "8", "floor": "1", "location": "כננת פיר מעלית בצד חצר", "type": "צילינדר", "size": "75", "qty": 2.0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "5TA", "keyNum": "10", "raw": "8", "floor": "1", "location": "כניסה ראשית קבוע", "type": "צילינדר", "size": "65", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "11", "raw": "8", "floor": "1", "location": "זאל קבוע", "type": "צילינדר", "size": "65", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "15", "raw": "8", "floor": "1", "location": "לוח מודעות", "type": "מנעול", "size": "", "qty": 2.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "18", "raw": "8", "floor": "0", "location": "מחסן מדרגות ראשי שמאל", "type": "צילינדר", "size": "65", "qty": 7.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "21", "raw": "8", "floor": "0", "location": "שער לפני דלת אלומיניום תחתון", "type": "מנעול", "size": "", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "24", "raw": "8", "floor": "0", "location": "שער גדר בין משרד לוי לחצר תלמידים", "type": "צילינדר", "size": "65", "qty": 2.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "26", "raw": "8", "floor": "0", "location": "מעלית מטבח", "type": "צילינדר", "size": "65", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "28", "raw": "8", "floor": "0", "location": "שער ראשי עליון", "type": "מנעול", "size": "", "qty": 2.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "29", "raw": "8", "floor": "5", "location": "חדר 515- צנרת מזגנים", "type": "צילינדר", "size": "65", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "30", "raw": "8", "floor": "0", "location": "שער ראשי תחתון", "type": "מנעול", "size": "", "qty": 2.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "31", "raw": "8", "floor": "0", "location": "שער לפני דלת אלומיניום עליון", "type": "מנעול", "size": "", "qty": 2.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "32", "raw": "8", "floor": "1", "location": "חדר גניזה במדרגות חירום קומה 1", "type": "מנעול", "size": "", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "33", "raw": "8", "floor": "6", "location": "יציאה לגג ממדרגות ראשי-סולם רפרפת", "type": "מנעול", "size": "", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "34", "raw": "8", "floor": "3", "location": "מרפסת קומה 3", "type": "צילינדר", "size": "75", "qty": 1.0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "5TA", "keyNum": "50", "raw": "8", "floor": "9", "location": "לוי בית", "type": "צילינדר", "size": "75", "qty": 2.0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "5TA", "keyNum": "52", "raw": "8", "floor": "10", "location": "ספר", "type": "", "size": "", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "53", "raw": "8", "floor": "1", "location": "ארון מנקה בשירותים קומה 1", "type": "מנעול", "size": "", "qty": 2.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "54", "raw": "8", "floor": "0", "location": "מחסן מדרגות ראשי-צד ימין", "type": "צילינדר", "size": "65", "qty": 0.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "55", "raw": "8", "floor": "1", "location": "דלת פנימית בתוך פיר מעלית קומה 1", "type": "צילינדר", "size": "65", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "56", "raw": "8", "floor": "0", "location": "מחסן ליד מעלית מטבח (דלת מהגינה)", "type": "צילינדר", "size": "65", "qty": 3.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "416", "raw": "8", "floor": "4", "location": "חדר מנקה קומה 4", "type": "צילינדר", "size": "65", "qty": 2.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "417", "raw": "8", "floor": "2", "location": "מקרר בחדר אוכל", "type": "צילינדר", "size": "65", "qty": 1.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "516", "raw": "8", "floor": "5", "location": "חדר מנקה קומה 5", "type": "צילינדר", "size": "65", "qty": 2.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "517", "raw": "8", "floor": "2", "location": "מקרר בחדר אוכל", "type": "צילינדר", "size": "65", "qty": 2.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "612", "raw": "8", "floor": "0", "location": "שער גדר צובר גז", "type": "צילינדר", "size": "65", "qty": 3.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "614", "raw": "8", "floor": "6", "location": "חדר כביסה קומה 6", "type": "צילינדר", "size": "65", "qty": 3.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "616", "raw": "8", "floor": "6", "location": "חדר מנקה קומה 6", "type": "צילינדר", "size": "65", "qty": 2.0, "notes": "", "masters": []}, {"code": "5TA", "keyNum": "617", "raw": "8", "floor": "9", "location": "מחסן לוי בית", "type": "צילינדר", "size": "65", "qty": 1.0, "notes": "", "masters": []}, {"code": "D7P", "keyNum": "22", "raw": "7", "floor": "1", "location": "ארון בגרויות גדול בחדר הירוק", "type": "מנעול", "size": "", "qty": 0, "notes": "שלישייה", "masters": []}, {"code": "D7P", "keyNum": "10", "raw": "7", "floor": "2", "location": "מחסן מטבח (מול המעלית)", "type": "צילינדר", "size": "65", "qty": 0.0, "notes": "שישייה", "masters": []}, {"code": "D7P", "keyNum": "24", "raw": "7", "floor": "2", "location": "ארון חד פעמי שמאלי בממ''ד 2", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "D7P", "keyNum": "23", "raw": "7", "floor": "2", "location": "ארון חד פעמי ימני בממ''ד 2", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "D7P", "keyNum": "22", "raw": "7", "floor": "6", "location": "יציאה לגג ממדרגות חירום", "type": "מנעול", "size": "", "qty": 0, "notes": "שלישייה", "masters": []}, {"code": "D7P", "keyNum": "21", "raw": "7", "floor": "10", "location": "ספר שבור (היה במקרר מטבח)", "type": "מנעול", "size": "", "qty": 0, "notes": "שלישייה", "masters": []}, {"code": "D7P", "keyNum": "10", "raw": "7", "floor": "10", "location": "ספר (היה במחסן מטבח (בצד בשרי)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "שישייה", "masters": []}, {"code": "D7P", "keyNum": "7", "raw": "7", "floor": "10", "location": "ספר (היה בחדר חונכים/שלוחים(שינה)-צד ר''מים)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "D7P", "keyNum": "11", "raw": "7", "floor": "10", "location": "ספר (היה בחדר את''ה-מחסן מלאי מכונת מזון ושתיה)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "D7P", "keyNum": "21", "raw": "7", "floor": "10", "location": "ספר (היה בארון פח/כלוב במקרר מטבח)", "type": "מנעול", "size": "", "qty": 0, "notes": "שלישייה", "masters": []}, {"code": "D7P", "keyNum": "18", "raw": "7", "floor": "10", "location": "ספר (היה ב613)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "תאומים", "masters": []}, {"code": "D7P", "keyNum": "18", "raw": "7", "floor": "10", "location": "ספר (היה ב612)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "תאומים", "masters": []}, {"code": "D7P", "keyNum": "M", "raw": "7", "floor": "M", "location": "מסטר", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "D8P", "keyNum": "21", "raw": "8", "floor": "3", "location": "301 ארון מקרן", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "D8P", "keyNum": "22", "raw": "", "floor": "3", "location": "302 ארון מקרן", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "D8P", "keyNum": "23", "raw": "", "floor": "3", "location": "303 ארון מקרן", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "D8P", "keyNum": "24", "raw": "", "floor": "3", "location": "304 ארון מקרן", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "D8P", "keyNum": "25", "raw": "", "floor": "3", "location": "305 ארון מקרן", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "D8P", "keyNum": "31", "raw": "", "floor": "3", "location": "שרותים חצר", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "D8P", "keyNum": "24", "raw": "", "floor": "3", "location": "שרותים חצר", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "D8P", "keyNum": "M", "raw": "8", "floor": "M", "location": "מסטר", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "408", "raw": "", "floor": "1", "location": "ספר (היה בחדר פנימי בחדר תאים)", "type": "צילינדר", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "414", "raw": "", "floor": "1", "location": "ספר", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "511", "raw": "", "floor": "5", "location": "ספר (היה במחסן 511)", "type": "צילינדר", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "510", "raw": "", "floor": "5", "location": "ספר (היה בכביסה 5)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "515", "raw": "", "floor": "5", "location": "ספר (היה בחדר גרינוולד)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "תאומים", "masters": []}, {"code": "DXP", "keyNum": "415", "raw": "", "floor": "6", "location": "ספר (היה ב611)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "411", "raw": "", "floor": "6", "location": "ספר (היה ב 609)", "type": "צילינדר", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "509", "raw": "", "floor": "6", "location": "ספר ( היה בכביסה 6)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "409", "raw": "", "floor": "6", "location": "ספר ( היה ב 602)", "type": "צילינדר", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "514", "raw": "", "floor": "10", "location": "ספר (היה בממ''מ 2)", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "DXP", "keyNum": "505", "raw": "", "floor": "10", "location": "ספר (היה במחסן מצעים 412)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "508", "raw": "", "floor": "10", "location": "ספר (היה ב614)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "507", "raw": "", "floor": "10", "location": "ספר (היה ב613)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "516", "raw": "", "floor": "10", "location": "ספר (היה ב413)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "K7H", "keyNum": "7", "raw": "", "floor": "", "location": "חדר פנימייה 610", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M1", "keyNum": "1", "raw": "8", "floor": "1", "location": "חדר ירוק", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "2", "raw": "7", "floor": "1", "location": "חדר ר''מים", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "3", "raw": "8", "floor": "1", "location": "חדר עופר", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "4", "raw": "8", "floor": "1", "location": "חדר חונכים", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "5", "raw": "7", "floor": "2", "location": "", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "6", "raw": "8", "floor": "3", "location": "כיתה 301", "type": "צילינדר", "size": "65", "qty": 0.0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "7", "raw": "7", "floor": "3", "location": "ממ\"ד קומה 2", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "8", "raw": "7", "floor": "3", "location": "כיתה 303", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "9", "raw": "7", "floor": "3", "location": "כיתה 304", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "10", "raw": "7", "floor": "3", "location": "*-/87", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "11", "raw": "7", "floor": "3", "location": "כיתה 307-ממ''ד - ספרייה", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "12", "raw": "7", "floor": "3", "location": "חדר קפה 306קומה 3", "type": "צילינדר", "size": "65", "qty": 0, "notes": "תאומים", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "13", "raw": "8", "floor": "0", "location": "דלת צמוד למעלית בצד ימין", "type": "צילינדר", "size": "65", "qty": 1.0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "14", "raw": "7", "floor": "1", "location": "כניסה ראשית (דלת עץ)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "15", "raw": "7", "floor": "0", "location": "פנל משנה כיבוי אש ליד דלת אלומיניום", "type": "מנעול", "size": "", "qty": 0, "notes": "תאומים", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "16", "raw": "7", "floor": "1", "location": "מדרגות חירום קומה 1", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "17", "raw": "7", "floor": "1", "location": "יציאת חירום זאל", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "18", "raw": "7", "floor": "2", "location": "מדרגות חירום קומה 2", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "19", "raw": "7", "floor": "3", "location": "מדרגות חירום קומה 3", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "21", "raw": "", "floor": "", "location": "חדר אתה למטה ציוני חונך", "type": "", "size": "", "qty": 0, "notes": "", "masters": ["GM", "M1"]}, {"code": "M1", "keyNum": "22", "raw": "", "floor": "", "location": "דלת שער צר כבש לספקים", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M2", "keyNum": "1", "raw": "", "floor": "1", "location": "דלת שער כניסה צד משרדים", "type": "צילינדר", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M2", "keyNum": "2", "raw": "7", "floor": "5", "location": "מדרגות חירום קומה 5", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "3", "raw": "8", "floor": "1", "location": "ארון חשמל קומה 1", "type": "מנעול", "size": "", "qty": 1.0, "notes": "שלישייה, גלגלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "4", "raw": "8", "floor": "2", "location": "כניסה חדר אוכל", "type": "צילינדר", "size": "75", "qty": 1.0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "5", "raw": "8", "floor": "2", "location": "ארון חשמל קומה 2", "type": "מנעול", "size": "", "qty": 1.0, "notes": "שלישייה, גלגלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "6", "raw": "8", "floor": "3", "location": "כניסה קומה 3", "type": "צילינדר", "size": "75", "qty": 1.0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "7", "raw": "8", "floor": "3", "location": "ארון חשמל קומה 3", "type": "צילינדר", "size": "75", "qty": 1.0, "notes": "שלישייה, גלגלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "8", "raw": "7", "floor": "4", "location": "כניסה קומה 4", "type": "צילינדר", "size": "75", "qty": 0, "notes": "תאומים \"גלגלת לדלת פלדלת\"", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "9", "raw": "8", "floor": "4", "location": "ארון חשמל קומה 4", "type": "צילינדר", "size": "75", "qty": 3.0, "notes": "רביעייה, גלגלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "10", "raw": "7", "floor": "5", "location": "כניסה קומה 5", "type": "צילינדר", "size": "75", "qty": 0, "notes": "תאומים \"גלגלת לדלת פלדלת\"", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "11", "raw": "8", "floor": "5", "location": "ארון חשמל קומה 5", "type": "צילינדר", "size": "75", "qty": 3.0, "notes": "רביעייה, גלגלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "12", "raw": "7", "floor": "6", "location": "כניסה קומה 6", "type": "צילינדר", "size": "75", "qty": 0, "notes": "תאומים \"גלגלת לדלת פלדלת\"", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "13", "raw": "8", "floor": "6", "location": "ארון חשמל קומה 6", "type": "צילינדר", "size": "75", "qty": 3.0, "notes": "רביעייה, גלגלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "14", "raw": "7", "floor": "1", "location": "זאל", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "15", "raw": "7", "floor": "1", "location": "משרד שלוחים", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "16", "raw": "7", "floor": "1", "location": "דלת אלומיניום-כניסה למדרגות", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "17", "raw": "8", "floor": "2", "location": "שירותים חדר אוכל", "type": "צילינדר", "size": "65", "qty": 2.0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "18", "raw": "8", "floor": "4", "location": "מקלחות קומה 4", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "19", "raw": "8", "floor": "4", "location": "ממ''ד קומה 4 כיתת תקשורת", "type": "צילינדר", "size": "65", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "20", "raw": "7", "floor": "4", "location": "מדרגות חירום קומה 4", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M2"]}, {"code": "m2", "keyNum": "21", "raw": "8", "floor": "4", "location": "חדר מדריך 413", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "22", "raw": "8", "floor": "5", "location": "מקלחות קומה 5", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "23", "raw": "8", "floor": "5", "location": "חדר מדריך 513", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "24", "raw": "8", "floor": "5", "location": "ממ''ד קומה 5 חדר שינה מדריך", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "25", "raw": "7", "floor": "6", "location": "חדר שלוחים", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "26", "raw": "8", "floor": "6", "location": "מקלחות קומה 6", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "27", "raw": "7", "floor": "6", "location": "מדרגות חירום קומה 6", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM", "M2"]}, {"code": "M2", "keyNum": "28", "raw": "", "floor": "", "location": "חדר דני אהרון", "type": "", "size": "", "qty": 0, "notes": "", "masters": ["GM"]}, {"code": "M2", "keyNum": "1", "raw": "8", "floor": "0", "location": "שער חצר ליד משרדים", "type": "צילינדר", "size": "65", "qty": 1.0, "notes": "", "masters": ["GM", "M2"]}, {"code": "M3", "keyNum": "1", "raw": "7", "floor": "", "location": "כניסה למטבח", "type": "צילינדר", "size": "65", "qty": 0, "notes": "שלישייה", "masters": ["GM"]}, {"code": "M3", "keyNum": "2", "raw": "8", "floor": "1", "location": "משרד משגיח ראשי זלמנוביץ", "type": "צילינדר", "size": "75", "qty": 1.0, "notes": "גלגלת לדלת פלדלת", "masters": ["GM"]}, {"code": "M3", "keyNum": "3", "raw": "7", "floor": "1", "location": "", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": ["GM"]}, {"code": "M3", "keyNum": "4", "raw": "7", "floor": "3", "location": "חדר אורח 308", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": ["GM"]}, {"code": "M3", "keyNum": "5", "raw": "7", "floor": "1", "location": "דלת מעבר לובי לפרוזדור שירותים", "type": "צילינדר", "size": "75", "qty": 0, "notes": "תאומים \"גלגלת לדלת פלדלת\"", "masters": ["GM"]}, {"code": "T7C", "keyNum": "3", "raw": "7", "floor": "1", "location": "ספר (היה בחדר שלוחים-לא תקין)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T7C", "keyNum": "3", "raw": "7", "floor": "10", "location": "ספר (היה בכניסה קומה 6 תפיסת דלת)", "type": "מנעול", "size": "", "qty": 0, "notes": "תאומים", "masters": []}, {"code": "T7C", "keyNum": "5", "raw": "7", "floor": "10", "location": "ספר (היה בכניסה קומה 5 תפיסת דלת)", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7C", "keyNum": "6", "raw": "7", "floor": "10", "location": "ספר (היה ביציאה לגג ממדרגות חירום)", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7C", "keyNum": "M", "raw": "7", "floor": "M", "location": "מסטר", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "18", "raw": "", "floor": "", "location": "חדר פנימייה 609", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "2", "raw": "7", "floor": "10", "location": "ספר (היה בארון מים קומה 4)", "type": "צילינדר", "size": "75", "qty": 0, "notes": "תאומים \"גלגלת לדלת פלדלת\"", "masters": []}, {"code": "T7D", "keyNum": "10", "raw": "7", "floor": "1", "location": "ארון הגברה זאל", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "17", "raw": "8", "floor": "5", "location": "חדר 512- חדר גרינוולד", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "18", "raw": "", "floor": "", "location": "חדר פנימייה 609", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "19", "raw": "7", "floor": "6", "location": "ארון מים קומה 6-ברז ספרינקלרים", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "20", "raw": "7", "floor": "0", "location": "שער שנדורפי", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "20", "raw": "7", "floor": "10", "location": "ספר (היה בחדר קירור מטבח)", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "21", "raw": "7", "floor": "10", "location": "ספר (היה בארון מים קומה 6)", "type": "צילינדר", "size": "75", "qty": 0, "notes": "תאומים \"גלגלת לדלת פלדלת\"", "masters": []}, {"code": "T7D", "keyNum": "21", "raw": "7", "floor": "4", "location": "ארון מים קומה 4-ברז ספרינקלרים", "type": "מנעול", "size": "", "qty": 0, "notes": "תאומים \"גלגלת לדלת פלדלת\"", "masters": []}, {"code": "T7D", "keyNum": "22", "raw": "7", "floor": "0", "location": "שער כניסה לבניין-שומר", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "31", "raw": "7", "floor": "10", "location": "ספר (מכיתה 305)-צד אחד יש בורג שמונע נעילה מאותו צד", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "31", "raw": "8", "floor": "0", "location": "חדר שומר ביתן שמירה", "type": "צילינדר", "size": "65", "qty": 1.0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "33", "raw": "7", "floor": "2", "location": "מטבח שבת תחתון", "type": "צילינדר", "size": "65", "qty": 0, "notes": "שישייה", "masters": []}, {"code": "T7D", "keyNum": "34", "raw": "ר", "floor": "1", "location": "מעבר מחדר אקווריום ןלחדר עופר", "type": "צילינדר", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "35", "raw": "8", "floor": "6", "location": "חדר יוסקה", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "52", "raw": "7", "floor": "4", "location": "מחסן מצעים 412", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "53", "raw": "8", "floor": "1", "location": "חדר תאים", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "111", "raw": "ר", "floor": "0", "location": "מחסן מכונת פחיות במדרגות-חדר את''ה לשעבר", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "412", "raw": "7", "floor": "4", "location": "חדר כביסה קומה 4", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T7D", "keyNum": "513", "raw": "7", "floor": "1", "location": "חדר פנימי בחדר תאים", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "50", "raw": "8", "floor": "1", "location": "מגירה של ישראל פוני מתחת לאקווריום", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "30", "raw": "8", "floor": "2", "location": "מנעול סורג ממ''ד 2", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "27", "raw": "8", "floor": "2", "location": "ארון פח רוטר (שמאל)", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "11", "raw": "8", "floor": "3", "location": "חדר 303-ארון מתחת ארון קודש", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "14", "raw": "8", "floor": "5", "location": "חדר שלוחים 502 (לא כ''כ תקין)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "512", "raw": "8", "floor": "5", "location": "חדר מצעים", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "55", "raw": "8", "floor": "6", "location": "חדר ג'ינג'ים 617", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "T8M", "keyNum": "51", "raw": "8", "floor": "9", "location": "מנעול שרשרת אופניים של הרב וינפלד", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "31", "raw": "8", "floor": "10", "location": "ספר (היה בצובר גז)", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "25", "raw": "8", "floor": "10", "location": "ספר (היה בחדר מדריך 502)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "10", "raw": "8", "floor": "10", "location": "ספר (היה ב612) (אין מס' מפתח)", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "T8M", "keyNum": "M", "raw": "8", "floor": "M", "location": "מסטר", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "407", "raw": "7", "floor": "1", "location": "משרד לוי-צד לובי משרדים", "type": "צילינדר", "size": "65", "qty": 0, "notes": "שישייה", "masters": []}, {"code": "DXP", "keyNum": "415", "raw": "8", "floor": "1", "location": "משרד לוי-צד מזכיר", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "414", "raw": "8", "floor": "1", "location": "משרד הנהלת חשבונות", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "404", "raw": "", "floor": "1", "location": "מעבר ממשרד שלום בער זילברשטרום למחסן", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "506", "raw": "7", "floor": "1", "location": "משרד מוישי כהן", "type": "צילינדר", "size": "65", "qty": 0, "notes": "שישייה", "masters": []}, {"code": "DXP", "keyNum": "509", "raw": "", "floor": "1", "location": "כניסה למחסן של שלום בער זילברשטרום מבחוץ", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "402", "raw": "7", "floor": "1", "location": "משרד מנדי רוזנברג", "type": "צילינדר", "size": "65", "qty": 0, "notes": "תאומים", "masters": []}, {"code": "DXP", "keyNum": "515", "raw": "7", "floor": "1", "location": "משרד שלום בער זילברשטרום", "type": "צילינדר", "size": "65", "qty": 0, "notes": "", "masters": []}, {"code": "DXP", "keyNum": "508", "raw": "7", "floor": "5", "location": "חדר עבודה ש.ח.", "type": "צילינדר", "size": "65", "qty": 0, "notes": "תאומים", "masters": []}, {"code": "פ", "keyNum": "3.3", "raw": "פ", "floor": "1", "location": "משרד לוי-ממ''ד 1", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "פ", "keyNum": "1.3", "raw": "פ", "floor": "2", "location": "מעלית 2", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "פ", "keyNum": "5.3", "raw": "פ", "floor": "3", "location": "מעלית 3", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "פ", "keyNum": "3.8", "raw": "פ", "floor": "4", "location": "מעלית 4", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "פ", "keyNum": "2.5", "raw": "פ", "floor": "5", "location": "מעלית 5", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "פ", "keyNum": "2.6", "raw": "פ", "floor": "6", "location": "מעלית 6", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "פ", "keyNum": "1.4/5", "raw": "פ", "floor": "9", "location": "לוי בית", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "פ", "keyNum": "פ", "raw": "פ", "floor": "פ", "location": "מסטר", "type": "צילינדר", "size": "75", "qty": 0, "notes": "גלגלת לדלת פלדלת", "masters": []}, {"code": "קטן", "keyNum": "3", "raw": "ק", "floor": "1", "location": "ארון פח חדר ירוק-3", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "קטן", "keyNum": "4", "raw": "ק", "floor": "1", "location": "ארון פח דבר מלכות-4", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "קטן", "keyNum": "2", "raw": "ק", "floor": "1", "location": "ארון פח את''ה-2", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "רגיל", "keyNum": "1", "raw": "ר", "floor": "1", "location": "ארון פח את''ה-1", "type": "מנעול", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "GM", "keyNum": "GM", "raw": "", "floor": "", "location": "מסטר", "type": "", "size": "", "qty": 0, "notes": "", "masters": ["GM"]}, {"code": "M1", "keyNum": "מאסטר", "raw": "M", "floor": "M", "location": "מסטר", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M2", "keyNum": "מאסטר", "raw": "M", "floor": "M", "location": "מסטר", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "מאסטר", "raw": "M", "floor": "M", "location": "מסטר", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "6", "raw": "", "floor": "", "location": "", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "7", "raw": "", "floor": "", "location": "", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "8", "raw": "", "floor": "", "location": "", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "9", "raw": "", "floor": "", "location": "", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "10", "raw": "", "floor": "", "location": "", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "11", "raw": "", "floor": "", "location": "", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "12", "raw": "", "floor": "", "location": "", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "13", "raw": "", "floor": "", "location": "", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "14", "raw": "", "floor": "", "location": "", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}, {"code": "M3", "keyNum": "15", "raw": "", "floor": "", "location": "", "type": "", "size": "", "qty": 0, "notes": "", "masters": []}], "people": [{"name": "אברימי ברוד", "active": true}, {"name": "אושי הלפרין", "active": true}, {"name": "גלוכובסקי", "active": true}, {"name": "דהאן מטבח ראשי", "active": true}, {"name": "דוברוסקין", "active": true}, {"name": "דוד אופן", "active": true}, {"name": "דוד פרוס", "active": true}, {"name": "דונל", "active": true}, {"name": "דני אהרון", "active": true}, {"name": "הירץ", "active": true}, {"name": "הלל רוזנברג", "active": true}, {"name": "הרב גולדשמיד", "active": true}, {"name": "הרב שמואל רוזנברג", "active": true}, {"name": "וינפלד", "active": true}, {"name": "זילברשטרום", "active": false}, {"name": "זלמן גולדברג", "active": true}, {"name": "זלמן כהן עובד מטבח", "active": true}, {"name": "זלמנוביץ", "active": true}, {"name": "זנדרוב", "active": true}, {"name": "חונך גליקסברג", "active": true}, {"name": "טביב", "active": true}, {"name": "יוסי קסטל", "active": true}, {"name": "יוסקה שוורץ", "active": false}, {"name": "יעקב וינפלד", "active": true}, {"name": "יער ויזל תלמיד מצוין", "active": true}, {"name": "יצחק גרינוולד", "active": true}, {"name": "יצחק הטבח", "active": true}, {"name": "יצחק וילהלם", "active": true}, {"name": "ישראל הכט", "active": true}, {"name": "לוי", "active": true}, {"name": "לוי נאדה תלמיד תקשורת", "active": true}, {"name": "לוי צרור רזרבי", "active": true}, {"name": "מדריך א", "active": true}, {"name": "מדריך ב", "active": true}, {"name": "מוישי כהן", "active": true}, {"name": "מנדי מרכוס", "active": true}, {"name": "מנדי רוזנברג", "active": true}, {"name": "מנחם שמח חונך", "active": false}, {"name": "מנקה ערב", "active": true}, {"name": "מענדי וילהלם", "active": true}, {"name": "משגיח לייזר קרישבסקי", "active": true}, {"name": "נהג של הילד", "active": true}, {"name": "נחום כהן", "active": true}, {"name": "נפתלי רוזנברג", "active": true}, {"name": "סבינר", "active": true}, {"name": "סטמבלר אראי הגברה", "active": true}, {"name": "ספייה איסחקוב", "active": false}, {"name": "סרג'ו מנקה בוקר", "active": false}, {"name": "עברון ניקיון קומה 3", "active": true}, {"name": "עומר מטבח ראשי", "active": true}, {"name": "עופר דישון", "active": false}, {"name": "פוני", "active": true}, {"name": "צדוק", "active": true}, {"name": "ציוני חונך", "active": true}, {"name": "קובי קופרמן", "active": true}, {"name": "קרישבסקי חונך", "active": true}, {"name": "רייכמן", "active": true}, {"name": "ריפפקינד חונך", "active": true}, {"name": "שוורץ בחור", "active": true}, {"name": "שולם זלמנוביץ", "active": true}, {"name": "שומער ערב", "active": true}, {"name": "שומר בוקר", "active": false}, {"name": "שומר ערב", "active": true}, {"name": "שומר צהריים", "active": false}, {"name": "שייקה גורליק", "active": true}, {"name": "שליח א משה גורליק", "active": true}, {"name": "שליח ב", "active": true}, {"name": "שליח ג", "active": true}, {"name": "שליח ד", "active": true}, {"name": "שליח ה", "active": true}, {"name": "שליח ו", "active": true}, {"name": "שלמה חיים", "active": true}, {"name": "שלמה רוזמברג", "active": true}, {"name": "שמוליק חזן חדר קפה", "active": true}, {"name": "שמילו", "active": true}, {"name": "שמעיה גרינוולד", "active": true}, {"name": "תורן מטבח שבת", "active": true}, {"name": "תלמיד נחום כהן", "active": false}, {"name": "יונתן וינברג", "active": true}], "log": [{"holder": "שומר בוקר", "keyDesc": "5TA - 24", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שומר צהריים", "keyDesc": "5TA - 24", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שומר ערב", "keyDesc": "5TA - 24", "dateOut": "2026-08-06", "notes": ""}, {"holder": "תלמיד נחום כהן", "keyDesc": "D7P - 10", "dateOut": "2026-08-06", "notes": ""}, {"holder": "ספייה איסחקוב", "keyDesc": "D8P - 22", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מדריך א", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מנחם שמח חונך", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "טביב", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דוד אופן", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "גלוכובסקי", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שמעיה גרינוולד", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "פוני", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דוברוסקין", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דונל", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "הירץ", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "זלמן גולדברג", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "אושי הלפרין", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יצחק וילהלם", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "נחום כהן", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "עופר דישון", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מנדי מרכוס", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "ריפפקינד חונך", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "אברימי ברוד", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "קובי קופרמן", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יוסי קסטל", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מענדי וילהלם", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דוד פרוס", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח א משה גורליק", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח ב", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח ג", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח ד", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח ה", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח ו", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יעקב וינפלד", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "ציוני חונך", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "קרישבסקי חונך", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "חונך גליקסברג", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "הרב גולדשמיד", "keyDesc": "M1 - 2", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שייקה גורליק", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "צדוק", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מנקה ערב", "keyDesc": "M1 - 2", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שומר צהריים", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שומער ערב", "keyDesc": "M1 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "ישראל הכט", "keyDesc": "M1 - 5", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שמוליק חזן חדר קפה", "keyDesc": "M1 - 12", "dateOut": "2026-08-06", "notes": ""}, {"holder": "רייכמן", "keyDesc": "M1 - 12", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יער ויזל תלמיד מצוין", "keyDesc": "M1 - 13", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מדריך א", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יוסי קסטל", "keyDesc": "M2 - 3", "dateOut": "2026-08-06", "notes": ""}, {"holder": "זלמן כהן עובד מטבח", "keyDesc": "M2 - 4", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מנקה ערב", "keyDesc": "M2 - 4", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דהאן מטבח ראשי", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "עומר מטבח ראשי", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "תורן מטבח שבת", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "עברון ניקיון קומה 3", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "טביב", "keyDesc": "M2 - 8", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דונל", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "הירץ", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "נחום כהן", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח א משה גורליק", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח ב", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח ג", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח ד", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח ה", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שליח ו", "keyDesc": "M2 - מאסטר", "dateOut": "2026-08-06", "notes": ""}, {"holder": "ציוני חונך", "keyDesc": "M2 - 15", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יצחק וילהלם", "keyDesc": "M2 - 19", "dateOut": "2026-08-06", "notes": ""}, {"holder": "לוי נאדה תלמיד תקשורת", "keyDesc": "M2 - 19", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שלמה רוזמברג", "keyDesc": "M2 - 22", "dateOut": "2026-08-06", "notes": ""}, {"holder": "אברימי ברוד", "keyDesc": "M2 - 26", "dateOut": "2026-08-06", "notes": ""}, {"holder": "הלל רוזנברג", "keyDesc": "M2 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "אושי הלפרין", "keyDesc": "M2 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דוד פרוס", "keyDesc": "M2 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יער ויזל תלמיד מצוין", "keyDesc": "M2 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "נהג של הילד", "keyDesc": "M2 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "הרב גולדשמיד", "keyDesc": "M2 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שמילו", "keyDesc": "M2 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "זלמן כהן עובד מטבח", "keyDesc": "M3 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מנקה ערב", "keyDesc": "M3 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דהאן מטבח ראשי", "keyDesc": "M3 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "עומר מטבח ראשי", "keyDesc": "M3 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "תורן מטבח שבת", "keyDesc": "M3 - 1", "dateOut": "2026-08-06", "notes": ""}, {"holder": "זנדרוב", "keyDesc": "M3 - 3", "dateOut": "2026-08-06", "notes": ""}, {"holder": "זלמן גולדברג", "keyDesc": "M3 - 4", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דוד פרוס", "keyDesc": "M3 - 4", "dateOut": "2026-08-06", "notes": ""}, {"holder": "פוני", "keyDesc": "M3 - 5", "dateOut": "2026-08-06", "notes": ""}, {"holder": "נחום כהן", "keyDesc": "M3 - 5", "dateOut": "2026-08-06", "notes": ""}, {"holder": "סטמבלר אראי הגברה", "keyDesc": "T7D - 2", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שוורץ בחור", "keyDesc": "T7D - 52", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דהאן מטבח ראשי", "keyDesc": "T8M - 27", "dateOut": "2026-08-06", "notes": ""}, {"holder": "עומר מטבח ראשי", "keyDesc": "T8M - 27", "dateOut": "2026-08-06", "notes": ""}, {"holder": "תורן מטבח שבת", "keyDesc": "T8M - 27", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שמילו", "keyDesc": "DXP - 506", "dateOut": "2026-08-06", "notes": ""}, {"holder": "הרב שמואל רוזנברג", "keyDesc": "DXP - 506", "dateOut": "2026-08-06", "notes": ""}, {"holder": "הירץ", "keyDesc": "פ - 3.8", "dateOut": "2026-08-06", "notes": ""}, {"holder": "דני אהרון", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יצחק גרינוולד", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שלמה חיים", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "שולם זלמנוביץ", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "וינפלד", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "זילברשטרום", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "זלמנוביץ", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "משגיח לייזר קרישבסקי", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מוישי כהן", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "סבינר", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "לוי", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "לוי צרור רזרבי", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "נפתלי רוזנברג", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מנדי רוזנברג", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יצחק הטבח", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יוסקה שוורץ", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "סרג'ו מנקה בוקר", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "מדריך ב", "keyDesc": "GM - GM", "dateOut": "2026-08-06", "notes": ""}, {"holder": "יעקב וינפלד", "keyDesc": "M2 - 1", "dateOut": "2026-08-17 00:00:00", "notes": ""}, {"holder": "יעקב וינפלד", "keyDesc": "M3 - 5", "dateOut": "2026-08-17 00:00:00", "notes": ""}, {"holder": "יונתן וינברג", "keyDesc": "M1 - 3", "dateOut": "2026-08-17 00:00:00", "notes": ""}, {"holder": "פוני", "keyDesc": "M3 - 7", "dateOut": "", "notes": ""}]};
+function backfillKeysImport(){
+  if(data.keysImportDone) return;
+  const keyIdByDesc = {};
+  KEYS_IMPORT_DATA.keys.forEach(k => {
+    const id = nextId()+11000;
+    keyIdByDesc[k.code + " - " + k.keyNum] = id;
+    data.keysInventory.push({id, code:k.code, keyNum:k.keyNum, floor:k.floor, raw:k.raw, location:k.location, type:k.type||"צילינדר", size:k.size, qty:k.qty, notes:k.notes, masters:k.masters||[]});
+  });
+  KEYS_IMPORT_DATA.people.forEach(p => {
+    data.keysHolders.push({id: nextId()+14000, name:p.name, phone:"", active:p.active});
+  });
+  KEYS_IMPORT_DATA.log.forEach(l => {
+    const keyId = keyIdByDesc[l.keyDesc];
+    data.keysLog.push({id: nextId()+12000, keyId: keyId||null, keyDesc:l.keyDesc, holder:l.holder, dateOut:l.dateOut, dateIn:"", notes:l.notes||""});
+  });
+  data.keysImportDone = true;
+  saveKeys();
+}
+function backfillCodeMasterKeys(){
+  if(data.codeMasterKeysDone) return;
+  ["M1","M2","M3"].forEach(id => {
+    if(!data.masterKeys.some(m=>m.id===id)) data.masterKeys.push({id, label:"מאסטר " + id});
+  });
+  const codes = [...new Set(data.keysInventory.map(k=>k.code).filter(Boolean))];
+  codes.forEach(code => {
+    if(!data.masterKeys.some(m=>m.id===code)) data.masterKeys.push({id:code, label:"מאסטר " + code});
+  });
+  data.keysInventory.forEach(k => {
+    if(!k.masters) k.masters = [];
+    if(k.code && !k.masters.includes(k.code)) k.masters.push(k.code);
+  });
+  data.codeMasterKeysDone = true;
+  saveKeys();
+}
+
 /* ---------- KEYS MANAGEMENT ---------- */
-function addKeyInv(){
-  data.keysInventory.push({id: nextId()+11000, code:"", keyNum:"", floor:"", location:"", type:"צילינדר", size:"", qty:1, notes:""});
-  renderKeysInv(); saveKeys();
+let editingKeyId = null;
+let editingHolderId = null;
+let currentKeyDetailId = null;
+let currentHolderDetailId = null;
+
+function closeModalOverlay(id){ const el = document.getElementById(id); if(el) el.style.display = "none"; }
+function openModalOverlay(id){ const el = document.getElementById(id); if(el) el.style.display = "flex"; }
+
+function keyDisplayId(k){ return k.code + (k.keyNum ? " - " + k.keyNum : ""); }
+function keyById(id){ return data.keysInventory.find(k => k.id === id); }
+function holderById(id){ return data.keysHolders.find(h => h.id === id); }
+function holderByName(name){ return data.keysHolders.find(h => h.name === name); }
+function openLoansFor(keyId){ return data.keysLog.filter(l => l.keyId === keyId && !l.dateIn); }
+function keyLoanedCount(keyId){ return openLoansFor(keyId).length; }
+function keyStatus(k){
+  const loaned = keyLoanedCount(k.id);
+  const qty = parseFloat(k.qty) || 0;
+  if(qty - loaned < 0) return "mismatch";
+  if(loaned === 0) return "available";
+  if(loaned < qty) return "partial";
+  return "out";
 }
+function activeHolderNames(){ return data.keysHolders.filter(h => h.active !== false).map(h => h.name); }
+
+function renderKeysTab(){
+  populateKeyFilters();
+  renderKeyStats();
+  renderKeyCards();
+  renderHolderCards();
+  renderKeyLogList();
+  renderKeyAlerts();
+  const pill = document.getElementById("keysYearPill");
+  if(pill) pill.textContent = data.keysInventory.length + " מפתחות במערכת";
+}
+
+function renderKeyStats(){
+  const cards = document.getElementById("keysStatCards");
+  if(!cards) return;
+  const total = data.keysInventory.length;
+  const loanedNow = data.keysLog.filter(l => !l.dateIn).length;
+  const available = data.keysInventory.reduce((s,k) => s + Math.max(0, (parseFloat(k.qty)||0) - keyLoanedCount(k.id)), 0);
+  const stale = data.keysLog.filter(l => { if(l.dateIn) return false; const h = holderByName(l.holder); return h && h.active === false; }).length;
+  cards.innerHTML = `
+    <div class="stat"><div class="label">מפתחות מתועדים במערכת</div><div class="value">${total}</div></div>
+    <div class="stat warn"><div class="label">בהשאלה כרגע</div><div class="value">${loanedNow}</div></div>
+    <div class="stat good"><div class="label">זמינים בארון (לפי ספירה)</div><div class="value">${available}</div></div>
+    <div class="stat ${stale>0?'bad':'good'}"><div class="label">בהשאלה אצל מי שאינו פעיל</div><div class="value">${stale}</div></div>
+  `;
+  const badge = document.getElementById("keysAlertCount");
+  if(badge){
+    if(stale>0){ badge.textContent = stale; badge.style.display = "inline-block"; }
+    else{ badge.style.display = "none"; }
+  }
+}
+
+function populateKeyFilters(){
+  const floorSel = document.getElementById("keysFloorFilter");
+  const rawSel = document.getElementById("keysRawFilter");
+  if(!floorSel || !rawSel) return;
+  const floors = [...new Set(data.keysInventory.map(k=>k.floor).filter(v=>v!==""&&v!=null))].sort((a,b)=>(""+a).localeCompare(""+b,undefined,{numeric:true}));
+  const rawVals = [...new Set(data.keysInventory.map(k=>k.raw).filter(v=>v!==""&&v!=null))];
+  const curFloor = floorSel.value, curRaw = rawSel.value;
+  floorSel.innerHTML = `<option value="">כל הקומות</option>` + floors.map(f=>`<option value="${f}">קומה ${f}</option>`).join("");
+  rawSel.innerHTML = `<option value="">כל הגלמים</option>` + rawVals.map(r=>`<option value="${r}">גלם ${r}</option>`).join("");
+  if(floors.includes(curFloor)) floorSel.value = curFloor;
+  if(rawVals.includes(curRaw)) rawSel.value = curRaw;
+}
+
+function renderKeyCards(){
+  const grid = document.getElementById("keysGrid");
+  if(!grid) return;
+  const q = (document.getElementById("keysInvSearch").value||"").trim().toLowerCase();
+  const floorF = document.getElementById("keysFloorFilter").value;
+  const rawF = document.getElementById("keysRawFilter").value;
+  const statusF = document.getElementById("keysStatusFilter").value;
+  const list = data.keysInventory.filter(k => {
+    if(q && !(keyDisplayId(k).toLowerCase().includes(q) || (k.location||"").toLowerCase().includes(q))) return false;
+    if(floorF && (""+k.floor)!==floorF) return false;
+    if(rawF && (""+k.raw)!==rawF) return false;
+    if(statusF && keyStatus(k)!==statusF) return false;
+    return true;
+  });
+  if(list.length===0){ grid.innerHTML = `<div class="empty-hint">אין מפתחות התואמים לסינון</div>`; return; }
+  grid.innerHTML = list.map(k => {
+    const loaned = keyLoanedCount(k.id);
+    const qty = parseFloat(k.qty)||0;
+    const status = keyStatus(k);
+    const tagMap = {available:["green","זמין"], partial:["warn","בהשאלה חלקית"], out:["bad","אזל במלאי"], mismatch:["bad","לבדוק ספירה"]};
+    const [cls,label] = tagMap[status];
+    return `
+    <div class="key-card ${status==='mismatch'?'mismatch':''}" onclick="openKeyDetailModal(${k.id})">
+      <div class="kc-top"><span class="kc-code">${keyDisplayId(k)}</span><span class="pill ${cls==='green'?'done':cls==='warn'?'open':'late'}">${label}</span></div>
+      <div class="kc-loc">${k.location || "—"}</div>
+      <div class="kc-meta"><span>קומה ${k.floor||"—"}</span><span>${k.type||""} ${k.size||""}</span></div>
+      <div class="kc-foot"><span>${status==='mismatch' ? `יצא ${loaned} מתוך ${qty} רשומים` : `${Math.max(0,qty-loaned)} זמינים מתוך ${qty}`}</span></div>
+    </div>`;
+  }).join("");
+}
+
+function openKeyDetailModal(id){
+  currentKeyDetailId = id;
+  const k = keyById(id);
+  if(!k) return;
+  const loaned = keyLoanedCount(id);
+  document.getElementById("kdTitle").textContent = keyDisplayId(k);
+  document.getElementById("kdInfo").innerHTML = `
+    <div><div style="font-size:11px;color:var(--ink-soft)">מיקום</div><div style="font-weight:600;font-size:13.5px">${k.location||"—"}</div></div>
+    <div><div style="font-size:11px;color:var(--ink-soft)">קומה</div><div style="font-weight:600;font-size:13.5px">${k.floor||"—"}</div></div>
+    <div><div style="font-size:11px;color:var(--ink-soft)">סוג נעילה / גודל</div><div style="font-weight:600;font-size:13.5px">${k.type||"—"} ${k.size||""}</div></div>
+    <div><div style="font-size:11px;color:var(--ink-soft)">כמות בארון (ספירה ידנית)</div><div style="font-weight:600;font-size:13.5px">${k.qty ?? 0}${k.lastCounted? ' <span style="font-weight:400;color:var(--ink-soft);font-size:11px">(נספר '+k.lastCounted+')</span>':''}</div></div>
+    <div><div style="font-size:11px;color:var(--ink-soft)">בהשאלה כרגע (מהיומן)</div><div style="font-weight:600;font-size:13.5px">${loaned}</div></div>
+    <div><div style="font-size:11px;color:var(--ink-soft)">הערות</div><div style="font-weight:600;font-size:13.5px">${k.notes||"—"}</div></div>
+  `;
+  const holders = openLoansFor(id);
+  document.getElementById("kdHolders").innerHTML = holders.length ? holders.map(l => {
+    const h = holderByName(l.holder);
+    const pillCls = h && h.active===false ? "late" : "done";
+    const pillTxt = h && h.active===false ? "לא פעיל" : "פעיל";
+    return `<div style="display:flex;align-items:center;justify-content:space-between;background:var(--tint-a);border-radius:10px;padding:9px 12px;margin-bottom:6px">
+      <div><div style="font-weight:700;font-size:13px">${l.holder}</div><div style="font-size:11px;color:var(--ink-soft)">מ-${l.dateOut}</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="pill ${pillCls}">${pillTxt}</span><button class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="markReturned(${l.id})">סימון החזרה</button></div>
+    </div>`;
+  }).join("") : `<div class="empty-hint">אף אחד לא מחזיק כרגע במפתח הזה</div>`;
+  document.getElementById("kdMasters").innerHTML = (k.masters&&k.masters.length) ? k.masters.map(mid => {
+    const def = data.masterKeys.find(m=>m.id===mid);
+    return `<span class="master-badge">${def ? def.label : mid}</span>`;
+  }).join("") : `<span class="empty-hint">אין מפתח אב שפותח דלת זו</span>`;
+  openModalOverlay("keyDetailModal");
+}
+function closeKeyDetailModal(){ closeModalOverlay("keyDetailModal"); }
+
+function renderMasterCheckboxes(selected){
+  const wrap = document.getElementById("kfMasters");
+  if(!wrap) return;
+  if(data.masterKeys.length===0){ wrap.innerHTML = `<span class="empty-hint">אין עדיין מפתחות אב מוגדרים — ניתן להוסיף דרך "ניהול מפתחות אב"</span>`; return; }
+  wrap.innerHTML = data.masterKeys.map(m => `
+    <label class="check-chip ${selected.includes(m.id)?'checked':''}">
+      <input type="checkbox" value="${m.id}" ${selected.includes(m.id)?"checked":""} onchange="this.parentElement.classList.toggle('checked', this.checked)">
+      ${m.label}
+    </label>
+  `).join("");
+}
+
+function openKeyFormModal(id){
+  editingKeyId = id || null;
+  const k = id ? keyById(id) : null;
+  document.getElementById("kfTitle").textContent = k ? "עריכת מפתח " + keyDisplayId(k) : "מפתח חדש";
+  document.getElementById("kfSubmitBtn").textContent = k ? "שמירת שינויים" : "הוספה";
+  document.getElementById("kfCode").value = k ? k.code : "";
+  document.getElementById("kfNum").value = k ? k.keyNum : "";
+  document.getElementById("kfFloor").value = k ? k.floor : "";
+  document.getElementById("kfRaw").value = k ? (k.raw||"") : "";
+  document.getElementById("kfType").value = k && k.type==="מנעול" ? "מנעול" : "צילינדר";
+  document.getElementById("kfSize").value = k ? k.size : "";
+  document.getElementById("kfLoc").value = k ? k.location : "";
+  document.getElementById("kfQty").value = k ? (k.qty ?? 1) : 1;
+  document.getElementById("kfNotes").value = k ? (k.notes||"") : "";
+  renderMasterCheckboxes(k ? (k.masters||[]) : []);
+  document.getElementById("kfDeleteBtn").style.display = k ? "inline-flex" : "none";
+  openModalOverlay("keyFormModal");
+}
+function deleteKeyFromForm(){
+  if(!editingKeyId) return;
+  closeKeyFormModal();
+  removeKeyInv(editingKeyId);
+}
+function closeKeyFormModal(){ closeModalOverlay("keyFormModal"); }
+function editKeyFromDetail(){ closeKeyDetailModal(); openKeyFormModal(currentKeyDetailId); }
+
+function submitKeyForm(){
+  const code = document.getElementById("kfCode").value.trim();
+  if(!code){ alert("יש להזין קוד למפתח."); return; }
+  const masters = Array.from(document.querySelectorAll("#kfMasters input:checked")).map(i=>i.value);
+  const fields = {
+    code,
+    keyNum: document.getElementById("kfNum").value.trim(),
+    floor: document.getElementById("kfFloor").value.trim(),
+    raw: document.getElementById("kfRaw").value.trim(),
+    type: document.getElementById("kfType").value,
+    size: document.getElementById("kfSize").value.trim(),
+    location: document.getElementById("kfLoc").value.trim(),
+    qty: parseFloat(document.getElementById("kfQty").value)||0,
+    notes: document.getElementById("kfNotes").value.trim(),
+    masters
+  };
+  if(editingKeyId){
+    const row = keyById(editingKeyId);
+    Object.assign(row, fields);
+  }else{
+    data.keysInventory.push(Object.assign({id: nextId()+11000}, fields));
+  }
+  saveKeys();
+  renderKeysTab();
+  closeKeyFormModal();
+}
+
 function removeKeyInv(id){
-  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
+  openConfirmModal("למחוק את המפתח? לא ניתן לשחזר את הפעולה.", () => {
     data.keysInventory = data.keysInventory.filter(r=>r.id!==id);
-    renderKeysInv(); saveKeys();
+    saveKeys(); renderKeysTab(); closeKeyDetailModal();
   });
 }
-function renderKeysInv(){
-  const body = document.getElementById("keysInvBody");
-  if(!body) return;
-  body.innerHTML = "";
-  data.keysInventory.forEach(row => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><input type="text" value="${row.code}" data-f="code" style="width:70px"></td>
-      <td><input type="text" value="${row.keyNum}" data-f="keyNum" style="width:70px"></td>
-      <td><input type="text" value="${row.floor}" data-f="floor" style="width:60px"></td>
-      <td class="primary-field"><input type="text" value="${row.location}" data-f="location" style="min-width:160px"></td>
-      <td><select data-f="type">
-            <option ${row.type==="צילינדר"?"selected":""}>צילינדר</option>
-            <option ${row.type==="מנעול"?"selected":""}>מנעול</option>
-          </select></td>
-      <td><input type="text" value="${row.size}" data-f="size" style="width:60px"></td>
-      <td><input type="number" value="${row.qty}" data-f="qty" style="width:60px"></td>
-      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:100px"></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeKeyInv(${row.id})">${svgIcon('trash',13)}</button></td>
-    `;
-    tr.querySelectorAll("[data-f]").forEach(inp => {
-      inp.addEventListener("input", () => {
-        row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
-        saveKeys();
-      });
-      inp.addEventListener("change", () => { renderKeysInv(); renderKeysLog(); });
-    });
-    body.appendChild(tr);
+
+function openStockCountModal(){
+  const k = keyById(currentKeyDetailId);
+  if(!k) return;
+  const loaned = keyLoanedCount(k.id);
+  document.getElementById("scHint").textContent = `לפי היומן יצאו כרגע ${loaned} מפתחות מסוג זה. הזן כמה יש בפועל בארון עכשיו (לא כולל מה שבהשאלה).`;
+  document.getElementById("scQty").value = k.qty ?? 0;
+  openModalOverlay("stockCountModal");
+}
+function submitStockCount(){
+  const k = keyById(currentKeyDetailId);
+  if(!k) return;
+  k.qty = parseFloat(document.getElementById("scQty").value)||0;
+  k.lastCounted = new Date().toISOString().slice(0,10);
+  saveKeys();
+  renderKeysTab();
+  closeModalOverlay("stockCountModal");
+  openKeyDetailModal(k.id);
+}
+
+/* ---- אנשי מפתח ---- */
+function renderHolderCards(){
+  const grid = document.getElementById("holdersGrid");
+  if(!grid) return;
+  const q = (document.getElementById("holderSearch").value||"").trim().toLowerCase();
+  const statusF = document.getElementById("holderStatusFilter").value;
+  const list = data.keysHolders.filter(h => {
+    if(q && !(h.name||"").toLowerCase().includes(q)) return false;
+    if(statusF==="active" && h.active===false) return false;
+    if(statusF==="inactive" && h.active!==false) return false;
+    return true;
   });
+  if(list.length===0){ grid.innerHTML = `<div class="empty-hint">אין אנשי מפתח להצגה</div>`; return; }
+  grid.innerHTML = list.map(h => {
+    const count = data.keysLog.filter(l=>l.holder===h.name && !l.dateIn).length;
+    return `
+    <div class="holder-card" onclick="openHolderDetail(${h.id})">
+      <div class="holder-avatar">${(h.name||"?").trim()[0]||"?"}</div>
+      <div class="hc-name">${h.name}</div>
+      <span class="pill ${h.active===false?'late':'done'}">${h.active===false?'לא פעיל':'פעיל'}</span>
+      <div style="font-size:11.5px;color:var(--ink-soft)">מחזיק ${count} מפתחות</div>
+    </div>`;
+  }).join("");
 }
-function addKeyLog(){
-  data.keysLog.push({id: nextId()+12000, keyDesc:"", holder:"", dateOut: new Date().toISOString().slice(0,10), dateIn:"", notes:""});
-  renderKeysLog(); saveKeys();
+
+function openHolderFormModal(id){
+  editingHolderId = id || null;
+  const h = id ? holderById(id) : null;
+  document.getElementById("hfTitle").textContent = h ? "עריכת איש מפתח" : "איש מפתח חדש";
+  document.getElementById("hfSubmitBtn").textContent = h ? "שמירת שינויים" : "הוספה";
+  document.getElementById("hfName").value = h ? h.name : "";
+  document.getElementById("hfPhone").value = h ? (h.phone||"") : "";
+  document.getElementById("hfActive").value = h && h.active===false ? "0" : "1";
+  openModalOverlay("holderFormModal");
 }
-function removeKeyLog(id){
-  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
-    data.keysLog = data.keysLog.filter(r=>r.id!==id);
-    renderKeysLog(); saveKeys();
-  });
+function submitHolderForm(){
+  const name = document.getElementById("hfName").value.trim();
+  if(!name){ alert("יש להזין שם."); return; }
+  const phone = document.getElementById("hfPhone").value.trim();
+  const active = document.getElementById("hfActive").value === "1";
+  if(editingHolderId){
+    const row = holderById(editingHolderId);
+    const oldName = row.name;
+    Object.assign(row, {name, phone, active});
+    if(oldName !== name){ data.keysLog.forEach(l => { if(l.holder===oldName) l.holder = name; }); }
+  }else{
+    data.keysHolders.push({id: nextId()+14000, name, phone, active});
+  }
+  saveKeys();
+  renderKeysTab();
+  closeModalOverlay("holderFormModal");
+  if(currentHolderDetailId) openHolderDetail(currentHolderDetailId);
 }
-function returnKey(id){
-  const row = data.keysLog.find(r=>r.id===id);
+
+function openHolderDetail(id){
+  currentHolderDetailId = id;
+  const h = holderById(id);
+  if(!h) return;
+  document.getElementById("hdTitle").textContent = h.name;
+  const pill = document.getElementById("hdStatusPill");
+  pill.className = "pill " + (h.active===false ? "late" : "done");
+  pill.textContent = h.active===false ? "לא פעיל" : "פעיל";
+  const myLoans = data.keysLog.filter(l=>l.holder===h.name && !l.dateIn);
+  document.getElementById("hdKeys").innerHTML = myLoans.length ? myLoans.map(l => {
+    const k = keyById(l.keyId);
+    return `<div style="display:flex;align-items:center;justify-content:space-between;background:var(--tint-a);border-radius:10px;padding:9px 12px;margin-bottom:6px">
+      <div><div style="font-weight:700;font-size:13px">${k?keyDisplayId(k):(l.keyDesc||"—")}</div><div style="font-size:11px;color:var(--ink-soft)">${k?k.location:""} · מ-${l.dateOut}</div></div>
+      <button class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="markReturned(${l.id})">סימון החזרה</button>
+    </div>`;
+  }).join("") : `<div class="empty-hint">לא מחזיק כרגע באף מפתח</div>`;
+  openModalOverlay("holderDetailModal");
+}
+function toggleHolderActive(){
+  const h = holderById(currentHolderDetailId);
+  if(!h) return;
+  h.active = h.active===false ? true : false;
+  saveKeys();
+  renderKeysTab();
+  openHolderDetail(h.id);
+}
+function editHolderFromDetail(){ closeModalOverlay("holderDetailModal"); openHolderFormModal(currentHolderDetailId); }
+
+/* ---- יומן פעילות ---- */
+function populateLoanSelectors(preselectKeyId){
+  const holderSel = document.getElementById("lnHolder");
+  const keySel = document.getElementById("lnKey");
+  holderSel.innerHTML = `<option value="">בחירת שם...</option>` + activeHolderNames().map(n=>`<option>${n}</option>`).join("");
+  keySel.innerHTML = `<option value="">בחירת מפתח...</option>` + data.keysInventory.map(k => {
+    const avail = Math.max(0,(parseFloat(k.qty)||0) - keyLoanedCount(k.id));
+    return `<option value="${k.id}">${keyDisplayId(k)} — ${k.location||""} (זמין: ${avail})</option>`;
+  }).join("");
+  document.getElementById("lnDate").value = new Date().toISOString().slice(0,10);
+  document.getElementById("lnNotes").value = "";
+  if(preselectKeyId) keySel.value = preselectKeyId;
+}
+function openLoanModal(preselectKeyId){ populateLoanSelectors(preselectKeyId); openModalOverlay("loanModal"); }
+function openLoanModalFor(){ const id = currentKeyDetailId; closeKeyDetailModal(); openLoanModal(id); }
+function submitLoan(){
+  const holder = document.getElementById("lnHolder").value;
+  const keyId = parseInt(document.getElementById("lnKey").value,10);
+  const date = document.getElementById("lnDate").value;
+  const notes = document.getElementById("lnNotes").value.trim();
+  if(!holder || !keyId){ alert("יש לבחור גם איש מפתח וגם מפתח."); return; }
+  const k = keyById(keyId);
+  data.keysLog.push({id: nextId()+12000, keyId, keyDesc: k?keyDisplayId(k):"", holder, dateOut: date||new Date().toISOString().slice(0,10), dateIn:"", notes});
+  saveKeys();
+  renderKeysTab();
+  closeModalOverlay("loanModal");
+}
+function markReturned(logId){
+  const row = data.keysLog.find(r=>r.id===logId);
   if(!row) return;
   row.dateIn = new Date().toISOString().slice(0,10);
-  renderKeysLog(); saveKeys();
+  saveKeys();
+  renderKeysTab();
+  if(currentKeyDetailId) openKeyDetailModal(currentKeyDetailId);
+  if(currentHolderDetailId) openHolderDetail(currentHolderDetailId);
 }
-function renderKeysLog(){
-  const body = document.getElementById("keysLogBody");
-  if(!body) return;
-  body.innerHTML = "";
-  const locations = data.keysInventory.map(k => `${k.location||"—"} (קוד ${k.code||"?"}${k.keyNum?"/"+k.keyNum:""})`);
-  const names = getContactNames();
-  data.keysLog.forEach(row => {
-    const status = row.dateIn ? "הוחזר" : "אצל המחזיק";
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="primary-field">${buildSelect(locations, row.keyDesc, "keyDesc")}</td>
-      <td>${buildSelect(names, row.holder, "holder")}</td>
-      <td><input type="date" value="${row.dateOut}" data-f="dateOut"></td>
-      <td><input type="date" value="${row.dateIn}" data-f="dateIn"></td>
-      <td><span class="pill ${row.dateIn?"done":"open"}">${status}</span></td>
-      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:100px"></td>
-      <td class="row-actions">
-        ${!row.dateIn ? `<button class="btn ghost" style="padding:5px 8px;font-size:11px" onclick="returnKey(${row.id})">החזרה</button>` : ""}
-        <button class="card-delete-btn" title="מחיקה" onclick="removeKeyLog(${row.id})">${svgIcon('trash',13)}</button>
-      </td>
-    `;
-    tr.querySelectorAll("[data-f]").forEach(inp => {
-      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; saveKeys(); });
-      inp.addEventListener("change", () => { row[inp.dataset.f] = inp.value; saveKeys(); renderKeysLog(); });
-    });
-    body.appendChild(tr);
+function removeKeyLog(id){
+  openConfirmModal("למחוק רשומה מהיומן? לא ניתן לשחזר את הפעולה.", () => {
+    data.keysLog = data.keysLog.filter(r=>r.id!==id);
+    saveKeys(); renderKeysTab();
   });
+}
+function renderKeyLogList(){
+  const list = document.getElementById("keysLogList");
+  if(!list) return;
+  const rows = data.keysLog.slice().sort((a,b) => (b.dateOut||"").localeCompare(a.dateOut||""));
+  if(rows.length===0){ list.innerHTML = `<div class="empty-hint">עדיין אין רשומות ביומן</div>`; return; }
+  list.innerHTML = rows.map(l => {
+    const k = keyById(l.keyId);
+    const label = k ? keyDisplayId(k) + (k.location?" · "+k.location:"") : (l.keyDesc||"—");
+    return `
+    <div class="log-row">
+      <div class="lr-date">${l.dateOut||""}</div>
+      <div class="lr-who">${l.holder||"—"}</div>
+      <div class="lr-key">${label}</div>
+      <div class="lr-note">${l.notes||""}</div>
+      <span class="pill ${l.dateIn?'done':'open'}">${l.dateIn?'הוחזר':'אצל המחזיק'}</span>
+      ${!l.dateIn ? `<button class="btn ghost" style="padding:5px 10px;font-size:11.5px" onclick="markReturned(${l.id})">החזרה</button>` : ""}
+      <button class="card-delete-btn" title="מחיקה" onclick="removeKeyLog(${l.id})" style="position:static">${svgIcon('trash',13)}</button>
+    </div>`;
+  }).join("");
+}
+
+/* ---- מעקב החזרות ---- */
+function renderKeyAlerts(){
+  const list = document.getElementById("keysAlertsList");
+  if(!list) return;
+  const stale = data.keysLog.filter(l => { if(l.dateIn) return false; const h = holderByName(l.holder); return h && h.active===false; });
+  if(stale.length===0){ list.innerHTML = `<div class="empty-hint">אין כרגע מפתחות תקועים אצל אנשים לא פעילים</div>`; return; }
+  list.innerHTML = stale.map(l => {
+    const h = holderByName(l.holder);
+    const k = keyById(l.keyId);
+    const keyLabel = k ? keyDisplayId(k) : (l.keyDesc||"—");
+    const waBtn = (h && h.phone) ? `<button class="contact-action-btn ca-whatsapp" title="שליחת תזכורת בוואטסאפ" onclick="sendHolderReturnReminder('${(h.name||"").replace(/'/g,"\\'")}')">${svgIcon('whatsapp',15)}</button>` : "";
+    return `
+    <div class="alert-card">
+      <div class="ac-icon">${svgIcon('alert',20)}</div>
+      <div class="ac-txt"><b>${l.holder}</b> מחזיק במפתח <b>${keyLabel}</b> מאז ${l.dateOut}, וסומן כלא פעיל<div class="ac-sub">מומלץ ליצור קשר ולתאם החזרה</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        ${waBtn}
+        <button class="btn ghost" style="padding:6px 12px;font-size:12px" onclick="markReturned(${l.id})">סימון כהוחזר</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+function sendHolderReturnReminder(name){
+  const h = holderByName(name);
+  if(!h || !h.phone){ alert("אין מספר טלפון שמור לאיש הזה. אפשר להוסיף בעריכת פרטי איש המפתח."); return; }
+  const myKeys = data.keysLog.filter(l=>l.holder===name && !l.dateIn).map(l => { const k=keyById(l.keyId); return k?keyDisplayId(k):(l.keyDesc||""); }).filter(Boolean);
+  const text = `שלום ${name}, יש ברשותך עדיין מפתחות שטרם הוחזרו (${myKeys.join(", ")||"—"}). נשמח לתאם החזרה, תודה.`;
+  window.open(`https://wa.me/${formatPhoneForWhatsApp(h.phone)}?text=${encodeURIComponent(text)}`, "_blank");
+}
+
+/* ---- מפתחות אב (הגדרות) ---- */
+function renderMasterKeysList(){
+  const wrap = document.getElementById("mkList");
+  if(!wrap) return;
+  if(data.masterKeys.length===0){ wrap.innerHTML = `<div class="empty-hint">אין עדיין מפתחות אב מוגדרים</div>`; return; }
+  wrap.innerHTML = data.masterKeys.map(m => `
+    <div class="mk-row">
+      <span class="mk-id">${m.id}</span>
+      <span class="mk-label">${m.label}</span>
+      <button class="icon-btn" title="מחיקה" onclick="removeMasterKeyDef('${m.id}')">${svgIcon('trash',14)}</button>
+    </div>
+  `).join("");
+}
+function openMasterKeysModal(){
+  document.getElementById("mkNewId").value = "";
+  document.getElementById("mkNewLabel").value = "";
+  renderMasterKeysList();
+  openModalOverlay("masterKeysModal");
+}
+function addMasterKeyDef(){
+  const id = document.getElementById("mkNewId").value.trim();
+  const label = document.getElementById("mkNewLabel").value.trim();
+  if(!id || !label){ alert("יש להזין גם קיצור וגם תיאור."); return; }
+  if(data.masterKeys.some(m=>m.id===id)){ alert("כבר קיים מפתח אב עם קיצור כזה."); return; }
+  data.masterKeys.push({id, label});
+  saveKeys();
+  document.getElementById("mkNewId").value = "";
+  document.getElementById("mkNewLabel").value = "";
+  renderMasterKeysList();
+}
+function removeMasterKeyDef(id){
+  openConfirmModal("למחוק את מפתח האב? הוא יוסר גם מכל הדלתות שסימנו אותו.", () => {
+    data.masterKeys = data.masterKeys.filter(m=>m.id!==id);
+    data.keysInventory.forEach(k => { if(k.masters) k.masters = k.masters.filter(mid=>mid!==id); });
+    saveKeys();
+    renderMasterKeysList();
+    renderKeysTab();
+  });
+}
+
+/* ---- מעבר בין תת-לשוניות ---- */
+function setKeysSubTab(key){
+  document.querySelectorAll("#keysSubtabs .pill-tab").forEach(b => b.classList.toggle("active", b.dataset.subtab===key));
+  document.getElementById("keysSubInv").style.display = key==="inv" ? "" : "none";
+  document.getElementById("keysSubHolders").style.display = key==="holders" ? "" : "none";
+  document.getElementById("keysSubLog").style.display = key==="log" ? "" : "none";
+  document.getElementById("keysSubAlerts").style.display = key==="alerts" ? "" : "none";
 }
 
 /* ---------- FILE UPLOADS ---------- */
@@ -5523,6 +6151,7 @@ function repairDuplicateIds(){
   (data.projects||[]).forEach(p => dedupeIds(p.quotes));
   dedupeIds(data.keysInventory);
   dedupeIds(data.keysLog);
+  dedupeIds(data.keysHolders);
   dedupeIds(data.foodPriceList);
   dedupeIds(data.foodOrders);
   dedupeIds(data.bank);
@@ -5597,6 +6226,8 @@ async function initAppData(){
   backfillTaskNumbers();
   backfillTaskInvoiceSync();
   backfillProcInvoiceSync();
+  backfillKeysImport();
+  backfillCodeMasterKeys();
   buildNav();
   buildInstallmentTabs();
   renderTasks();
@@ -5611,8 +6242,7 @@ async function initAppData(){
   buildOrderVendorSelect();
   renderFoodOrders();
   renderFinance();
-  renderKeysInv();
-  renderKeysLog();
+  renderKeysTab();
   renderFiles();
   renderProjects();
   switchTab(allowedTabs()[0]);
@@ -5629,7 +6259,7 @@ function buildFullExportObject(){
   const out = {};
   for(const sk in map) out[sk] = JSON.stringify(data[map[sk]]);
   out["staff-data"] = JSON.stringify({ installments: data.installments, bank: data.bank });
-  out["keys-data"] = JSON.stringify({ inventory: data.keysInventory, log: data.keysLog });
+  out["keys-data"] = JSON.stringify({ inventory: data.keysInventory, log: data.keysLog, holders: data.keysHolders, masters: data.masterKeys, importDone: data.keysImportDone, codeMastersDone: data.codeMasterKeysDone });
   out["food-data"] = JSON.stringify({ priceList: data.foodPriceList, orders: data.foodOrders });
   return out;
 }
