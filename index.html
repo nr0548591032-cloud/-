@@ -4,6 +4,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -627,6 +628,7 @@
   }
   .check-chip input{ accent-color:var(--brand); width:14px; height:14px; cursor:pointer; }
   .check-chip.checked{ background:var(--brand); color:#fff; border-color:var(--brand); }
+  .hf-keys-wrap{ max-height:200px; overflow-y:auto; overflow-x:hidden; border:1px solid var(--line); border-radius:10px; padding:8px; }
   .mk-row{ display:flex; align-items:center; gap:8px; background:var(--tint-a); border-radius:10px; padding:8px 10px; }
   .mk-row .mk-id{ font-weight:700; font-size:12.5px; color:var(--brand-dark); width:50px; flex-shrink:0; }
   .mk-row .mk-label{ font-size:13px; flex:1; }
@@ -1349,6 +1351,10 @@
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">שם מלא<input type="text" id="hfName" placeholder="לדוגמה: משה כהן"></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">טלפון (לא חובה, לשליחת תזכורות בוואטסאפ)<input type="text" id="hfPhone" placeholder="05X-XXXXXXX"></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:14px">סטטוס<select id="hfActive"><option value="1">פעיל</option><option value="0">לא פעיל</option></select></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:6px">הוספת מפתחות שקיבל <span style="font-weight:400">(ניתן לסמן כמה שרוצים)</span></label>
+      <input type="text" id="hfKeySearch" placeholder="חיפוש מפתח לפי קוד או מיקום..." oninput="renderHolderKeyCheckboxes()" style="margin-bottom:8px">
+      <div class="checkgroup hf-keys-wrap" id="hfKeysGroup"></div>
+      <div id="hfHeldKeysNote" style="font-size:11.5px;color:var(--ink-soft);margin:8px 0 14px"></div>
       <div class="toolbar">
         <button class="btn ghost" onclick="closeModalOverlay('holderFormModal')">ביטול</button>
         <button class="btn" id="hfSubmitBtn" onclick="submitHolderForm()">הוספה</button>
@@ -4817,6 +4823,7 @@ function backfillCodeMasterKeys(){
 /* ---------- KEYS MANAGEMENT ---------- */
 let editingKeyId = null;
 let editingHolderId = null;
+let hfSelectedKeyIds = new Set();
 let currentKeyDetailId = null;
 let currentHolderDetailId = null;
 
@@ -5070,13 +5077,43 @@ function openHolderFormModal(id){
   document.getElementById("hfName").value = h ? h.name : "";
   document.getElementById("hfPhone").value = h ? (h.phone||"") : "";
   document.getElementById("hfActive").value = h && h.active===false ? "0" : "1";
+  document.getElementById("hfKeySearch").value = "";
+  hfSelectedKeyIds = new Set();
+  const heldCount = h ? data.keysLog.filter(l=>l.holder===h.name && !l.dateIn).length : 0;
+  document.getElementById("hfHeldKeysNote").textContent = heldCount
+    ? `${h.name} מחזיק כרגע ב-${heldCount} מפתחות. הרשימה כאן מיועדת להוספת מפתחות נוספים בלבד — להחזרת מפתח קיים יש להשתמש ב"סימון החזרה" בכרטיס איש המפתח.`
+    : "";
+  renderHolderKeyCheckboxes();
   openModalOverlay("holderFormModal");
+}
+function renderHolderKeyCheckboxes(){
+  const wrap = document.getElementById("hfKeysGroup");
+  if(!wrap) return;
+  const q = (document.getElementById("hfKeySearch").value||"").trim().toLowerCase();
+  const h = editingHolderId ? holderById(editingHolderId) : null;
+  const heldKeyIds = new Set(h ? data.keysLog.filter(l=>l.holder===h.name && !l.dateIn).map(l=>l.keyId) : []);
+  const list = data.keysInventory.filter(k => {
+    if(heldKeyIds.has(k.id)) return false;
+    if(!q) return true;
+    return (keyDisplayId(k) + " " + (k.location||"")).toLowerCase().includes(q);
+  });
+  wrap.innerHTML = list.length ? list.map(k => `
+    <label class="check-chip ${hfSelectedKeyIds.has(k.id)?'checked':''}">
+      <input type="checkbox" value="${k.id}" ${hfSelectedKeyIds.has(k.id)?"checked":""} onchange="toggleHfKeyChip(this, ${k.id})">
+      ${escHtml(keyDisplayId(k))}${k.location ? " — " + escHtml(k.location) : ""}
+    </label>
+  `).join("") : `<span class="empty-hint">לא נמצאו מפתחות תואמים</span>`;
+}
+function toggleHfKeyChip(input, keyId){
+  input.parentElement.classList.toggle("checked", input.checked);
+  if(input.checked) hfSelectedKeyIds.add(keyId); else hfSelectedKeyIds.delete(keyId);
 }
 function submitHolderForm(){
   const name = document.getElementById("hfName").value.trim();
   if(!name){ alert("יש להזין שם."); return; }
   const phone = document.getElementById("hfPhone").value.trim();
   const active = document.getElementById("hfActive").value === "1";
+  const today = new Date().toISOString().slice(0,10);
   if(editingHolderId){
     const row = holderById(editingHolderId);
     const oldName = row.name;
@@ -5085,6 +5122,10 @@ function submitHolderForm(){
   }else{
     data.keysHolders.push({id: nextId()+14000, name, phone, active});
   }
+  hfSelectedKeyIds.forEach(keyId => {
+    const k = keyById(keyId);
+    data.keysLog.push({id: nextId()+12000, keyId, keyDesc: k?keyDisplayId(k):"", holder:name, dateOut: today, dateIn:"", notes:""});
+  });
   saveKeys();
   renderKeysTab();
   closeModalOverlay("holderFormModal");
