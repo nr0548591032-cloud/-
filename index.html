@@ -5,6 +5,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -909,6 +910,24 @@
     </div>
   </div>
 
+  <div id="staffEmployeeReportModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:520px">
+      <div style="font-weight:700;font-size:16px;margin-bottom:4px" id="staffEmpReportTitle">דוח תשלומים</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">בחר אילו פרטים ייכללו בדוח. הדוח נפתח בחלון הדפסה – ושם בוחרים "שמירה כ-PDF".</div>
+      <div class="report-form">
+        <label class="report-check"><input type="checkbox" id="staffEmpShowRates" checked> להציג פירוט תעריפים (חודשי / יומי / ימי חיסור / חודשים)</label>
+        <label class="report-check"><input type="checkbox" id="staffEmpShowDates" checked> להציג תאריך לכל תשלום חד פעמי</label>
+        <label class="report-check"><input type="checkbox" id="staffEmpShowStatus" checked> להציג סטטוס אישור ותשלום</label>
+        <label class="report-check"><input type="checkbox" id="staffEmpShowBank" checked> להציג פרטי בנק</label>
+        <label class="report-check"><input type="checkbox" id="staffEmpShowNotes" checked> להציג הערות</label>
+      </div>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="btn ghost" onclick="closeStaffEmployeeReportModal()">ביטול</button>
+        <button class="btn" onclick="printStaffEmployeeReport()">הפקת הדוח</button>
+      </div>
+    </div>
+  </div>
+
   <div id="createVendorPayModal" class="modal-overlay" style="display:none">
     <div class="modal-box">
       <div id="cvpStep1">
@@ -1042,7 +1061,7 @@
           <button class="btn ghost" onclick="copyStaffRosterText()"><span class="btn-icon-inline" id="copyIconSlot"></span>העתקה כטקסט</button>
         </div>
       </div>
-      <p class="hint">התעריף היומי מחושב אוטומטית מהתעריף החודשי (חלקי 30). סה"כ לתשלום = (תעריף חודשי × מספר חודשים) פחות (ימי חיסור × תעריף יומי). סימון "אושר לתשלום" הוא מה שקובע אם השורה תופיע בדוח למנהל חשבונות.</p>
+      <p class="hint">התעריף היומי מחושב אוטומטית מהתעריף החודשי (חלקי 30). סה"כ לתשלום = (תעריף חודשי × מספר חודשים) פחות (ימי חיסור × תעריף יומי). בשורת "תפקיד ראשי / תפקידים נוספים" (מתחת לכל שם) אפשר גם להוסיף תשלומים חד פעמיים לאותו עובד ולהפיק לו דוח תשלומים מלא כ-PDF. סימון "אושר לתשלום" הוא מה שקובע אם השורה תופיע בדוח למנהל חשבונות.</p>
       <div class="table-scroll">
         <table>
           <thead><tr>
@@ -1941,7 +1960,8 @@ const svgIconPaths = {
   trash: '<path d="M4 7h16"/><path d="M6 7V4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V7"/><path d="M19 7l-.8 12.1a2 2 0 0 1-2 1.9H7.8a2 2 0 0 1-2-1.9L5 7"/><path d="M10 11v6"/><path d="M14 11v6"/>',
   edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/>',
   receipt: '<path d="M6 2.5h12v18.5l-2.3-1.4-2 1.4-2-1.4-2 1.4-2-1.4-1.7 1.4V2.5Z"/><path d="M8.5 7.5h7"/><path d="M8.5 11h7"/><path d="M8.5 14.5h4"/>',
-  alert: '<path d="M12 9v4M12 17h.01M10.3 3.9L2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>'
+  alert: '<path d="M12 9v4M12 17h.01M10.3 3.9L2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
+  cash: '<rect x="2.5" y="6" width="19" height="12" rx="2.2"/><circle cx="12" cy="12" r="2.8"/><path d="M6 9.2h.01"/><path d="M18 14.8h.01"/>'
 };
 function svgIcon(name, size){
   const path = svgIconPaths[name];
@@ -3578,9 +3598,13 @@ function computeExtraRoleTotal(er){
   const base = months > 0 ? monthly * months : monthly;
   return Math.max(0, base - (missing * daily));
 }
+function computeOnePaymentsTotal(row){
+  return (row.onePayments||[]).reduce((s,p)=>s+(parseFloat(p.amount)||0), 0);
+}
 function computeStaffTotal(row){
   let total = computeBaseRoleTotal(row);
   (row.extraRoles||[]).forEach(er => { total += computeExtraRoleTotal(er); });
+  total += computeOnePaymentsTotal(row);
   return total;
 }
 function withScrollPreserved(fn){
@@ -3600,6 +3624,21 @@ function removeExtraRole(id, idx){
   const row = DOC_TABLES.staff.find(id);
   if(!row || !row.extraRoles) return;
   row.extraRoles.splice(idx, 1);
+  saveInstallments();
+  refreshSingleStaffRow(id);
+}
+function addOnePayment(id){
+  const row = DOC_TABLES.staff.find(id);
+  if(!row) return;
+  row.onePayments = row.onePayments || [];
+  row.onePayments.push({desc:"", amount:0, date:""});
+  saveInstallments();
+  refreshSingleStaffRow(id);
+}
+function removeOnePayment(id, idx){
+  const row = DOC_TABLES.staff.find(id);
+  if(!row || !row.onePayments) return;
+  row.onePayments.splice(idx, 1);
   saveInstallments();
   refreshSingleStaffRow(id);
 }
@@ -3683,16 +3722,35 @@ function buildStaffRowElement(row){
       ${fieldLabel("חודשים", `<input type="number" value="${er.months}" data-erf="months" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:65px">`)}
     </div>`;
   }).join("");
+  const onePayments = row.onePayments || [];
+  const onePaymentsHtml = onePayments.length ? `
+    <div class="role-summary-line" style="font-weight:700;font-size:11px;color:var(--ink-soft);margin-top:6px">תשלומים חד פעמיים</div>
+    ${onePayments.map((p,i) => `
+    <div class="op-line" data-opidx="${i}" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:4px 0;border-bottom:1px dashed var(--line)">
+      <input type="text" value="${escHtml(p.desc||"")}" data-opf="desc" data-opidx="${i}" placeholder="תיאור התשלום" style="flex:1 1 120px;min-width:100px;border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:12px">
+      <input type="date" value="${p.date||""}" data-opf="date" data-opidx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:12px">
+      <input type="number" value="${p.amount}" data-opf="amount" data-opidx="${i}" style="width:80px;border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:12px;font-weight:700;text-align:center">
+      <button type="button" class="ca-mini" title="הסרה" onclick="removeOnePayment(${row.id},${i})">✕</button>
+    </div>`).join("")}
+    <div class="role-summary-line op-subtotal-line" style="margin-top:2px">
+      <span>סה"כ תשלומים חד פעמיים</span><span><b>${fmtMoney(computeOnePaymentsTotal(row))}</b></span>
+    </div>
+  ` : "";
   extraTd.innerHTML = `
     <div class="role-summary-line">
       <span>תפקיד ראשי${row.role ? " — "+row.role : ""}</span>
       <span><b>${fmtMoney(baseTotal)}</b></span>
     </div>
     ${extraRolesHtml}
+    ${onePaymentsHtml}
     <div class="role-summary-total">
-      <span>סה"כ לתשלום (כל התפקידים)</span><span>${fmtMoney(rowTotal)}</span>
+      <span>סה"כ לתשלום (כל התפקידים והתשלומים)</span><span>${fmtMoney(rowTotal)}</span>
     </div>
-    <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px;margin-top:6px" onclick="addExtraRole(${row.id})">${svgIcon('plus',12)} הוספת תפקיד נוסף</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+      <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="addExtraRole(${row.id})">${svgIcon('plus',12)} הוספת תפקיד נוסף</button>
+      <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="addOnePayment(${row.id})">${svgIcon('cash',12)} הוספת תשלום חד פעמי</button>
+      <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="openStaffEmployeeReportModal(${row.id})">${svgIcon('printer',12)} הפקת דוח תשלומים (PDF)</button>
+    </div>
   `;
   extraTd.querySelectorAll(".role-edit-toggle").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -3722,6 +3780,8 @@ function buildStaffRowElement(row){
         line.querySelector("b").textContent = fmtMoney(computeExtraRoleTotal(er));
       }
     });
+    const opSubtotalLine = extraTd.querySelector(".op-subtotal-line b");
+    if(opSubtotalLine) opSubtotalLine.textContent = fmtMoney(computeOnePaymentsTotal(row));
     const totalLine = extraTd.querySelector(".role-summary-total");
     const newTotal = computeStaffTotal(row);
     if(totalLine) totalLine.querySelector("span:last-child").textContent = fmtMoney(newTotal);
@@ -3742,6 +3802,16 @@ function buildStaffRowElement(row){
         const dailyDisplay = extraTd.querySelector(`.extra-daily-display[data-eridx="${idx}"]`);
         if(dailyDisplay) dailyDisplay.value = fmtMoney((parseFloat(inp.value)||0)/30);
       }
+      saveInstallments();
+      patchRoleTotalsDisplay();
+    });
+    inp.addEventListener("change", () => { renderPayment(); });
+  });
+  extraTd.querySelectorAll("[data-opf]").forEach(inp => {
+    inp.addEventListener("input", () => {
+      const idx = parseInt(inp.dataset.opidx, 10);
+      const field = inp.dataset.opf;
+      row.onePayments[idx][field] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
       saveInstallments();
       patchRoleTotalsDisplay();
     });
@@ -4231,6 +4301,99 @@ function copyStaffRosterText(){
   navigator.clipboard.writeText(text)
     .then(() => alert("הטקסט הועתק, אפשר להדביק בוואטסאפ/אימייל"))
     .catch(() => alert("לא ניתן להעתיק אוטומטית, יש להעתיק ידנית:\n\n" + text));
+}
+
+/* ---------- STAFF EMPLOYEE PAYMENT REPORT (single employee, PDF) ---------- */
+let staffReportRowId = null;
+function openStaffEmployeeReportModal(id){
+  const row = DOC_TABLES.staff.find(id);
+  if(!row) return;
+  staffReportRowId = id;
+  document.getElementById("staffEmpReportTitle").textContent = `דוח תשלומים — ${row.name || "ללא שם"}`;
+  document.getElementById("staffEmployeeReportModal").style.display = "flex";
+}
+function closeStaffEmployeeReportModal(){
+  document.getElementById("staffEmployeeReportModal").style.display = "none";
+  staffReportRowId = null;
+}
+function printStaffEmployeeReport(){
+  const row = DOC_TABLES.staff.find(staffReportRowId);
+  if(!row){ closeStaffEmployeeReportModal(); return; }
+  const showRates = document.getElementById("staffEmpShowRates").checked;
+  const showDates = document.getElementById("staffEmpShowDates").checked;
+  const showStatus = document.getElementById("staffEmpShowStatus").checked;
+  const showBank = document.getElementById("staffEmpShowBank").checked;
+  const showNotes = document.getElementById("staffEmpShowNotes").checked;
+
+  const roles = [{role: row.role || "תפקיד ראשי", monthly: row.monthly, missing: row.missing, months: row.months, total: computeBaseRoleTotal(row)}]
+    .concat((row.extraRoles||[]).map(er => ({role: er.role || "תפקיד נוסף", monthly: er.monthly, missing: er.missing, months: er.months, total: computeExtraRoleTotal(er)})));
+  const rolesRows = roles.map(r => `
+    <tr>
+      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6;font-weight:600">${escHtml(r.role)}</td>
+      ${showRates ? `
+      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${fmtMoney(r.monthly)}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${fmtMoney((parseFloat(r.monthly)||0)/30)}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${r.missing||0}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${r.months||0}</td>` : ""}
+      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6;font-weight:700">${fmtMoney(r.total)}</td>
+    </tr>`).join("");
+  const rolesTotal = roles.reduce((s,r)=>s+r.total, 0);
+
+  const onePayments = row.onePayments || [];
+  const onePaymentsRows = onePayments.map(p => `
+    <tr>
+      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6;font-weight:600">${escHtml(p.desc||"—")}</td>
+      ${showDates ? `<td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${p.date ? fmtDateHe(p.date) : "—"}</td>` : ""}
+      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6;font-weight:700">${fmtMoney(p.amount)}</td>
+    </tr>`).join("");
+  const onePaymentsTotal = computeOnePaymentsTotal(row);
+
+  const bankRow = data.bank.find(b => b.name && b.name === row.name) || null;
+  const status = row.paymentStatus || (row.paid ? "שולם" : "ממתין");
+  const grandTotal = computeStaffTotal(row);
+
+  const html = `
+    <!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
+    <title>דוח תשלומים — ${escHtml(row.name||"")}</title>
+    <style>${reportBaseCss()}</style>
+    </head><body>
+    <div class="head">
+      <div><h1>דוח תשלומים: ${escHtml(row.name||"—")}</h1><div class="sub">תיק ניהול בניין · הופק ב-${new Date().toLocaleDateString("he-IL")} ${new Date().toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"})}</div></div>
+      <div class="logo">${reportLogoSvg()}</div>
+    </div>
+    ${showStatus ? `<div class="filters"><b>סטטוס אישור:</b> ${row.approved ? "מאושר" : "לא מאושר"} &nbsp;·&nbsp; <b>סטטוס תשלום:</b> ${escHtml(status)}</div>` : ""}
+
+    <h2>תפקידים ותעריפים</h2>
+    <table>
+      <thead><tr>
+        <th>תפקיד</th>
+        ${showRates ? `<th>תעריף חודשי</th><th>תעריף יומי</th><th>ימי חיסור</th><th>חודשים</th>` : ""}
+        <th>סה"כ</th>
+      </tr></thead>
+      <tbody>${rolesRows}</tbody>
+    </table>
+    <div class="filters" style="margin-top:6px"><b>סה"כ תפקידים:</b> ${fmtMoney(rolesTotal)}</div>
+
+    <h2>תשלומים חד פעמיים</h2>
+    ${onePayments.length ? `
+    <table>
+      <thead><tr><th>תיאור</th>${showDates ? "<th>תאריך</th>" : ""}<th>סכום</th></tr></thead>
+      <tbody>${onePaymentsRows}</tbody>
+    </table>
+    <div class="filters" style="margin-top:6px"><b>סה"כ תשלומים חד פעמיים:</b> ${fmtMoney(onePaymentsTotal)}</div>` : `<div class="empty">אין תשלומים חד פעמיים.</div>`}
+
+    ${showBank && bankRow ? `
+    <h2>פרטי בנק</h2>
+    <div class="filters">בנק: <b>${escHtml(bankRow.bank||"—")}</b> &nbsp;·&nbsp; סניף: <b>${escHtml(bankRow.branch||"—")}</b> &nbsp;·&nbsp; מספר חשבון: <b>${escHtml(bankRow.account||"—")}</b> &nbsp;·&nbsp; ע"ש: <b>${escHtml(bankRow.holder||"—")}</b></div>` : ""}
+
+    ${showNotes && row.notes ? `<h2>הערות</h2><div class="filters">${escHtml(row.notes)}</div>` : ""}
+
+    <div class="summary" style="margin-top:24px;background:#F6DFA8;border-radius:8px;padding:16px 20px">
+      <div class="grand" style="font-size:18px;font-weight:800;color:#0D1922">סה"כ לתשלום: ${fmtMoney(grandTotal)}</div>
+    </div>
+    </body></html>`;
+  openPrintWindow(html);
+  closeStaffEmployeeReportModal();
 }
 
 /* ---------- COMBINED PAYMENT VIEW ---------- */
