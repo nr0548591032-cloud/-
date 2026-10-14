@@ -2057,7 +2057,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261016; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261017; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -7657,6 +7657,7 @@ function openFileViewer(url, opts){
   el.style.display = "flex";
   document.body.style.overflow = "hidden";
   try{ history.pushState({ fileViewer: true }, ""); st.pushed = true; }catch(e){}
+  st.openedAt = Date.now();
   st.filePromise = fvFetchFile().catch(err => { st.fetchError = err; console.warn("טעינת הקובץ נכשלה", err); return null; });
   if(isImg){
     body.innerHTML = `<img src="${escHtml(url)}" alt="${escHtml(st.title)}">`;
@@ -7700,10 +7701,20 @@ async function fvRenderInline(st, body){
   body.innerHTML = `<div class="fv-placeholder">${jobIcon("file", 48)}<div style="font-weight:600;color:var(--ink)">${escHtml(st.name)}</div><div>אין תצוגה מקדימה לסוג הקובץ הזה. אפשר להוריד, לשתף או לפתוח בחלון חדש.</div></div>`;
 }
 function fvShowLoadFallback(st, body){
+  // פותח את הקובץ ישירות בדפדפן מיד, כל עוד הלחיצה של המשתמש עוד "טרייה" (אחרת הדפדפן חוסם חלון חדש)
+  let opened = false;
+  if(st.openedAt && Date.now() - st.openedAt < 4000){
+    try{
+      const w = window.open(st.url, "_blank");
+      if(w){ try{ w.opener = null; }catch(e){} opened = true; }
+    }catch(e){}
+  }
+  const detail = st.fetchError && st.fetchError.message ? st.fetchError.message : "";
   body.innerHTML = `<div class="fv-placeholder">${jobIcon("file", 48)}
-    <div style="font-weight:600;color:var(--ink)">לא הצלחתי לטעון את הקובץ לתצוגה בתוך האפליקציה</div>
-    <div>אפשר לפתוח אותו ישירות, או לשלוח אותו בוואטסאפ וב-Gmail מהכפתורים למטה.</div>
-    <button type="button" class="job-btn" onclick="fvOpenExternal()">${jobIcon("external", 16)}פתיחת הקובץ</button></div>`;
+    <div style="font-weight:600;color:var(--ink)">${opened ? "הקובץ נפתח ישירות בחלון חדש" : "הקובץ לא נטען לתצוגה בתוך האפליקציה"}</div>
+    <div>${opened ? "אם הוא לא נפתח, לחץ על הכפתור." : "לחיצה על הכפתור תפתח אותו ישירות."} אפשר גם לשלוח אותו בוואטסאפ וב-Gmail מהכפתורים למטה.</div>
+    <button type="button" class="job-btn" onclick="fvOpenExternal()">${jobIcon("external", 16)}פתיחת הקובץ</button>
+    ${detail ? `<div style="font-size:11px;opacity:.6;direction:ltr;word-break:break-word">${escHtml(detail)}</div>` : ""}</div>`;
 }
 let pdfJsPromise = null;
 function loadScriptOnce(src){
@@ -7801,16 +7812,39 @@ async function fvFetchFile(){
   if(!fvState) throw new Error("no file");
   if(fvState.file) return fvState.file;
   const st = fvState;
-  const ctrl = new AbortController();
-  const tm = setTimeout(() => ctrl.abort(), 25000);
+  // 1) ישירות מהאחסון  2) דרך האתר עצמו (קובץ _redirects ב-Netlify) — עוקף חסימת דפדפן בין אתרים
+  const attempts = [st.url].concat(fvProxyUrls(st.url));
+  const errs = [];
+  for(const u of attempts){
+    const ctrl = new AbortController();
+    const tm = setTimeout(() => ctrl.abort(), 20000);
+    try{
+      const res = await fetch(u, { signal: ctrl.signal, credentials: "omit" });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const ct = (res.headers.get("content-type") || "").toLowerCase();
+      if(ct.includes("text/html")) throw new Error("html במקום קובץ");
+      const blob = await res.blob();
+      if(!blob.size) throw new Error("קובץ ריק");
+      const type = blob.type && blob.type !== "application/octet-stream" ? blob.type : (FV_MIME[st.ext] || "application/octet-stream");
+      st.file = new File([blob], st.name, { type });
+      st.loadedVia = u === st.url ? "direct" : "proxy";
+      return st.file;
+    }catch(e){
+      errs.push((u === st.url ? "ישיר: " : "דרך האתר: ") + (e && e.message ? e.message : e));
+    }finally{ clearTimeout(tm); }
+  }
+  throw new Error(errs.join(" | "));
+}
+function fvProxyUrls(url){
   try{
-    const res = await fetch(st.url, { signal: ctrl.signal, mode: "cors" });
-    if(!res.ok) throw new Error("HTTP " + res.status);
-    const blob = await res.blob();
-    const type = blob.type && blob.type !== "application/octet-stream" ? blob.type : (FV_MIME[st.ext] || "application/octet-stream");
-    st.file = new File([blob], st.name, { type });
-    return st.file;
-  }finally{ clearTimeout(tm); }
+    const u = new URL(url);
+    if(u.hostname !== "firebasestorage.googleapis.com") return [];
+    if(!/^https?:$/.test(location.protocol)) return [];
+    const base = location.origin + "/fbfiles";
+    const single = base + u.pathname + u.search;
+    const double = base + u.pathname.replace(/%2F/gi, "%252F") + u.search;
+    return single === double ? [single] : [single, double];
+  }catch(e){ return []; }
 }
 function fvSetStatus(msg){ const el = document.getElementById("fvStatus"); if(el) el.textContent = msg || ""; }
 function fvOpenExternal(){ if(fvState) window.open(fvState.url, "_blank", "noopener"); }
