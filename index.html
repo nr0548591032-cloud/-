@@ -915,6 +915,12 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
 }
 .fv-body img{ max-width:100%; max-height:100%; object-fit:contain; display:block; }
 .fv-body iframe{ width:100%; height:100%; border:0; background:#fff; }
+.fv-body.has-pages{ align-items:flex-start; justify-content:center; background:#e9e2d6; }
+.fv-pages{ direction:ltr; display:flex; flex-direction:column; align-items:center; gap:10px; padding:8px; width:100%; box-sizing:border-box; }
+.fv-pages canvas{ display:block; max-width:100%; height:auto; background:#fff; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+.fv-more{ font-size:13px; color:var(--ink-soft); padding:6px 0 10px; text-align:center; }
+.fv-spinner{ width:34px; height:34px; border-radius:50%; border:3px solid #e2d9cb; border-top-color:#c67139; animation:fvSpin .8s linear infinite; }
+@keyframes fvSpin{ to{ transform:rotate(360deg); } }
 .fv-placeholder{ display:flex; flex-direction:column; align-items:center; gap:12px; padding:30px 20px; text-align:center; color:var(--ink-soft); }
 .fv-actions{ padding:12px 12px 14px; display:flex; flex-direction:column; gap:10px; }
 .fv-grid{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; }
@@ -2051,7 +2057,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261015; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261016; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -7646,21 +7652,125 @@ function openFileViewer(url, opts){
   document.getElementById("fvStatus").textContent = "";
   const body = document.getElementById("fvBody");
   const isImg = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(info.ext);
-  const isPdf = info.ext === "pdf";
-  const coarse = window.matchMedia && window.matchMedia("(pointer:coarse)").matches;
-  if(isImg){
-    body.innerHTML = `<img src="${escHtml(url)}" alt="${escHtml(fvState.title)}">`;
-  }else if(isPdf){
-    const src = coarse ? `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(url)}` : url;
-    body.innerHTML = `<iframe src="${escHtml(src)}" title="${escHtml(fvState.title)}"></iframe>`;
-  }else{
-    body.innerHTML = `<div class="fv-placeholder">${jobIcon("file", 48)}<div style="font-weight:600;color:var(--ink)">${escHtml(info.name)}</div><div>אין תצוגה מקדימה לסוג הקובץ הזה. אפשר להוריד, לשתף או לפתוח בחלון חדש.</div></div>`;
-  }
+  const st = fvState;
   const el = document.getElementById("fileViewer");
   el.style.display = "flex";
   document.body.style.overflow = "hidden";
-  try{ history.pushState({ fileViewer: true }, ""); fvState.pushed = true; }catch(e){}
-  fvState.filePromise = fvFetchFile().catch(() => null);   // טעינה מוקדמת כדי שהשיתוף יהיה מיידי
+  try{ history.pushState({ fileViewer: true }, ""); st.pushed = true; }catch(e){}
+  st.filePromise = fvFetchFile().catch(err => { st.fetchError = err; console.warn("טעינת הקובץ נכשלה", err); return null; });
+  if(isImg){
+    body.innerHTML = `<img src="${escHtml(url)}" alt="${escHtml(st.title)}">`;
+  }else{
+    // טוען את הקובץ ומציג אותו בתוך האפליקציה (PDF מצויר כעמודים), בלי שום שירות חיצוני
+    body.innerHTML = `<div class="fv-placeholder"><div class="fv-spinner" aria-hidden="true"></div><div>טוען את הקובץ…</div></div>`;
+    fvRenderInline(st, body);
+  }
+}
+async function fvRenderInline(st, body){
+  const file = await st.filePromise;
+  if(fvState !== st) return;
+  if(!file){
+    // אם הקובץ לא נטען (למשל חסימת דפדפן): במחשב אפשר עדיין להציג PDF בתצוגה המובנית
+    const isMobileUa = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+    if(st.ext === "pdf" && !isMobileUa){
+      body.innerHTML = `<iframe src="${escHtml(st.url)}" title="${escHtml(st.title)}"></iframe>`;
+      return;
+    }
+    fvShowLoadFallback(st, body);
+    return;
+  }
+  const type = file.type || "";
+  try{
+    if(type.startsWith("image/")){
+      const href = URL.createObjectURL(file);
+      st.objectUrls = (st.objectUrls || []).concat(href);
+      body.innerHTML = `<img src="${href}" alt="${escHtml(st.title)}">`;
+      return;
+    }
+    if(type === "application/pdf" || st.ext === "pdf"){
+      await fvRenderPdf(st, file, body);
+      return;
+    }
+  }catch(e){
+    console.warn("תצוגת הקובץ נכשלה", e);
+    if(fvState !== st) return;
+    body.innerHTML = `<div class="fv-placeholder">${jobIcon("file", 48)}<div style="font-weight:600;color:var(--ink)">${escHtml(st.name)}</div><div>לא ניתן להציג תצוגה מקדימה, אבל הקובץ נטען: אפשר להוריד ולשתף אותו מהכפתורים למטה.</div><button type="button" class="job-btn" onclick="fvOpenExternal()">${jobIcon("external", 16)}פתיחת הקובץ</button></div>`;
+    return;
+  }
+  body.innerHTML = `<div class="fv-placeholder">${jobIcon("file", 48)}<div style="font-weight:600;color:var(--ink)">${escHtml(st.name)}</div><div>אין תצוגה מקדימה לסוג הקובץ הזה. אפשר להוריד, לשתף או לפתוח בחלון חדש.</div></div>`;
+}
+function fvShowLoadFallback(st, body){
+  body.innerHTML = `<div class="fv-placeholder">${jobIcon("file", 48)}
+    <div style="font-weight:600;color:var(--ink)">לא הצלחתי לטעון את הקובץ לתצוגה בתוך האפליקציה</div>
+    <div>אפשר לפתוח אותו ישירות, או לשלוח אותו בוואטסאפ וב-Gmail מהכפתורים למטה.</div>
+    <button type="button" class="job-btn" onclick="fvOpenExternal()">${jobIcon("external", 16)}פתיחת הקובץ</button></div>`;
+}
+let pdfJsPromise = null;
+function loadScriptOnce(src){
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = src;
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => { s.remove(); reject(new Error("load failed: " + src)); };
+    document.head.appendChild(s);
+  });
+}
+function loadPdfJs(){
+  if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if(pdfJsPromise) return pdfJsPromise;
+  const sources = [
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+    "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"
+  ];
+  pdfJsPromise = (async () => {
+    for(const src of sources){
+      try{
+        await loadScriptOnce(src);
+        if(window.pdfjsLib){
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = src.replace(/pdf\.min\.js$/, "pdf.worker.min.js");
+          return window.pdfjsLib;
+        }
+      }catch(e){ console.warn(e); }
+    }
+    pdfJsPromise = null;
+    throw new Error("רכיב תצוגת ה-PDF לא נטען");
+  })();
+  return pdfJsPromise;
+}
+async function fvRenderPdf(st, file, body){
+  const lib = await loadPdfJs();
+  const buf = await file.arrayBuffer();
+  const PDFJS_BASE = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/";
+  const pdf = await lib.getDocument({
+    data: new Uint8Array(buf),
+    cMapUrl: PDFJS_BASE + "cmaps/", cMapPacked: true,          // גופנים בעברית בחשבוניות
+    standardFontDataUrl: PDFJS_BASE + "standard_fonts/"
+  }).promise;
+  if(fvState !== st) return;
+  body.innerHTML = `<div class="fv-pages"></div>`;
+  body.classList.add("has-pages");
+  const wrap = body.querySelector(".fv-pages");
+  const maxPages = Math.min(pdf.numPages, 40);
+  const cssWidth = Math.max(200, Math.min(body.clientWidth - 16, 900));
+  const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  for(let i = 1; i <= maxPages; i++){
+    const page = await pdf.getPage(i);
+    if(fvState !== st) return;
+    const base = page.getViewport({ scale: 1 });
+    const viewport = page.getViewport({ scale: (cssWidth / base.width) * dpr });
+    const canvas = document.createElement("canvas");
+    canvas.dir = "ltr";   // בלי זה הדפדפן מצייר את האותיות בכיוון ימין-לשמאל של האפליקציה והטקסט במסמך משתבש
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+    canvas.style.width = cssWidth + "px";
+    canvas.setAttribute("aria-label", `עמוד ${i} מתוך ${pdf.numPages}`);
+    wrap.appendChild(canvas);
+    await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+  }
+  if(pdf.numPages > maxPages){
+    wrap.insertAdjacentHTML("beforeend", `<div class="fv-more">מוצגים ${maxPages} עמודים מתוך ${pdf.numPages}. לקובץ המלא: הורדה או פתיחה.</div>`);
+  }
 }
 function closeFileViewer(silent){
   const el = document.getElementById("fileViewer");
@@ -7668,7 +7778,10 @@ function closeFileViewer(silent){
   const pushed = fvState && fvState.pushed;
   if(fvState) fvState.pushed = false;
   el.style.display = "none";
-  document.getElementById("fvBody").innerHTML = "";
+  const fvb = document.getElementById("fvBody");
+  fvb.innerHTML = "";
+  fvb.classList.remove("has-pages");
+  if(fvState && fvState.objectUrls){ fvState.objectUrls.forEach(u => { try{ URL.revokeObjectURL(u); }catch(e){} }); fvState.objectUrls = []; }
   if(document.getElementById("proSheet").style.display === "none") document.body.style.overflow = "";
   if(pushed && !silent){ try{ history.back(); }catch(e){} }
 }
