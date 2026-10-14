@@ -647,6 +647,76 @@
     table tbody tr.search-hit-row:not(.total-row) > td.search-hit-cell{ display:flex; }
     .search-clear-link{ margin-inline-start:0; }
   }
+  /* ===== צוות ותורנים — כרטיסיית עובד ===== */
+  table.staff-cards tr.sc-tr{ display:block; padding:0; overflow:hidden; gap:0; }
+  table.staff-cards tr.sc-tr.sc-open:hover{ transform:none; }
+  table.staff-cards tbody tr.sc-tr > td.sc-td{ display:block !important; padding:0; flex:none; width:100%; min-width:0; }
+  table.staff-cards td.sc-td::before{ content:none; }
+  table.staff-cards td.search-hit-cell input[type=text]:not([readonly]){ box-shadow:none; }
+  table.staff-cards tr.sc-tr.search-hit-row .sc-head{ box-shadow:inset 0 0 0 2px var(--amber); }
+  .sc-head{ display:flex; align-items:center; gap:12px; padding:12px 16px; cursor:pointer; user-select:none; flex-wrap:wrap; }
+  .sc-avatar{ width:40px; height:40px; border-radius:50%; background:var(--brand-dark); color:var(--amber-bg); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0; }
+  .sc-who{ flex:1 1 140px; min-width:0; }
+  .sc-name{ font-weight:700; font-size:15.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sc-role{ font-size:12.5px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sc-pills{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .sc-pills .pill{ display:inline-flex; align-items:center; gap:4px; }
+  .sc-flag{ display:inline-flex; align-items:center; gap:4px; font-size:11.5px; font-weight:700; color:var(--red); background:var(--red-bg); border-radius:999px; padding:3px 9px; }
+  .sc-total{ text-align:left; min-width:86px; }
+  .sc-total small{ display:block; font-size:11px; color:var(--ink-soft); }
+  .sc-total b{ font-size:18px; font-weight:800; }
+  .sc-chev{ color:var(--ink-soft); transition:transform .18s ease; display:flex; }
+  .sc-open .sc-chev{ transform:rotate(180deg); }
+  .sc-body{ display:none; padding:4px 16px 16px; border-top:1px solid var(--line); background:var(--card); }
+  .sc-open .sc-body{ display:block; }
+  .sc-fields{ display:grid; grid-template-columns:repeat(auto-fit, minmax(118px, 1fr)); gap:10px 12px; padding-top:12px; }
+  .sc-fields label, .sc-mini-fields label{ display:flex; flex-direction:column; gap:3px; font-size:11px; font-weight:700; color:var(--ink-soft); min-width:0; }
+  .sc-fields label input, .sc-mini-fields label input{ width:100%; min-width:0; }
+  .sc-fields .sc-wide{ grid-column:1 / -1; }
+  .sc-check{ flex-direction:row !important; align-items:center; gap:8px !important; font-size:13px !important; color:var(--ink) !important; cursor:pointer; padding-top:16px; }
+  .sc-section{ margin-top:14px; padding-top:12px; border-top:1px dashed var(--line); }
+  .sc-section-title{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:8px; flex-wrap:wrap; }
+  .sc-section-title b{ color:var(--ink); font-size:14px; }
+  .sc-months{ display:grid; grid-template-columns:repeat(auto-fill, minmax(96px, 1fr)); gap:8px; }
+  .sc-month{ border:1px solid var(--line); border-radius:10px; padding:7px 9px; background:var(--tint-a); }
+  .sc-month small{ display:block; font-size:11px; color:var(--ink-soft); }
+  .sc-month b{ font-size:14px; }
+  .sc-month.raised{ background:var(--green-bg); border-color:var(--green); }
+  .sc-deduct{ font-size:12px; color:var(--red); margin-top:6px; }
+  .sc-raises{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:8px; font-size:12px; }
+  .sc-chip{ display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; background:var(--tint-a); border:1px solid var(--line); font-size:12px; }
+  .sc-chip.up{ background:var(--green-bg); border-color:var(--green); }
+  .sc-chip button{ border:none; background:transparent; color:var(--red); cursor:pointer; padding:0 2px; font-size:13px; line-height:1; }
+  .sc-link-btn{ border:1px dashed var(--brand); background:transparent; color:var(--brand); border-radius:999px; padding:3px 11px; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; }
+  .sc-link-btn:hover{ background:var(--brand); color:#f9f4ed; }
+  .sc-extra{ border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-top:10px; background:var(--tint-b); }
+  .sc-mini-fields{ display:grid; grid-template-columns:repeat(auto-fit, minmax(96px, 1fr)); gap:8px 10px; margin-bottom:8px; }
+  .sc-op{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; padding:4px 0; border-bottom:1px dashed var(--line); }
+  .sc-op input{ width:auto !important; }
+  .sc-op input[type=text]{ flex:1 1 140px; min-width:0; }
+  .sc-op input[type=date]{ flex:0 0 150px; }
+  .sc-op input[type=number]{ flex:0 0 90px; width:90px !important; font-weight:700; text-align:center; }
+  table.staff-cards tr.sc-tr > .card-badge, table.staff-cards .mob-toggle{ display:none !important; }
+  .sc-grand{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-top:14px; padding:10px 14px; border-radius:12px; background:var(--amber-bg); font-weight:700; }
+  .sc-grand b{ font-size:18px; font-weight:800; }
+  .sc-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .sc-actions .btn{ padding:6px 12px; font-size:12.5px; }
+  .sc-actions .sc-del{ margin-inline-start:auto; border:1.5px solid var(--red); color:var(--red); background:transparent; border-radius:999px; padding:6px 12px; font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+  .sc-frozen-note{ font-size:12px; color:var(--ink-soft); font-weight:400; }
+  .sc-instbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0 12px; }
+  .sc-instbar .sc-months-label{ font-weight:700; }
+  .sc-stats{ display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:14px; }
+  .sc-stat{ background:var(--tint-a); border:1px solid var(--line); border-radius:12px; padding:10px 14px; }
+  .sc-stat small{ display:block; font-size:12px; color:var(--ink-soft); }
+  .sc-stat b{ font-size:20px; font-weight:800; }
+  .sc-modal-field{ display:flex; flex-direction:column; gap:4px; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:12px; }
+  .sc-modal-field select, .sc-modal-field input[type=number]{ width:100%; }
+  .sc-preview{ font-size:12.5px; background:var(--tint-a); border-radius:10px; padding:8px 10px; margin-top:6px; line-height:1.7; }
+  @media (max-width:720px){
+    .sc-head{ padding:10px 12px; gap:8px; }
+    .sc-total{ min-width:0; }
+    .sc-body{ padding:4px 12px 14px; }
+  }
 </style>
 <link rel="stylesheet" href="theme.css">
 </head>
@@ -924,6 +994,48 @@
     </div>
   </div>
 
+  <div id="staffRaiseModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:460px">
+      <div style="font-weight:700;font-size:16px;margin-bottom:4px" id="staffRaiseTitle">העלאת שכר</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">ההעלאה חלה רק מהחודש שנבחר והלאה. החודשים שלפניו נשארים בתעריף הקודם.</div>
+      <label class="sc-modal-field">החל מחודש
+        <select id="staffRaiseFrom"></select>
+      </label>
+      <label class="sc-modal-field">תעריף חודשי חדש (₪)
+        <input type="number" id="staffRaiseRate" min="0" step="1">
+      </label>
+      <div id="staffRaiseError" style="color:var(--red);font-size:12.5px;margin:-6px 0 10px;display:none"></div>
+      <label class="report-check" style="display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer">
+        <input type="checkbox" id="staffRaiseFuture" checked style="width:auto"> לעדכן את התעריף גם בפעימות הבאות (רק שורות שעוד לא שולמו)
+      </label>
+      <div class="sc-preview" id="staffRaisePreview"></div>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="btn ghost" onclick="closeStaffRaiseModal()">ביטול</button>
+        <button class="btn" onclick="saveStaffRaise()">שמירת ההעלאה</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="instMonthsModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:420px">
+      <div style="font-weight:700;font-size:16px;margin-bottom:4px" id="instMonthsTitle">חודשי הפעימה</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">משמש להצגת שמות החודשים בחישוב ובהעלאות. לא משנה אף סכום.</div>
+      <label class="report-check" style="display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer;margin-bottom:12px">
+        <input type="checkbox" id="instMonthsLeap" style="width:auto" onchange="fillInstMonthsSelect()"> שנה מעוברת (אדר א' ואדר ב')
+      </label>
+      <label class="sc-modal-field">חודש ראשון בפעימה
+        <select id="instMonthsStart"></select>
+      </label>
+      <label class="sc-modal-field">מספר חודשים בפעימה
+        <input type="number" id="instMonthsCount" min="1" max="13" step="1">
+      </label>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="btn ghost" onclick="closeInstMonthsModal()">ביטול</button>
+        <button class="btn" onclick="saveInstMonths()">שמירה</button>
+      </div>
+    </div>
+  </div>
+
   <div id="staffEmployeeReportModal" class="modal-overlay" style="display:none">
     <div class="modal-box" style="max-width:520px">
       <div style="font-weight:700;font-size:16px;margin-bottom:4px" id="staffEmpReportTitle">דוח תשלומים</div>
@@ -1075,22 +1187,30 @@
           <button class="btn ghost" onclick="copyStaffRosterText()"><span class="btn-icon-inline" id="copyIconSlot"></span>העתקה כטקסט</button>
         </div>
       </div>
-      <p class="hint">התעריף היומי מחושב אוטומטית מהתעריף החודשי (חלקי 30). סה"כ לתשלום = (תעריף חודשי × מספר חודשים) פחות (ימי חיסור × תעריף יומי). בשורת "תפקיד ראשי / תפקידים נוספים" (מתחת לכל שם) אפשר גם להוסיף תשלומים חד פעמיים לאותו עובד ולהפיק לו דוח תשלומים מלא כ-PDF. סימון "אושר לתשלום" הוא מה שקובע אם השורה תופיע בדוח למנהל חשבונות.</p>
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>שם הבחור</th><th>תפקיד / תורנות</th><th>תעריף בסיס חודשי (₪)</th>
-            <th>תעריף יומי (₪)</th><th>ימי חיסור בחודש</th><th>מספר חודשים לתשלום</th>
-            <th>סה"כ לתשלום</th><th>אושר לתשלום</th><th>שולם</th><th>פירוט תפקיד</th><th>הערות</th><th></th>
-          </tr></thead>
+      <div class="sc-instbar">
+        <span>חודשי הפעימה:</span>
+        <span class="sc-months-label" id="staffInstMonthsLabel">לא הוגדרו</span>
+        <button type="button" class="sc-link-btn" onclick="openInstMonthsModal()">הגדרת חודשים</button>
+        <span style="flex:1"></span>
+        <button type="button" class="sc-link-btn" onclick="setAllStaffCardsOpen(true)">פתיחת כל הכרטיסים</button>
+        <button type="button" class="sc-link-btn" onclick="setAllStaffCardsOpen(false)">סגירת הכל</button>
+      </div>
+      <div class="sc-stats">
+        <div class="sc-stat"><small>סה"כ לתשלום לפעימה</small><b id="staffTotal"></b></div>
+        <div class="sc-stat"><small>אושרו לתשלום</small><b id="staffApprovedCount"></b></div>
+        <div class="sc-stat"><small>שולמו</small><b id="staffPaidCount"></b></div>
+      </div>
+      <p class="hint">לחיצה על כרטיס עובד פותחת את כל הפרטים שלו. העלאת שכר נרשמת מחודש מסוים בתוך הפעימה ולא משנה את החודשים שלפניה. ברגע שתשלום מסומן "שולם" (בדוח למנהל חשבונות) הסכום ננעל ולא ישתנה גם אם יעודכן תעריף. סימון "אושר לתשלום" קובע אם העובד יופיע בדוח למנהל חשבונות.</p>
+      <div>
+        <table class="staff-cards">
           <tbody id="staffBody"></tbody>
-          <tfoot><tr class="total-row"><td>סה"כ לתשלום לפעימה</td><td id="staffTotal"></td></tr></tfoot>
         </table>
       </div>
     </div>
 
-    <div class="section-title" id="bankAnchor">פרטי בנק לפי שם</div>
-    <div class="card">
+    <details class="card" id="bankAnchor" style="padding:0">
+    <summary class="section-title" style="cursor:pointer;padding:14px 16px;margin:0">טבלת כל פרטי הבנק (אפשר לערוך גם מתוך כרטיס העובד)</summary>
+    <div style="padding:0 16px 16px">
       <div class="toolbar toolbar-sticky">
         <div></div>
         <button class="btn" onclick="addBankRow()">+ הוספת שורה</button>
@@ -1102,6 +1222,7 @@
         </table>
       </div>
       </div>
+    </details>
 
     <div class="section-title">תשלום מרוכז לפעימה נבחרת</div>
     <div class="card">
@@ -1984,7 +2105,8 @@ const svgIconPaths = {
   edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/>',
   receipt: '<path d="M6 2.5h12v18.5l-2.3-1.4-2 1.4-2-1.4-2 1.4-2-1.4-1.7 1.4V2.5Z"/><path d="M8.5 7.5h7"/><path d="M8.5 11h7"/><path d="M8.5 14.5h4"/>',
   alert: '<path d="M12 9v4M12 17h.01M10.3 3.9L2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
-  cash: '<rect x="2.5" y="6" width="19" height="12" rx="2.2"/><circle cx="12" cy="12" r="2.8"/><path d="M6 9.2h.01"/><path d="M18 14.8h.01"/>'
+  cash: '<rect x="2.5" y="6" width="19" height="12" rx="2.2"/><circle cx="12" cy="12" r="2.8"/><path d="M6 9.2h.01"/><path d="M18 14.8h.01"/>',
+  lock: '<rect x="4.5" y="10.5" width="15" height="10.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>'
 };
 function svgIcon(name, size){
   const path = svgIconPaths[name];
@@ -2291,7 +2413,7 @@ function saveInstallments(){
   clearTimeout(saveTimers["installments"]);
   saveTimers["installments"] = setTimeout(async () => {
     try{
-      await appStorage.set("staff-data", JSON.stringify({installments: data.installments, bank: data.bank}));
+      await appStorage.set("staff-data", JSON.stringify({installments: data.installments, bank: data.bank, installmentMeta: data.installmentMeta || []}));
       const f = document.getElementById("staffSaved");
       if(f){ f.classList.add("show"); setTimeout(()=>f.classList.remove("show"), 1200); }
     }catch(e){ console.error("שגיאת שמירה", e); }
@@ -2315,6 +2437,7 @@ async function loadAll(){
       const parsed = JSON.parse(res.value);
       if(parsed.installments) data.installments = parsed.installments;
       if(parsed.bank) data.bank = parsed.bank;
+      if(Array.isArray(parsed.installmentMeta)) data.installmentMeta = parsed.installmentMeta;
     }
   }catch(e){ /* keep seed */ }
   if(anyLoadFailed()) return;
@@ -3599,36 +3722,95 @@ function buildInstallmentTabs(){
   const wrap = document.getElementById("installmentTabs");
   wrap.innerHTML = "";
   data.installments.forEach((_, i) => {
-    const b = el("button", {text: "פעימה " + (i+1)});
+    const range = instRangeLabel(i);
+    const b = el("button", {text: "פעימה " + (i+1) + (range ? " · " + range : "")});
     b.className = i===activeInstallment ? "active" : "";
     b.onclick = () => { activeInstallment = i; buildInstallmentTabs(); renderStaff(); renderPayment(); };
     wrap.appendChild(b);
   });
 }
-function computeBaseRoleTotal(row){
-  const monthly = parseFloat(row.monthly)||0;
+/* ---- חישוב שכר: תעריף בסיס + העלאות מחודש מסוים בתוך הפעימה ----
+   בלי העלאות החישוב זהה בדיוק לחישוב הקודם: (תעריף × חודשים) פחות (ימי חיסור × תעריף בסיס / 30).
+   עם העלאות: כל חודש בפעימה מחושב לפי התעריף שהיה בתוקף באותו חודש. */
+const HEB_MONTHS = ["תשרי","חשון","כסלו","טבת","שבט","אדר","ניסן","אייר","סיון","תמוז","אב","אלול"];
+const HEB_MONTHS_LEAP = ["תשרי","חשון","כסלו","טבת","שבט","אדר א'","אדר ב'","ניסן","אייר","סיון","תמוז","אב","אלול"];
+function instMeta(i){ return (data.installmentMeta || [])[i] || null; }
+function instMonthLabel(instIdx, m){
+  const meta = instMeta(instIdx);
+  if(meta && meta.start){
+    const list = meta.leap ? HEB_MONTHS_LEAP : HEB_MONTHS;
+    const st = list.indexOf(meta.start);
+    if(st >= 0) return list[(st + m - 1) % list.length];
+  }
+  return "חודש " + m;
+}
+function instRangeLabel(i){
+  const meta = instMeta(i);
+  if(!meta || !meta.start) return "";
+  const cnt = Math.max(1, parseInt(meta.count, 10) || 1);
+  return cnt === 1 ? instMonthLabel(i, 1) : instMonthLabel(i, 1) + "–" + instMonthLabel(i, cnt);
+}
+function roleMonthCount(r){
+  const months = parseFloat(r.months) || 0;
+  return months > 0 ? months : 1;
+}
+function roleRaises(r){
+  return (r.raises || [])
+    .filter(x => x && (parseInt(x.fromMonth, 10) || 0) >= 2 && isFinite(parseFloat(x.monthly)))
+    .slice().sort((a,b) => a.fromMonth - b.fromMonth);
+}
+function roleRateForMonth(r, m){
+  let rate = parseFloat(r.monthly) || 0;
+  roleRaises(r).forEach(x => { if(x.fromMonth <= m) rate = parseFloat(x.monthly) || 0; });
+  return rate;
+}
+function roleMonthBreakdown(r){
+  const M = roleMonthCount(r);
+  const out = [];
+  for(let i = 1; i <= Math.ceil(M); i++){
+    const weight = Math.min(1, M - (i - 1));
+    const rate = roleRateForMonth(r, i);
+    out.push({m:i, rate, weight, amount: rate * weight, raised: rate !== (parseFloat(r.monthly) || 0)});
+  }
+  return out;
+}
+function computeRoleTotal(r){
+  const monthly = parseFloat(r.monthly) || 0;
   const daily = monthly / 30;
-  const missing = parseFloat(row.missing)||0;
-  const months = parseFloat(row.months)||0;
-  const base = months > 0 ? monthly * months : monthly;
+  const missing = parseFloat(r.missing) || 0;
+  const months = parseFloat(r.months) || 0;
+  let base;
+  if(!roleRaises(r).length) base = months > 0 ? monthly * months : monthly;
+  else base = roleMonthBreakdown(r).reduce((sum, x) => sum + x.amount, 0);
   return Math.max(0, base - (missing * daily));
 }
-function computeExtraRoleTotal(er){
-  const monthly = parseFloat(er.monthly)||0;
-  const daily = monthly / 30;
-  const missing = parseFloat(er.missing)||0;
-  const months = parseFloat(er.months)||0;
-  const base = months > 0 ? monthly * months : monthly;
-  return Math.max(0, base - (missing * daily));
-}
+function computeBaseRoleTotal(row){ return computeRoleTotal(row); }
+function computeExtraRoleTotal(er){ return computeRoleTotal(er); }
 function computeOnePaymentsTotal(row){
   return (row.onePayments||[]).reduce((s,p)=>s+(parseFloat(p.amount)||0), 0);
 }
-function computeStaffTotal(row){
+function computeLiveStaffTotal(row){
   let total = computeBaseRoleTotal(row);
   (row.extraRoles||[]).forEach(er => { total += computeExtraRoleTotal(er); });
   total += computeOnePaymentsTotal(row);
   return total;
+}
+function isStaffFrozen(row){
+  return !!(row && row.paid && typeof row.paidTotal === "number" && isFinite(row.paidTotal));
+}
+/* שורה ששולמה מחזירה את הסכום שננעל ברגע התשלום */
+function computeStaffTotal(row){
+  return isStaffFrozen(row) ? row.paidTotal : computeLiveStaffTotal(row);
+}
+function staffFrozenMismatch(row){
+  return isStaffFrozen(row) && Math.abs(computeLiveStaffTotal(row) - row.paidTotal) > 0.005;
+}
+/* מיגרציה: שורות שכבר סומנו כשולם מקבלות את הסכום הנוכחי כסכום נעול. לא משנה אף סכום */
+function backfillStaffPaidSnapshots(){
+  if(!Array.isArray(data.installmentMeta)) data.installmentMeta = [];
+  (data.installments || []).forEach(inst => (inst || []).forEach(r => {
+    if(r && r.paid && !(typeof r.paidTotal === "number" && isFinite(r.paidTotal))) r.paidTotal = computeLiveStaffTotal(r);
+  }));
 }
 function withScrollPreserved(fn){
   const scrollY = window.scrollY;
@@ -3666,7 +3848,9 @@ function removeOnePayment(id, idx){
   refreshSingleStaffRow(id);
 }
 function addStaffRow(){
-  data.installments[activeInstallment].push({id: nextId()+4000, name:"", role:"", monthly:0, daily:0, missing:0, months:0, link:"", notes:"", approved:false});
+  const newId = nextId()+4000;
+  data.installments[activeInstallment].push({id: newId, name:"", role:"", monthly:0, daily:0, missing:0, months:0, link:"", notes:"", approved:false});
+  staffOpenCards.add(newId);
   withScrollPreserved(() => renderStaff());
   saveInstallments();
 }
@@ -3677,187 +3861,249 @@ function removeStaffRow(id){
     saveInstallments();
   });
 }
+/* ---------- צוות ותורנים: כרטיס עובד ---------- */
+const staffOpenCards = new Set();
+function staffRowInstallmentIndex(id){
+  const idx = (data.installments || []).findIndex(inst => (inst || []).some(r => r.id === id));
+  return idx >= 0 ? idx : activeInstallment;
+}
+function staffInitials(name){
+  const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return "?";
+  return (parts[0][0] + (parts.length > 1 ? parts[parts.length-1][0] : "")).toUpperCase();
+}
+function staffRoleObj(row, roleIdx){
+  return roleIdx < 0 ? row : ((row.extraRoles || [])[roleIdx] || null);
+}
+function staffBankRowFor(row){
+  const nm = (row.name || "").trim();
+  if(!nm) return null;
+  return data.bank.find(b => (b.name || "").trim() === nm) || null;
+}
+function staffHeadPillsHtml(row){
+  const status = row.paymentStatus || (row.paid ? "שולם" : "ממתין");
+  const payCls = status === "שולם" ? "done" : status === "חסר פרטים" ? "late" : "open";
+  let html = `<span class="pill ${row.approved ? 'done' : 'open'}">${row.approved ? "מאושר" : "לא מאושר"}</span>`;
+  html += `<span class="pill ${payCls}">${isStaffFrozen(row) ? svgIcon('lock',11) : ""}${escHtml(status)}${isStaffFrozen(row) ? " · נעול" : ""}</span>`;
+  if(staffFrozenMismatch(row)) html += `<span class="sc-flag" title="הסכום ששולם שונה מהחישוב הנוכחי">${svgIcon('alert',12)} שונה מהחישוב</span>`;
+  return html;
+}
+function staffRoleCalcInner(row, r, roleIdx, instIdx){
+  const frozen = isStaffFrozen(row);
+  const tiles = roleMonthBreakdown(r).map(x => `
+    <div class="sc-month ${x.raised ? 'raised' : ''}">
+      <small>${escHtml(instMonthLabel(instIdx, x.m))}${x.weight < 1 ? " · " + (Math.round(x.weight*100)/100) + " חודש" : ""}${x.raised ? " · אחרי העלאה" : ""}</small>
+      <b>${fmtMoney(x.amount)}</b>
+    </div>`).join("");
+  const monthly = parseFloat(r.monthly) || 0;
+  const missing = parseFloat(r.missing) || 0;
+  const deduct = missing ? `<div class="sc-deduct">ניכוי ימי חיסור: ${fmtMoney(missing*monthly/30)} (${missing} ימים × ${fmtMoney(monthly/30)} תעריף יומי בסיס)</div>` : "";
+  const raises = roleRaises(r);
+  const chips = [`<span class="sc-chip">תעריף בסיס ${fmtMoney(monthly)}</span>`]
+    .concat(raises.map(x => `<span style="color:var(--ink-soft)">←</span><span class="sc-chip up">מ${escHtml(instMonthLabel(instIdx, x.fromMonth))} ${fmtMoney(x.monthly)}${frozen ? "" : `<button type="button" title="הסרת ההעלאה" onclick="removeStaffRaise(${row.id},${roleIdx},${x.fromMonth})">✕</button>`}</span>`))
+    .join("");
+  const addBtn = frozen
+    ? `<span class="sc-frozen-note">${svgIcon('lock',11)} שולם — הסכום נעול</span>`
+    : `<button type="button" class="sc-link-btn" onclick="openStaffRaiseModal(${row.id},${roleIdx})">+ העלאת שכר</button>`;
+  return `
+    <div class="sc-section-title"><span>חישוב לפי חודש${r.role ? " — " + escHtml(r.role) : ""}</span><b>${fmtMoney(computeRoleTotal(r))}</b></div>
+    <div class="sc-months">${tiles}</div>
+    ${deduct}
+    <div class="sc-raises">${chips}${addBtn}</div>`;
+}
+function staffBankInner(row){
+  const nm = (row.name || "").trim();
+  if(!nm) return `<div class="sc-frozen-note">יש למלא שם עובד כדי לשמור פרטי בנק.</div>`;
+  const b = staffBankRowFor(row);
+  if(!b) return `<button type="button" class="sc-link-btn" onclick="addStaffBankEntry(${row.id})">+ הוספת פרטי בנק</button>`;
+  const f = (key, label, w) => `<label>${label}<input type="text" data-bf="${key}" value="${escHtml(b[key]||"")}"></label>`;
+  return `<div class="sc-mini-fields">${f("bank","בנק")}${f("branch","סניף")}${f("account","מספר חשבון")}${f("holder","שם בעל החשבון")}</div>`;
+}
+function staffGrandInner(row){
+  const live = computeLiveStaffTotal(row);
+  if(isStaffFrozen(row)){
+    const mismatch = staffFrozenMismatch(row);
+    return `<span>סה"כ ששולם <span class="sc-frozen-note">(נעול${mismatch ? " · החישוב הנוכחי: " + fmtMoney(live) : ""})</span></span>
+      <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${mismatch ? `<button type="button" class="sc-link-btn" onclick="refreshFrozenStaffTotal(${row.id})">עדכון לסכום החדש</button>` : ""}<b>${fmtMoney(row.paidTotal)}</b></span>`;
+  }
+  return `<span>סה"כ לתשלום (כל התפקידים והתשלומים)</span><b>${fmtMoney(live)}</b>`;
+}
 function buildStaffRowElement(row){
-  const rowTotal = computeStaffTotal(row);
+  const instIdx = staffRowInstallmentIndex(row.id);
+  migrateSingleDocToArray(row, "link", "docs", "פירוט תפקיד");
   const tr = document.createElement("tr");
   tr.dataset.rowId = row.id;
+  tr.className = "sc-tr";
+  if(staffOpenCards.has(row.id)) tr.classList.add("sc-open");
   if(row.paid) tr.classList.add("card-ok");
   else if(row.approved) tr.classList.add("card-warn");
-  tr.innerHTML = `
-    <td class="primary-field"><input type="text" value="${row.name}" data-f="name" style="min-width:110px"></td>
-    <td><input type="text" value="${row.role}" data-f="role" style="min-width:130px"></td>
-    <td><input type="number" value="${row.monthly}" data-f="monthly" style="width:80px"></td>
-    <td><input type="text" class="staff-daily-display" value="${fmtMoney((parseFloat(row.monthly)||0)/30)}" readonly style="width:75px;color:var(--ink-soft)"></td>
-    <td><input type="number" value="${row.missing}" data-f="missing" style="width:60px"></td>
-    <td><input type="number" value="${row.months}" data-f="months" style="width:60px"></td>
-    <td><input type="text" class="staff-total-display" value="${fmtMoney(rowTotal)}" readonly style="width:80px;font-weight:600"></td>
-    <td class="sync-cell"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-approved="1" ${row.approved?"checked":""}><span class="pill ${row.approved?'done':'open'}">${row.approved?"מאושר":"לא מאושר"}</span></label></td>
-    <td class="sync-cell">${paymentStatusPill(row)}</td>
-    <td class="file-cell"></td>
-    <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
-    <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeStaffRow(${row.id})">${svgIcon('trash',13)}</button></td>
-  `;
-  migrateSingleDocToArray(row, "link", "docs", "פירוט תפקיד");
-  const fileTd = tr.querySelector(".file-cell");
-  fileTd.innerHTML = renderDocsChecklist(row, "docs", "staff");
+  const num = (v) => (v === undefined || v === null) ? "" : escHtml(v);
+  const extraHtml = (row.extraRoles || []).map((er, i) => `
+    <div class="sc-extra" data-extra="${i}">
+      <div class="sc-section-title"><span>תפקיד נוסף ${i+1}</span><button type="button" class="sc-link-btn" style="border-color:var(--red);color:var(--red)" onclick="confirmRemoveExtraRole(${row.id},${i})">הסרה</button></div>
+      <div class="sc-mini-fields">
+        <label>שם התפקיד<input type="text" data-erf="role" data-eridx="${i}" value="${escHtml(er.role||"")}"></label>
+        <label>תעריף בסיס חודשי<input type="number" data-erf="monthly" data-eridx="${i}" value="${num(er.monthly)}"></label>
+        <label>ימי חיסור<input type="number" data-erf="missing" data-eridx="${i}" value="${num(er.missing)}"></label>
+        <label>חודשים בפעימה<input type="number" data-erf="months" data-eridx="${i}" value="${num(er.months)}"></label>
+      </div>
+      <div class="sc-calc" data-role="${i}">${staffRoleCalcInner(row, er, i, instIdx)}</div>
+    </div>`).join("");
+  const ops = row.onePayments || [];
+  const opsHtml = ops.length ? `
+    <div class="sc-section">
+      <div class="sc-section-title"><span>תשלומים חד פעמיים</span><b class="sc-ops-total">${fmtMoney(computeOnePaymentsTotal(row))}</b></div>
+      ${ops.map((p,i) => `
+      <div class="sc-op">
+        <input type="text" data-opf="desc" data-opidx="${i}" value="${escHtml(p.desc||"")}" placeholder="תיאור התשלום">
+        <input type="date" data-opf="date" data-opidx="${i}" value="${escHtml(p.date||"")}">
+        <input type="number" data-opf="amount" data-opidx="${i}" value="${num(p.amount)}">
+        <button type="button" class="ca-mini" title="הסרה" onclick="confirmRemoveOnePayment(${row.id},${i})">✕</button>
+      </div>`).join("")}
+    </div>` : "";
+  tr.innerHTML = `<td class="sc-td">
+    <div class="sc-head">
+      <div class="sc-avatar">${escHtml(staffInitials(row.name))}</div>
+      <div class="sc-who"><div class="sc-name">${escHtml(row.name || "עובד חדש")}</div><div class="sc-role">${escHtml([row.role].concat((row.extraRoles||[]).map(e=>e.role)).filter(Boolean).join(" · ") || "ללא תפקיד")}</div></div>
+      <div class="sc-pills">${staffHeadPillsHtml(row)}</div>
+      <div class="sc-total"><small>לתשלום</small><b>${fmtMoney(computeStaffTotal(row))}</b></div>
+      <span class="sc-chev">${svgIcon('chevronDown',18)}</span>
+    </div>
+    <div class="sc-body">
+      <div class="sc-fields">
+        <label>שם העובד<input type="text" data-f="name" value="${escHtml(row.name||"")}"></label>
+        <label>תפקיד ראשי / תורנות<input type="text" data-f="role" value="${escHtml(row.role||"")}"></label>
+        <label>תעריף בסיס חודשי (₪)<input type="number" data-f="monthly" value="${num(row.monthly)}"></label>
+        <label>ימי חיסור<input type="number" data-f="missing" value="${num(row.missing)}"></label>
+        <label>חודשים בפעימה<input type="number" data-f="months" value="${num(row.months)}"></label>
+        <label class="sc-check"><input type="checkbox" data-approved="1" ${row.approved ? "checked" : ""} style="width:auto"> אושר לתשלום</label>
+        <label class="sc-wide">הערות<input type="text" data-f="notes" value="${escHtml(row.notes||"")}"></label>
+      </div>
+      <div class="sc-section sc-calc" data-role="-1">${staffRoleCalcInner(row, row, -1, instIdx)}</div>
+      ${extraHtml}
+      ${opsHtml}
+      <div class="sc-section">
+        <div class="sc-section-title"><span>פירוט תפקיד ומסמכים</span></div>
+        <div class="file-cell">${renderDocsChecklist(row, "docs", "staff")}</div>
+      </div>
+      <div class="sc-section">
+        <div class="sc-section-title"><span>פרטי בנק</span></div>
+        <div class="sc-bank">${staffBankInner(row)}</div>
+      </div>
+      <div class="sc-grand">${staffGrandInner(row)}</div>
+      <div class="sc-actions">
+        <button type="button" class="btn ghost" onclick="addExtraRole(${row.id})">${svgIcon('plus',12)} תפקיד נוסף</button>
+        <button type="button" class="btn ghost" onclick="addOnePayment(${row.id})">${svgIcon('cash',12)} תשלום חד פעמי</button>
+        <button type="button" class="btn ghost" onclick="openStaffEmployeeReportModal(${row.id})">${svgIcon('printer',12)} דוח תשלומים (PDF)</button>
+        <button type="button" class="sc-del" onclick="removeStaffRow(${row.id})">${svgIcon('trash',12)} מחיקת עובד</button>
+      </div>
+    </div>
+  </td>`;
+
+  tr.querySelector(".sc-head").addEventListener("click", () => toggleStaffCard(row.id));
+
   tr.querySelectorAll("[data-f]").forEach(inp => {
     inp.addEventListener("input", () => {
-      row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
-      if(inp.dataset.f === "monthly"){
-        const dailyDisplay = tr.querySelector(".staff-daily-display");
-        if(dailyDisplay) dailyDisplay.value = fmtMoney((parseFloat(inp.value)||0)/30);
-      }
+      row[inp.dataset.f] = (inp.type === "number") ? parseFloat(inp.value) || 0 : inp.value;
       saveInstallments();
+      patchStaffCard(tr, row);
     });
     inp.addEventListener("change", () => {
-      if(inp.dataset.f === "name"){ ensureBankEntry(inp.value); }
-      patchRoleTotalsDisplay();
+      if(inp.dataset.f === "name"){
+        ensureBankEntry(inp.value);
+        const bankBox = tr.querySelector(".sc-bank");
+        if(bankBox){ bankBox.innerHTML = staffBankInner(row); bindStaffBankInputs(tr, row); }
+      }
       renderPayment();
     });
   });
   tr.querySelector("[data-approved]").addEventListener("change", (e) => {
     row.approved = e.target.checked;
     saveInstallments();
+    patchStaffCard(tr, row);
     renderAccountantReport();
   });
-
-  const extraTd = document.createElement("td");
-  extraTd.style.flex = "1 1 100%";
-  const baseTotal = computeBaseRoleTotal(row);
-  const extraRoles = row.extraRoles || [];
-  const fieldLabel = (label, inputHtml) => `<label style="display:flex;flex-direction:column;gap:2px;font-size:10px;color:var(--ink-soft);font-weight:700">${label}${inputHtml}</label>`;
-  const extraRolesHtml = extraRoles.map((er,i) => {
-    const erTotal = computeExtraRoleTotal(er);
-    return `
-    <div class="role-summary-line">
-      <span>${er.role || ("תפקיד נוסף "+(i+1))}</span>
-      <span style="display:flex;align-items:center;gap:6px">
-        <b>${fmtMoney(erTotal)}</b>
-        <button type="button" class="ca-mini role-edit-toggle" title="עריכה">${svgIcon('edit',11)}</button>
-        <button type="button" class="ca-mini" title="הסרה" onclick="removeExtraRole(${row.id},${i})">✕</button>
-      </span>
-    </div>
-    <div class="role-edit-form" style="display:none">
-      ${fieldLabel("שם תפקיד", `<input type="text" value="${er.role}" data-erf="role" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:110px">`)}
-      ${fieldLabel("תעריף חודשי", `<input type="number" value="${er.monthly}" data-erf="monthly" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:80px">`)}
-      ${fieldLabel("תעריף יומי", `<input type="text" class="extra-daily-display" data-eridx="${i}" value="${fmtMoney((parseFloat(er.monthly)||0)/30)}" readonly style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:80px;color:var(--ink-soft)">`)}
-      ${fieldLabel("ימי חיסור", `<input type="number" value="${er.missing}" data-erf="missing" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:75px">`)}
-      ${fieldLabel("חודשים", `<input type="number" value="${er.months}" data-erf="months" data-eridx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;width:65px">`)}
-    </div>`;
-  }).join("");
-  const onePayments = row.onePayments || [];
-  const onePaymentsHtml = onePayments.length ? `
-    <div class="role-summary-line" style="font-weight:700;font-size:11px;color:var(--ink-soft);margin-top:6px">תשלומים חד פעמיים</div>
-    ${onePayments.map((p,i) => `
-    <div class="op-line" data-opidx="${i}" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:4px 0;border-bottom:1px dashed var(--line)">
-      <input type="text" value="${escHtml(p.desc||"")}" data-opf="desc" data-opidx="${i}" placeholder="תיאור התשלום" style="flex:1 1 120px;min-width:100px;border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:12px">
-      <input type="date" value="${p.date||""}" data-opf="date" data-opidx="${i}" style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:12px">
-      <input type="number" value="${p.amount}" data-opf="amount" data-opidx="${i}" style="width:80px;border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:12px;font-weight:700;text-align:center">
-      <button type="button" class="ca-mini" title="הסרה" onclick="removeOnePayment(${row.id},${i})">✕</button>
-    </div>`).join("")}
-    <div class="role-summary-line op-subtotal-line" style="margin-top:2px">
-      <span>סה"כ תשלומים חד פעמיים</span><span><b>${fmtMoney(computeOnePaymentsTotal(row))}</b></span>
-    </div>
-  ` : "";
-  extraTd.innerHTML = `
-    <div class="role-summary-line">
-      <span>תפקיד ראשי${row.role ? " — "+row.role : ""}</span>
-      <span><b>${fmtMoney(baseTotal)}</b></span>
-    </div>
-    ${extraRolesHtml}
-    ${onePaymentsHtml}
-    <div class="role-summary-total">
-      <span>סה"כ לתשלום (כל התפקידים והתשלומים)</span><span>${fmtMoney(rowTotal)}</span>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
-      <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="addExtraRole(${row.id})">${svgIcon('plus',12)} הוספת תפקיד נוסף</button>
-      <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="addOnePayment(${row.id})">${svgIcon('cash',12)} הוספת תשלום חד פעמי</button>
-      <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="openStaffEmployeeReportModal(${row.id})">${svgIcon('printer',12)} הפקת דוח תשלומים (PDF)</button>
-    </div>
-  `;
-  extraTd.querySelectorAll(".role-edit-toggle").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const form = btn.closest(".role-summary-line").nextElementSibling;
-      if(!form || !form.classList.contains("role-edit-form")) return;
-      const isOpen = form.classList.contains("open");
-      document.querySelectorAll(".role-edit-form.open").forEach(f => {
-        f.classList.remove("open");
-        f.style.display = "none";
-      });
-      if(!isOpen){
-        form.classList.add("open");
-        form.style.display = "flex";
-      }
-    });
-  });
-  function patchRoleTotalsDisplay(){
-    const lines = extraTd.querySelectorAll(".role-summary-line");
-    if(lines[0]){
-      lines[0].querySelector("span:first-child").textContent = "תפקיד ראשי" + (row.role ? " — "+row.role : "");
-      lines[0].querySelector("b").textContent = fmtMoney(computeBaseRoleTotal(row));
-    }
-    (row.extraRoles||[]).forEach((er,i) => {
-      const line = lines[i+1];
-      if(line){
-        line.querySelector("span:first-child").textContent = er.role || ("תפקיד נוסף "+(i+1));
-        line.querySelector("b").textContent = fmtMoney(computeExtraRoleTotal(er));
-      }
-    });
-    const opSubtotalLine = extraTd.querySelector(".op-subtotal-line b");
-    if(opSubtotalLine) opSubtotalLine.textContent = fmtMoney(computeOnePaymentsTotal(row));
-    const totalLine = extraTd.querySelector(".role-summary-total");
-    const newTotal = computeStaffTotal(row);
-    if(totalLine) totalLine.querySelector("span:last-child").textContent = fmtMoney(newTotal);
-    const mainTotalInput = tr.querySelector(".staff-total-display");
-    if(mainTotalInput) mainTotalInput.value = fmtMoney(newTotal);
-    const staffTotalEl = document.getElementById("staffTotal");
-    if(staffTotalEl){
-      const sumAll = data.installments[activeInstallment].reduce((s,r)=>s+computeStaffTotal(r),0);
-      staffTotalEl.textContent = fmtMoney(sumAll);
-    }
-  }
-  extraTd.querySelectorAll("[data-erf]").forEach(inp => {
+  tr.querySelectorAll("[data-erf]").forEach(inp => {
     inp.addEventListener("input", () => {
       const idx = parseInt(inp.dataset.eridx, 10);
-      const field = inp.dataset.erf;
-      row.extraRoles[idx][field] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
-      if(field==="monthly"){
-        const dailyDisplay = extraTd.querySelector(`.extra-daily-display[data-eridx="${idx}"]`);
-        if(dailyDisplay) dailyDisplay.value = fmtMoney((parseFloat(inp.value)||0)/30);
-      }
+      const er = (row.extraRoles || [])[idx];
+      if(!er) return;
+      er[inp.dataset.erf] = (inp.type === "number") ? parseFloat(inp.value) || 0 : inp.value;
       saveInstallments();
-      patchRoleTotalsDisplay();
+      patchStaffCard(tr, row);
     });
     inp.addEventListener("change", () => { renderPayment(); });
   });
-  extraTd.querySelectorAll("[data-opf]").forEach(inp => {
+  tr.querySelectorAll("[data-opf]").forEach(inp => {
     inp.addEventListener("input", () => {
       const idx = parseInt(inp.dataset.opidx, 10);
-      const field = inp.dataset.opf;
-      row.onePayments[idx][field] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+      const p = (row.onePayments || [])[idx];
+      if(!p) return;
+      p[inp.dataset.opf] = (inp.type === "number") ? parseFloat(inp.value) || 0 : inp.value;
       saveInstallments();
-      patchRoleTotalsDisplay();
+      patchStaffCard(tr, row);
     });
     inp.addEventListener("change", () => { renderPayment(); });
   });
-  tr.appendChild(extraTd);
+  bindStaffBankInputs(tr, row);
   return tr;
+}
+function bindStaffBankInputs(tr, row){
+  tr.querySelectorAll("[data-bf]").forEach(inp => {
+    inp.addEventListener("input", () => {
+      const b = staffBankRowFor(row);
+      if(!b) return;
+      b[inp.dataset.bf] = inp.value;
+      saveInstallments();
+    });
+    inp.addEventListener("change", () => { renderBank(); renderPayment(); });
+  });
+}
+/* מעדכן רק את האזורים המחושבים בכרטיס (בלי שדות קלט) כדי לא לאבד פוקוס בזמן הקלדה */
+function patchStaffCard(tr, row){
+  const instIdx = staffRowInstallmentIndex(row.id);
+  const q = (sel) => tr.querySelector(sel);
+  if(q(".sc-avatar")) q(".sc-avatar").textContent = staffInitials(row.name);
+  if(q(".sc-name")) q(".sc-name").textContent = row.name || "עובד חדש";
+  if(q(".sc-role")) q(".sc-role").textContent = [row.role].concat((row.extraRoles||[]).map(e=>e.role)).filter(Boolean).join(" · ") || "ללא תפקיד";
+  if(q(".sc-pills")) q(".sc-pills").innerHTML = staffHeadPillsHtml(row);
+  if(q(".sc-total b")) q(".sc-total b").textContent = fmtMoney(computeStaffTotal(row));
+  tr.querySelectorAll(".sc-calc").forEach(box => {
+    const idx = parseInt(box.dataset.role, 10);
+    const r = staffRoleObj(row, idx);
+    if(r) box.innerHTML = staffRoleCalcInner(row, r, idx, instIdx);
+  });
+  if(q(".sc-ops-total")) q(".sc-ops-total").textContent = fmtMoney(computeOnePaymentsTotal(row));
+  if(q(".sc-grand")) q(".sc-grand").innerHTML = staffGrandInner(row);
+  tr.classList.toggle("card-ok", !!row.paid);
+  tr.classList.toggle("card-warn", !row.paid && !!row.approved);
+  updateStaffSummary();
+}
+function updateStaffSummary(){
+  const inst = data.installments[activeInstallment] || [];
+  const totalEl = document.getElementById("staffTotal");
+  if(totalEl) totalEl.textContent = fmtMoney(inst.reduce((s,r)=>s+computeStaffTotal(r),0));
+  const apEl = document.getElementById("staffApprovedCount");
+  if(apEl) apEl.textContent = inst.filter(r=>r.approved).length + " מתוך " + inst.length;
+  const pdEl = document.getElementById("staffPaidCount");
+  if(pdEl) pdEl.textContent = inst.filter(r=>r.paid).length + " מתוך " + inst.length;
+  const mEl = document.getElementById("staffInstMonthsLabel");
+  if(mEl){
+    const range = instRangeLabel(activeInstallment);
+    const meta = instMeta(activeInstallment);
+    mEl.textContent = range ? range + " (" + (parseInt(meta.count,10)||1) + " חודשים)" : "לא הוגדרו — החודשים יוצגו כחודש 1, חודש 2...";
+  }
 }
 function renderStaff(){
   const body = document.getElementById("staffBody");
   body.innerHTML = "";
-  let total = 0;
-  data.installments[activeInstallment].forEach(row => {
-    total += computeStaffTotal(row);
-    body.appendChild(buildStaffRowElement(row));
-  });
-  document.getElementById("staffTotal").textContent = fmtMoney(total);
-  renderStaffCards();
+  (data.installments[activeInstallment] || []).forEach(row => body.appendChild(buildStaffRowElement(row)));
+  updateStaffSummary();
 }
 function refreshSingleStaffRow(id){
   const body = document.getElementById("staffBody");
   if(!body) return;
-  const row = data.installments[activeInstallment].find(r=>r.id===id);
+  const row = (data.installments[activeInstallment] || []).find(r=>r.id===id);
   const oldTr = body.querySelector(`tr[data-row-id="${id}"]`);
   if(!row){
     if(oldTr) oldTr.remove();
@@ -3866,11 +4112,195 @@ function refreshSingleStaffRow(id){
     if(oldTr) oldTr.replaceWith(newTr);
     else body.appendChild(newTr);
   }
-  const total = data.installments[activeInstallment].reduce((s,r)=>s+computeStaffTotal(r),0);
-  const totalEl = document.getElementById("staffTotal");
-  if(totalEl) totalEl.textContent = fmtMoney(total);
+  updateStaffSummary();
+}
+function toggleStaffCard(id){
+  if(staffOpenCards.has(id)) staffOpenCards.delete(id); else staffOpenCards.add(id);
+  const tr = document.querySelector(`#staffBody tr[data-row-id="${id}"]`);
+  if(tr) tr.classList.toggle("sc-open", staffOpenCards.has(id));
+}
+function setAllStaffCardsOpen(open){
+  (data.installments[activeInstallment] || []).forEach(r => { if(open) staffOpenCards.add(r.id); else staffOpenCards.delete(r.id); });
+  document.querySelectorAll("#staffBody tr.sc-tr").forEach(tr => tr.classList.toggle("sc-open", open));
+}
+function confirmRemoveExtraRole(id, idx){
+  openConfirmModal("להסיר את התפקיד הנוסף? לא ניתן לשחזר את הפעולה.", () => removeExtraRole(id, idx));
+}
+function confirmRemoveOnePayment(id, idx){
+  openConfirmModal("להסיר את התשלום החד פעמי? לא ניתן לשחזר את הפעולה.", () => removeOnePayment(id, idx));
+}
+function refreshFrozenStaffTotal(id){
+  const row = DOC_TABLES.staff.find(id);
+  if(!row) return;
+  openConfirmModal(`לעדכן את הסכום הנעול מ-${fmtMoney(row.paidTotal)} ל-${fmtMoney(computeLiveStaffTotal(row))}?`, () => {
+    row.paidTotal = computeLiveStaffTotal(row);
+    saveInstallments();
+    refreshSingleStaffRow(id);
+    renderPayment();
+    renderAccountantReport();
+  });
+}
+function addStaffBankEntry(id){
+  const row = DOC_TABLES.staff.find(id);
+  if(!row) return;
+  ensureBankEntry(row.name);
+  refreshSingleStaffRow(id);
 }
 function renderStaffCards(){}
+
+/* ---------- העלאת שכר ---------- */
+let staffRaiseCtx = null;
+function staffFutureMatches(row, roleIdx, fromInst){
+  const r = staffRoleObj(row, roleIdx);
+  const nm = (row.name || "").trim();
+  const roleName = ((r && r.role) || "").trim();
+  const out = [];
+  if(!nm || !roleName) return out;
+  for(let k = fromInst + 1; k < data.installments.length; k++){
+    (data.installments[k] || []).forEach(other => {
+      if((other.name || "").trim() !== nm || isStaffFrozen(other) || other.paid) return;
+      if((other.role || "").trim() === roleName) out.push({inst:k, obj:other});
+      (other.extraRoles || []).forEach(er => { if((er.role || "").trim() === roleName) out.push({inst:k, obj:er}); });
+    });
+  }
+  return out;
+}
+function openStaffRaiseModal(id, roleIdx){
+  const row = DOC_TABLES.staff.find(id);
+  const r = row && staffRoleObj(row, roleIdx);
+  if(!r) return;
+  if(isStaffFrozen(row)) return;
+  const instIdx = staffRowInstallmentIndex(id);
+  staffRaiseCtx = {id, roleIdx, instIdx};
+  document.getElementById("staffRaiseTitle").textContent = `העלאת שכר — ${row.name || "עובד"}${r.role ? " · " + r.role : ""}`;
+  const sel = document.getElementById("staffRaiseFrom");
+  const M = Math.ceil(roleMonthCount(r));
+  let opts = "";
+  for(let m = 2; m <= M; m++) opts += `<option value="${m}">${escHtml(instMonthLabel(instIdx, m))} (חודש ${m} בפעימה)</option>`;
+  opts += `<option value="next">מהפעימה הבאה (לא משנה את הפעימה הזו)</option>`;
+  sel.innerHTML = opts;
+  sel.value = M >= 2 ? "2" : "next";
+  document.getElementById("staffRaiseRate").value = roleRateForMonth(r, M) || "";
+  document.getElementById("staffRaiseFuture").checked = true;
+  document.getElementById("staffRaiseError").style.display = "none";
+  sel.onchange = updateStaffRaisePreview;
+  document.getElementById("staffRaiseRate").oninput = () => { document.getElementById("staffRaiseError").style.display = "none"; updateStaffRaisePreview(); };
+  document.getElementById("staffRaiseFuture").onchange = updateStaffRaisePreview;
+  updateStaffRaisePreview();
+  document.getElementById("staffRaiseModal").style.display = "flex";
+}
+function closeStaffRaiseModal(){
+  document.getElementById("staffRaiseModal").style.display = "none";
+  staffRaiseCtx = null;
+}
+function updateStaffRaisePreview(){
+  if(!staffRaiseCtx) return;
+  const row = DOC_TABLES.staff.find(staffRaiseCtx.id);
+  const r = row && staffRoleObj(row, staffRaiseCtx.roleIdx);
+  const box = document.getElementById("staffRaisePreview");
+  if(!r){ box.innerHTML = ""; return; }
+  const from = document.getElementById("staffRaiseFrom").value;
+  const rateRaw = document.getElementById("staffRaiseRate").value;
+  const rate = parseFloat(rateRaw);
+  const future = document.getElementById("staffRaiseFuture").checked || from === "next";
+  document.getElementById("staffRaiseFuture").disabled = (from === "next");
+  if(from === "next") document.getElementById("staffRaiseFuture").checked = true;
+  const lines = [];
+  if(from !== "next" && isFinite(rate)){
+    const test = Object.assign({}, r, {raises: (r.raises || []).filter(x => x.fromMonth !== parseInt(from,10)).concat([{fromMonth: parseInt(from,10), monthly: rate}])});
+    lines.push(`בפעימה הזו: ${fmtMoney(computeRoleTotal(r))} ← <b>${fmtMoney(computeRoleTotal(test))}</b>`);
+  }
+  if(future){
+    const matches = staffFutureMatches(row, staffRaiseCtx.roleIdx, staffRaiseCtx.instIdx);
+    if(!(r.role || "").trim()) lines.push("לתפקיד אין שם, ולכן אי אפשר לאתר אותו בפעימות הבאות.");
+    else if(!matches.length) lines.push("לא נמצאו שורות תואמות (אותו שם ואותו תפקיד) בפעימות הבאות שעוד לא שולמו.");
+    else matches.forEach(m => lines.push(`פעימה ${m.inst+1}: ${fmtMoney(m.obj.monthly)} ← <b>${isFinite(rate) ? fmtMoney(rate) : "?"}</b>`));
+  }
+  box.innerHTML = lines.join("<br>") || "";
+}
+function saveStaffRaise(){
+  if(!staffRaiseCtx) return;
+  const row = DOC_TABLES.staff.find(staffRaiseCtx.id);
+  const r = row && staffRoleObj(row, staffRaiseCtx.roleIdx);
+  if(!r){ closeStaffRaiseModal(); return; }
+  const errEl = document.getElementById("staffRaiseError");
+  const rateRaw = document.getElementById("staffRaiseRate").value.trim();
+  const rate = parseFloat(rateRaw);
+  if(rateRaw === "" || !isFinite(rate) || rate < 0){
+    errEl.textContent = "יש להזין תעריף חודשי חדש.";
+    errEl.style.display = "block";
+    return;
+  }
+  const from = document.getElementById("staffRaiseFrom").value;
+  const future = document.getElementById("staffRaiseFuture").checked || from === "next";
+  const matches = future ? staffFutureMatches(row, staffRaiseCtx.roleIdx, staffRaiseCtx.instIdx) : [];
+  if(from === "next" && !matches.length){
+    errEl.textContent = "לא נמצאה שורה של העובד בפעימה הבאה. יש להוסיף אותו שם קודם, ואז לעדכן.";
+    errEl.style.display = "block";
+    return;
+  }
+  if(from !== "next"){
+    const fm = parseInt(from, 10);
+    r.raises = (r.raises || []).filter(x => x && x.fromMonth !== fm);
+    r.raises.push({fromMonth: fm, monthly: rate});
+    r.raises.sort((a,b) => a.fromMonth - b.fromMonth);
+  }
+  matches.forEach(m => { m.obj.monthly = rate; });
+  saveInstallments();
+  closeStaffRaiseModal();
+  refreshSingleStaffRow(row.id);
+  renderPayment();
+  renderAccountantReport();
+}
+function removeStaffRaise(id, roleIdx, fromMonth){
+  const row = DOC_TABLES.staff.find(id);
+  const r = row && staffRoleObj(row, roleIdx);
+  if(!r || isStaffFrozen(row)) return;
+  openConfirmModal("להסיר את ההעלאה? החודשים יחושבו שוב לפי התעריף הקודם.", () => {
+    r.raises = (r.raises || []).filter(x => x && x.fromMonth !== fromMonth);
+    saveInstallments();
+    refreshSingleStaffRow(id);
+    renderPayment();
+    renderAccountantReport();
+  });
+}
+
+/* ---------- חודשי הפעימה ---------- */
+function fillInstMonthsSelect(keep){
+  const leap = document.getElementById("instMonthsLeap").checked;
+  const list = leap ? HEB_MONTHS_LEAP : HEB_MONTHS;
+  const sel = document.getElementById("instMonthsStart");
+  const prev = keep || sel.value;
+  sel.innerHTML = list.map(m => `<option value="${escHtml(m)}">${escHtml(m)}</option>`).join("");
+  if(list.includes(prev)) sel.value = prev;
+  else if(prev === "אדר" && leap) sel.value = "אדר א'";
+  else if(prev && prev.startsWith("אדר") && !leap) sel.value = "אדר";
+}
+function openInstMonthsModal(){
+  const meta = instMeta(activeInstallment) || {};
+  document.getElementById("instMonthsTitle").textContent = `חודשי פעימה ${activeInstallment+1}`;
+  document.getElementById("instMonthsLeap").checked = !!meta.leap;
+  fillInstMonthsSelect(meta.start || "תשרי");
+  const maxMonths = Math.max(1, ...(data.installments[activeInstallment] || []).map(r => Math.ceil(parseFloat(r.months)||0)));
+  document.getElementById("instMonthsCount").value = meta.count || maxMonths;
+  document.getElementById("instMonthsModal").style.display = "flex";
+}
+function closeInstMonthsModal(){
+  document.getElementById("instMonthsModal").style.display = "none";
+}
+function saveInstMonths(){
+  const start = document.getElementById("instMonthsStart").value;
+  const count = Math.min(13, Math.max(1, parseInt(document.getElementById("instMonthsCount").value, 10) || 1));
+  const leap = document.getElementById("instMonthsLeap").checked;
+  if(!Array.isArray(data.installmentMeta)) data.installmentMeta = [];
+  while(data.installmentMeta.length < activeInstallment) data.installmentMeta.push(null);
+  data.installmentMeta[activeInstallment] = {start, count, leap};
+  saveInstallments();
+  closeInstMonthsModal();
+  buildInstallmentTabs();
+  renderStaff();
+}
+
 
 /* ---------- BANK ---------- */
 function ensureBankEntry(name){
@@ -4191,6 +4621,10 @@ function renderAccountantReport(){
       const newStatus = e.target.value;
       r.ref.paymentStatus = newStatus;
       r.ref.paid = (newStatus === "שולם");
+      if(r.kind === "staff"){
+        if(r.ref.paid) r.ref.paidTotal = computeLiveStaffTotal(r.ref);
+        else delete r.ref.paidTotal;
+      }
       if(newStatus === "שולם"){
         const hasReceipt = (r.ref.docs||[]).some(d=>d.fileUrl);
         if(!hasReceipt) alert("סומן כשולם. מומלץ לצרף קבלה/חשבונית עבור תשלום זה.");
@@ -4348,13 +4782,15 @@ function printStaffEmployeeReport(){
   const showBank = document.getElementById("staffEmpShowBank").checked;
   const showNotes = document.getElementById("staffEmpShowNotes").checked;
 
-  const roles = [{role: row.role || "תפקיד ראשי", monthly: row.monthly, missing: row.missing, months: row.months, total: computeBaseRoleTotal(row)}]
-    .concat((row.extraRoles||[]).map(er => ({role: er.role || "תפקיד נוסף", monthly: er.monthly, missing: er.missing, months: er.months, total: computeExtraRoleTotal(er)})));
+  const reportInst = staffRowInstallmentIndex(row.id);
+  const raiseNote = (r) => roleRaises(r).map(x => `<div style="font-size:11.5px;color:#159C82">מ${escHtml(instMonthLabel(reportInst, x.fromMonth))}: ${fmtMoney(x.monthly)}</div>`).join("");
+  const roles = [{role: row.role || "תפקיד ראשי", monthly: row.monthly, missing: row.missing, months: row.months, total: computeBaseRoleTotal(row), raises: raiseNote(row)}]
+    .concat((row.extraRoles||[]).map(er => ({role: er.role || "תפקיד נוסף", monthly: er.monthly, missing: er.missing, months: er.months, total: computeExtraRoleTotal(er), raises: raiseNote(er)})));
   const rolesRows = roles.map(r => `
     <tr>
       <td style="padding:9px 10px;border-bottom:1px solid #eee5d6;font-weight:600">${escHtml(r.role)}</td>
       ${showRates ? `
-      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${fmtMoney(r.monthly)}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${fmtMoney(r.monthly)}${r.raises}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${fmtMoney((parseFloat(r.monthly)||0)/30)}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${r.missing||0}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${r.months||0}</td>` : ""}
@@ -6677,6 +7113,7 @@ async function initAppData(){
   repairDuplicateIds();
   backfillSchoolYear();
   backfillBankEntries();
+  backfillStaffPaidSnapshots();
   backfillTaskNumbers();
   backfillTaskInvoiceSync();
   backfillProcInvoiceSync();
@@ -6712,7 +7149,7 @@ function buildFullExportObject(){
   };
   const out = {};
   for(const sk in map) out[sk] = JSON.stringify(data[map[sk]]);
-  out["staff-data"] = JSON.stringify({ installments: data.installments, bank: data.bank });
+  out["staff-data"] = JSON.stringify({ installments: data.installments, bank: data.bank, installmentMeta: data.installmentMeta || [] });
   out["keys-data"] = JSON.stringify({ inventory: data.keysInventory, log: data.keysLog, holders: data.keysHolders, masters: data.masterKeys, importDone: data.keysImportDone, codeMastersDone: data.codeMasterKeysDone });
   out["food-data"] = JSON.stringify({ priceList: data.foodPriceList, orders: data.foodOrders });
   return out;
