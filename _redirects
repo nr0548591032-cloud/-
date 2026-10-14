@@ -1,0 +1,2 @@
+# Show stored files inside the app (same-origin proxy to Firebase Storage)
+/fbfiles/*  https://firebasestorage.googleapis.com/:splat  200
