@@ -719,6 +719,281 @@
   }
 </style>
 <link rel="stylesheet" href="theme.css">
+<style id="jobsFlowStyles">
+/* ===== תיק עבודה: משימה ↔ תשלום ↔ מסמכים ↔ דוח (אוקטובר 2026) ===== */
+:root{
+  --job-accent:#9c5224;
+  --job-accent-ink:#fbf7f0;
+  --job-ok:#3f4a2c;
+  --job-ok-bg:#e1eecc;
+  --job-warn:#643312;
+  --job-warn-bg:#ffe1d0;
+  --job-idle:#645c50;
+  --job-idle-bg:#eee7db;
+  --job-tint-a:#fff2eb;
+  --job-tint-b:#f0fae1;
+  --job-shadow:0 1px 2px rgba(46,43,37,.10), 0 8px 22px rgba(46,43,37,.09);
+}
+
+/* --- כפתורים כלליים של המודול --- */
+.job-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  min-height:42px; padding:0 15px; border-radius:13px; border:none;
+  background:var(--job-accent); color:var(--job-accent-ink);
+  font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.job-btn:hover{ transform:translateY(-1px); box-shadow:0 4px 12px rgba(140,73,26,.25); }
+.job-btn:active{ transform:none; }
+.job-btn.ghost{ background:transparent; color:#8c491a; border:1.5px solid var(--job-accent); }
+.job-btn.soft{ background:var(--job-idle-bg); color:var(--ink); }
+.job-btn.ok{ background:var(--job-ok-bg); color:#2f3820; }
+.job-btn svg{ flex:0 0 auto; }
+.job-btn[disabled]{ opacity:.55; cursor:default; transform:none; box-shadow:none; }
+
+.job-status{
+  display:inline-flex; align-items:center; white-space:nowrap;
+  font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:999px;
+}
+.job-status.ok{ background:var(--job-ok-bg); color:var(--job-ok); }
+.job-status.warn{ background:var(--job-warn-bg); color:var(--job-warn); }
+.job-status.bad{ background:#ffc6a5; color:#5a2a0c; }
+.job-status.idle{ background:var(--job-idle-bg); color:var(--job-idle); }
+
+.job-chip{
+  display:inline-flex; align-items:center; gap:6px; min-height:34px; padding:0 12px;
+  border-radius:999px; font-family:inherit; font-size:13px; font-weight:600;
+  white-space:nowrap; cursor:pointer; border:none; text-decoration:none;
+  background:var(--job-ok-bg); color:var(--job-ok);
+}
+.job-chip.receipt{ background:#dfeee8; color:#24453a; }
+.job-chip.missing{ background:transparent; color:#8c491a; border:1.5px dashed #c67139; }
+.job-chip.plain{ background:var(--job-idle-bg); color:var(--ink); }
+
+/* --- תא העלות בכרטיס המשימה --- */
+table td.job-cell{ flex:1 1 100% !important; padding-top:8px; }
+table td.job-cell::before{ content:none !important; }
+.job-add-cost{
+  align-self:flex-start; display:inline-flex; align-items:center; gap:6px;
+  min-height:36px; padding:0 13px; border-radius:999px; cursor:pointer;
+  border:1.5px dashed rgba(198,113,57,.6); background:transparent; color:#8c491a;
+  font-family:inherit; font-size:13px; font-weight:600;
+}
+.job-full{ display:flex; flex-direction:column; gap:10px; width:100%; }
+.job-mini{ display:none; align-items:center; gap:8px; font-size:13.5px; font-weight:700; }
+.job-cost{
+  display:flex; align-items:center; gap:12px; padding:10px 12px;
+  background:var(--job-tint-a); border-radius:16px;
+}
+.job-cost.is-missing{ background:var(--job-warn-bg); box-shadow:inset 0 0 0 1.5px rgba(198,113,57,.45); }
+.job-cost-ico{
+  width:40px; height:40px; border-radius:12px; background:var(--job-warn-bg); color:#8c491a;
+  display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+}
+.job-cost.is-missing .job-cost-ico{ background:#fbf7f0; }
+.job-cost-field{ display:flex; flex-direction:column; gap:1px; flex:1 1 auto; min-width:0; margin:0; }
+.job-cost-field > span:first-child{ font-size:12px; font-weight:600; color:var(--ink-soft); }
+.job-cost-input{ display:flex; align-items:baseline; gap:4px; }
+.job-cost-input > span{ font-family:var(--font-heading, var(--font-display)); font-size:22px; color:var(--ink); }
+table td .job-cost-input input,
+.job-cost-input input{
+  border:none !important; background:transparent !important; box-shadow:none !important;
+  padding:0 !important; margin:0; width:100%; min-width:0;
+  font-family:var(--font-heading, var(--font-display)); font-size:24px; color:var(--ink);
+  border-radius:8px !important;
+}
+.job-cost-input input:focus{ background:#fbf7f0 !important; box-shadow:0 0 0 2px rgba(198,113,57,.35) !important; }
+.job-cost-input input::placeholder{ font-family:var(--font-body); font-size:15px; color:#8c491a; opacity:.9; }
+.job-cost-input input::-webkit-outer-spin-button,
+.job-cost-input input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+.job-flag{ flex:0 0 auto; font-size:11.5px; font-weight:700; color:#5a2a0c; background:#ffc6a5; padding:4px 10px; border-radius:999px; }
+.job-sync-note{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-soft); padding-inline:4px; }
+
+.job-steps{ display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:2px; position:relative; padding-top:2px; }
+.job-steps::before{
+  content:""; position:absolute; top:12px; inset-inline:10%; height:3px; border-radius:3px; background:var(--job-idle-bg);
+}
+.job-step{ position:relative; display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; }
+.job-step-dot{
+  width:22px; height:22px; border-radius:50%; box-sizing:border-box;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--job-idle-bg); color:#fbf7f0; position:relative;
+}
+.job-step.done .job-step-dot{ background:var(--green); }
+.job-step.cur .job-step-dot{ background:#fbf7f0; border:3px solid #c67139; }
+.job-step-lbl{ font-size:10.5px; font-weight:600; line-height:1.25; color:var(--ink-soft); }
+.job-step.done .job-step-lbl{ color:var(--ink); }
+.job-step.cur .job-step-lbl{ color:#8c491a; font-weight:700; }
+.job-cell-actions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.job-closed{ display:inline-flex; align-items:center; gap:6px; font-size:13.5px; font-weight:700; color:var(--job-ok); background:var(--job-ok-bg); padding:8px 13px; border-radius:12px; }
+
+tr.job-flash{ animation:jobFlash 2.2s ease; }
+@keyframes jobFlash{ 0%,60%{ box-shadow:0 0 0 3px #c67139, 0 10px 26px rgba(46,43,37,.18); } 100%{ box-shadow:none; } }
+
+@media (max-width:720px){
+  table tbody tr:not(.total-row):not(.mob-open) > td.job-cell.has-job{ display:flex !important; }
+  table tbody tr:not(.mob-open) > td.job-cell .job-full{ display:none; }
+  table tbody tr:not(.mob-open) > td.job-cell .job-mini{ display:flex; }
+}
+
+/* --- טאב חשבוניות וקבלות כרשימת עבודות --- */
+.jobs-head{ display:flex; flex-direction:column; gap:12px; }
+.jobs-search{
+  display:flex; align-items:center; gap:10px; min-height:48px; padding:0 14px;
+  background:var(--card); border-radius:14px; box-shadow:0 1px 2px rgba(46,43,37,.10);
+  border:1px solid var(--line);
+}
+.jobs-search svg{ flex:0 0 auto; color:var(--ink-soft); }
+.jobs-search input{
+  border:none !important; background:transparent !important; box-shadow:none !important;
+  flex:1 1 auto; min-width:0; padding:10px 0 !important; font-family:inherit; font-size:15px; color:var(--ink);
+}
+.jobs-filters{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.jobs-pill{
+  display:inline-flex; align-items:center; gap:6px; min-height:38px; padding:0 14px;
+  border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--ink);
+  font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap;
+}
+.jobs-pill.active{ background:#2b2723; color:#fbf7f0; border-color:#2b2723; }
+.jobs-pill .n{ background:var(--job-warn-bg); color:#8c491a; border-radius:999px; padding:1px 8px; font-size:12px; }
+.jobs-pill.active .n{ background:rgba(251,247,240,.2); color:#fbf7f0; }
+.jobs-topic{ min-height:38px; border-radius:999px !important; padding:0 12px; font-family:inherit; font-size:13.5px; width:auto !important; }
+.jobs-stats{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; }
+.jobs-stat{ background:var(--card); border-radius:16px; padding:11px 13px; display:flex; flex-direction:column; gap:2px; border-top:3px solid var(--green); box-shadow:0 1px 2px rgba(46,43,37,.08); min-width:0; }
+.jobs-stat.warn{ border-top-color:#c67139; }
+.jobs-stat.bad{ border-top-color:#8c491a; }
+.jobs-stat .l{ font-size:11.5px; font-weight:600; color:var(--ink-soft); }
+.jobs-stat .v{ font-family:var(--font-heading, var(--font-display)); font-size:20px; color:var(--ink); overflow-wrap:anywhere; }
+.jobs-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap:14px; margin-top:4px; }
+.job-card{
+  background:var(--job-tint-a); border-radius:20px; padding:14px 16px;
+  box-shadow:var(--job-shadow); display:flex; flex-direction:column; gap:10px; min-width:0;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.job-card:nth-child(even){ background:var(--job-tint-b); }
+.job-card:hover{ transform:translateY(-2px); box-shadow:0 2px 4px rgba(46,43,37,.10), 0 14px 30px rgba(46,43,37,.14); }
+.job-card.unlinked{ background:var(--card); box-shadow:none; border:1.5px dashed rgba(32,30,29,.22); }
+.job-card-top{ display:flex; align-items:flex-start; gap:10px; }
+.job-card-main{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.job-topic{ font-family:var(--font-heading, var(--font-display)); font-size:19px; color:#8c491a; line-height:1.2; overflow-wrap:anywhere; }
+.job-card:nth-child(even) .job-topic{ color:#4f5b3a; }
+.job-title{ font-size:15px; font-weight:600; color:var(--ink); overflow-wrap:anywhere; text-align:right; }
+button.job-title{ background:none; border:none; padding:0; font-family:inherit; cursor:pointer; text-decoration:underline; text-decoration-color:rgba(32,30,29,.25); text-underline-offset:4px; }
+.job-meta{ font-size:13px; color:var(--ink-soft); display:flex; flex-wrap:wrap; gap:4px 6px; align-items:center; }
+.job-pro-link{ background:none; border:none; padding:0; font-family:inherit; font-size:13px; font-weight:700; color:#8c491a; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.job-card-side{ display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex:0 0 auto; }
+.job-amount{ font-family:var(--font-heading, var(--font-display)); font-size:22px; color:var(--ink); white-space:nowrap; }
+.job-amount.none{ color:var(--ink-soft); font-size:16px; }
+.job-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.job-card-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+.job-card-actions .job-btn{ flex:1 1 140px; }
+.jobs-empty{ grid-column:1 / -1; text-align:center; color:var(--ink-soft); padding:26px 10px; background:var(--card); border-radius:18px; }
+.jobs-section-title{ grid-column:1 / -1; font-size:13px; font-weight:700; color:var(--ink-soft); margin-top:6px; }
+
+/* --- צפייה בקובץ --- */
+.fv-overlay{
+  position:fixed; inset:0; z-index:1200; background:rgba(26,23,20,.72);
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.fv-shell{
+  width:min(920px, 100%); height:min(92vh, 980px); background:#2b2723; color:#fbf7f0;
+  border-radius:22px; display:flex; flex-direction:column; overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+.fv-head{ display:flex; align-items:center; gap:10px; padding:12px 12px 10px; }
+.fv-head-text{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.fv-title{ font-family:var(--font-heading, var(--font-display)); font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fv-meta{ font-size:12.5px; opacity:.78; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fv-icon-btn{
+  width:44px; height:44px; border-radius:14px; border:none; flex:0 0 auto; cursor:pointer;
+  background:rgba(251,247,240,.12); color:#fbf7f0; display:flex; align-items:center; justify-content:center;
+}
+.fv-icon-btn:hover{ background:rgba(251,247,240,.22); }
+.fv-body{
+  flex:1 1 auto; min-height:0; margin:0 12px; background:#fbf7f0; border-radius:14px;
+  display:flex; align-items:center; justify-content:center; overflow:auto; color:var(--ink);
+}
+.fv-body img{ max-width:100%; max-height:100%; object-fit:contain; display:block; }
+.fv-body iframe{ width:100%; height:100%; border:0; background:#fff; }
+.fv-placeholder{ display:flex; flex-direction:column; align-items:center; gap:12px; padding:30px 20px; text-align:center; color:var(--ink-soft); }
+.fv-actions{ padding:12px 12px 14px; display:flex; flex-direction:column; gap:10px; }
+.fv-grid{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; }
+.fv-act{
+  min-height:64px; border-radius:16px; border:none; cursor:pointer;
+  font-family:inherit; font-size:12.5px; font-weight:600;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+  background:#fbf7f0; color:#201e1d; transition:transform .15s ease;
+}
+.fv-act:hover{ transform:translateY(-1px); }
+.fv-act.primary{ background:#c67139; color:#201e1d; }
+.fv-act.wa{ background:#e1eecc; color:#2f3820; }
+.fv-act.mail{ background:#eee7db; color:#201e1d; }
+.fv-acct{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; }
+.fv-acct > span{ opacity:.85; font-weight:600; }
+.fv-acct button{
+  flex:1 1 110px; min-height:42px; border-radius:12px; cursor:pointer;
+  border:1.5px solid rgba(251,247,240,.35); background:transparent; color:#fbf7f0;
+  font-family:inherit; font-size:13.5px; font-weight:600;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+}
+.fv-status{ min-height:18px; font-size:12.5px; opacity:.85; text-align:center; }
+@media (max-width:720px){
+  .fv-overlay{ padding:0; }
+  .fv-shell{ width:100%; height:100%; border-radius:0; }
+}
+
+/* --- חלון איש מקצוע --- */
+.pro-overlay{ align-items:center; }
+.pro-sheet{
+  width:min(520px, 100%); max-height:90vh; overflow-y:auto; background:var(--card); color:var(--ink);
+  border-radius:24px; padding:10px 16px 20px; display:flex; flex-direction:column; gap:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.pro-grip{ width:44px; height:5px; border-radius:5px; background:rgba(32,30,29,.18); align-self:center; display:none; }
+.pro-head{ display:flex; align-items:center; gap:12px; }
+.pro-avatar{
+  width:54px; height:54px; border-radius:18px; background:var(--job-warn-bg); color:#8c491a; flex:0 0 auto;
+  font-family:var(--font-heading, var(--font-display)); font-size:22px; display:flex; align-items:center; justify-content:center;
+}
+.pro-name{ font-family:var(--font-heading, var(--font-display)); font-size:22px; }
+.pro-sub{ font-size:13px; color:var(--ink-soft); }
+.pro-close{ background:var(--job-idle-bg); color:var(--ink); }
+.pro-close:hover{ background:#e2d9cb; }
+.pro-contact{ display:flex; gap:8px; }
+.pro-contact .job-btn{ flex:1 1 0; }
+.pro-stats{ background:#2b2723; color:#fbf7f0; border-radius:20px; padding:16px; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+.pro-stats .l{ font-size:11.5px; opacity:.8; }
+.pro-stats .v{ font-family:var(--font-heading, var(--font-display)); font-size:21px; overflow-wrap:anywhere; }
+.pro-list-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.pro-list-head > div{ font-size:13px; font-weight:700; color:var(--ink-soft); }
+.pro-list-head select{ width:auto !important; min-height:38px; font-family:inherit; font-size:13px; }
+.pro-list{ display:flex; flex-direction:column; gap:8px; }
+.pro-item{
+  width:100%; text-align:right; border:none; cursor:pointer; font-family:inherit; color:inherit;
+  background:var(--job-tint-a); border-radius:16px; padding:12px 14px; display:flex; align-items:center; gap:10px;
+}
+.pro-item:nth-child(even){ background:var(--job-tint-b); }
+.pro-item-main{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.pro-item-title{ font-size:14.5px; font-weight:600; }
+.pro-item-sub{ font-size:12.5px; color:var(--ink-soft); }
+.pro-item-side{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; flex:0 0 auto; }
+.pro-item-amt{ font-family:var(--font-heading, var(--font-display)); font-size:18px; white-space:nowrap; }
+@media (max-width:720px){
+  .pro-overlay{ align-items:flex-end; padding:0; }
+  .pro-sheet{ border-radius:26px 26px 0 0; max-height:92vh; }
+  .pro-grip{ display:block; }
+}
+
+/* --- דוח למנהל חשבונות: מקור העבודה --- */
+.acct-src{ display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; font-family:var(--font-body); font-size:12.5px; font-weight:500; color:var(--ink-soft); margin-top:3px; }
+.acct-src-link{ background:none; border:none; padding:0; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:700; color:#8c491a; text-decoration:underline; text-underline-offset:3px; display:inline-flex; align-items:center; gap:4px; }
+.job-toast{
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%); z-index:1300;
+  background:#2b2723; color:#fbf7f0; padding:11px 18px; border-radius:14px; font-size:14px; font-weight:600;
+  box-shadow:0 10px 30px rgba(0,0,0,.25); max-width:calc(100vw - 32px); text-align:center;
+}
+.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+</style>
 </head>
 <body>
 
@@ -799,7 +1074,7 @@
           <thead><tr>
             <th>מזהה</th><th>תאריך יצירה</th><th>תחום</th><th>תיאור המשימה</th>
             <th>סטטוס</th><th>אחראי ביצוע</th><th>תאריך יעד</th><th>שנת לימודים</th><th>סנכרון ליומן</th><th>פירוט / הערות</th>
-            <th>סוג תחזוקה</th><th>חשבונית / תמונת ביצוע</th><th>שליחה לאיש מקצוע</th><th></th>
+            <th>סוג תחזוקה</th><th>חשבונית / תמונת ביצוע</th><th>עלות ותשלום</th><th>שליחה לאיש מקצוע</th><th></th>
           </tr></thead>
           <tbody id="tasksBody"></tbody>
         </table>
@@ -1058,9 +1333,10 @@
     <div class="modal-box">
       <div id="cvpStep1">
         <div style="font-weight:700;font-size:15px;margin-bottom:10px">✓ החשבונית הועלתה בהצלחה</div>
-        <p class="hint" style="margin-bottom:16px">ליצור גם רישום תשלום לספק, כדי שזה יופיע גם בדוח למנהל חשבונות?</p>
+        <p class="hint" style="margin-bottom:16px">אם זו חשבונית של עבודה ממשימה, עדיף לשייך אותה למשימה: הסכום והסטטוס יתעדכנו שם. אחרת אפשר ליצור רישום תשלום לספק, כדי שזה יופיע בדוח למנהל חשבונות.</p>
         <div class="toolbar">
           <button class="btn ghost" onclick="closeCreateVendorPayModal()">לא, תודה</button>
+          <button class="btn ghost" onclick="cvpAssignToTask()">שיוך למשימה קיימת</button>
           <button class="btn" onclick="showCvpStep2()">כן, ליצור רישום</button>
         </div>
       </div>
@@ -1592,16 +1868,22 @@
       </div>
     </div>
     <div class="card">
-      <div class="toolbar">
-        <div>סינון לפי נושא: <select id="fileFilterSelect" onchange="renderFiles()" style="width:150px;display:inline-block"><option value="">הכל</option></select></div>
-        <button class="btn ghost" onclick="printFilesSummary()"><span class="btn-icon-inline" id="filesPrintIconSlot"></span>הפקת סיכום PDF לנושא</button>
+      <div class="jobs-head">
+        <div class="toolbar" style="margin:0">
+          <div>
+            <div class="section-title" style="margin:0;border:none;padding:0">עבודות ומסמכים</div>
+            <div style="font-size:13px;color:var(--ink-soft);margin-top:4px">כל עבודה בכרטיס אחד: סכום, חשבונית וקבלה</div>
+          </div>
+          <button class="btn ghost" onclick="printJobsSummary()"><span class="btn-icon-inline" id="filesPrintIconSlot"></span>הפקת סיכום PDF</button>
+        </div>
+        <label class="jobs-search" for="jobsSearch">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input type="search" id="jobsSearch" placeholder="חיפוש: איש מקצוע, עבודה או סכום" oninput="onJobsSearch(this.value)" autocomplete="off">
+        </label>
+        <div class="jobs-filters" id="jobsFilters"></div>
+        <div class="jobs-stats" id="jobsStats"></div>
       </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>שם הקובץ</th><th>נושא</th><th>מקור</th><th>סכום</th><th>תאריך העלאה</th><th>קישור</th><th></th></tr></thead>
-          <tbody id="filesBody"></tbody>
-        </table>
-      </div>
+      <div class="jobs-list" id="filesBody"></div>
     </div>
   </section>
 
@@ -1662,6 +1944,97 @@
 </main>
 </div>
 
+
+<!-- ===== תיק עבודה: צפייה בקובץ, איש מקצוע, סכום, שיוך ===== -->
+<div id="fileViewer" class="fv-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="fvTitle">
+  <div class="fv-shell">
+    <div class="fv-head">
+      <button type="button" class="fv-icon-btn" onclick="closeFileViewer()" aria-label="סגירה" data-ji="close"></button>
+      <div class="fv-head-text">
+        <div id="fvTitle" class="fv-title"></div>
+        <div id="fvMeta" class="fv-meta"></div>
+      </div>
+      <button type="button" class="fv-icon-btn" onclick="fvOpenExternal()" aria-label="פתיחה בחלון חדש" title="פתיחה בחלון חדש" data-ji="external"></button>
+    </div>
+    <div id="fvBody" class="fv-body"></div>
+    <div class="fv-actions">
+      <div class="fv-grid">
+        <button type="button" class="fv-act primary" onclick="fvDownload()"><span data-ji="download"></span>הורדה</button>
+        <button type="button" class="fv-act" onclick="fvShare()"><span data-ji="share"></span>שיתוף</button>
+        <button type="button" class="fv-act wa" onclick="fvWhatsApp()"><span data-ji="whatsapp"></span>וואטסאפ</button>
+        <button type="button" class="fv-act mail" onclick="fvGmail()"><span data-ji="mail"></span>Gmail</button>
+      </div>
+      <div class="fv-acct">
+        <span>למנהל חשבונות:</span>
+        <button type="button" onclick="fvToAccountant('whatsapp')"><span data-ji="whatsapp"></span>וואטסאפ</button>
+        <button type="button" onclick="fvToAccountant('email')"><span data-ji="mail"></span>Gmail</button>
+      </div>
+      <div id="fvStatus" class="fv-status" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+
+<div id="proSheet" class="fv-overlay pro-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="proSheetName" onclick="if(event.target===this) closeProSheet()">
+  <div class="pro-sheet">
+    <div class="pro-grip"></div>
+    <div class="pro-head">
+      <div class="pro-avatar" id="proSheetAvatar"></div>
+      <div style="flex:1 1 auto;min-width:0">
+        <div class="pro-name" id="proSheetName"></div>
+        <div class="pro-sub" id="proSheetSub"></div>
+      </div>
+      <button type="button" class="fv-icon-btn pro-close" onclick="closeProSheet()" aria-label="סגירה" data-ji="close"></button>
+    </div>
+    <div class="pro-contact" id="proSheetContact"></div>
+    <div class="pro-stats" id="proSheetStats"></div>
+    <div class="pro-list-head">
+      <div id="proSheetListTitle">העבודות שלו</div>
+      <select id="proSheetYear" onchange="renderProSheet()" aria-label="סינון לפי שנה"></select>
+    </div>
+    <div class="pro-list" id="proSheetList"></div>
+    <button type="button" class="job-btn" onclick="printProReport()" style="min-height:48px"><span data-ji="printer"></span>דוח PDF לאיש המקצוע</button>
+  </div>
+</div>
+
+<div id="jobAmountModal" class="modal-overlay" style="display:none;z-index:1250">
+  <div class="modal-box" style="max-width:400px">
+    <div style="font-weight:700;font-size:16px;margin-bottom:4px">עלות העבודה</div>
+    <div id="jobAmountSub" style="font-size:13px;color:var(--ink-soft);margin-bottom:14px"></div>
+    <label style="display:block;margin-bottom:6px">
+      <div style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-bottom:4px">סכום לתשלום (₪)</div>
+      <input type="number" id="jobAmountInput" inputmode="decimal" min="0" step="any" style="width:100%;font-size:18px;padding:10px;font-family:inherit">
+    </label>
+    <div style="font-size:12px;color:var(--ink-soft)">הסכום נשמר בתשלומי ספקים ומופיע בדוח למנהל חשבונות.</div>
+    <div class="toolbar" style="margin-top:16px">
+      <button class="btn ghost" onclick="closeJobAmountModal()">ביטול</button>
+      <button class="btn" onclick="confirmJobAmountModal()">שמירה</button>
+    </div>
+  </div>
+</div>
+
+<div id="jobAssignModal" class="modal-overlay" style="display:none;z-index:1250">
+  <div class="modal-box" style="max-width:460px">
+    <div style="font-weight:700;font-size:16px;margin-bottom:4px">שיוך מסמך למשימה</div>
+    <div id="jobAssignSub" style="font-size:13px;color:var(--ink-soft);margin-bottom:14px"></div>
+    <label style="display:block;margin-bottom:12px">
+      <div style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-bottom:4px">משימה</div>
+      <select id="jobAssignTask" style="width:100%;font-family:inherit"></select>
+    </label>
+    <label style="display:block;margin-bottom:6px">
+      <div style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-bottom:4px">סוג המסמך</div>
+      <select id="jobAssignType" style="width:100%;font-family:inherit">
+        <option value="חשבונית">חשבונית</option>
+        <option value="קבלה">קבלה</option>
+      </select>
+    </label>
+    <div style="font-size:12px;color:var(--ink-soft)">המסמך יתווסף למשימה. הקובץ המקורי נשאר במקומו ולא נמחק.</div>
+    <div class="toolbar" style="margin-top:16px">
+      <button class="btn ghost" onclick="closeJobAssignModal()">ביטול</button>
+      <button class="btn" onclick="confirmJobAssignModal()">שיוך</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ---------- FIREBASE / FIRESTORE (cross-device storage) ---------- */
 const firebaseConfig = {
@@ -1678,7 +2051,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261014; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261015; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -3007,6 +3380,7 @@ function renderTasks(){
             <option value="תחזוקה בלתי מתוכננת" ${row.maint==="תחזוקה בלתי מתוכננת"?"selected":""}>תחזוקה בלתי מתוכננת</option>
           </select></td>
       <td class="file-cell"></td>
+      <td class="job-cell"></td>
       <td class="contact-actions">
         <button class="contact-action-btn ca-whatsapp" title="שליחת וואטסאפ לאיש המקצוע" onclick="sendTaskWhatsApp(${row.id})">${svgIcon("whatsapp",15)}</button>
         <button class="contact-action-btn ca-mail" title="שליחת אימייל לאיש המקצוע" onclick="sendTaskEmail(${row.id})">${svgIcon("mail",15)}</button>
@@ -3016,6 +3390,10 @@ function renderTasks(){
     migrateSingleDocToArray(row, "link", "docs", "חשבונית");
     const fileTd = tr.querySelector(".file-cell");
     fileTd.innerHTML = renderDocsChecklist(row, "docs", "tasks");
+    tr.dataset.taskId = row.id;
+    const jobTd = tr.querySelector(".job-cell");
+    jobTd.innerHTML = renderTaskJobCell(row);
+    if(taskVP(row) || finDocs(row.docs).length || jobCostOpen.has(row.id)) jobTd.classList.add("has-job");
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; scheduleSave("tasks","tasksSaved"); renderTasksCards(); renderDashboard(); });
       inp.addEventListener("change", () => { row[inp.dataset.f] = inp.value; scheduleSave("tasks","tasksSaved"); renderTasksCards(); renderDashboard(); });
@@ -3601,7 +3979,7 @@ function renderLic(){
     const docs = row.requiredDocs || [];
     const docsHtml = docs.map((d,i) => `
       <span class="extra-contact-chip ${d.fileUrl?'':'doc-missing-chip'}">
-        <span class="ca-mini" style="background:${d.fileUrl?'var(--green)':'transparent'};color:${d.fileUrl?'#fff':'var(--red)'};border:${d.fileUrl?'none':'1.5px dashed var(--red)'}" onclick="${d.fileUrl?`window.open('${d.fileUrl}','_blank')`:`uploadRequiredDoc(${row.id},${i})`}" title="${d.fileUrl?'פתיחה':'העלאה'}">${d.fileUrl?svgIcon('check',11):svgIcon('plus',11)}</span>
+        <span class="ca-mini" style="background:${d.fileUrl?'var(--green)':'transparent'};color:${d.fileUrl?'#fff':'var(--red)'};border:${d.fileUrl?'none':'1.5px dashed var(--red)'}" ${d.fileUrl?`data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(d.name||"מסמך")}"`:`onclick="uploadRequiredDoc(${row.id},${i})"`} title="${d.fileUrl?'פתיחה':'העלאה'}">${d.fileUrl?svgIcon('check',11):svgIcon('plus',11)}</span>
         ${d.name}
         <button type="button" class="ca-mini" title="הסרה" onclick="removeRequiredDoc(${row.id},${i})">✕</button>
       </span>`).join("");
@@ -4474,7 +4852,7 @@ function sendToAccountant(text, channel){
     window.open(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${encodeURIComponent(text)}`, "_blank");
   }else{
     if(!contact.email){ alert("לא הוזנה כתובת אימייל למנהל החשבונות. אפשר להזין אותה בראש טאב \"דוח למנהל חשבונות\"."); return; }
-    window.location.href = `mailto:${contact.email}?subject=${encodeURIComponent("תשלומים לטיפול")}&body=${encodeURIComponent(text)}`;
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email)}&su=${encodeURIComponent("תשלומים לטיפול")}&body=${encodeURIComponent(text)}`, "_blank");
   }
 }
 function sendPaymentReminder(kind, id, channel){
@@ -4548,6 +4926,25 @@ function sendCategorySummary(category){
     sendToAccountant(text, "email");
   }
 }
+function acctNameCellHtml(r){
+  const name = escHtml(r.name || "—");
+  if(r.kind !== "vendor") return name;
+  const j = jobForVendorPayment(r.ref);
+  const bits = [];
+  if(r.ref.desc) bits.push(`<span>${escHtml(r.ref.desc)}</span>`);
+  if(j && j.task){
+    bits.push(canOpenTab("tasks")
+      ? `<button type="button" class="acct-src-link" data-job-act="open" data-job-key="${j.key}">${jobIcon("link",13)}ממשימה ${escHtml(j.code)}</button>`
+      : `<span>ממשימה ${escHtml(j.code)}</span>`);
+  }else if(j && j.proc){
+    bits.push(`<span>מרכש</span>`);
+  }
+  j && j.docs.forEach(d => {
+    const rec = isReceiptDocType(d.docType);
+    bits.push(`<button type="button" class="acct-src-link" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${rec?"קבלה":"חשבונית"} · ${escHtml(j.title)}" data-fv-meta="${escHtml(j.pro||"")}" data-fv-job="${j.key}" data-fv-kind="${rec?"receipt":"invoice"}">${jobIcon("doc",13)}${rec?"קבלה":"חשבונית"}</button>`);
+  });
+  return `<div style="display:flex;flex-direction:column;min-width:0"><span>${name}</span>${bits.length ? `<div class="acct-src">${bits.join(" · ")}</div>` : ""}</div>`;
+}
 function renderAccountantReport(){
   const acctPhoneEl = document.getElementById("accountantPhone");
   const acctEmailEl = document.getElementById("accountantEmail");
@@ -4600,7 +4997,7 @@ function renderAccountantReport(){
     const tr = document.createElement("tr");
     const curStatus = r.ref.paymentStatus || (r.ref.paid ? "שולם" : "ממתין");
     tr.innerHTML = `
-      <td class="primary-field">${r.name||"—"}</td><td>${r.type}</td><td style="font-weight:600">${fmtMoney(r.total)}</td>
+      <td class="primary-field">${acctNameCellHtml(r)}</td><td>${r.type}</td><td style="font-weight:600">${r.kind==="vendor" && !(r.total>0) ? '<span class="job-status bad">חסר סכום</span>' : fmtMoney(r.total)}</td>
       <td><select class="payment-status-select" data-status-style="paymentStatus">
             <option value="ממתין" ${curStatus==="ממתין"?"selected":""}>ממתין</option>
             <option value="שולם" ${curStatus==="שולם"?"selected":""}>שולם</option>
@@ -6299,21 +6696,33 @@ function sendDocGroupMessage(tableKey, id, field, kind, channel){
   const text = kind==="invoice" ? buildInvoiceGroupMessageText(info, docs) : buildReceiptGroupMessageText(info, docs);
   sendToAccountant(text, channel);
 }
+function docRowJobKey(tableKey, row){
+  if(tableKey === "tasks") return "t" + row.id;
+  if(tableKey === "procurement") return "p" + row.id;
+  if(tableKey === "vendorPayments") return "v" + row.id;
+  return "";
+}
+function docRowMeta(tableKey, row){
+  if(tableKey === "tasks") return [row.desc, row.assignee].filter(Boolean).join(" · ");
+  if(tableKey === "procurement") return [row.item, row.supplier].filter(Boolean).join(" · ");
+  if(tableKey === "vendorPayments") return [row.vendor, row.desc].filter(Boolean).join(" · ");
+  return row.name || "";
+}
 function renderDocsChecklist(row, field, tableKey){
   const docs = row[field] || [];
   const chips = docs.map((d,i) => {
     if(isPhotoDocType(d.docType)){
       return `
     <span class="extra-contact-chip photo-chip ${d.fileUrl?'':'doc-missing-chip'}" title="${d.fileUrl?'תמונת ביצוע – לחיצה לפתיחה':'תמונת ביצוע – טרם הועלתה'}">
-      ${d.fileUrl ? `<img src="${d.fileUrl}" alt="" onclick="window.open('${d.fileUrl}','_blank')">` : `<span class="ca-mini" style="background:transparent;color:var(--red);border:1.5px dashed var(--red)" onclick="uploadGenericDoc('${tableKey}',${row.id},'${field}',${i})">${svgIcon('camera',11)}</span>`}
-      <span onclick="${d.fileUrl?`window.open('${d.fileUrl}','_blank')`:''}" style="cursor:${d.fileUrl?'pointer':'default'}">${svgIcon('camera',12)} ${d.name}${d.uploadedAt ? ` <span style="color:var(--ink-soft);font-weight:400">${fmtDateHe(d.uploadedAt)}</span>` : ""}</span>
+      ${d.fileUrl ? `<img src="${d.fileUrl}" alt="" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(d.name||"תמונת ביצוע")}">` : `<span class="ca-mini" style="background:transparent;color:var(--red);border:1.5px dashed var(--red)" onclick="uploadGenericDoc('${tableKey}',${row.id},'${field}',${i})">${svgIcon('camera',11)}</span>`}
+      <span ${d.fileUrl?`data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(d.name||"תמונת ביצוע")}"`:''} style="cursor:${d.fileUrl?'pointer':'default'}">${svgIcon('camera',12)} ${d.name}${d.uploadedAt ? ` <span style="color:var(--ink-soft);font-weight:400">${fmtDateHe(d.uploadedAt)}</span>` : ""}</span>
       <button type="button" class="ca-mini" title="הסרה" onclick="removeGenericDoc('${tableKey}',${row.id},'${field}',${i})">✕</button>
     </span>`;
     }
     const typeTag = isReceiptDocType(d.docType) ? '<span style="color:var(--teal);font-weight:700">קבלה · </span>' : "";
     return `
     <span class="extra-contact-chip ${d.fileUrl?'':'doc-missing-chip'}">
-      <span class="ca-mini" style="background:${d.fileUrl?'var(--green)':'transparent'};color:${d.fileUrl?'#fff':'var(--red)'};border:${d.fileUrl?'none':'1.5px dashed var(--red)'}" onclick="${d.fileUrl?`window.open('${d.fileUrl}','_blank')`:`uploadGenericDoc('${tableKey}',${row.id},'${field}',${i})`}" title="${d.fileUrl?'פתיחה':'העלאה'}">${d.fileUrl?svgIcon('check',11):svgIcon('plus',11)}</span>
+      <span class="ca-mini" style="background:${d.fileUrl?'var(--green)':'transparent'};color:${d.fileUrl?'#fff':'var(--red)'};border:${d.fileUrl?'none':'1.5px dashed var(--red)'}" ${d.fileUrl?`data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml((d.name||"מסמך"))}" data-fv-meta="${escHtml(docRowMeta(tableKey,row))}" ${docRowJobKey(tableKey,row)?`data-fv-job="${docRowJobKey(tableKey,row)}"`:""} data-fv-kind="${isReceiptDocType(d.docType)?"receipt":"invoice"}"`:`onclick="uploadGenericDoc('${tableKey}',${row.id},'${field}',${i})"`} title="${d.fileUrl?'פתיחה':'העלאה'}">${d.fileUrl?svgIcon('check',11):svgIcon('plus',11)}</span>
       ${typeTag}${d.name}
       <button type="button" class="ca-mini" title="הסרה" onclick="removeGenericDoc('${tableKey}',${row.id},'${field}',${i})">✕</button>
     </span>`;
@@ -6395,6 +6804,13 @@ function openCreateVendorPayModal(fileName, category, url){
   document.getElementById("cvpVendorName").value = "";
   document.getElementById("cvpAmount").value = "0";
   document.getElementById("createVendorPayModal").style.display = "flex";
+}
+function cvpAssignToTask(){
+  const ctx = cvpContext;
+  closeCreateVendorPayModal();
+  if(!ctx) return;
+  const f = data.files.find(x => x.url === ctx.url);
+  if(f) openJobAssignModal(f.id);
 }
 function showCvpStep2(){
   document.getElementById("cvpStep1").style.display = "none";
@@ -6545,34 +6961,875 @@ function printFilesSummary(){
   w.document.close();
   setTimeout(() => w.print(), 400);
 }
+/* =====================================================================
+   תיק עבודה — משימה ↔ תשלום ספק ↔ חשבונית/קבלה ↔ דוח למנהל חשבונות
+   מקור אמת יחיד לסכום: רשומת "תשלומי ספקים" (vendorPayments) המקושרת.
+   המודול רק מוסיף שדות/מסמכים — אף פעולה כאן לא מוחקת נתונים.
+   ===================================================================== */
+const JOB_STEPS = ["בוצע", "חשבונית התקבלה", "אושר", "שולם", "קבלה התקבלה"];
+const jobCostOpen = new Set();          // משימות שנפתח בהן ידנית בלוק העלות (בזיכרון בלבד)
+let jobsUi = { q: "", filter: "all", topic: "" };
+let jobsLastList = [];
+
+const JOB_ICONS = {
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  external: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  download: '<path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/>',
+  share: '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>',
+  sync: '<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/>',
+  phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+  upload: '<path d="M12 16V5"/><path d="M7 10l5-5 5 5"/><path d="M5 19h14"/>',
+  doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  person: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  check: '<path d="M5 12l5 5 9-10"/>',
+  file: '<path d="M6 3h9l4 4v14H6z"/>'
+};
+function jobIcon(name, size){
+  const p = JOB_ICONS[name];
+  if(p) return `<svg viewBox="0 0 24 24" width="${size||18}" height="${size||18}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  return svgIcon(name, size);
+}
+function fillJobIcons(root){
+  (root || document).querySelectorAll("[data-ji]").forEach(el => {
+    if(el.dataset.jiDone) return;
+    el.dataset.jiDone = "1";
+    el.innerHTML = jobIcon(el.dataset.ji, el.classList.contains("fv-icon-btn") ? 20 : 22);
+  });
+}
+
+function jobToast(msg, ms){
+  let el = document.getElementById("jobToast");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "jobToast";
+    el.className = "job-toast";
+    el.setAttribute("role", "status");
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.display = "block";
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.display = "none"; }, ms || 2600);
+}
+
+function isJobAdmin(){ return typeof currentRole === "undefined" || currentRole === "admin"; }
+function canOpenTab(t){ try{ return allowedTabs().includes(t); }catch(e){ return true; } }
+
+/* ---------- נתוני העבודה ---------- */
+function taskVP(t){
+  if(!t || !t.vendorPayId) return null;
+  return data.vendorPayments.find(v => v.id === t.vendorPayId) || null;
+}
+function procVP(p){
+  if(!p || !p.vendorPayId) return null;
+  return data.vendorPayments.find(v => v.id === p.vendorPayId) || null;
+}
+function vpIsPaid(vp){
+  return !!vp && (vp.paymentStatus || (vp.paid ? "שולם" : "ממתין")) === "שולם";
+}
+function finDocs(list){
+  const seen = new Set();
+  const out = [];
+  (list || []).forEach(d => {
+    if(!d || !d.fileUrl) return;
+    if(!(isInvoiceDocType(d.docType) || isReceiptDocType(d.docType))) return;
+    if(seen.has(d.fileUrl)) return;
+    seen.add(d.fileUrl);
+    out.push(d);
+  });
+  return out;
+}
+function buildJob(task, proc, vp){
+  const allDocs = [].concat(task ? (task.docs || []) : [], proc ? (proc.docs || []) : [], vp ? (vp.docs || []) : []);
+  const docs = finDocs(allDocs);
+  const hasInvoice = docs.some(d => isInvoiceDocType(d.docType));
+  const hasReceipt = docs.some(d => isReceiptDocType(d.docType));
+  const amount = vp ? (parseFloat(vp.amount) || 0)
+               : proc ? (parseFloat(proc.qty) || 0) * (parseFloat(proc.price) || 0) : 0;
+  const approved = !!(vp && vp.approved);
+  const paid = vpIsPaid(vp);
+  const done = task ? task.status === "בוצע" : true;
+  const topicDoc = allDocs.find(d => d && d.topic);
+  const topic = (topicDoc && topicDoc.topic) || (task && task.category) || (proc ? "רכש" : "") || (vp && vp.sourceType) || "כללי";
+  const title = (task && task.desc) || (proc && proc.item) || (vp && vp.desc) || "ללא תיאור";
+  const pro = ((vp && vp.vendor) || (task && task.assignee) || (proc && proc.supplier) || "").trim();
+  const dated = docs.find(d => d.uploadedAt);
+  const date = (task && (task.created || task.due)) || (dated ? dated.uploadedAt : "") || "";
+  const key = task ? "t" + task.id : proc ? "p" + proc.id : "v" + vp.id;
+  return {
+    key, task, proc, vp, docs, hasInvoice, hasReceipt, amount, approved, paid, done,
+    steps: [done, hasInvoice, approved, paid, hasReceipt],
+    topic, title, pro, date,
+    year: task ? String(task.schoolYear || currentSchoolYearStart()) : "",
+    code: task ? taskCodeDisplay(task) : "",
+    missingAmount: hasInvoice && !(amount > 0),
+    missingReceipt: paid && !hasReceipt,
+    waitingPay: (hasInvoice || amount > 0) && !paid,
+    closed: paid && hasReceipt
+  };
+}
+function collectJobs(){
+  const jobs = [];
+  const usedVp = new Set();
+  data.tasks.forEach(t => {
+    const vp = taskVP(t);
+    if(!vp && finDocs(t.docs).length === 0) return;
+    if(vp) usedVp.add(vp.id);
+    jobs.push(buildJob(t, null, vp));
+  });
+  data.procurement.forEach(p => {
+    const vp = procVP(p);
+    if(vp && usedVp.has(vp.id)) return;
+    if(!vp && finDocs(p.docs).length === 0) return;
+    if(vp) usedVp.add(vp.id);
+    jobs.push(buildJob(null, p, vp));
+  });
+  data.vendorPayments.forEach(v => {
+    if(usedVp.has(v.id)) return;
+    jobs.push(buildJob(null, null, v));
+  });
+  const rank = j => j.missingAmount ? 0 : (j.approved && !j.paid) ? 1 : (j.hasInvoice && !j.paid) ? 2 : j.missingReceipt ? 3 : !j.closed ? 4 : 5;
+  jobs.sort((a, b) => (rank(a) - rank(b)) || String(b.date).localeCompare(String(a.date)));
+  return jobs;
+}
+function findJob(key){
+  const id = Number(String(key).slice(1));
+  const kind = String(key).charAt(0);
+  if(kind === "t"){ const t = data.tasks.find(x => x.id === id); return t ? buildJob(t, null, taskVP(t)) : null; }
+  if(kind === "p"){ const p = data.procurement.find(x => x.id === id); return p ? buildJob(null, p, procVP(p)) : null; }
+  if(kind === "v"){
+    const v = data.vendorPayments.find(x => x.id === id);
+    if(!v) return null;
+    const t = data.tasks.find(x => x.vendorPayId === v.id);
+    if(t) return buildJob(t, null, v);
+    const p = data.procurement.find(x => x.vendorPayId === v.id);
+    return buildJob(null, p || null, v);
+  }
+  return null;
+}
+function jobForVendorPayment(vp){
+  const t = data.tasks.find(x => x.vendorPayId === vp.id);
+  if(t) return buildJob(t, null, vp);
+  const p = data.procurement.find(x => x.vendorPayId === vp.id);
+  return buildJob(null, p || null, vp);
+}
+function unlinkedFiles(){
+  const linked = new Set();
+  const addAll = list => (list || []).forEach(d => { if(d && d.fileUrl) linked.add(d.fileUrl); });
+  data.tasks.forEach(t => addAll(t.docs));
+  data.procurement.forEach(p => addAll(p.docs));
+  data.vendorPayments.forEach(v => addAll(v.docs));
+  return data.files.filter(f => f.url && !linked.has(f.url));
+}
+function jobStatus(j){
+  if(j.closed) return { text: "שולם · סגור", tone: "ok" };
+  if(j.paid) return { text: "שולם · חסרה קבלה", tone: "warn" };
+  if(j.missingAmount) return { text: "חסר סכום", tone: "bad" };
+  if(j.approved) return { text: "אושר · טרם שולם", tone: "warn" };
+  if(j.hasInvoice) return { text: "ממתין לאישור", tone: "warn" };
+  if(j.hasReceipt) return { text: "קבלה בלבד", tone: "ok" };
+  return { text: "ממתין לחשבונית", tone: "idle" };
+}
+function jobNextAction(j){
+  if(!j.hasInvoice && !j.paid) return { act: "addInvoice", label: "העלאת חשבונית", icon: "upload" };
+  if(j.missingAmount && !j.proc) return { act: "amount", label: "הזנת סכום", icon: "cash" };
+  if(!j.approved && !j.paid) return { act: "approve", label: "אישור לתשלום", icon: "check" };
+  if(!j.paid) return { act: "paid", label: "סימון כשולם", icon: "check" };
+  if(!j.hasReceipt) return { act: "addReceipt", label: "העלאת קבלה", icon: "upload" };
+  return null;
+}
+
+/* ---------- שמירה ורענון ---------- */
+function saveJobRecords(j){
+  if(j.task) scheduleSave("tasks", "tasksSaved");
+  if(j.proc) scheduleSave("procurement", "procSaved");
+  scheduleSave("vendorPayments", "vendorPaySaved");
+}
+function refreshJobViews(){
+  withScrollPreserved(() => {
+    try{ renderTasks(); }catch(e){ console.error(e); }
+    try{ renderProc(); }catch(e){ console.error(e); }
+    try{ renderAccountantReport(); }catch(e){ console.error(e); }
+    try{ renderFiles(); }catch(e){ console.error(e); }
+    try{ renderDashboard(); }catch(e){ console.error(e); }
+    if(proSheetName && document.getElementById("proSheet").style.display !== "none"){
+      try{ renderProSheet(); }catch(e){ console.error(e); }
+    }
+  });
+}
+/* יוצר רשומת תשלום למשימה רק אם עדיין אין לה (ללא כפילויות) */
+function ensureTaskVendorPay(task){
+  let vp = taskVP(task);
+  if(vp) return vp;
+  const inv = (task.docs || []).find(d => d.fileUrl && isInvoiceDocType(d.docType));
+  vp = {
+    id: nextId() + 7000, vendor: task.assignee || "", desc: task.desc || "", amount: 0,
+    approved: false, paid: false, bank: "", branch: "", account: "", holder: "",
+    docs: inv ? [{ name: "חשבונית ממשימה", fileUrl: inv.fileUrl }] : [],
+    notes: "מקור: משימה", sourceType: "איש מקצוע"
+  };
+  data.vendorPayments.push(vp);
+  task.vendorPayId = vp.id;
+  scheduleSave("tasks", "tasksSaved");
+  scheduleSave("vendorPayments", "vendorPaySaved");
+  return vp;
+}
+function setJobAmount(key, value){
+  const j = findJob(key);
+  if(!j) return;
+  if(!isJobAdmin()){ jobToast("רק מנהל יכול לעדכן סכום"); return; }
+  const amount = Math.max(0, Math.round((parseFloat(String(value).replace(/[^\d.]/g, "")) || 0) * 100) / 100);
+  if(j.proc && !j.task){ jobToast("הסכום של פריט רכש נלקח מטאב רכש (כמות × מחיר)"); return; }
+  let vp = j.vp;
+  if(!vp){
+    if(!amount) return;
+    if(!j.task) return;
+    vp = ensureTaskVendorPay(j.task);
+  }
+  if((parseFloat(vp.amount) || 0) === amount) return;
+  vp.amount = amount;
+  saveJobRecords(j);
+  refreshJobViews();
+  jobToast(amount ? `הסכום עודכן: ${fmtMoney(amount)}` : "הסכום נוקה");
+}
+function setJobApproved(key){
+  const j = findJob(key);
+  if(!j || !isJobAdmin()) return;
+  let vp = j.vp;
+  if(!vp && j.task) vp = ensureTaskVendorPay(j.task);
+  if(!vp) return;
+  if(!(parseFloat(vp.amount) > 0) && !j.proc){ openJobAmountModal(key, "approve"); return; }
+  vp.approved = true;
+  saveJobRecords(j);
+  refreshJobViews();
+  jobToast("אושר לתשלום · מופיע עכשיו בדוח למנהל חשבונות");
+}
+function markJobPaid(key){
+  const j = findJob(key);
+  if(!j || !isJobAdmin()) return;
+  let vp = j.vp;
+  if(!vp && j.task) vp = ensureTaskVendorPay(j.task);
+  if(!vp) return;
+  vp.paymentStatus = "שולם";
+  vp.paid = true;
+  if(!vp.approved) vp.approved = true;
+  saveJobRecords(j);
+  refreshJobViews();
+  jobToast(j.hasReceipt ? "סומן כשולם · התיק סגור" : "סומן כשולם · נשאר לצרף קבלה");
+}
+/* בחירת קובץ → העלאה → הוספה לרשומה (משימה / רכש / תשלום ספק) */
+function attachJobDoc(key, docType){
+  const j = findJob(key);
+  if(!j) return;
+  if(!isJobAdmin()){ jobToast("רק מנהל יכול להוסיף מסמכים"); return; }
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*,application/pdf";
+  input.onchange = async () => {
+    if(!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const category = j.task ? "tasks-invoices" : j.proc ? "procurement-orders" : "vendor-invoices";
+    jobToast("מעלה את הקובץ…", 60000);
+    try{
+      const ref = storage.ref().child(`uploads/${category}/${Date.now()}_${file.name}`);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      const fresh = j.task ? data.tasks.find(x => x.id === j.task.id)
+                  : j.proc ? data.procurement.find(x => x.id === j.proc.id)
+                  : data.vendorPayments.find(x => x.id === j.vp.id);
+      if(!fresh){ jobToast("הרשומה לא נמצאה, הקובץ לא שויך"); return; }
+      fresh.docs = fresh.docs || [];
+      fresh.docs.push({
+        name: docType, topic: DOC_TOPICS.includes(j.topic) ? j.topic : "", docType,
+        fileUrl: url, uploadedAt: new Date().toISOString().slice(0, 10)
+      });
+      saveJobRecords(j);
+      if(isInvoiceDocType(docType)){
+        if(j.task) syncTaskInvoiceToVendorPay(fresh);
+        else if(j.proc) syncProcInvoiceToVendorPay(fresh);
+      }
+      refreshJobViews();
+      jobToast(docType === "קבלה" ? "הקבלה נשמרה בתיק ✓" : "החשבונית נשמרה בתיק ✓");
+      const after = findJob(key);
+      if(after && docType === "חשבונית" && after.missingAmount && !after.proc) openJobAmountModal(key);
+    }catch(e){
+      console.error(e);
+      jobToast("שגיאת העלאה: " + e.message, 5000);
+    }
+  };
+  input.click();
+}
+function jobAction(key, act){
+  if(act === "amount") return openJobAmountModal(key);
+  if(act === "approve") return setJobApproved(key);
+  if(act === "paid") return markJobPaid(key);
+  if(act === "addInvoice") return attachJobDoc(key, "חשבונית");
+  if(act === "addReceipt") return attachJobDoc(key, "קבלה");
+  if(act === "open") return openJobSource(key);
+}
+function openJobSource(key){
+  const j = findJob(key);
+  if(!j) return;
+  if(j.task) return goToTask(j.task.id);
+  if(j.proc && canOpenTab("procurement")){ closeProSheet(); return switchTab("procurement"); }
+  if(canOpenTab("accountant")){ closeProSheet(); switchTab("accountant"); }
+}
+function goToTask(id){
+  const t = data.tasks.find(x => x.id === id);
+  if(!t || !canOpenTab("tasks")) return;
+  closeProSheet();
+  closeFileViewer(true);
+  switchTab("tasks");
+  const yearSel = document.getElementById("tasksYearFilter");
+  if(yearSel && yearSel.value && yearSel.value !== String(t.schoolYear || currentSchoolYearStart())) yearSel.value = "";
+  renderTasks();
+  setTimeout(() => {
+    const tr = document.querySelector(`#tasksBody tr[data-task-id="${id}"]`);
+    if(!tr) return;
+    tr.classList.add("mob-open");
+    const tog = tr.querySelector(".mob-toggle");
+    if(tog) tog.textContent = "▴";
+    tr.scrollIntoView({ behavior: "smooth", block: "center" });
+    tr.classList.add("job-flash");
+    setTimeout(() => tr.classList.remove("job-flash"), 2300);
+  }, 90);
+}
+
+/* ---------- רכיבי תצוגה משותפים ---------- */
+function jobStepperHtml(j){
+  const cur = j.steps.findIndex(s => !s);
+  return `<div class="job-steps" role="list" aria-label="מסלול התשלום">` + JOB_STEPS.map((lbl, i) => {
+    const st = j.steps[i] ? "done" : (i === cur ? "cur" : "todo");
+    return `<div class="job-step ${st}" role="listitem"><span class="job-step-dot">${j.steps[i] ? jobIcon("check", 12) : ""}</span><span class="job-step-lbl">${lbl}${j.steps[i] ? '<span class="sr-only"> (הושלם)</span>' : ""}</span></div>`;
+  }).join("") + `</div>`;
+}
+function jobDocChipsHtml(j, opts){
+  opts = opts || {};
+  const name = j.pro ? ` · ${j.pro}` : "";
+  let html = j.docs.map(d => {
+    const isRec = isReceiptDocType(d.docType);
+    const label = isRec ? "קבלה" : "חשבונית";
+    return `<button type="button" class="job-chip ${isRec ? "receipt" : ""}" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(label + " · " + j.title)}" data-fv-meta="${escHtml((j.pro || "") + (j.amount > 0 ? " · " + fmtMoney(j.amount) : ""))}" data-fv-job="${j.key}" data-fv-kind="${isRec ? "receipt" : "invoice"}" aria-label="פתיחת ${label}${escHtml(name)}">${jobIcon("check", 15)}${label}</button>`;
+  }).join("");
+  if(opts.withMissing && isJobAdmin()){
+    if(!j.hasInvoice && !j.paid) html += `<button type="button" class="job-chip missing" data-job-act="addInvoice" data-job-key="${j.key}">${jobIcon("upload", 15)}חשבונית</button>`;
+    if(j.hasInvoice && !j.hasReceipt) html += `<button type="button" class="job-chip missing" data-job-act="addReceipt" data-job-key="${j.key}">${jobIcon("upload", 15)}קבלה${j.paid ? " חסרה" : ""}</button>`;
+  }
+  return html;
+}
+
+/* ---------- בלוק העלות בכרטיס המשימה ---------- */
+function renderTaskJobCell(row){
+  const vp = taskVP(row);
+  const hasDocs = finDocs(row.docs).length > 0;
+  if(!vp && !hasDocs && !jobCostOpen.has(row.id)){
+    return isJobAdmin() ? `<button type="button" class="job-add-cost" data-task-cost-open="${row.id}">${svgIcon("plus", 13)}עלות ותשלום</button>` : "";
+  }
+  const j = buildJob(row, null, vp);
+  const st = jobStatus(j);
+  const next = jobNextAction(j);
+  const adm = isJobAdmin();
+  return `
+    <div class="job-full">
+      <div class="job-cost ${j.missingAmount ? "is-missing" : ""}">
+        <span class="job-cost-ico">${svgIcon("cash", 21)}</span>
+        <label class="job-cost-field">
+          <span>עלות העבודה</span>
+          <span class="job-cost-input"><span>₪</span><input type="number" inputmode="decimal" min="0" step="any" value="${j.amount > 0 ? j.amount : ""}" placeholder="הזנת סכום" data-job-amount="${j.key}" aria-label="עלות העבודה בשקלים" ${adm ? "" : "readonly"}></span>
+        </label>
+        ${j.missingAmount ? `<span class="job-flag">חסר סכום</span>` : ""}
+      </div>
+      <div class="job-sync-note">${jobIcon("sync", 14)}מסונכרן לתשלומי ספקים ולדוח למנהל חשבונות</div>
+      ${jobStepperHtml(j)}
+      <div class="job-cell-actions">
+        ${next && adm ? `<button type="button" class="job-btn ${next.act === "paid" || next.act === "approve" ? "ghost" : ""}" data-job-act="${next.act}" data-job-key="${j.key}">${jobIcon(next.icon, 16)}${next.label}</button>` : ""}
+        ${!next ? `<span class="job-closed">${jobIcon("check", 15)}התיק סגור</span>` : ""}
+        ${j.pro ? `<button type="button" class="job-btn soft" data-pro="${escHtml(j.pro)}">${jobIcon("person", 16)}כל העבודות של ${escHtml(j.pro)}</button>` : ""}
+      </div>
+    </div>
+    <div class="job-mini">${j.amount > 0 ? fmtMoney(j.amount) : "ללא סכום"} <span class="job-status ${st.tone}">${st.text}</span></div>`;
+}
+
+/* ---------- טאב חשבוניות וקבלות: רשימת עבודות ---------- */
+function onJobsSearch(v){
+  jobsUi.q = v || "";
+  clearTimeout(onJobsSearch._t);
+  onJobsSearch._t = setTimeout(renderFiles, 120);
+}
+function setJobsFilter(f){ jobsUi.filter = f; renderFiles(); }
+function setJobsTopic(t){ jobsUi.topic = t; renderFiles(); }
+function jobMatchesSearch(j, q){
+  if(!q) return true;
+  const hay = [j.title, j.pro, j.topic, j.code, j.vp && j.vp.notes, j.task && j.task.notes,
+    j.amount ? String(j.amount) : "", j.amount ? fmtMoney(j.amount) : ""].join(" ").toLowerCase();
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every(w => hay.includes(w.replace(/[₪,]/g, "")) || hay.includes(w));
+}
 function renderFiles(){
   const body = document.getElementById("filesBody");
   if(!body) return;
-  const all = getAllDocumentsAggregated();
-  const filterSel = document.getElementById("fileFilterSelect");
-  if(filterSel && !filterSel.dataset.built){
-    filterSel.dataset.built = "1";
-    filterSel.innerHTML = `<option value="">הכל</option>` + DOC_TOPICS.map(c=>`<option value="${c}">${c}</option>`).join("");
+  const all = collectJobs();
+  const loose = unlinkedFiles();
+  const q = (jobsUi.q || "").trim();
+  const counts = {
+    receipt: all.filter(j => j.missingReceipt).length,
+    amount: all.filter(j => j.missingAmount).length,
+    pay: all.filter(j => j.waitingPay).length,
+    loose: loose.length
+  };
+  const filtersEl = document.getElementById("jobsFilters");
+  if(filtersEl){
+    const pill = (key, label, n) => `<button type="button" class="jobs-pill ${jobsUi.filter === key ? "active" : ""}" data-jobs-filter="${key}" aria-pressed="${jobsUi.filter === key}">${label}${n ? ` <span class="n">${n}</span>` : ""}</button>`;
+    const topics = [...new Set(DOC_TOPICS.concat(all.map(j => j.topic)))].filter(Boolean);
+    filtersEl.innerHTML =
+      pill("all", "הכל", 0) +
+      pill("amount", "חסר סכום", counts.amount) +
+      pill("receipt", "חסרה קבלה", counts.receipt) +
+      pill("pay", "ממתין לתשלום", counts.pay) +
+      (counts.loose ? pill("loose", "לא משויך", counts.loose) : "") +
+      `<select class="jobs-topic" aria-label="סינון לפי נושא" data-jobs-topic="1"><option value="">נושא: הכל</option>${topics.map(t => `<option value="${escHtml(t)}" ${jobsUi.topic === t ? "selected" : ""}>${escHtml(t)}</option>`).join("")}</select>`;
   }
-  const filterVal = filterSel ? filterSel.value : "";
-  const list = filterVal ? all.filter(f=>f.category===filterVal) : all;
-  body.innerHTML = "";
-  if(list.length===0){
-    body.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין קבצים להצגה.</td></tr>`;
+  let list = all.filter(j => jobMatchesSearch(j, q));
+  if(jobsUi.topic) list = list.filter(j => j.topic === jobsUi.topic);
+  if(jobsUi.filter === "amount") list = list.filter(j => j.missingAmount);
+  if(jobsUi.filter === "receipt") list = list.filter(j => j.missingReceipt);
+  if(jobsUi.filter === "pay") list = list.filter(j => j.waitingPay);
+  if(jobsUi.filter === "loose") list = [];
+  let looseList = (jobsUi.filter === "all" || jobsUi.filter === "loose") ? loose : [];
+  if(q) looseList = looseList.filter(f => [f.name, f.category, f.docType].join(" ").toLowerCase().includes(q.toLowerCase()));
+  if(jobsUi.topic) looseList = looseList.filter(f => (f.category || "") === jobsUi.topic);
+  jobsLastList = list;
+
+  const statsEl = document.getElementById("jobsStats");
+  if(statsEl){
+    const paidSum = list.filter(j => j.paid).reduce((s, j) => s + j.amount, 0);
+    const waitSum = list.filter(j => j.waitingPay).reduce((s, j) => s + j.amount, 0);
+    const missingDocs = list.filter(j => (j.hasInvoice && !j.hasReceipt && j.paid) || (!j.hasInvoice && !j.hasReceipt)).length;
+    statsEl.innerHTML = `
+      <div class="jobs-stat"><span class="l">שולם</span><span class="v">${fmtMoney(paidSum)}</span></div>
+      <div class="jobs-stat warn"><span class="l">ממתין לתשלום</span><span class="v">${fmtMoney(waitSum)}</span></div>
+      <div class="jobs-stat bad"><span class="l">מסמכים חסרים</span><span class="v">${missingDocs}</span></div>`;
+  }
+
+  const adm = isJobAdmin();
+  const cards = list.map(j => {
+    const st = jobStatus(j);
+    const next = jobNextAction(j);
+    const showNext = adm && next && next.act !== "addInvoice" && next.act !== "addReceipt";
+    const titleHtml = (j.task && canOpenTab("tasks"))
+      ? `<button type="button" class="job-title" data-job-act="open" data-job-key="${j.key}">${escHtml(j.title)}</button>`
+      : `<div class="job-title">${escHtml(j.title)}</div>`;
+    const meta = [
+      j.pro ? `<button type="button" class="job-pro-link" data-pro="${escHtml(j.pro)}">${escHtml(j.pro)}</button>` : "",
+      j.code ? `משימה ${escHtml(j.code)}` : (j.proc ? "רכש" : (!j.task ? "תשלום ספק" : "")),
+      j.date ? fmtDateHe(j.date) : ""
+    ].filter(Boolean).join(" · ");
+    return `
+      <article class="job-card">
+        <div class="job-card-top">
+          <div class="job-card-main">
+            <div class="job-topic">${escHtml(j.topic)}</div>
+            ${titleHtml}
+            <div class="job-meta">${meta}</div>
+          </div>
+          <div class="job-card-side">
+            <div class="job-amount ${j.amount > 0 ? "" : "none"}">${j.amount > 0 ? fmtMoney(j.amount) : "ללא סכום"}</div>
+            <span class="job-status ${st.tone}">${st.text}</span>
+          </div>
+        </div>
+        <div class="job-chips">${jobDocChipsHtml(j, { withMissing: true })}</div>
+        ${showNext ? `<div class="job-card-actions"><button type="button" class="job-btn ${next.act === "amount" ? "" : "ghost"}" data-job-act="${next.act}" data-job-key="${j.key}">${jobIcon(next.icon, 16)}${next.label}</button></div>` : ""}
+      </article>`;
+  }).join("");
+  const looseCards = looseList.map(f => {
+    const isRec = isReceiptDocType(f.docType);
+    const typeLabel = isRec ? "קבלה" : (f.docType === "אחר" ? "מסמך" : "חשבונית");
+    return `
+      <article class="job-card unlinked">
+        <div class="job-card-top">
+          <div class="job-card-main">
+            <div class="job-topic" style="color:var(--ink-soft)">${escHtml(f.category || "ללא נושא")}</div>
+            <div class="job-title" style="font-weight:500">${typeLabel} שהועלתה ישירות${f.uploadedAt ? " · " + fmtDateHe(f.uploadedAt) : ""}</div>
+            <div class="job-meta">${escHtml(String(f.name || "").replace(/^\d{10,}_/, ""))}</div>
+          </div>
+          <button type="button" class="job-chip plain" data-fv-url="${escHtml(f.url)}" data-fv-title="${escHtml(typeLabel + " · " + (f.category || ""))}" data-fv-meta="${escHtml(f.name || "")}" data-fv-kind="${isRec ? "receipt" : "invoice"}">${jobIcon("doc", 15)}פתיחה</button>
+        </div>
+        ${adm ? `<div class="job-card-actions"><button type="button" class="job-btn ghost" data-file-assign="${f.id}">${jobIcon("link", 16)}שיוך למשימה</button>
+          <button type="button" class="job-btn soft" data-file-remove="${f.id}" style="flex:0 0 auto" aria-label="הסרה מהרשימה">${svgIcon("trash", 15)}</button></div>` : ""}
+      </article>`;
+  }).join("");
+  if(!cards && !looseCards){
+    body.innerHTML = `<div class="jobs-empty">${q || jobsUi.filter !== "all" || jobsUi.topic ? "לא נמצאו עבודות שמתאימות לחיפוש." : "עדיין אין עבודות עם חשבוניות או סכומים."}</div>`;
     return;
   }
-  list.forEach(row => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="primary-field">${row.name}</td><td>${row.category||"—"}</td><td>${row.source}</td>
-      <td>${row.amount!==null && row.amount!==undefined ? fmtMoney(row.amount) : "—"}</td>
-      <td>${row.uploadedAt||"—"}</td>
-      <td><a href="${row.url}" target="_blank" rel="noopener">פתיחה</a></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible">${row.deletable?`<button class="card-delete-btn" title="הסרה מהרשימה" onclick="removeFile(${row.nativeId})">${svgIcon('trash',13)}</button>`:""}</td>
-    `;
-    body.appendChild(tr);
-  });
+  body.innerHTML = cards + (looseCards ? `<div class="jobs-section-title">מסמכים שעוד לא שויכו לעבודה</div>` + looseCards : "");
 }
+function printJobsSummary(){
+  const list = jobsLastList.length ? jobsLastList : collectJobs();
+  if(!list.length){ jobToast("אין עבודות להפקה"); return; }
+  const rows = list.map(j => `
+    <tr>
+      <td>${escHtml(j.topic)}</td>
+      <td class="desc">${escHtml(j.title)}${j.code ? `<div class="notes">משימה ${escHtml(j.code)}</div>` : ""}</td>
+      <td>${escHtml(j.pro || "—")}</td>
+      <td style="white-space:nowrap;font-weight:700">${j.amount > 0 ? fmtMoney(j.amount) : "—"}</td>
+      <td>${escHtml(jobStatus(j).text)}</td>
+      <td>${j.hasInvoice ? "✓" : "—"}</td>
+      <td>${j.hasReceipt ? "✓" : "—"}</td>
+    </tr>`).join("");
+  const total = list.reduce((s, j) => s + j.amount, 0);
+  const paid = list.filter(j => j.paid).reduce((s, j) => s + j.amount, 0);
+  const filt = [jobsUi.topic && `נושא: ${jobsUi.topic}`, jobsUi.q && `חיפוש: ${jobsUi.q}`].filter(Boolean).join(" · ");
+  openPrintWindow(`<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>סיכום עבודות וחשבוניות</title><style>${reportBaseCss()}</style></head><body>
+    <div class="head"><div><h1>סיכום עבודות וחשבוניות</h1><div class="sub">תיק ניהול בניין · הופק ב-${new Date().toLocaleDateString("he-IL")}${filt ? " · " + escHtml(filt) : ""}</div></div><div class="logo">${reportLogoSvg()}</div></div>
+    <div class="stats"><div class="stat"><div class="l">עבודות</div><div class="v">${list.length}</div></div><div class="stat good"><div class="l">שולם</div><div class="v">${fmtMoney(paid)}</div></div><div class="stat warn"><div class="l">סה"כ</div><div class="v">${fmtMoney(total)}</div></div></div>
+    <table><thead><tr><th>נושא</th><th>עבודה</th><th>איש מקצוע / ספק</th><th>סכום</th><th>סטטוס</th><th>חשבונית</th><th>קבלה</th></tr></thead><tbody>${rows}</tbody></table>
+  </body></html>`);
+}
+
+/* ---------- מודאל סכום ---------- */
+let jobAmountCtx = null;
+function openJobAmountModal(key, then){
+  const j = findJob(key);
+  if(!j || !isJobAdmin()) return;
+  if(j.proc && !j.task){ jobToast("הסכום של פריט רכש נלקח מטאב רכש (כמות × מחיר)"); return; }
+  jobAmountCtx = { key, then: then || "" };
+  document.getElementById("jobAmountSub").textContent = [j.title, j.pro].filter(Boolean).join(" · ");
+  const inp = document.getElementById("jobAmountInput");
+  inp.value = j.amount > 0 ? j.amount : "";
+  document.getElementById("jobAmountModal").style.display = "flex";
+  setTimeout(() => inp.focus(), 60);
+}
+function closeJobAmountModal(){
+  document.getElementById("jobAmountModal").style.display = "none";
+  jobAmountCtx = null;
+}
+function confirmJobAmountModal(){
+  const ctx = jobAmountCtx;
+  if(!ctx) return closeJobAmountModal();
+  const v = parseFloat(document.getElementById("jobAmountInput").value);
+  if(!(v > 0)){ jobToast("יש להזין סכום גדול מאפס"); return; }
+  closeJobAmountModal();
+  setJobAmount(ctx.key, v);
+  if(ctx.then === "approve") setJobApproved(ctx.key);
+}
+
+/* ---------- שיוך מסמך שהועלה ישירות למשימה ---------- */
+let jobAssignFileId = null;
+function openJobAssignModal(fileId){
+  const f = data.files.find(x => x.id === fileId);
+  if(!f || !isJobAdmin()) return;
+  jobAssignFileId = fileId;
+  document.getElementById("jobAssignSub").textContent = `${f.category || "ללא נושא"} · ${String(f.name || "").replace(/^\d{10,}_/, "")}`;
+  const tasks = data.tasks.slice().sort((a, b) => String(b.created || "").localeCompare(String(a.created || "")) || (b.id - a.id));
+  document.getElementById("jobAssignTask").innerHTML = `<option value="">בחירת משימה…</option>` + tasks.map(t =>
+    `<option value="${t.id}">${escHtml(taskCodeDisplay(t))} · ${escHtml(t.desc || "ללא תיאור")}${t.assignee ? " · " + escHtml(t.assignee) : ""}</option>`).join("");
+  document.getElementById("jobAssignType").value = isReceiptDocType(f.docType) ? "קבלה" : "חשבונית";
+  document.getElementById("jobAssignModal").style.display = "flex";
+}
+function closeJobAssignModal(){
+  document.getElementById("jobAssignModal").style.display = "none";
+  jobAssignFileId = null;
+}
+function confirmJobAssignModal(){
+  const f = data.files.find(x => x.id === jobAssignFileId);
+  const taskId = Number(document.getElementById("jobAssignTask").value);
+  const t = data.tasks.find(x => x.id === taskId);
+  if(!f){ closeJobAssignModal(); return; }
+  if(!t){ jobToast("יש לבחור משימה"); return; }
+  const docType = document.getElementById("jobAssignType").value;
+  t.docs = t.docs || [];
+  if(!t.docs.some(d => d.fileUrl === f.url)){
+    t.docs.push({ name: docType, topic: f.category || "", docType, fileUrl: f.url, uploadedAt: f.uploadedAt || new Date().toISOString().slice(0, 10) });
+  }
+  scheduleSave("tasks", "tasksSaved");
+  if(isInvoiceDocType(docType)) syncTaskInvoiceToVendorPay(t);
+  closeJobAssignModal();
+  refreshJobViews();
+  jobToast(`המסמך שויך למשימה ${taskCodeDisplay(t)} ✓`);
+  const j = buildJob(t, null, taskVP(t));
+  if(isInvoiceDocType(docType) && j.missingAmount) openJobAmountModal(j.key);
+}
+
+/* ---------- חלון איש מקצוע ---------- */
+let proSheetName = "";
+function openProSheet(name){
+  if(!name) return;
+  proSheetName = name;
+  const jobs = collectJobs().filter(j => j.pro === name);
+  const years = [...new Set(jobs.map(j => j.year).filter(Boolean))].sort().reverse();
+  const sel = document.getElementById("proSheetYear");
+  sel.innerHTML = `<option value="">כל השנים</option>` + years.map(y => `<option value="${y}">${schoolYearLabel(Number(y))}</option>`).join("");
+  sel.value = "";
+  renderProSheet();
+  document.getElementById("proSheet").style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+function closeProSheet(){
+  const el = document.getElementById("proSheet");
+  if(!el || el.style.display === "none") return;
+  el.style.display = "none";
+  if(document.getElementById("fileViewer").style.display === "none") document.body.style.overflow = "";
+}
+function proJobsFiltered(){
+  const year = document.getElementById("proSheetYear").value;
+  return collectJobs().filter(j => j.pro === proSheetName && (!year || j.year === year))
+    .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+}
+function renderProSheet(){
+  const name = proSheetName;
+  const contact = data.contacts.find(c => c.name === name) || {};
+  const jobs = proJobsFiltered();
+  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w.charAt(0)).join("");
+  document.getElementById("proSheetAvatar").textContent = initials || "?";
+  document.getElementById("proSheetName").textContent = name;
+  document.getElementById("proSheetSub").textContent = [contact.specialty, contact.contactType].filter(Boolean).join(" · ") || "איש מקצוע / ספק";
+  const phone = contact.phone ? formatPhoneForWhatsApp(contact.phone) : "";
+  document.getElementById("proSheetContact").innerHTML = phone ? `
+    <a class="job-btn ok" href="https://wa.me/${phone}" target="_blank" rel="noopener">${svgIcon("whatsapp", 17)}וואטסאפ</a>
+    <a class="job-btn soft" href="tel:${escHtml(contact.phone)}">${jobIcon("phone", 17)}חיוג</a>` : "";
+  const paidSum = jobs.filter(j => j.paid).reduce((s, j) => s + j.amount, 0);
+  const priced = jobs.filter(j => j.amount > 0);
+  const avg = priced.length ? priced.reduce((s, j) => s + j.amount, 0) / priced.length : 0;
+  document.getElementById("proSheetStats").innerHTML = `
+    <div><div class="l">שולם</div><div class="v">${fmtMoney(paidSum)}</div></div>
+    <div><div class="l">עבודות</div><div class="v">${jobs.length}</div></div>
+    <div><div class="l">ממוצע לעבודה</div><div class="v">${priced.length ? fmtMoney(Math.round(avg)) : "—"}</div></div>`;
+  document.getElementById("proSheetList").innerHTML = jobs.length ? jobs.map(j => {
+    const st = jobStatus(j);
+    const docsLine = [j.hasInvoice ? "חשבונית ✓" : "חסרה חשבונית", j.hasReceipt ? "קבלה ✓" : (j.paid ? "קבלה חסרה" : "")].filter(Boolean).join(" · ");
+    return `<button type="button" class="pro-item" data-job-act="open" data-job-key="${j.key}">
+      <div class="pro-item-main"><div class="pro-item-title">${escHtml(j.title)}</div><div class="pro-item-sub">${[j.date ? fmtDateHe(j.date) : "", docsLine].filter(Boolean).join(" · ")}</div></div>
+      <div class="pro-item-side"><div class="pro-item-amt">${j.amount > 0 ? fmtMoney(j.amount) : "—"}</div><span class="job-status ${st.tone}">${st.text}</span></div>
+    </button>`;
+  }).join("") : `<div class="jobs-empty">אין עבודות בתקופה הזו.</div>`;
+}
+function printProReport(){
+  const jobs = proJobsFiltered();
+  const name = proSheetName;
+  const yearVal = document.getElementById("proSheetYear").value;
+  const paidSum = jobs.filter(j => j.paid).reduce((s, j) => s + j.amount, 0);
+  const total = jobs.reduce((s, j) => s + j.amount, 0);
+  const rows = jobs.map(j => `<tr><td>${j.date ? fmtDateHe(j.date) : "—"}</td><td class="desc">${escHtml(j.title)}</td><td>${escHtml(j.topic)}</td><td style="font-weight:700;white-space:nowrap">${j.amount > 0 ? fmtMoney(j.amount) : "—"}</td><td>${escHtml(jobStatus(j).text)}</td></tr>`).join("");
+  openPrintWindow(`<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>עבודות — ${escHtml(name)}</title><style>${reportBaseCss()}</style></head><body>
+    <div class="head"><div><h1>עבודות: ${escHtml(name)}</h1><div class="sub">${yearVal ? schoolYearLabel(Number(yearVal)) : "כל השנים"} · הופק ב-${new Date().toLocaleDateString("he-IL")}</div></div><div class="logo">${reportLogoSvg()}</div></div>
+    <div class="stats"><div class="stat"><div class="l">עבודות</div><div class="v">${jobs.length}</div></div><div class="stat good"><div class="l">שולם</div><div class="v">${fmtMoney(paidSum)}</div></div><div class="stat warn"><div class="l">סה"כ</div><div class="v">${fmtMoney(total)}</div></div></div>
+    ${jobs.length ? `<table><thead><tr><th>תאריך</th><th>עבודה</th><th>נושא</th><th>סכום</th><th>סטטוס</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty">אין עבודות.</div>`}
+  </body></html>`);
+}
+
+/* ---------- צפייה בקובץ: הורדה, שיתוף, וואטסאפ, Gmail ---------- */
+let fvState = null;
+function fileInfoFromUrl(url){
+  try{
+    const u = new URL(url);
+    let p = u.pathname;
+    const m = p.match(/\/o\/([^/]+)$/);
+    p = decodeURIComponent(m ? m[1] : p);
+    const raw = p.split("/").pop() || "";
+    const name = raw.replace(/^\d{10,}_/, "") || "קובץ";
+    const ext = ((name.match(/\.([a-z0-9]+)$/i) || [])[1] || "").toLowerCase();
+    return { name, ext };
+  }catch(e){ return { name: "קובץ", ext: "" }; }
+}
+const FV_MIME = { pdf: "application/pdf", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif", webp: "image/webp", heic: "image/heic", doc: "application/msword", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", xls: "application/vnd.ms-excel", xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" };
+function isFileStorageUrl(href){
+  return typeof href === "string" && /firebasestorage\.(googleapis\.com|app)/.test(href);
+}
+function openFileViewer(url, opts){
+  if(!url) return;
+  opts = opts || {};
+  const info = fileInfoFromUrl(url);
+  fvState = { url, name: info.name, ext: info.ext, title: opts.title || info.name, meta: opts.meta || info.name, jobKey: opts.jobKey || "", kind: opts.kind || "", file: null, filePromise: null, pushed: false };
+  document.getElementById("fvTitle").textContent = fvState.title;
+  document.getElementById("fvMeta").textContent = fvState.meta;
+  document.getElementById("fvStatus").textContent = "";
+  const body = document.getElementById("fvBody");
+  const isImg = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(info.ext);
+  const isPdf = info.ext === "pdf";
+  const coarse = window.matchMedia && window.matchMedia("(pointer:coarse)").matches;
+  if(isImg){
+    body.innerHTML = `<img src="${escHtml(url)}" alt="${escHtml(fvState.title)}">`;
+  }else if(isPdf){
+    const src = coarse ? `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(url)}` : url;
+    body.innerHTML = `<iframe src="${escHtml(src)}" title="${escHtml(fvState.title)}"></iframe>`;
+  }else{
+    body.innerHTML = `<div class="fv-placeholder">${jobIcon("file", 48)}<div style="font-weight:600;color:var(--ink)">${escHtml(info.name)}</div><div>אין תצוגה מקדימה לסוג הקובץ הזה. אפשר להוריד, לשתף או לפתוח בחלון חדש.</div></div>`;
+  }
+  const el = document.getElementById("fileViewer");
+  el.style.display = "flex";
+  document.body.style.overflow = "hidden";
+  try{ history.pushState({ fileViewer: true }, ""); fvState.pushed = true; }catch(e){}
+  fvState.filePromise = fvFetchFile().catch(() => null);   // טעינה מוקדמת כדי שהשיתוף יהיה מיידי
+}
+function closeFileViewer(silent){
+  const el = document.getElementById("fileViewer");
+  if(!el || el.style.display === "none") return;
+  const pushed = fvState && fvState.pushed;
+  if(fvState) fvState.pushed = false;
+  el.style.display = "none";
+  document.getElementById("fvBody").innerHTML = "";
+  if(document.getElementById("proSheet").style.display === "none") document.body.style.overflow = "";
+  if(pushed && !silent){ try{ history.back(); }catch(e){} }
+}
+window.addEventListener("popstate", () => {
+  const el = document.getElementById("fileViewer");
+  if(el && el.style.display !== "none"){
+    if(fvState) fvState.pushed = false;
+    closeFileViewer(true);
+  }
+});
+document.addEventListener("keydown", e => {
+  if(e.key !== "Escape") return;
+  if(document.getElementById("fileViewer").style.display !== "none") closeFileViewer();
+  else if(document.getElementById("proSheet").style.display !== "none") closeProSheet();
+});
+async function fvFetchFile(){
+  if(!fvState) throw new Error("no file");
+  if(fvState.file) return fvState.file;
+  const st = fvState;
+  const ctrl = new AbortController();
+  const tm = setTimeout(() => ctrl.abort(), 25000);
+  try{
+    const res = await fetch(st.url, { signal: ctrl.signal, mode: "cors" });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const blob = await res.blob();
+    const type = blob.type && blob.type !== "application/octet-stream" ? blob.type : (FV_MIME[st.ext] || "application/octet-stream");
+    st.file = new File([blob], st.name, { type });
+    return st.file;
+  }finally{ clearTimeout(tm); }
+}
+function fvSetStatus(msg){ const el = document.getElementById("fvStatus"); if(el) el.textContent = msg || ""; }
+function fvOpenExternal(){ if(fvState) window.open(fvState.url, "_blank", "noopener"); }
+async function fvDownload(){
+  if(!fvState) return;
+  fvSetStatus("מכין הורדה…");
+  const file = fvState.file || await (fvState.filePromise || Promise.resolve(null));
+  if(file){
+    const href = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = href;
+    a.download = fvState.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(href), 8000);
+    fvSetStatus("הקובץ ירד למכשיר ✓");
+  }else{
+    window.open(fvState.url, "_blank", "noopener");
+    fvSetStatus("הקובץ נפתח בחלון חדש. שמירה: תפריט הדפדפן ← הורדה");
+  }
+}
+async function fvShare(){
+  if(!fvState) return;
+  const st = fvState;
+  const text = `${st.title}${st.meta && st.meta !== st.title ? " · " + st.meta : ""}`;
+  if(navigator.share){
+    const file = st.file || await (st.filePromise || Promise.resolve(null));
+    try{
+      if(file && navigator.canShare && navigator.canShare({ files: [file] })){
+        await navigator.share({ files: [file], title: st.title, text });
+      }else{
+        await navigator.share({ title: st.title, text, url: st.url });
+      }
+      fvSetStatus("");
+      return;
+    }catch(e){
+      if(e && e.name === "AbortError") return;
+      if(e && e.name === "NotAllowedError"){ fvSetStatus("הקובץ מוכן. לחץ שוב על שיתוף"); return; }
+      console.warn("share failed", e);
+    }
+  }
+  try{
+    await navigator.clipboard.writeText(st.url);
+    fvSetStatus("הקישור לקובץ הועתק. אפשר להדביק בכל אפליקציה");
+  }catch(e){
+    fvSetStatus("השיתוף לא נתמך בדפדפן הזה. אפשר להשתמש בוואטסאפ או ב-Gmail");
+  }
+}
+function fvMessageText(){
+  const st = fvState;
+  return `${st.title}${st.meta && st.meta !== st.title ? "\n" + st.meta : ""}\n📎 ${st.url}`;
+}
+function fvWhatsApp(){
+  if(!fvState) return;
+  window.open(`https://wa.me/?text=${encodeURIComponent(fvMessageText())}`, "_blank", "noopener");
+}
+function fvGmail(){
+  if(!fvState) return;
+  window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(fvState.title)}&body=${encodeURIComponent(fvMessageText())}`, "_blank", "noopener");
+}
+function fvToAccountant(channel){
+  if(!fvState) return;
+  const st = fvState;
+  let text = "";
+  const j = st.jobKey ? findJob(st.jobKey) : null;
+  if(j){
+    const info = { name: j.pro || "—", desc: j.title || "—", amount: j.amount,
+      bankInfo: j.vp ? { bank: j.vp.bank, branch: j.vp.branch, account: j.vp.account, holder: j.vp.holder } : null };
+    text = st.kind === "receipt" ? buildReceiptGroupMessageText(info, [{ fileUrl: st.url }]) : buildInvoiceGroupMessageText(info, [{ fileUrl: st.url }]);
+  }else{
+    text = `שלום 👋\nמה שלומך?\nמצורף ${st.title}:\n📎 ${st.url}\n\nתודה רבה! 🙏`;
+  }
+  sendToAccountant(text, channel);
+}
+
+/* ---------- האזנה מרוכזת ללחיצות ---------- */
+document.addEventListener("click", e => {
+  const t = e.target;
+  if(!t || !t.closest) return;
+  const fv = t.closest("[data-fv-url]");
+  if(fv){
+    e.preventDefault();
+    openFileViewer(fv.dataset.fvUrl, { title: fv.dataset.fvTitle, meta: fv.dataset.fvMeta, jobKey: fv.dataset.fvJob, kind: fv.dataset.fvKind });
+    return;
+  }
+  const actBtn = t.closest("[data-job-act]");
+  if(actBtn){
+    e.preventDefault();
+    jobAction(actBtn.dataset.jobKey, actBtn.dataset.jobAct);
+    return;
+  }
+  const proBtn = t.closest("[data-pro]");
+  if(proBtn){ e.preventDefault(); openProSheet(proBtn.dataset.pro); return; }
+  const costOpen = t.closest("[data-task-cost-open]");
+  if(costOpen){
+    const id = Number(costOpen.dataset.taskCostOpen);
+    jobCostOpen.add(id);
+    const td = costOpen.closest("td.job-cell");
+    const row = data.tasks.find(x => x.id === id);
+    if(td && row){
+      td.innerHTML = renderTaskJobCell(row);
+      td.classList.add("has-job");
+      const inp = td.querySelector("[data-job-amount]");
+      if(inp) inp.focus();
+    }
+    return;
+  }
+  const filt = t.closest("[data-jobs-filter]");
+  if(filt){ setJobsFilter(filt.dataset.jobsFilter); return; }
+  const assign = t.closest("[data-file-assign]");
+  if(assign){ openJobAssignModal(Number(assign.dataset.fileAssign)); return; }
+  const rem = t.closest("[data-file-remove]");
+  if(rem && rem.closest("#filesBody")){ removeFile(Number(rem.dataset.fileRemove)); return; }
+  const link = t.closest("a[href]");
+  if(link && isFileStorageUrl(link.getAttribute("href")) && !link.hasAttribute("data-fv-skip") && !e.ctrlKey && !e.metaKey){
+    e.preventDefault();
+    openFileViewer(link.getAttribute("href"), { title: (link.textContent || "").replace(/📄/g, "").trim() || undefined });
+  }
+});
+document.addEventListener("change", e => {
+  const t = e.target;
+  if(!t) return;
+  if(t.matches && t.matches("[data-job-amount]")) setJobAmount(t.dataset.jobAmount, t.value);
+  if(t.matches && t.matches("[data-jobs-topic]")) setJobsTopic(t.value);
+});
+document.addEventListener("keydown", e => {
+  const t = e.target;
+  if(e.key === "Enter" && t && t.matches && t.matches("[data-job-amount]")){ e.preventDefault(); t.blur(); }
+  if(e.key === "Enter" && t && t.id === "jobAmountInput"){ e.preventDefault(); confirmJobAmountModal(); }
+});
+fillJobIcons();
 
 /* ---------- PROJECTS & QUOTES ---------- */
 let activeProjectId = null;
