@@ -634,6 +634,19 @@
   .mk-row .mk-id{ font-weight:700; font-size:12.5px; color:var(--brand-dark); width:50px; flex-shrink:0; }
   .mk-row .mk-label{ font-size:13px; flex:1; }
   .empty-hint{ font-size:12.5px; color:var(--ink-soft); text-align:center; padding:14px 0; }
+
+  /* ---- חיפוש בטבלאות ---- */
+  .search-result-hint{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; margin:8px 0 10px; padding:8px 12px; border-radius:12px; background:var(--amber-bg); color:var(--ink); font-size:13px; }
+  .search-result-hint b{ font-weight:800; }
+  .search-hint-sub{ color:var(--ink-soft); font-size:12px; }
+  .search-chip{ border:none; border-radius:999px; padding:4px 11px; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; background:var(--card); color:var(--ink); box-shadow:0 1px 2px rgba(46,43,37,.15); }
+  .search-chip:hover{ background:var(--amber); color:#fff; }
+  .search-clear-link{ margin-inline-start:auto; border:none; background:transparent; font-family:inherit; font-size:12px; color:var(--ink-soft); cursor:pointer; text-decoration:underline; padding:2px 4px; }
+  td.search-hit-cell input[type=text]:not([readonly]), td.search-hit-cell select{ box-shadow:0 0 0 2px var(--amber); }
+  @media (max-width:720px){
+    table tbody tr.search-hit-row:not(.total-row) > td.search-hit-cell{ display:flex; }
+    .search-clear-link{ margin-inline-start:0; }
+  }
 </style>
 <link rel="stylesheet" href="theme.css">
 </head>
@@ -698,6 +711,7 @@
     <div class="cards" id="tasksCards"></div>
     <div class="card">
       <div class="toolbar toolbar-sticky">
+        <input type="text" id="tasksSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="🔍 חיפוש לפי תיאור, תחום, אחראי, מזהה..." oninput="filterRows('tasksBody', this.value)" style="max-width:280px">
         <div>שנת לימודים: <select id="tasksYearFilter" onchange="data.uiPrefs.tasksYear=this.value; saveUiPrefs(); renderTasks();" style="width:170px;display:inline-block"></select></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn ghost" onclick="openTasksReportModal()"><span class="btn-icon-inline" id="tasksReportIconSlot"></span>דוח משימות (PDF)</button>
@@ -727,7 +741,7 @@
     <div class="section-title" id="procGeneralAnchor">רכש כללי</div>
     <div class="card">
       <div class="toolbar toolbar-sticky">
-        <input type="text" id="procSearchInput" placeholder="🔍 חיפוש לפי שם פריט, ספק..." oninput="filterRows('procBody', this.value)" style="max-width:280px">
+        <input type="text" id="procSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="🔍 חיפוש לפי פריט, ספק, מק״ט, קטגוריה..." oninput="filterRows('procBody', this.value)" style="max-width:280px">
         <button class="btn" onclick="addProc()">+ הוספת פריט</button>
       </div>
       <div class="toolbar">
@@ -1012,7 +1026,7 @@
   <section class="tab" id="tab-licensing">
     <div class="card">
       <div class="toolbar toolbar-sticky">
-        <input type="text" id="licSearchInput" placeholder="🔍 חיפוש לפי סוג אישור, גורם בודק..." oninput="filterRows('licBody', this.value)" style="max-width:280px">
+        <input type="text" id="licSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="🔍 חיפוש לפי סוג אישור, גורם בודק, סטטוס..." oninput="filterRows('licBody', this.value)" style="max-width:280px">
         <button class="btn" onclick="addLic()">+ הוספת אישור / בדיקה</button>
       </div>
       <div class="toolbar">
@@ -1045,7 +1059,7 @@
     <div class="installment-tabs" id="installmentTabs"></div>
     <div class="card">
       <div class="toolbar toolbar-sticky">
-        <input type="text" id="staffSearchInput" placeholder="🔍 חיפוש שם / תפקיד (כולל בפעימות אחרות)..." oninput="searchStaff(this.value)" style="max-width:300px">
+        <input type="text" id="staffSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="🔍 חיפוש שם, תפקיד / תורנות, הערה (בכל הפעימות)..." oninput="searchStaff(this.value)" style="max-width:300px">
         <button class="btn" onclick="addStaffRow()">+ הוספת שורה</button>
       </div>
       <div class="toolbar">
@@ -1253,7 +1267,7 @@
     <div id="keysSubInv">
       <div class="card">
         <div class="toolbar toolbar-sticky toolbar-merged">
-          <div class="search-wrap toolbar-grow"><input type="text" id="keysInvSearch" placeholder="חיפוש לפי קוד, מיקום או מזהה..." oninput="renderKeyCards()"></div>
+          <div class="search-wrap toolbar-grow"><input type="text" id="keysInvSearch" data-search-input autocomplete="off" enterkeyhint="search" placeholder="חיפוש לפי קוד, מיקום, סוג או מי מחזיק..." oninput="renderKeyCards()"></div>
           <select id="keysFloorFilter" onchange="renderKeyCards()"><option value="">כל הקומות</option></select>
           <select id="keysRawFilter" onchange="renderKeyCards()"><option value="">כל הגלמים</option></select>
           <select id="keysStatusFilter" onchange="renderKeyCards()">
@@ -1276,7 +1290,7 @@
     <div id="keysSubHolders" style="display:none">
       <div class="card">
         <div class="toolbar toolbar-sticky toolbar-merged">
-          <div class="search-wrap toolbar-grow"><input type="text" id="holderSearch" placeholder="חיפוש איש מפתח..." oninput="renderHolderCards()"></div>
+          <div class="search-wrap toolbar-grow"><input type="text" id="holderSearch" data-search-input autocomplete="off" enterkeyhint="search" placeholder="חיפוש לפי שם, טלפון או מפתח שמוחזק..." oninput="renderHolderCards()"></div>
           <select id="holderStatusFilter" onchange="renderHolderCards()"><option value="">הכול</option><option value="active">פעילים</option><option value="inactive">לא פעילים</option></select>
           <div class="toolbar-push"><button class="btn" onclick="openHolderFormModal()">+ איש מפתח חדש</button></div>
         </div>
@@ -1371,7 +1385,7 @@
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">טלפון (לא חובה, לשליחת תזכורות בוואטסאפ)<input type="text" id="hfPhone" placeholder="05X-XXXXXXX"></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:14px">סטטוס<select id="hfActive"><option value="1">פעיל</option><option value="0">לא פעיל</option></select></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:6px">הוספת מפתחות שקיבל <span style="font-weight:400">(ניתן לסמן כמה שרוצים)</span></label>
-      <input type="text" id="hfKeySearch" placeholder="חיפוש מפתח לפי קוד או מיקום..." oninput="renderHolderKeyCheckboxes()" style="margin-bottom:8px">
+      <input type="text" id="hfKeySearch" data-search-input autocomplete="off" placeholder="חיפוש מפתח לפי קוד, מיקום או סוג..." oninput="renderHolderKeyCheckboxes()" style="margin-bottom:8px">
       <div class="checkgroup hf-keys-wrap" id="hfKeysGroup"></div>
       <div id="hfHeldKeysNote" style="font-size:11.5px;color:var(--ink-soft);margin:8px 0 14px"></div>
       <div class="toolbar">
@@ -1505,7 +1519,7 @@
   <section class="tab" id="tab-contacts">
     <div class="card">
       <div class="toolbar toolbar-sticky">
-        <input type="text" id="contactsSearchInput" placeholder="🔍 חיפוש לפי שם, תחום..." oninput="filterRows('contactsBody', this.value)" style="max-width:260px">
+        <input type="text" id="contactsSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="🔍 חיפוש לפי שם, תחום, טלפון, מייל..." oninput="filterRows('contactsBody', this.value)" style="max-width:260px">
         <button class="btn" onclick="addContact()">+ הוספת איש קשר</button>
       </div>
       <div class="toolbar">
@@ -1543,7 +1557,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261007; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261014; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -5013,6 +5027,17 @@ function openModalOverlay(id){ const el = document.getElementById(id); if(el) el
 
 function keyDisplayId(k){ return k.code + (k.keyNum ? " - " + k.keyNum : ""); }
 function keyById(id){ return data.keysInventory.find(k => k.id === id); }
+function keySearchHay(k){
+  const holders = data.keysLog.filter(l => l.keyId === k.id && !l.dateIn).map(l => l.holder);
+  return buildSearchHay(keyDisplayId(k), k.code, k.keyNum, k.location, k.type, k.size, k.notes, holders);
+}
+function holderSearchHay(h){
+  const keys = data.keysLog.filter(l => l.holder === h.name && !l.dateIn).map(l => {
+    const k = l.keyId ? keyById(l.keyId) : null;
+    return [k ? keyDisplayId(k) : "", k ? k.location : "", l.keyDesc];
+  });
+  return buildSearchHay(h.name, h.phone, keys);
+}
 function holderById(id){ return data.keysHolders.find(h => h.id === id); }
 function holderByName(name){ return data.keysHolders.find(h => h.name === name); }
 function openLoansFor(keyId){ return data.keysLog.filter(l => l.keyId === keyId && !l.dateIn); }
@@ -5074,12 +5099,12 @@ function populateKeyFilters(){
 function renderKeyCards(){
   const grid = document.getElementById("keysGrid");
   if(!grid) return;
-  const q = (document.getElementById("keysInvSearch").value||"").trim().toLowerCase();
+  const qTokens = searchTokens(document.getElementById("keysInvSearch").value);
   const floorF = document.getElementById("keysFloorFilter").value;
   const rawF = document.getElementById("keysRawFilter").value;
   const statusF = document.getElementById("keysStatusFilter").value;
   const list = data.keysInventory.filter(k => {
-    if(q && !(keyDisplayId(k).toLowerCase().includes(q) || (k.location||"").toLowerCase().includes(q))) return false;
+    if(qTokens.length && !matchesTokens(keySearchHay(k), qTokens)) return false;
     if(floorF && (""+k.floor)!==floorF) return false;
     if(rawF && (""+k.raw)!==rawF) return false;
     if(statusF && keyStatus(k)!==statusF) return false;
@@ -5229,10 +5254,10 @@ function submitStockCount(){
 function renderHolderCards(){
   const grid = document.getElementById("holdersGrid");
   if(!grid) return;
-  const q = (document.getElementById("holderSearch").value||"").trim().toLowerCase();
+  const qTokens = searchTokens(document.getElementById("holderSearch").value);
   const statusF = document.getElementById("holderStatusFilter").value;
   const list = data.keysHolders.filter(h => {
-    if(q && !(h.name||"").toLowerCase().includes(q)) return false;
+    if(qTokens.length && !matchesTokens(holderSearchHay(h), qTokens)) return false;
     if(statusF==="active" && h.active===false) return false;
     if(statusF==="inactive" && h.active!==false) return false;
     return true;
@@ -5270,13 +5295,13 @@ function openHolderFormModal(id){
 function renderHolderKeyCheckboxes(){
   const wrap = document.getElementById("hfKeysGroup");
   if(!wrap) return;
-  const q = (document.getElementById("hfKeySearch").value||"").trim().toLowerCase();
+  const qTokens = searchTokens(document.getElementById("hfKeySearch").value);
   const h = editingHolderId ? holderById(editingHolderId) : null;
   const heldKeyIds = new Set(h ? data.keysLog.filter(l=>l.holder===h.name && !l.dateIn).map(l=>l.keyId) : []);
   const list = data.keysInventory.filter(k => {
     if(heldKeyIds.has(k.id)) return false;
-    if(!q) return true;
-    return (keyDisplayId(k) + " " + (k.location||"")).toLowerCase().includes(q);
+    if(!qTokens.length) return true;
+    return matchesTokens(keySearchHay(k), qTokens);
   });
   wrap.innerHTML = list.length ? list.map(k => `
     <label class="check-chip ${hfSelectedKeyIds.has(k.id)?'checked':''}">
@@ -5484,28 +5509,235 @@ function setKeysSubTab(key){
 }
 
 /* ---------- FILE UPLOADS ---------- */
+/* ---------- מנוע חיפוש משותף (נרמול עברית + חיפוש לפי מילים) ---------- */
+const HEB_FINAL_LETTERS = {"ך":"כ","ם":"מ","ן":"נ","ף":"פ","ץ":"צ"};
+function normSearch(s){
+  return String(s==null ? "" : s).toLowerCase()
+    .replace(/־/g, " ")                         // מקף עברי
+    .replace(/[֑-ֽֿ-ׇ]/g, "")   // ניקוד וטעמים
+    .replace(/[ךםןףץ]/g, c => HEB_FINAL_LETTERS[c]) // אותיות סופיות = רגילות
+    .replace(/["'`׳״“”„‘’]/g, "") // גרש / גרשיים / מירכאות
+    .replace(/[‐-―\-_\/\\|,.;:()\[\]{}!?+*#~<>=]+/g, " ")
+    .replace(/\s+/g, " ").trim();
+}
+function searchTokens(q){
+  const n = normSearch(q);
+  return n ? n.split(" ") : [];
+}
+function buildSearchHay(...parts){
+  const raw = parts.flat(Infinity).filter(v => v!==null && v!==undefined && v!=="").map(String).join(" ");
+  const norm = normSearch(raw);
+  // גם צורה "דחוסה" של כל מילה: 054-1234567 → 0541234567
+  const compact = raw.split(/\s+/).map(w => normSearch(w).replace(/ /g,"")).filter(w => w && w.indexOf(" ")===-1).join(" ");
+  return " " + norm + " " + compact + " ";
+}
+function matchesTokens(hay, tokens){
+  return tokens.every(t => hay.includes(t));
+}
+function recordSearchHay(rec){
+  if(!rec || typeof rec !== "object") return "";
+  const vals = [];
+  Object.keys(rec).forEach(k => {
+    const v = rec[k];
+    if(typeof v === "string"){ if(!/^https?:\/\//i.test(v)) vals.push(v); }
+    else if(typeof v === "number"){ vals.push(String(v)); }
+  });
+  return buildSearchHay(vals);
+}
+/* טקסט גלוי של שורה/תא — בלי אפשרויות שלא נבחרו ברשימות נפתחות ובלי טקסט של כפתורים */
+function domSearchText(root){
+  const parts = [];
+  const walk = node => {
+    node.childNodes.forEach(ch => {
+      if(ch.nodeType === 3){ parts.push(ch.nodeValue); return; }
+      if(ch.nodeType !== 1) return;
+      const tag = ch.tagName.toUpperCase();
+      if(tag==="BUTTON" || tag==="OPTION" || tag==="SCRIPT" || tag==="STYLE" || tag==="SVG" || tag==="TEMPLATE") return;
+      if(ch.hasAttribute("data-search-skip") || ch.classList.contains("card-badge") || ch.classList.contains("mob-toggle") || ch.classList.contains("primary-field-display")) return;
+      if(tag==="SELECT"){
+        const o = ch.options[ch.selectedIndex];
+        if(o && o.value !== "") parts.push(o.text);
+        return;
+      }
+      if(tag==="INPUT"){
+        const t = (ch.type||"text").toLowerCase();
+        if(!["checkbox","radio","file","button","submit","hidden","color","range","reset","image"].includes(t)) parts.push(ch.value);
+        return;
+      }
+      if(tag==="TEXTAREA"){ parts.push(ch.value); return; }
+      walk(ch);
+    });
+  };
+  walk(root);
+  return parts.join(" ");
+}
+
+/* ---------- חיפוש בטבלאות ---------- */
+const SEARCH_TABLES = {
+  tasksBody:    { input:"tasksSearchInput",    yearSelect:"tasksYearFilter", records:() => data.tasks },
+  procBody:     { input:"procSearchInput",     yearSelect:"procYearFilter",  records:() => data.procurement },
+  licBody:      { input:"licSearchInput" },
+  contactsBody: { input:"contactsSearchInput" },
+  staffBody:    { input:"staffSearchInput",    matcher:(tr,tokens) => staffRowMatcher(tr,tokens), extraHint:(tokens) => staffOtherInstallmentsHint(tokens) }
+};
+const rowFilterState = {};
+
 function filterRows(tbodyId, query){
   const tbody = document.getElementById(tbodyId);
   if(!tbody) return;
-  const q = query.trim().toLowerCase();
+  rowFilterState[tbodyId] = { query: query||"" };
+  watchFilteredBody(tbody);
+  applyRowFilter(tbodyId);
+}
+function watchFilteredBody(tbody){
+  if(tbody._searchObserver) return;
+  // כשהטבלה מצוירת מחדש (עריכה, שמירה, החלפת פעימה/שנה) — הסינון נשמר
+  const obs = new MutationObserver(() => applyRowFilter(tbody.id));
+  obs.observe(tbody, { childList:true });
+  tbody._searchObserver = obs;
+}
+function applyRowFilter(tbodyId){
+  const tbody = document.getElementById(tbodyId);
+  const st = rowFilterState[tbodyId];
+  if(!tbody || !st) return null;
+  const cfg = SEARCH_TABLES[tbodyId] || {};
+  const tokens = searchTokens(st.query);
+  if(!tokens.length && st.idle) return null;
+  st.idle = !tokens.length;
+  let shown = 0, total = 0;
   Array.from(tbody.children).forEach(tr => {
-    let text = tr.textContent.toLowerCase();
-    tr.querySelectorAll("input, select").forEach(el => { text += " " + (el.value||"").toLowerCase(); });
-    tr.style.display = (!q || text.includes(q)) ? "" : "none";
+    if(tr.tagName !== "TR" || tr.classList.contains("total-row")) return;
+    total++;
+    let ok = true;
+    if(tokens.length){
+      ok = cfg.matcher ? cfg.matcher(tr, tokens) : matchesTokens(buildSearchHay(domSearchText(tr)), tokens);
+    }
+    tr.style.display = ok ? "" : "none";
+    markSearchHitCells(tr, ok ? tokens : []);
+    if(ok) shown++;
   });
+  updateSearchHint(tbody, tokens.length ? {shown, total, query: st.query.trim(), tokens} : null);
+  return {shown, total};
+}
+function markSearchHitCells(tr, tokens){
+  Array.from(tr.children).forEach(td => {
+    if(td.tagName !== "TD") return;
+    if(!tokens.length){ td.classList.remove("search-hit-cell"); return; }
+    const hay = buildSearchHay(domSearchText(td));
+    td.classList.toggle("search-hit-cell", tokens.some(t => hay.includes(t)));
+  });
+  tr.classList.toggle("search-hit-row", tokens.length > 0);
+}
+function updateSearchHint(tbody, info){
+  const hintId = tbody.id + "SearchHint";
+  let hint = document.getElementById(hintId);
+  if(!info){ if(hint) hint.style.display = "none"; return; }
+  if(!hint){
+    const anchor = tbody.closest(".table-scroll") || tbody.closest("table");
+    if(!anchor || !anchor.parentNode) return;
+    hint = document.createElement("div");
+    hint.id = hintId;
+    hint.className = "search-result-hint";
+    anchor.parentNode.insertBefore(hint, anchor);
+  }
+  const cfg = SEARCH_TABLES[tbody.id] || {};
+  const q = escHtml(info.query);
+  let html = info.shown
+    ? `<span>נמצאו <b>${info.shown}</b> מתוך ${info.total} עבור «${q}»</span>`
+    : `<span>לא נמצאו תוצאות עבור «${q}»</span>`;
+  if(cfg.extraHint) html += cfg.extraHint(info.tokens);
+  if(!info.shown && cfg.yearSelect && cfg.records){
+    const sel = document.getElementById(cfg.yearSelect);
+    if(sel && sel.value !== ""){
+      const otherYears = (cfg.records()||[]).filter(r => matchesTokens(recordSearchHay(r), info.tokens)).length;
+      if(otherYears) html += `<button type="button" class="search-chip" onclick="searchAllYears('${tbody.id}')">${otherYears} תוצאות בשנים אחרות — הצג את כל השנים</button>`;
+    }
+  }
+  html += `<button type="button" class="search-clear-link" onclick="clearTableSearch('${tbody.id}')">ניקוי חיפוש ✕</button>`;
+  hint.innerHTML = html;
+  hint.style.display = "";
+}
+function clearTableSearch(tbodyId){
+  const cfg = SEARCH_TABLES[tbodyId];
+  const input = cfg && document.getElementById(cfg.input);
+  if(input){ input.value = ""; input.dispatchEvent(new Event("input", {bubbles:true})); }
+  else filterRows(tbodyId, "");
+}
+function searchAllYears(tbodyId){
+  const cfg = SEARCH_TABLES[tbodyId];
+  const sel = cfg && document.getElementById(cfg.yearSelect);
+  if(!sel) return;
+  sel.value = "";
+  sel.dispatchEvent(new Event("change", {bubbles:true}));
+}
+
+/* ---------- חיפוש בצוות ותורנים: לפי שם, תפקיד ראשי, תפקידים נוספים, הערות ותשלומים חד פעמיים, בכל הפעימות ---------- */
+function staffRowHay(r){
+  return buildSearchHay(
+    r.name, r.role,
+    (r.extraRoles||[]).map(e => e && e.role),
+    r.notes,
+    (r.onePayments||[]).map(p => p && p.desc)
+  );
+}
+function staffRowMatcher(tr, tokens){
+  const id = Number(tr.dataset.rowId);
+  const inst = data.installments[activeInstallment] || [];
+  const row = inst.find(r => r.id === id);
+  if(row) return matchesTokens(staffRowHay(row), tokens);
+  return matchesTokens(buildSearchHay(domSearchText(tr)), tokens);
+}
+function staffMatchCounts(tokens){
+  return data.installments.map(inst => (inst||[]).filter(r => matchesTokens(staffRowHay(r), tokens)).length);
+}
+function staffOtherInstallmentsHint(tokens){
+  const counts = staffMatchCounts(tokens);
+  const chips = counts.map((c,i) => (c && i !== activeInstallment)
+    ? `<button type="button" class="search-chip" onclick="goToInstallmentFromSearch(${i})">פעימה ${i+1} · ${c}</button>` : "").join("");
+  return chips ? `<span class="search-hint-sub">נמצא גם ב:</span>${chips}` : "";
+}
+function goToInstallmentFromSearch(i){
+  if(i < 0 || i >= data.installments.length) return;
+  activeInstallment = i;
+  buildInstallmentTabs();
+  renderStaff();   // הסינון מוחל מחדש אוטומטית
+  renderPayment();
 }
 function searchStaff(value){
-  const q = value.trim().toLowerCase();
-  if(q){
-    const idx = data.installments.findIndex(inst => inst.some(r => (r.name||"").toLowerCase().includes(q) || (r.role||"").toLowerCase().includes(q)));
-    if(idx !== -1 && idx !== activeInstallment){
-      activeInstallment = idx;
-      buildInstallmentTabs();
-      renderStaff();
+  const tokens = searchTokens(value);
+  if(tokens.length){
+    const counts = staffMatchCounts(tokens);
+    // עוברים לפעימה אחרת רק אם בפעימה הנוכחית אין אף תוצאה
+    if(!counts[activeInstallment]){
+      const idx = counts.findIndex(c => c > 0);
+      if(idx !== -1 && idx !== activeInstallment){
+        activeInstallment = idx;
+        buildInstallmentTabs();
+        renderStaff();
+        renderPayment();
+      }
     }
   }
   filterRows("staffBody", value);
 }
+
+/* ---------- התנהגות שדות חיפוש: Esc מנקה, הוספת שורה מנקה את החיפוש כדי שהשורה החדשה תיראה ---------- */
+document.addEventListener("keydown", e => {
+  const t = e.target;
+  if(e.key === "Escape" && t && t.hasAttribute && t.hasAttribute("data-search-input") && t.value){
+    t.value = "";
+    t.dispatchEvent(new Event("input", {bubbles:true}));
+  }
+});
+document.addEventListener("click", e => {
+  const btn = e.target.closest && e.target.closest("button[onclick^='add']");
+  if(!btn) return;
+  const bar = btn.closest(".toolbar");
+  if(!bar) return;
+  bar.querySelectorAll("input[data-search-input]").forEach(inp => {
+    if(inp.value){ inp.value = ""; inp.dispatchEvent(new Event("input", {bubbles:true})); }
+  });
+}, true);
 
 function renderFileCellHTML(row, field){
   if(row[field]){
