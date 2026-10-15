@@ -9395,8 +9395,13 @@ function loadXLSX(){
   if(window.XLSX) return Promise.resolve();
   return xlsxLoading = xlsxLoading || new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = res; s.onerror = () => { xlsxLoading = null; rej(); }; document.head.appendChild(s); });
 }
-async function readTableFile(f, cb){
+async function readTableFile(f, cb, rowsCb, owner){
   if(!f) return;
+  if(/\.pdf$/i.test(f.name||'') || f.type==='application/pdf'){
+    if(typeof rowsCb !== 'function'){ toast('אפשר להעלות כאן רק קובץ אקסל או CSV'); return; }
+    return readPdfTable(f, rowsCb, owner);
+  }
+  PDFST = null;
   try{ await loadXLSX(); }catch(e){ toast('לא הצלחתי לטעון את רכיב האקסל. בדוק חיבור לאינטרנט, או השתמש בהדבקה מאקסל'); return; }
   const fr = new FileReader();
   fr.onload = e => { try{ cb(XLSX.read(new Uint8Array(e.target.result), {type:'array'})); }catch(err){ toast('לא הצלחתי לקרוא את הקובץ. ודא שזה קובץ אקסל או CSV תקין'); } };
@@ -9414,8 +9419,8 @@ function findHeader(rows){
   return h >= 0 ? h : 0;
 }
 const RE = {
-  name:/שם|פריט|תיאור|מוצר|item|name|desc/i, price:/מחיר|price|עלות|₪/i, unit:/יחיד|יח['׳]|אריזה|unit|יח$/i,
-  sku:/מק["״]?ט|ברקוד|קוד|sku|code|barcode/i, qty:/כמות|qty|quantity|כמ['׳]/i
+  name:/שם|פריט|תיאור|מוצר|item|name|desc/i, price:/מחיר|price|עלות|₪/i, unit:/יחיד|יח['׳]|יחי['׳]|מידה|אריזה|unit|יח$/i,
+  sku:/מק["״]?ט|ברקוד|קוד|קטלוג|מס(פר)?['׳]?\s*פריט|sku|code|barcode/i, qty:/כמות|qty|quantity|כמ['׳]/i
 };
 function guessMap(rows, header, fields){
   const hdr = (rows[header]||[]).map(String); const map = {}; const used = new Set();
@@ -9436,20 +9441,168 @@ const cell = (r, map, k) => map[k]==='' || map[k]==null ? '' : String(r[+map[k]]
 /* בוחר מקור: קובץ או הדבקה. st = שם המשתנה הגלובלי (IMP / INV) */
 function srcPicker(obj, st, redraw, onWb, onRows, loaded){
   return `<div class="seg" role="group" aria-label="מקור">
-      <button aria-pressed="${obj.src==='file'}" onclick="with(SP){${st}.src='file';${redraw}()}">קובץ אקסל / CSV</button>
+      <button aria-pressed="${obj.src==='file'}" onclick="with(SP){${st}.src='file';${redraw}()}">קובץ אקסל / PDF</button>
       <button aria-pressed="${obj.src==='paste'}" onclick="with(SP){${st}.src='paste';${redraw}()}">הדבקה מאקסל</button>
+      <button aria-pressed="${obj.src==='text'}" onclick="with(SP){${st}.src='text';${redraw}()}">טקסט חופשי</button>
     </div>
-    ${obj.src==='file' ? `<label class="drop">${ic('file')}<span>${loaded?'הקובץ נטען · אפשר לבחור קובץ אחר':'בחר קובץ ‎.xlsx ‎.xls או ‎.csv'}</span><input type="file" accept=".xlsx,.xls,.csv" style="max-width:240px" onchange="with(SP){readTableFile(this.files[0], ${onWb})}"></label>`
+    ${obj.src==='file' ? `<label class="drop">${ic('file')}<span>${loaded?'הקובץ נטען · אפשר לבחור קובץ אחר':'בחר קובץ אקסל, CSV או PDF'}</span><input type="file" accept=".xlsx,.xls,.csv,.pdf,application/pdf" style="max-width:240px" onchange="with(SP){readTableFile(this.files[0], ${onWb}, ${onRows}, '${st}')}"></label>
+       ${loaded ? pdfBar(st) : ''}`
+    : obj.src==='text' ? `<label class="f">הדבק כאן טקסט מה-PDF (פותחים את הקובץ, מסמנים הכל ומעתיקים) או הקלד שורה לכל פריט: שם הפריט ואחריו המחיר<textarea id="sp-textBox" style="min-height:140px" placeholder="קמח לבן 1 ק&quot;ג 4.90&#10;שמן קנולה ליטר 9.50&#10;סוכר ק&quot;ג 5.20"></textarea></label>
+       <label class="radio"><input type="checkbox" id="sp-textRev"><span>העברית הודבקה הפוכה (למשל "בלח" במקום "חלב")</span></label>
+       <div><button class="sb sb-soft sm" onclick="with(SP){textGo(${onRows})}">קריאת הטקסט</button></div>`
     : `<label class="f">סמן באקסל את הטבלה (כולל שורת הכותרות), העתק והדבק כאן<textarea id="sp-pasteBox" placeholder="שם פריט&#9;כמות&#9;מחיר"></textarea></label>
        <div><button class="sb sb-soft sm" onclick="with(SP){pasteGo(${onRows})}">קריאת הטבלה</button></div>`}`;
 }
 function pasteGo(cb){ const t = $('#sp-pasteBox').value.trim(); if(!t){ toast('לא הודבק טקסט'); return; } cb(pasteRows(t)); }
+
+/* ---------- טקסט חופשי ו-PDF → שורות טבלה ---------- */
+const HEB = /[\u0590-\u05FF]/;
+const SMART_HDR = ['מק"ט','שם פריט','יחידה','מחיר'];
+const UNIT_RE = /^(ק["״]?ג|קילו|ק['׳]|ליטר|ל['׳]|גרם|גר['׳]?|מ["״]ל|יח['׳]?|יחידה|יחידות|אריזה|חבילה|קרטון|ארגז|שק|בקבוק|פחית|מארז|זוג|kg|gr?|l|ml|pcs?)$/i;
+const isNumTok = t => /^₪?-?\d[\d,]*(\.\d+)?₪?$/.test(t);
+/* טקסט עברי שהועתק בסדר הפוך (נפוץ ב-PDF): הופך אותיות ומשאיר מספרים ואנגלית כמו שהם */
+function fixRev(str){
+  if(!HEB.test(str)) return str;
+  const mir = {'(' : ')', ')' : '(', '[' : ']', ']' : '[', '<' : '>', '>' : '<'};
+  return [...str].reverse().map(c=>mir[c]||c).join('').replace(/[A-Za-z0-9.,%\/\-+:₪]+/g, m=>[...m].reverse().join(''));
+}
+/* שורה אחת של טקסט → [מק"ט, שם, יחידה, מחיר] */
+function smartRow(line){
+  const toks = line.replace(/\s+/g,' ').trim().split(' ').filter(t => t && !/^(₪|ש["״]?ח|nis)$/i.test(t));
+  const clean = toks.map(t=>t.replace(/₪/g,''));
+  let pi = -1;
+  if(toks.length > 1 && isNumTok(clean[clean.length-1])) pi = clean.length-1;
+  else if(toks.length > 1 && isNumTok(clean[0])) pi = 0;
+  if(pi < 0) return ['', toks.join(' '), '', ''];
+  const price = clean[pi]; const rest = toks.filter((_,i)=>i!==pi);
+  let unit = '', sku = '';
+  for(const ui of (pi===0 ? [0, rest.length-1] : [rest.length-1, 0])){
+    const neighbor = ui===0 ? rest[1] : rest[rest.length-2];
+    if(rest.length > 1 && UNIT_RE.test(rest[ui]) && !(neighbor && isNumTok(neighbor))){ unit = rest[ui]; rest.splice(ui,1); break; }
+  }
+  const si = pi===0 ? rest.length-1 : 0;
+  if(rest.length > 1 && /^\d{4,}$/.test(rest[si])){ sku = rest[si]; rest.splice(si,1); }
+  return [sku, rest.join(' '), unit, price];
+}
+function smartRows(lines){ return [SMART_HDR, ...lines.map(l=>l.trim()).filter(Boolean).map(smartRow)]; }
+function textRows(t, rev){
+  let lines = t.split(/\r?\n/).filter(x=>x.trim());
+  if(rev) lines = lines.map(fixRev);
+  const tabbed = lines.filter(l=>l.includes('\t')).length;
+  if(tabbed >= lines.length*0.6) return pasteRows(lines.join('\n'));
+  return smartRows(lines);
+}
+function textGo(cb){
+  const t = $('#sp-textBox').value.trim(); if(!t){ toast('לא הוזן טקסט'); return; }
+  const rows = textRows(t, $('#sp-textRev')?.checked);
+  if(rows.length < 2){ toast('לא נמצאו שורות'); return; }
+  cb(rows);
+}
+/* PDF: קורא את הטקסט עם המיקום שלו בדף, מסדר לשורות ולעמודות */
+let PDFST = null;
+async function readPdfTable(f, cb, owner){
+  let lib;
+  try{ lib = await loadPdfJs(); }catch(e){ toast('לא הצלחתי לטעון את רכיב ה-PDF. בדוק חיבור לאינטרנט, או השתמש ב"טקסט חופשי"'); return; }
+  toast('קורא את קובץ ה-PDF…');
+  let lines = [];
+  try{
+    const doc = await lib.getDocument({data: new Uint8Array(await f.arrayBuffer())}).promise;
+    for(let pn=1; pn<=doc.numPages; pn++){
+      const page = await doc.getPage(pn); const tc = await page.getTextContent();
+      const mir = {'(' : ')', ')' : '(', '[' : ']', ']' : '[', '<' : '>', '>' : '<'};
+      const its = tc.items.filter(i=>i.str && i.str.trim()).map(i=>({s: i.dir==='rtl' ? i.str.replace(/[()[\]<>]/g, c=>mir[c]) : i.str, x:i.transform[4], y:i.transform[5], w:Math.max(0,i.width||0), h:Math.abs(i.transform[3]) || Math.hypot(i.transform[2],i.transform[3]) || 10}));
+      its.sort((a,b)=>b.y-a.y || a.x-b.x);
+      const pl = [];
+      its.forEach(it => { const L = pl.find(l=>Math.abs(l.y-it.y) <= Math.max(2, Math.min(l.h,it.h)*0.45)); if(L) L.items.push(it); else pl.push({y:it.y, h:it.h, items:[it]}); });
+      pl.sort((a,b)=>b.y-a.y);
+      pl.forEach(l => { const c = pdfCells(l.items); c.y = l.y; c.h = l.h; c.pg = pn; lines.push(c); });
+    }
+  }catch(e){ console.warn(e); toast('לא הצלחתי לקרוא את קובץ ה-PDF. אפשר לפתוח אותו, להעתיק את הטקסט ולהדביק ב"טקסט חופשי"'); return; }
+  if(!lines.length){ PDFST = null; toast('ב-PDF הזה אין טקסט (כנראה סריקה או תמונה), אז אי אפשר לקרוא ממנו מחירים. בקש מהספק קובץ אקסל, או הקלד את הפריטים ב"טקסט חופשי"'); return; }
+  PDFST = {owner, cb, lines, rev:false, mode:'auto', name:f.name||''};
+  pdfApply();
+}
+/* מחבר פריטי טקסט סמוכים לתאים לפי רווחים ביניהם */
+function pdfCells(items){
+  items = [...items].sort((a,b)=>a.x-b.x);
+  const cells = []; let cur = null;
+  items.forEach(it => {
+    const gap = cur ? it.x - cur.x2 : 0;
+    if(!cur || gap > Math.max(it.h, cur.h) * 1.0){ cur = {x1:it.x, x2:it.x+it.w, h:it.h, items:[it]}; cells.push(cur); }
+    else { cur.items.push(it); cur.x2 = Math.max(cur.x2, it.x+it.w); }
+  });
+  return cells.map(c => ({x1:c.x1, x2:c.x2, s:joinPdf(c.items)}));
+}
+function joinPdf(items){
+  const seq = (arr, rev) => arr.reduce((out, it, i) => {
+    if(!i) return it.s; const p = arr[i-1];
+    const gap = rev ? p.x - (it.x+it.w) : it.x - (p.x+p.w);
+    return out + (gap > it.h*0.15 && !/\s$/.test(out) && !/^\s/.test(it.s) ? ' ' : '') + it.s;
+  }, '');
+  if(!items.some(i=>HEB.test(i.s))) return seq(items, false).replace(/\s+/g,' ').trim();
+  const runs = [];
+  items.forEach(it => { const h = HEB.test(it.s) || (!/\S/.test(it.s)); const last = runs[runs.length-1]; if(last && last.h===h) last.items.push(it); else runs.push({h, items:[it]}); });
+  return runs.reverse().map(r => r.h ? seq([...r.items].reverse(), true) : seq(r.items, false)).join(' ').replace(/\s+/g,' ').trim();
+}
+function pdfTableRows(lines, rev){
+  const spans = [];
+  /* עמודות נבנות רק משורות שנראות כמו שורות טבלה (כמה תאים, חלקם מספרים), כדי שכותרת המסמך לא תחבר עמודות */
+  const numCell = c => /^[₪\s\d.,%\-]+$/.test(c.s) && /\d/.test(c.s);
+  let base = lines.filter(l=>l.length>=3 && l.filter(numCell).length>=2);
+  if(base.length < 2) base = lines.filter(l=>l.length>=2);
+  base.forEach(l=>l.forEach(c=>spans.push([c.x1, c.x2])));
+  spans.sort((a,b)=>a[0]-b[0]);
+  const cols = [];
+  spans.forEach(sp => { const c = cols[cols.length-1]; if(c && sp[0] <= c[1]+1) c[1] = Math.max(c[1], sp[1]); else cols.push([...sp]); });
+  cols.sort((a,b)=>b[1]-a[1]); /* מימין לשמאל: עמודה 1 היא הימנית */
+  if(cols.length < 2) return null;
+  const out = lines.map(l => { const row = cols.map(()=>'');
+    l.forEach(c => { let bi = 0, bo = -Infinity;
+      cols.forEach((k,i) => { const ov = Math.min(k[1],c.x2) - Math.max(k[0],c.x1); const sc = ov > 0 ? ov : -Math.abs((k[0]+k[1])/2 - (c.x1+c.x2)/2) - 1e6; if(sc > bo){ bo = sc; bi = i; } });
+      const v = rev ? fixRev(c.s) : c.s; row[bi] = row[bi] ? row[bi]+' '+v : v; });
+    return row; });
+  /* שם פריט שנשבר לשתי שורות: מצרף את השורה החסרה (בלי מספרים) לשורת הפריט הצמודה */
+  const isNumRow = i => out[i].filter(v => /^[₪\s\d.,%\-]+$/.test(v) && /\d/.test(v)).length >= 2;
+  const drop = new Set();
+  out.forEach((r, i) => {
+    if(isNumRow(i) || !r.some(Boolean)) return;
+    const L = lines[i]; let best = -1, bd = Infinity;
+    [i-1, i+1].forEach(j => { if(j<0 || j>=out.length || drop.has(j) || !isNumRow(j) || lines[j].pg!==L.pg) return;
+      const d = Math.abs(lines[j].y - L.y); if(d <= Math.max(L.h, lines[j].h)*1.3 && d < bd){ bd = d; best = j; } });
+    if(best < 0) return;
+    r.forEach((v, k) => { if(!v) return; const t = out[best][k]; out[best][k] = !t ? v : (L.y > lines[best].y ? v+' '+t : t+' '+v); });
+    drop.add(i);
+  });
+  return out.filter((_, i) => !drop.has(i));
+}
+function pdfLineRows(lines, rev){ return smartRows(lines.map(l => [...l].sort((a,b)=>b.x2-a.x2).map(c => rev ? fixRev(c.s) : c.s).join(' '))); }
+const goodRows = rows => rows.filter(r => r.some(c=>/\p{L}{2}/u.test(c)) && r.some(c=>/^[₪\s\d.,\-]+$/.test(c) && num(c)>0)).length;
+function pdfApply(){
+  const P = PDFST; if(!P) return;
+  const tbl = pdfTableRows(P.lines, P.rev), txt = pdfLineRows(P.lines, P.rev);
+  if(P.mode==='auto') P.mode = tbl && goodRows(tbl) >= goodRows(txt)*0.8 ? 'table' : 'lines';
+  if(P.mode==='table' && !tbl) P.mode = 'lines';
+  P.cb(P.mode==='table' ? tbl : txt);
+}
+function pdfOpt(k, v){ if(!PDFST) return; PDFST[k] = v; pdfApply(); }
+function pdfBar(st){
+  if(!PDFST || PDFST.owner !== st) return '';
+  return `<div class="sp-card flat" style="gap:8px;background:var(--tint-a)">
+    <span class="muted">${ic('file','sm')} נקרא מתוך PDF: ${esc(PDFST.name)}. אם משהו לא נראה נכון בתצוגה המקדימה, נסה כאן:</span>
+    <div class="seg small" role="group" aria-label="אופן הקריאה">
+      <button aria-pressed="${PDFST.mode==='table'}" onclick="with(SP){pdfOpt('mode','table')}">לפי עמודות</button>
+      <button aria-pressed="${PDFST.mode==='lines'}" onclick="with(SP){pdfOpt('mode','lines')}">שורה לכל פריט</button>
+    </div>
+    <label class="radio"><input type="checkbox" ${PDFST.rev?'checked':''} onchange="with(SP){pdfOpt('rev',this.checked)}"><span>העברית מופיעה הפוכה (למשל "בלח" במקום "חלב")</span></label>
+  </div>`;
+}
 
 /* ---------- ייבוא מחירון ---------- */
 let IMP = null;
 function supDatalist(){ let extra = []; try{ extra = typeof getSupplierNames === 'function' ? getSupplierNames() : []; }catch(e){} return `<datalist id="sp-supList">${[...new Set([...suppliers(), ...extra])].map(s=>`<option value="${esc(s)}">`).join('')}</datalist>`; }
 function openImport(catId, listId){
   const l = listId ? S.lists.find(x=>x.id===listId) : null;
+  PDFST = null;
   IMP = {rows:null, sheets:null, wb:null, header:0, map:{}, catId: catId || S.cats[0]?.id || '', newCat:'', supplier: l?.supplier||'', title: l?.title||'', targetList: listId||null, src:'file', mode:'merge'};
   drawImport();
 }
@@ -9468,7 +9621,7 @@ function drawImport(){
   const skipped = r ? r.length-IMP.header-1-parsed.length : 0;
   modal(`<div class="mhead"><h2>ייבוא מחירון</h2>${closeBtn()}</div>
     ${srcPicker(IMP, 'IMP', 'drawImport', 'onImpWb', 'onImpRows', !!r)}
-    ${IMP.sheets && IMP.sheets.length>1 ? `<label class="f">גיליון<select onchange="with(SP){IMP.sheet=this.value;onImpRows(sheetRows(IMP.wb,this.value))}">${IMP.sheets.map(s=>`<option ${s===IMP.sheet?'selected':''}>${esc(s)}</option>`).join('')}</select></label>`:''}
+    ${IMP.sheets && IMP.sheets.length>1 && !(PDFST && PDFST.owner==='IMP') ? `<label class="f">גיליון<select onchange="with(SP){IMP.sheet=this.value;onImpRows(sheetRows(IMP.wb,this.value))}">${IMP.sheets.map(s=>`<option ${s===IMP.sheet?'selected':''}>${esc(s)}</option>`).join('')}</select></label>`:''}
     ${r ? `
       <h3>אילו עמודות הן מה?</h3>
       <div class="fgrid">
@@ -10627,6 +10780,25 @@ Object.defineProperties(SPX, {
 "cell":{get(){return cell},enumerable:true},
 "srcPicker":{get(){return srcPicker},enumerable:true},
 "pasteGo":{get(){return pasteGo},enumerable:true},
+"HEB":{get(){return HEB},enumerable:true},
+"SMART_HDR":{get(){return SMART_HDR},enumerable:true},
+"UNIT_RE":{get(){return UNIT_RE},enumerable:true},
+"isNumTok":{get(){return isNumTok},enumerable:true},
+"fixRev":{get(){return fixRev},enumerable:true},
+"smartRow":{get(){return smartRow},enumerable:true},
+"smartRows":{get(){return smartRows},enumerable:true},
+"textRows":{get(){return textRows},enumerable:true},
+"textGo":{get(){return textGo},enumerable:true},
+"readPdfTable":{get(){return readPdfTable},enumerable:true},
+"pdfCells":{get(){return pdfCells},enumerable:true},
+"joinPdf":{get(){return joinPdf},enumerable:true},
+"pdfTableRows":{get(){return pdfTableRows},enumerable:true},
+"pdfLineRows":{get(){return pdfLineRows},enumerable:true},
+"goodRows":{get(){return goodRows},enumerable:true},
+"pdfApply":{get(){return pdfApply},enumerable:true},
+"pdfOpt":{get(){return pdfOpt},enumerable:true},
+"pdfBar":{get(){return pdfBar},enumerable:true},
+"PDFST":{get(){return PDFST},set(v){PDFST=v},enumerable:true},
 "IMP":{get(){return IMP},set(v){IMP=v},enumerable:true},
 "supDatalist":{get(){return supDatalist},enumerable:true},
 "openImport":{get(){return openImport},enumerable:true},
