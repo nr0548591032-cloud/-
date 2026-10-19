@@ -9082,7 +9082,28 @@ async function autoBackupIfDue(){
 .spx .meal:nth-child(even){background:var(--sp-tint-b)}
 .spx .dish-chip{display:inline-flex;align-items:center;gap:4px;background:var(--sp-card);border-radius:999px;padding:3px 4px 3px 10px;font-size:13px}
 .spx .dish-chip button{border:0;background:transparent;color:var(--sp-soft);cursor:pointer;padding:2px;border-radius:50%;display:inline-flex}
-.spx .ing{display:grid;grid-template-columns:minmax(0,1fr) 90px 30px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--sp-line)}
+.spx .ing{display:grid;grid-template-columns:minmax(0,1fr) auto 30px;gap:4px 8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--sp-line)}
+.spx .ing .sub{grid-column:1/-1;font-size:12px;color:var(--sp-soft);display:flex;gap:4px 10px;flex-wrap:wrap;align-items:center}
+.spx .ing .stepper input{width:64px}
+.spx .wl{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;padding:0 8px;border-radius:999px;color:#fff;font:500 12px var(--sp-f-body);flex:0 0 auto;white-space:nowrap}
+.spx .wl.w1{background:#c67139}.spx .wl.w2{background:#3f7f77}.spx .wl.w3{background:#7a5aa6}.spx .wl.w4{background:#b8892a}.spx .wl.w5{background:#5f6f45}.spx .wl.w6{background:#9a4a5e}.spx .wl.w7{background:#2b2723}.spx .wl.w0{background:#8a8174}
+.spx .cyc-weeks{display:flex;flex-direction:column;gap:6px}
+.spx .cyc-wk{display:flex;align-items:center;gap:6px;border-radius:var(--sp-r-sm);background:var(--sp-bg);border:1px solid transparent;padding:2px 4px;transition:box-shadow .15s}
+.spx .cyc-wk.cur{border-color:var(--sp-brand)}
+.spx .cyc-wk.on{background:var(--sp-tint-a);box-shadow:var(--sp-shadow)}
+.spx .cyc-main{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:6px 10px;border:0;background:transparent;font:inherit;color:inherit;text-align:right;cursor:pointer;padding:6px 4px;flex-wrap:wrap;border-radius:var(--sp-r-sm)}
+.spx .cyc-main:focus-visible{outline:2px solid var(--sp-brand);outline-offset:1px}
+.spx .cyc-dates{display:flex;flex-direction:column;min-width:0}
+.spx .days7{display:flex;gap:3px;margin-inline-start:auto}
+.spx .days7 span{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:11px;background:var(--sp-chip);color:var(--sp-soft)}
+.spx .days7 .sh{background:var(--sp-brand-dark);color:var(--sp-bg)}
+.spx .days7 .out{opacity:.35}
+.spx .cyc-set{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.spx .cyc-set .lbl{font-size:13px;color:var(--sp-soft)}
+.spx .cyc-set .f{display:flex;flex-direction:column;gap:4px;min-width:0;align-items:flex-start}
+.spx .cyc-set .f .seg,.spx .cyc-set .f select,.spx .cyc-set .f input{align-self:stretch}
+.spx .stepper .v{min-width:84px;text-align:center;font-size:14px;padding:0 6px}
+@media (max-width:440px){.spx .days7{width:100%;margin:0}}
 .spx .ing input{padding:5px 7px}
 .spx .calc{display:grid;grid-template-columns:minmax(0,1fr) 60px 60px 104px;gap:2px 10px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--sp-line);font-size:14px}
 .spx .calc.h{font-size:12px;color:var(--sp-soft)}
@@ -9171,7 +9192,7 @@ const IC = {
   file:'<path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8 13h8M8 17h5"/>',
   link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
   user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', receipt:'<path d="M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4"/>',
-  menu:'<path d="M7 3v18M4 3v5a3 3 0 0 0 6 0V3M17 3c-2 0-3 3-3 7h3v11"/>', report:'<path d="M4 4h16v16H4zM8 16v-4M12 16V8M16 16v-6"/>',
+  menu:'<path d="M7 3v18M4 3v5a3 3 0 0 0 6 0V3M17 3c-2 0-3 3-3 7h3v11"/>', cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', chevR:'<path d="M9 6l6 6-6 6"/>', chevL:'<path d="M15 6l-6 6 6 6"/>', gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>', report:'<path d="M4 4h16v16H4zM8 16v-4M12 16V8M16 16v-6"/>',
   inbox:'<path d="M3 13l3-8h12l3 8v6H3zM3 13h5l1 3h6l1-3h5"/>',
   heart:'<path d="M12 20s-7.5-4.6-9.3-9.2A5 5 0 0 1 12 6.3a5 5 0 0 1 9.3 4.5C19.5 15.4 12 20 12 20z"/>',
   download:'<path d="M12 4v11M7 10l5 5 5-5M4 20h16"/>'
@@ -9217,7 +9238,7 @@ const STORE = 'supply-app-v1';
 const SUPPLY_KEYS = {
   'supply-data': ['cats','lists','links','linkDismiss','suppliers','meta'],
   'supplyOrders-data': ['orders','shortages','notes'],
-  'supplyKitchen-data': ['dishes','menu','par','stock','requests','rotation','rotationStart']
+  'supplyKitchen-data': ['dishes','menu','par','stock','requests','rotation','rotationStart','cycle','weekOver','menuPrev']
 };
 const DEFAULT_CATS = [
   {id:'cat-dry', name:'מזון יבש ומוצרי יסוד', cycleDays:14},
@@ -9228,7 +9249,7 @@ const DEFAULT_CATS = [
 ];
 function emptyState(){
   return {cats: DEFAULT_CATS.map(c=>({...c})), lists:[], links:{}, linkDismiss:[], suppliers:{}, meta:{},
-    orders:[], shortages:[], notes:[], dishes:[], menu:[], par:{}, stock:[], requests:[], rotation:1, rotationStart:''};
+    orders:[], shortages:[], notes:[], dishes:[], menu:[], par:{}, stock:[], requests:[], rotation:1, rotationStart:'', cycle:null, weekOver:{}, menuPrev:[]};
 }
 let S = emptyState();
 const synced = {};      // key -> הטקסט שנמצא כרגע בענן (לפי מה שהמכשיר הזה יודע)
@@ -10380,22 +10401,64 @@ function trackPar(key){
 }
 
 /* ============ 3. תפריט ============ */
-/* סבב תפריט: שבועי, או דו-שבועי (שבוע א׳ / שבוע ב׳ מתחלפים) */
+/* סבב התפריט: 1 עד 6 שבועות (שבוע א׳, ב׳, …), בשני מצבים:
+   month — מתחיל מחדש בכל חודש. שבוע שלם (ראשון–שבת) שייך לחודש שבו נופל יום ראשון שלו:
+           ראשון ב-1–7 לחודש = שבוע 1 בחודש, 8–14 = שבוע 2 … 29–31 = שבוע 5.
+           שבועות 1–4 בחודש רצים לפי הסבב. שבוע 5: חוזר לשבוע א׳ (wrap), חוזר על התפריט של שבוע 4 (last), או שבוע מיוחד (special = 7).
+           במצב הזה הסבב הוא עד 5 שבועות, כי בחודש יש לכל היותר 5.
+   cont  — רץ ברצף מתאריך התחלה, בלי קשר לחודש.
+   S.weekOver[יום ראשון] = מספר שבוע, או 'x' לשבוע בלי ארוחות. חל רק על אותו שבוע.
+   נתונים ישנים (S.rotation / S.rotationStart) נקראים כמו קודם עד שנשמרת הגדרה חדשה.
+   ארוחות לא נמחקות כשמקצרים סבב: הן מוסתרות וחוזרות כשמאריכים. */
 const sundayOf = ds => { const d = new Date(ds+'T00:00:00'); d.setDate(d.getDate()-d.getDay()); return iso(d); };
 const addDays = (ds, n) => { const d = new Date(ds+'T00:00:00'); d.setDate(d.getDate()+n); return iso(d); };
-const rotation = () => S.rotation===2 ? 2 : 1;
-const rotStart = () => S.rotationStart || sundayOf(today());
-function weekNumOf(ds){ if(rotation()===1) return 1; const w = Math.floor(dayDiff(rotStart(), sundayOf(ds))/7); return ((w%2)+2)%2 + 1; }
-const WEEK_LBL = ['','שבוע א׳','שבוע ב׳'];
+const SPECIAL_W = 7;
+const WEEK_LET = ['—','א׳','ב׳','ג׳','ד׳','ה׳','ו׳','מיוחד'];
+const WEEK_LBL = w => w===SPECIAL_W ? 'שבוע מיוחד' : (w>=1 && w<=6) ? 'שבוע '+WEEK_LET[w] : 'בלי ארוחות';
+const isDate = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+function cycle(){
+  const c = S.cycle && typeof S.cycle === 'object' ? S.cycle : null;
+  if(!c) return S.rotation===2
+    ? {len:2, mode:'cont', fifth:'wrap', anchor: isDate(S.rotationStart) ? sundayOf(S.rotationStart) : sundayOf(today())}
+    : {len:1, mode:'month', fifth:'wrap', anchor: sundayOf(today())};
+  const mode = c.mode==='cont' ? 'cont' : 'month';
+  return {len: Math.min(mode==='month'?5:6, Math.max(1, parseInt(c.len)||1)), mode,
+    fifth: c.fifth==='last' || c.fifth==='special' ? c.fifth : 'wrap', anchor: isDate(c.anchor) ? sundayOf(c.anchor) : sundayOf(today())};
+}
+const rotation = () => cycle().len;
+const hasSpecial = () => { const c = cycle(); return c.mode==='month' && c.fifth==='special' && c.len < 5; };
+const activeWeeks = () => { const a = Array.from({length:rotation()}, (_,i)=>i+1); if(hasSpecial()) a.push(SPECIAL_W); return a; };
+const isActiveWeek = w => activeWeeks().includes(w);
+const multiWeek = () => activeWeeks().length > 1;
+const weekOfMonth = sun => Math.floor((+sun.slice(8,10)-1)/7) + 1;
+function cycleWeekOf(sun){
+  const c = cycle();
+  if(c.mode==='cont'){ const n = Math.round(dayDiff(c.anchor, sun)/7); return ((n % c.len) + c.len) % c.len + 1; }
+  const i = weekOfMonth(sun);
+  if(i <= 4 || c.len >= 5) return ((i-1) % c.len) + 1;
+  return c.fifth==='special' ? SPECIAL_W : c.fifth==='last' ? ((4-1) % c.len) + 1 : 1;
+}
+function weekNumOf(ds){
+  const sun = sundayOf(ds); const o = S.weekOver && S.weekOver[sun];
+  if(o === 'x') return 0;
+  if(typeof o === 'number' && isActiveWeek(o)) return o;
+  return cycleWeekOf(sun);
+}
 const mealsOf = (w, day) => S.menu.filter(m=>(m.week||1)===w && m.day===day);
 const dm = ds => { const d = new Date(ds+'T00:00:00'); return d.getDate()+'.'+(d.getMonth()+1); };
 
-let MN = {view: pref('mnview') || 'week', day: new Date().getDay(), week: 1, openDish:null, dishFilter:'all', period:'week', calcWeek: 1, month:today().slice(0,7), counts:null, deduct:true, weekShabbat:true, ingQ:''};
+let MN = {view: pref('mnview') || 'week', day: new Date().getDay(), week: null, openDish:null, dishFilter:'all', period:'week', calcWeek: null, month:today().slice(0,7), counts:null, deduct:true, weekShabbat:true, ingQ:'', cycOpen:false, calYm:today().slice(0,7)};
+/* מוודא שהשבוע המוצג קיים בסבב הנוכחי; אחרת עובר לשבוע של היום */
+function normWeek(){
+  const t = weekNumOf(today()), def = isActiveWeek(t) ? t : 1;
+  if(!isActiveWeek(MN.week)) MN.week = def;
+  if(!isActiveWeek(MN.calcWeek)) MN.calcWeek = def;
+}
 function setMnView(v){ MN.view = v; pref('mnview', v); renderMenu(); }
 function renderMenu(){
-  if(rotation()===1) MN.week = 1;
-  const intro = {week:'התפריט הקבוע. לכל ארוחה מספר סועדים ומנות. ימי החול חוזרים כל שבוע, ושבת נספרת לפי מספר השבתות הפעילות.',
-    dishes:'לכל מנה רושמים פעם אחת כמה צריך מכל מוצר ל-100 סועדים, ביחידות של המחירון. הלב מסמן מנה שהסועדים אוהבים.',
+  normWeek();
+  const intro = {week:'התפריט הקבוע. לכל ארוחה מספר סועדים ומנות. השבועות מתחלפים לפי הסבב, ושבת נספרת לפי מספר השבתות הפעילות.',
+    dishes:`לכל מנה רושמים פעם אחת כמה מקבל סועד אחד מכל מוצר, ביחידות של המחירון.${isCook()?'':' המחיר למנה מחושב לבד.'} הלב מסמן מנה שהסועדים אוהבים.`,
     calc:'מהתפריט ומספר הסועדים מחושבת כמות לכל מוצר, בקיזוז מה שיש במלאי.'}[MN.view];
   $('#sp-view').innerHTML = `
   <div class="sp-card">
@@ -10418,28 +10481,81 @@ function favChip(d, mealId){
   return `<span class="dish-chip"><button class="heart" aria-pressed="${!!d.fav}" aria-label="${d.fav?'הסרת סימון מועדפת':'סימון כמנה מועדפת'}" title="מנה מועדפת" onclick="with(SP){toggleFav('${d.id}')}">${ic('heart', 'sm'+(d.fav?' filled':''))}</button>${esc(d.name)}${mealId?`<button aria-label="הסרת ${esc(d.name)} מהארוחה" onclick="with(SP){mealDish('${mealId}','${d.id}',false)}">${ic('x','sm')}</button>`:''}</span>`;
 }
 function toggleFav(id){ const d = S.dishes.find(x=>x.id===id); d.fav = !d.fav; save(); renderMenu(); toast(d.fav ? `${d.name} סומנה כמועדפת` : 'הסימון הוסר'); }
+const rng = (a, b) => `<span dir="ltr" class="sp-num">${dm(a)}–${dm(b)}</span>`;
+const wPill = w => `<span class="wl w${w===SPECIAL_W||(w>=1&&w<=6)?w:0}">${WEEK_LET[w===SPECIAL_W||(w>=1&&w<=6)?w:0]}</span>`;
+const monthWeeks = ym => { const out = []; let s = sundayOf(ym+'-01'); if(s.slice(0,7) < ym) s = addDays(s, 7); while(s.slice(0,7) === ym){ out.push(s); s = addDays(s, 7); } return out; };
+const dishCost1 = (d, pm) => d ? d.ings.reduce((s,g)=>{ const p = pm.get(resolve(g.key)); return s + (p ? p.offers[0].price*(+g.per100||0)/100 : 0); },0) : 0;
+function cycleCard(){
+  const c = cycle(), cook = isCook(), curSun = sundayOf(today()), ym = MN.calYm;
+  const fifthTxt = {wrap:'חוזר לשבוע א׳', last:`חוזר על התפריט של ${WEEK_LBL(((4-1) % c.len) + 1)}`, special:'מקבל תפריט מיוחד משלו'}[c.fifth];
+  const rule = c.len===1 ? 'אותו תפריט חוזר בכל שבוע.'
+    : c.mode==='month' ? `השבוע שיום ראשון שלו נופל ב-1 עד 7 לחודש הוא שבוע א׳, ואחריו ${activeWeeks().filter(w=>w>1&&w<=6).map(w=>WEEK_LET[w]).join(', ')}${c.len<4?' ושוב מההתחלה':''}. שבוע שמתחיל בחודש הקודם נשאר כולו שבוע של החודש הקודם.${c.len<=4?` שבוע חמישי בחודש ${fifthTxt}.`:''}`
+    : `הסבב רץ ברצף מיום ראשון ${dm(c.anchor)}: ${activeWeeks().map(w=>WEEK_LET[w]).join(', ')}, ושוב א׳. לא מתאפס בתחילת חודש.`;
+  const set = MN.cycOpen && !cook ? `<div class="detail">
+      <div class="cyc-set">
+        <div class="f"><span class="lbl">אורך הסבב</span>
+          <div class="stepper" style="align-self:flex-start"><button aria-label="פחות שבועות" onclick="with(SP){cycLen(-1)}">−</button><span class="v sp-num">${c.len===1?'שבוע אחד':c.len+' שבועות'}</span><button aria-label="יותר שבועות" onclick="with(SP){cycLen(1)}">+</button></div></div>
+        <div class="f"><span class="lbl">איך הסבב רץ</span>
+          <div class="seg" role="group" aria-label="מצב הסבב"><button aria-pressed="${c.mode==='month'}" onclick="with(SP){setCycle('mode','month')}">מתחיל מחדש כל חודש</button><button aria-pressed="${c.mode==='cont'}" onclick="with(SP){setCycle('mode','cont')}">רציף</button></div></div>
+        ${c.mode==='month' && c.len<=4 ? `<label class="f"><span class="lbl">שבוע 5 בחודש</span>
+          <select aria-label="מה קורה בשבוע החמישי בחודש" onchange="with(SP){setCycle('fifth',this.value)}">
+            <option value="wrap" ${c.fifth==='wrap'?'selected':''}>חוזר לשבוע א׳</option>
+            <option value="last" ${c.fifth==='last'?'selected':''}>חוזר על התפריט של שבוע 4</option>
+            <option value="special" ${c.fifth==='special'?'selected':''}>שבוע מיוחד משלו</option></select></label>`:''}
+        ${c.mode==='cont' && c.len>1 ? `<label class="f"><span class="lbl">שבוע א׳ מתחיל ביום ראשון</span><input id="sp-cycAnchor" type="date" value="${c.anchor}" onchange="with(SP){if(this.value)setCycle('anchor',sundayOf(this.value))}"></label>`:''}
+      </div>
+      ${c.mode==='month' && (S.cycle?.len|0) > 5 ? '<p class="muted">בחודש יש לכל היותר 5 שבועות, לכן במצב הזה הסבב הוא עד 5. שבוע ו׳ נשמר וחוזר במצב רציף.</p>':''}
+    </div>` : '';
+  const weeks = monthWeeks(ym);
+  const rows = weeks.map(sun => { const w = weekNumOf(sun), o = S.weekOver && S.weekOver[sun];
+    const manual = o==='x' || (typeof o==='number' && isActiveWeek(o));
+    const fifth = c.mode==='month' && c.len<=4 && weekOfMonth(sun)===5;
+    const days = Array.from({length:7}, (_,i)=>{ const ds = addDays(sun,i); return `<span class="${i===6?'sh':''} ${ds.slice(0,7)!==ym?'out':''}">${+ds.slice(8,10)}</span>`; }).join('');
+    return `<div class="cyc-wk ${sun===curSun?'cur':''} ${w && w===MN.week?'on':''}">
+      <button class="cyc-main" aria-label="הצגת התפריט של השבוע ${dm(sun)}" onclick="with(SP){calPick('${sun}')}">${wPill(w)}
+        <span class="cyc-dates"><b>${rng(sun, addDays(sun,6))}</b><span class="muted">${sun===curSun?'השבוע · ':''}${c.mode==='month'?'שבוע '+weekOfMonth(sun)+' בחודש':WEEK_LBL(w)}${manual?' <span class="tag a">שונה ידנית</span>':fifth?' <span class="tag">שבוע חמישי</span>':''}</span></span>
+        <span class="days7" aria-hidden="true">${days}</span></button>
+      ${cook?'':`<button class="sb icon sb-ghost" aria-label="שינוי התפריט לשבוע ${dm(sun)} בלבד" title="שינוי לשבוע הזה בלבד" onclick="with(SP){openWeekOver('${sun}')}">${ic('edit','sm')}</button>`}
+    </div>`; }).join('');
+  return `<div class="sp-card">
+    <div class="row between">
+      <div class="row grow">${ic('repeat')}<div class="grow"><h3>סבב התפריט</h3><span class="muted">${c.len===1?'שבוע אחד':c.len+' שבועות'}${c.len>1?' · '+(c.mode==='month'?'מתחיל מחדש כל חודש':'רץ ברצף'):''}${hasSpecial()?' · עם שבוע מיוחד':''}</span></div></div>
+      ${cook?'':`<button class="sb sb-ghost sm" aria-expanded="${!!MN.cycOpen}" onclick="with(SP){MN.cycOpen=!MN.cycOpen;renderMenu()}">${ic(MN.cycOpen?'x':'gear','sm')}${MN.cycOpen?'סגירה':'הגדרות'}</button>`}
+    </div>
+    ${set}
+    <p class="note">${rule}</p>
+    <div class="row between">
+      <button class="sb icon sb-ghost" aria-label="חודש קודם" onclick="with(SP){calNav(-1)}">${ic('chevR','sm')}</button>
+      <div style="text-align:center"><h3>${monthName(ym)}</h3><span class="muted">לחיצה על שבוע מציגה את התפריט שלו</span></div>
+      <button class="sb icon sb-ghost" aria-label="חודש הבא" onclick="with(SP){calNav(1)}">${ic('chevL','sm')}</button>
+    </div>
+    <div class="cyc-weeks">${rows}</div>
+  </div>`;
+}
 function menuWeek(){
-  const d = MN.day, w = MN.week, rot = rotation();
-  const meals = mealsOf(w, d);
+  const d = MN.day, w = MN.week, multi = multiWeek(), cook = isCook();
+  const meals = mealsOf(w, d); const pm = cook ? null : productMap();
   const avail = (d===6 ? MEALS_SHABBAT : MEALS_WEEK).filter(n=>!meals.some(m=>m.meal===n));
   const inWeek = new Set(S.menu.filter(m=>(m.week||1)===w).flatMap(m=>m.dishes));
   const favOut = S.dishes.filter(x=>x.fav && !inWeek.has(x.id));
   const curW = weekNumOf(today());
-  return `<div class="sp-card">
-    <div class="row between">
-      <div class="row"><span class="muted">סבב התפריט</span>
-        <div class="seg small" role="group" aria-label="סבב התפריט"><button aria-pressed="${rot===1}" onclick="with(SP){setRotation(1)}">שבועי</button><button aria-pressed="${rot===2}" onclick="with(SP){setRotation(2)}">דו-שבועי</button></div></div>
-      ${rot===2 ? `<div class="seg small" role="group" aria-label="איזה שבוע"><button aria-pressed="${w===1}" onclick="with(SP){MN.week=1;renderMenu()}">שבוע א׳</button><button aria-pressed="${w===2}" onclick="with(SP){MN.week=2;renderMenu()}">שבוע ב׳</button></div>`:''}
-    </div>
-    ${rot===2 ? `<div class="row between"><span class="muted">השבוע הנוכחי (${dm(sundayOf(today()))}–${dm(addDays(sundayOf(today()),6))}) הוא <b>${WEEK_LBL[curW]}</b></span>
-      <div class="row"><button class="sb sb-ghost sm" onclick="with(SP){swapRotation()}">${ic('repeat','sm')}להחליף</button><button class="sb sb-ghost sm" onclick="with(SP){copyWeek()}">${ic('copy','sm')}העתקת שבוע א׳ לשבוע ב׳</button></div></div>`:''}
+  const weekMeals = S.menu.filter(m=>(m.week||1)===w).length;
+  const prev = (S.menuPrev||[]).filter(p=>p.week===w).slice(-1)[0];
+  return `${cycleCard()}
+  <div class="sp-card">
+    ${multi ? `<div class="row between"><h2>${WEEK_LBL(w)}</h2>
+      <button class="sb sb-soft sm" onclick="with(SP){openCopyWeek()}">${ic('copy','sm')}העתקת שבוע</button></div>
+    <div class="chips" role="group" aria-label="בחירת שבוע בסבב">${activeWeeks().map(x=>{ const n = S.menu.filter(m=>(m.week||1)===x).length; return `<button class="chip" aria-pressed="${x===w}" onclick="with(SP){MN.week=${x};renderMenu()}">${WEEK_LBL(x)}${n?` · <span class="sp-num">${n}</span>`:''}</button>`; }).join('')}</div>
+    <span class="muted">השבוע הנוכחי (${rng(sundayOf(today()), addDays(sundayOf(today()),6))}): <b>${WEEK_LBL(curW)}</b></span>
+    ${!weekMeals ? `<div class="note"><b>${WEEK_LBL(w)} עדיין ריק</b><span class="muted">אפשר לבנות אותו מאפס, או להעתיק אליו שבוע קיים ולשנות רק מה שצריך.</span><div class="row"><button class="sb sm" onclick="with(SP){openCopyWeek()}">${ic('copy','sm')}העתקת שבוע לכאן</button></div></div>`:''}`:''}
+    ${prev ? `<div class="row between"><span class="muted">התפריט הקודם של ${WEEK_LBL(w)} נשמר ב-${dm(prev.date)} לפני העתקה</span><button class="sb sb-ghost sm" onclick="with(SP){askRestoreWeek('${prev.id}')}">${ic('repeat','sm')}שחזור</button></div>`:''}
     <div class="chips">${DAYS_S.map((n,i)=>{ const c = mealsOf(w,i).length; return `<button class="chip" aria-pressed="${i===d}" onclick="with(SP){MN.day=${i};renderMenu()}">${n}${c?` · <span class="sp-num">${c}</span>`:''}</button>`; }).join('')}</div>
-    <div class="row between"><h2>${d===6?'שבת קודש':'יום '+DAYS[d]}${rot===2?` · ${WEEK_LBL[w]}`:''}</h2>
+    <div class="row between"><h2>${d===6?'שבת קודש':'יום '+DAYS[d]}${multi?` · ${WEEK_LBL(w)}`:''}</h2>
       ${d>0 && d<6 ? `<button class="sb sb-ghost sm" onclick="with(SP){copyDay(${d})}">${ic('copy','sm')}העתקה מיום ${DAYS[d-1]}</button>`:''}</div>
     <div style="display:flex;flex-direction:column;gap:8px">
     ${meals.length ? meals.map(m=>`<div class="meal">
       <div class="row between">
-        <h3>${esc(m.meal)}</h3>
+        <div><h3>${esc(m.meal)}</h3>${(()=>{ if(cook) return ''; const c1 = m.dishes.reduce((s,id)=>s+dishCost1(S.dishes.find(x=>x.id===id), pm),0); return c1 ? `<span class="muted sp-num">כ-${money(c1)} לסועד</span>` : ''; })()}</div>
         <div class="row"><span class="muted">סועדים</span>
           <div class="stepper"><button aria-label="פחות סועדים" onclick="with(SP){mealDiners('${m.id}',-10)}">−</button><input class="sp-num" type="number" min="0" inputmode="numeric" value="${m.diners}" aria-label="מספר סועדים" onchange="with(SP){mealDiners('${m.id}',0,this.value)}"><button aria-label="יותר סועדים" onclick="with(SP){mealDiners('${m.id}',10)}">+</button></div>
           <button class="sb icon sb-ghost danger" aria-label="הסרת הארוחה" onclick="with(SP){askDelMeal('${m.id}')}">${ic('trash','sm')}</button></div>
@@ -10452,21 +10568,85 @@ function menuWeek(){
     ${avail.length ? `<div class="row">${avail.map(n=>`<button class="sb sb-ghost sm" onclick="with(SP){addMeal(${d},'${n}')}">${ic('plus','sm')}${n}</button>`).join('')}</div>`:''}
   </div>
   ${favOut.length ? `<div class="sp-card">
-    <div class="row between"><h3>מנות מועדפות שלא מופיעות ${rot===2?'ב'+WEEK_LBL[w]:'השבוע'}</h3><span class="muted">אפשר להוסיף אותן מהרשימה בכל ארוחה</span></div>
+    <div class="row between"><h3>מנות מועדפות שלא מופיעות ${multi?'ב'+WEEK_LBL(w):'השבוע'}</h3><span class="muted">אפשר להוסיף אותן מהרשימה בכל ארוחה</span></div>
     <div class="row">${favOut.map(x=>favChip(x)).join('')}</div>
   </div>`:''}`;
 }
-function setRotation(n){
-  if(n===rotation()) return;
-  if(n===2){
-    if(!S.rotationStart) S.rotationStart = sundayOf(today());
-    if(!S.menu.some(m=>(m.week||1)===2)){ S.menu.filter(m=>(m.week||1)===1).forEach(m=>S.menu.push({...m, id:uid(), week:2, dishes:[...m.dishes]})); sortMenu(); toast('שבוע ב׳ נוצר כהעתק של שבוע א׳. עכשיו אפשר לשנות אותו'); }
-  } else toast('התפריט השבועי פעיל. שבוע ב׳ נשמר אם תחזור לדו-שבועי');
-  S.rotation = n; MN.week = 1; MN.calcWeek = 1; MN.counts = null; save(); renderMenu();
+/* ---- הגדרות הסבב ---- */
+function setCycle(k, v){
+  const c = {...cycle()}; c[k] = v;
+  if(k==='mode' && v==='cont' && S.cycle && (S.cycle.len|0) > c.len) c.len = Math.min(6, S.cycle.len|0);  // שבוע ו׳ שמור חוזר במצב רציף
+  if(k==='mode' && v==='month' && c.len > 5) c.len = 5;
+  S.cycle = c; MN.counts = null; normWeek(); save(); renderMenu();
 }
-function swapRotation(){ S.rotationStart = addDays(rotStart(), 7); MN.counts = null; save(); renderMenu(); toast(`השבוע הנוכחי הוא עכשיו ${WEEK_LBL[weekNumOf(today())]}`); }
-function copyWeek(){
-  confirmBox('להחליף את כל שבוע ב׳ בהעתק של שבוע א׳?', ()=>{ S.menu = S.menu.filter(m=>(m.week||1)!==2); S.menu.filter(m=>(m.week||1)===1).forEach(m=>S.menu.push({...m, id:uid(), week:2, dishes:[...m.dishes]})); sortMenu(); save(); MN.week=2; renderMenu(); toast('שבוע ב׳ הועתק משבוע א׳'); });
+function cycLen(d){
+  const c = cycle(), max = c.mode==='month' ? 5 : 6, n = Math.min(max, Math.max(1, c.len + d));
+  if(n === c.len){ toast(d>0 ? (c.mode==='month' ? 'בחודש יש לכל היותר 5 שבועות' : 'אפשר עד 6 שבועות') : 'הסבב הוא לפחות שבוע אחד'); return; }
+  S.cycle = {...c, len:n}; MN.counts = null;
+  if(n > c.len){ MN.week = n; toast(S.menu.some(m=>(m.week||1)===n) ? `${WEEK_LBL(n)} חזר עם התפריט ששמור לו` : `נוסף ${WEEK_LBL(n)}. אפשר להעתיק אליו שבוע קיים`); }
+  else { const hid = S.menu.filter(m=>(m.week||1)===c.len).length; toast(hid ? `${WEEK_LBL(c.len)} הוסתר. הארוחות שלו שמורות ויחזרו אם תאריך שוב את הסבב` : `הסבב קוצר ל-${n===1?'שבוע אחד':n+' שבועות'}`); }
+  normWeek(); save(); renderMenu();
+}
+function calNav(d){ const [y,m] = MN.calYm.split('-').map(Number); const t = new Date(y, m-1+d, 1); MN.calYm = iso(t).slice(0,7); renderMenu(); }
+function calPick(sun){
+  const w = weekNumOf(sun);
+  if(!w){ toast('השבוע הזה מסומן בלי ארוחות'); return; }
+  MN.week = w; renderMenu();
+}
+/* שינוי ידני לשבוע אחד בלבד (חג, חופשה). לא משנה את הסבב */
+function openWeekOver(sun){
+  const o = S.weekOver && S.weekOver[sun]; const auto = cycleWeekOf(sun);
+  const cur = o==='x' ? 'x' : (typeof o==='number' && isActiveWeek(o)) ? String(o) : '';
+  modal(`<div class="mhead"><h2>השבוע <span dir="ltr">${dm(sun)}–${fullDate(addDays(sun,6))}</span></h2>${closeBtn()}</div>
+    <p class="muted">למשל שבוע של חג או חופשה. השינוי חל רק על השבוע הזה, והסבב ממשיך כרגיל אחריו.</p>
+    <label class="f">התפריט בשבוע הזה<select id="sp-wkOver">
+      <option value="">לפי הסבב (${esc(WEEK_LBL(auto))})</option>
+      ${activeWeeks().map(w=>`<option value="${w}" ${cur===String(w)?'selected':''}>${WEEK_LBL(w)}</option>`).join('')}
+      <option value="x" ${cur==='x'?'selected':''}>בלי ארוחות (לא ייכנס לחישוב ההזמנה)</option></select></label>
+    <div class="row"><button class="sb" onclick="with(SP){saveWeekOver('${sun}')}">${ic('check','sm')}שמירה</button><button class="sb sb-ghost" onclick="with(SP){closeModal()}">ביטול</button></div>`);
+}
+function saveWeekOver(sun){
+  const v = $('#sp-wkOver') ? $('#sp-wkOver').value : '';
+  const o = {...(S.weekOver && typeof S.weekOver==='object' ? S.weekOver : {})};
+  if(!v) delete o[sun]; else o[sun] = v==='x' ? 'x' : parseInt(v);
+  S.weekOver = o; MN.counts = null; save(); closeModal(); renderMenu();
+  toast(!v ? 'השבוע חזר לפי הסבב' : v==='x' ? 'השבוע סומן בלי ארוחות' : `בשבוע הזה יוגש ${WEEK_LBL(+v)}`);
+}
+/* העתקת שבוע: התפריט שהיה בשבוע היעד נשמר בצד ואפשר לשחזר אותו */
+function openCopyWeek(){
+  const ws = activeWeeks(); const to = MN.week; const from = ws.find(w=>w!==to && S.menu.some(m=>(m.week||1)===w)) || ws.find(w=>w!==to) || ws[0];
+  const opts = sel => ws.map(w=>`<option value="${w}" ${w===sel?'selected':''}>${WEEK_LBL(w)} (${S.menu.filter(m=>(m.week||1)===w).length} ארוחות)</option>`).join('');
+  modal(`<div class="mhead"><h2>העתקת שבוע</h2>${closeBtn()}</div>
+    <label class="f">מתוך<select id="sp-cpFrom">${opts(from)}</select></label>
+    <label class="f">אל<select id="sp-cpTo">${opts(to)}</select></label>
+    <p class="note">כל הארוחות, המנות ומספרי הסועדים יועתקו. אם בשבוע היעד כבר יש תפריט, הוא נשמר בצד ואפשר לשחזר אותו בלחיצה.</p>
+    <div class="row"><button class="sb" onclick="with(SP){doCopyWeek()}">${ic('copy','sm')}העתקה</button><button class="sb sb-ghost" onclick="with(SP){closeModal()}">ביטול</button></div>`);
+}
+function stashWeek(w){
+  const old = S.menu.filter(m=>(m.week||1)===w); if(!old.length) return;
+  S.menuPrev = [...(Array.isArray(S.menuPrev) ? S.menuPrev : []), {id:uid(), week:w, date:today(), meals: old.map(m=>({...m, dishes:[...m.dishes]}))}].slice(-20);
+}
+function doCopyWeek(){
+  const from = parseInt($('#sp-cpFrom')?.value), to = parseInt($('#sp-cpTo')?.value);
+  if(!isActiveWeek(from) || !isActiveWeek(to)) return;
+  if(from===to){ toast('בחר שני שבועות שונים'); return; }
+  const src = S.menu.filter(m=>(m.week||1)===from);
+  if(!src.length){ toast(`${WEEK_LBL(from)} ריק, אין מה להעתיק`); return; }
+  stashWeek(to);
+  S.menu = S.menu.filter(m=>(m.week||1)!==to);
+  src.forEach(m=>S.menu.push({...m, id:uid(), week:to, dishes:[...m.dishes]}));
+  sortMenu(); MN.week = to; save(); closeModal(); renderMenu(); toast(`${WEEK_LBL(from)} הועתק ל${WEEK_LBL(to)}`);
+}
+function askRestoreWeek(pid){
+  const p = (S.menuPrev||[]).find(x=>x.id===pid); if(!p) return;
+  confirmBox(`להחזיר את התפריט של ${WEEK_LBL(p.week)} כפי שהיה ב-${dm(p.date)}? התפריט הנוכחי שלו יישמר בצד.`, ()=>{
+    const cur = S.menu.filter(m=>(m.week||1)===p.week);
+    S.menuPrev = (S.menuPrev||[]).filter(x=>x.id!==pid);
+    if(cur.length) S.menuPrev = [...S.menuPrev, {id:uid(), week:p.week, date:today(), meals: cur.map(m=>({...m, dishes:[...m.dishes]}))}].slice(-20);
+    S.menu = S.menu.filter(m=>(m.week||1)!==p.week);
+    p.meals.forEach(m=>S.menu.push({...m, id:uid(), week:p.week, dishes:[...(m.dishes||[])]}));
+    sortMenu(); MN.week = p.week; save(); renderMenu(); toast('התפריט שוחזר');
+  });
 }
 function askDelMeal(id){ const m = S.menu.find(x=>x.id===id); confirmBox(`להסיר את ארוחת ${esc(m.meal)} מהתפריט?`, ()=>{ S.menu = S.menu.filter(x=>x.id!==id); save(); renderMenu(); }); }
 function addMeal(day, meal){ const prev = mealsOf(MN.week, day).slice(-1)[0]; S.menu.push({id:uid(), week:MN.week, day, meal, diners: prev?.diners || 100, dishes:[]}); sortMenu(); save(); renderMenu(); }
@@ -10492,7 +10672,7 @@ function createDish(mealId){
 }
 function menuDishes(){
   const pm = productMap();
-  const used = id => S.menu.filter(m=>m.dishes.includes(id) && ((m.week||1)===1 || rotation()===2)).length;
+  const used = id => S.menu.filter(m=>m.dishes.includes(id) && isActiveWeek(m.week||1)).length;
   const list = S.dishes.filter(d=>MN.dishFilter!=='fav' || d.fav).slice().sort((a,b)=>(b.fav?1:0)-(a.fav?1:0));
   const nFav = S.dishes.filter(d=>d.fav).length;
   return `<div class="row between">
@@ -10500,29 +10680,32 @@ function menuDishes(){
     <button class="sb sm" onclick="with(SP){newDish()}">${ic('plus','sm')}מנה חדשה</button></div>
   ${list.length ? '' : `<div class="sp-card sp-empty">עוד לא סימנת מנות מועדפות. לחץ על הלב ליד מנה.</div>`}
   ${list.map(d=>{ const open = MN.openDish===d.id;
-    const cost = d.ings.reduce((s,g)=>{ const p = pm.get(resolve(g.key)); return s + (p ? p.offers[0].price*g.per100 : 0); },0);
+    const cost = dishCost1(d, pm);
     const missing = d.ings.filter(g=>!pm.has(resolve(g.key))).length;
+    const noQty = d.ings.filter(g=>!(+g.per100 > 0)).length;
     return `<article class="sp-card">
       <div class="row between">
         <div class="row grow" style="flex-wrap:nowrap;align-items:flex-start">
           <button class="heart" style="margin-top:2px" aria-pressed="${!!d.fav}" aria-label="${d.fav?'הסרת סימון מועדפת':'סימון כמנה מועדפת'}" onclick="with(SP){toggleFav('${d.id}')}">${ic('heart', d.fav?'filled':'')}</button>
-          <div class="grow"><h3>${esc(d.name)}${d.fav?' <span class="tag r">מועדפת</span>':''}</h3><span class="muted">${d.ings.length} מוצרים · ב-${used(d.id)} ארוחות${!isCook()&&cost?` · עלות ל-100 סועדים כ-${money(cost)}`:''}</span>
+          <div class="grow"><h3>${esc(d.name)}${d.fav?' <span class="tag r">מועדפת</span>':''}</h3><span class="muted">${d.ings.length} מוצרים · ב-${used(d.id)} ארוחות${!isCook()&&cost?` · <b class="sp-num">מחיר למנה כ-${money(cost)}</b>`:''}</span>
           ${d.note?`<div class="muted">״${esc(d.note)}״</div>`:''}
-          ${missing?`<div><span class="tag a">${ic('alert','sm')}${missing} מוצרים לא נמצאו במחירונים</span></div>`:''}</div>
+          ${missing||noQty?`<div class="row">${missing?`<span class="tag a">${ic('alert','sm')}${missing} מוצרים לא נמצאו במחירונים</span>`:''}${noQty?`<span class="tag a">${ic('alert','sm')}${noQty} בלי כמות לסועד</span>`:''}</div>`:''}</div>
         </div>
         <button class="sb sb-ghost sm" onclick="with(SP){MN.openDish=MN.openDish==='${d.id}'?null:'${d.id}';MN.ingQ='';renderMenu()}">${open?'סגירה':'עריכה'}</button>
       </div>
       ${open ? `<div class="detail">
         <label class="f">מה הסועדים אומרים על המנה<input value="${esc(d.note||'')}" placeholder="למשל: אוהבים עם הרבה רוטב, נגמר מהר" onchange="with(SP){setDishNote('${d.id}',this.value)}"></label>
-        <div class="ing muted" style="font-size:12px"><span>מוצר</span><span>ל-100 סועדים</span><span></span></div>
-        ${d.ings.map((g,i)=>{ const p = pm.get(resolve(g.key)); return `<div class="ing">
-          <div class="grow"><div>${esc(p?.name||g.name)}</div><span class="muted">${p?esc(p.unit):'<span class="tag a">לא נמצא במחירונים</span>'}</span></div>
-          <input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${g.per100}" aria-label="כמות ל-100 סועדים" onchange="with(SP){setIng('${d.id}',${i},this.value)}">
+        <div class="ing muted" style="font-size:12px;border-bottom:0"><span>מוצר</span><span>כמות לסועד אחד</span><span></span></div>
+        ${d.ings.map((g,i)=>{ const p = pm.get(resolve(g.key)), per = perDiner(g), u = p ? uLbl(p.unit) : '';
+          return `<div class="ing">
+          <div class="grow"><div>${esc(p?.name||g.name)}</div><span class="muted">${p?`${esc(p.unit)}${!isCook()?` · ${money(p.offers[0].price)} ל${esc(u||'יחידה')}`:''}`:'<span class="tag a">לא נמצא במחירונים</span>'}</span></div>
+          <div class="stepper"><button aria-label="פחות" onclick="with(SP){stepIng('${d.id}',${i},-1)}">−</button><input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${per}" aria-label="כמות לסועד אחד${u?' ב'+esc(u):''}" onchange="with(SP){setIng('${d.id}',${i},this.value)}"><button aria-label="יותר" onclick="with(SP){stepIng('${d.id}',${i},1)}">+</button></div>
           <button class="sb icon sb-ghost danger" aria-label="הסרת מוצר" onclick="with(SP){delIng('${d.id}',${i})}">${ic('x','sm')}</button>
+          <div class="sub">${per>0?`<span class="sp-num">${qn(per)} ${esc(u)} לסועד · ${qn(+g.per100)} ל-100 סועדים</span>${p&&!isCook()?`<span class="sp-num">${money(p.offers[0].price*per)} לסועד</span>`:''}`:'<span class="tag a">חסרה כמות לסועד</span>'}</div>
         </div>`; }).join('') || '<div class="muted">עוד אין מוצרים במנה.</div>'}
         <div class="search">${ic('search','sm')}<input id="sp-ingQ" placeholder="הוספת מוצר מהמחירונים" value="${esc(MN.ingQ)}" oninput="with(SP){MN.ingQ=this.value;renderIngRes()}" autocomplete="off"></div>
         <div class="results" id="sp-ingRes"></div>
-        <p class="muted">דוגמה: 2 ביצים לסועד הן 200 ביצים ל-100 סועדים, כלומר 6.7 תבניות של 30.</p>
+        <p class="muted">דוגמה: שניצל וחצי לסועד כותבים 1.5. אורז שנמכר בק״ג כותבים בק״ג, למשל 0.08 (80 גרם). הכמות להזמנה מחושבת לפי מספר הסועדים בכל ארוחה.</p>
         <div class="row">
           <button class="sb sb-ghost sm" onclick="with(SP){renameDish('${d.id}')}">${ic('edit','sm')}שינוי שם</button>
           ${!S.menu.some(m=>m.dishes.includes(d.id))?`<button class="sb sb-ghost sm danger" onclick="with(SP){askDelDish('${d.id}')}">${ic('trash','sm')}מחיקת מנה</button>`:''}
@@ -10539,8 +10722,19 @@ function renderIngRes(){
   box.innerHTML = products().filter(p=>!have.has(p.key) && norm([p.name,...p.aliases].join(' ')).includes(q)).slice(0,6)
     .map(p=>`<button class="res" onclick="with(SP){addIng('${d.id}','${p.key}')}">${ic('plus','sm')}<span class="grow">${esc(p.name)}</span><span class="muted">${esc(p.unit)}</span></button>`).join('') || '<div class="muted">לא נמצא במחירונים</div>';
 }
-function addIng(id, key){ const p = productMap().get(key); const d = S.dishes.find(x=>x.id===id); d.ings.push({key, name:p.name, per100:1}); MN.ingQ=''; save(); renderMenu(); toast('נוסף. עדכן כמות ל-100 סועדים'); }
-function setIng(id, i, v){ const n = num(v); S.dishes.find(x=>x.id===id).ings[i].per100 = n>=0 ? n : 0; save(); renderMenu(); }
+function addIng(id, key){ const p = productMap().get(key); const d = S.dishes.find(x=>x.id===id); d.ings.push({key, name:p.name, per100:0}); MN.ingQ=''; save(); renderMenu(); toast('נוסף. קבע כמה מקבל סועד אחד'); }
+/* הכמות נשמרת כמו תמיד ל-100 סועדים (per100), ומוצגת ונערכת לסועד אחד. כך הנתונים הקיימים לא משתנים */
+const round4 = n => Math.round(n*10000)/10000;
+const perDiner = g => round4((+g.per100||0)/100);
+function qtyStep(unit){ const u = String(unit||''); if(/גרם|גר['׳]|מ["״']?ל|\bgr?\b|\bml\b/i.test(u)) return 10; if(/ק["״'׳]?ג|קילו|ליטר|^ל['׳]?$|\bkg\b|\bl\b|lit/i.test(u)) return 0.01; return 0.5; }
+function setPer(d, i, v){ d.ings[i].per100 = round4(Math.max(0, v) * 100); }
+function setIng(id, i, v){ const d = S.dishes.find(x=>x.id===id); if(!d || !d.ings[i]) return; const n = num(v); setPer(d, i, n>=0 ? n : 0); save(); renderMenu(); }
+function stepIng(id, i, dir){
+  const d = S.dishes.find(x=>x.id===id); if(!d || !d.ings[i]) return; const g = d.ings[i];
+  const p = productMap().get(resolve(g.key)); const st = qtyStep(p ? p.unit : '');
+  const cur = perDiner(g); let n = dir > 0 ? Math.floor(round4(cur/st))*st + st : Math.ceil(round4(cur/st))*st - st;
+  setPer(d, i, round4(Math.max(0, n))); save(); renderMenu();
+}
 function renameDish(id){ const d = S.dishes.find(x=>x.id===id);
   modal(`<div class="mhead"><h2>שינוי שם מנה</h2>${closeBtn()}</div><label class="f">שם<input id="sp-dishName" value="${esc(d.name)}"></label>
     <div class="row"><button class="sb" onclick="with(SP){doRenameDish('${id}')}">${ic('check','sm')}שמירה</button></div>`); }
@@ -10549,9 +10743,10 @@ function doRenameDish(id){ const n = $('#sp-dishName').value.trim(); if(!n){ toa
 /* ---- חישוב הזמנה מהתפריט ----
    מונה: c[שבוע-1][יום] = כמה פעמים כל ארוחה של אותו שבוע ויום נכללת בתקופה */
 const zero7 = () => [0,0,0,0,0,0,0];
+const zeroW = () => Array.from({length:SPECIAL_W}, zero7);   // שבועות 1–6 ושבוע מיוחד (7)
 function countsForDates(from, nDays){
-  const c = [zero7(), zero7()];
-  for(let i=0;i<nDays;i++){ const ds = addDays(from, i); c[weekNumOf(ds)-1][new Date(ds+'T00:00:00').getDay()]++; }
+  const c = zeroW();
+  for(let i=0;i<nDays;i++){ const ds = addDays(from, i); const w = weekNumOf(ds); if(w) c[w-1][new Date(ds+'T00:00:00').getDay()]++; }
   return c;
 }
 function monthCounts(ym){
@@ -10560,8 +10755,9 @@ function monthCounts(ym){
   return countsForDates(`${ym}-${String(start).padStart(2,'0')}`, days - start + 1);
 }
 function calcCounts(){
-  if(MN.period==='week'){ const c = [zero7(), zero7()]; c[(rotation()===2 ? MN.calcWeek : 1)-1] = [1,1,1,1,1,1, MN.weekShabbat?1:0]; return c; }
-  if(!MN.counts || MN.counts.ym!==MN.month || MN.counts.rot!==rotation()) MN.counts = {ym:MN.month, rot:rotation(), c:monthCounts(MN.month)};
+  if(MN.period==='week'){ const c = zeroW(); c[(isActiveWeek(MN.calcWeek) ? MN.calcWeek : 1)-1] = [1,1,1,1,1,1, MN.weekShabbat?1:0]; return c; }
+  const sig = JSON.stringify([cycle(), S.weekOver||{}]);
+  if(!MN.counts || MN.counts.ym!==MN.month || MN.counts.sig!==sig) MN.counts = {ym:MN.month, sig, c:monthCounts(MN.month)};
   return MN.counts.c;
 }
 function computeNeeds(cntOverride, deduct){
@@ -10585,12 +10781,12 @@ function computeNeeds(cntOverride, deduct){
   return {rows, dinerMeals};
 }
 function menuCalc(){
-  const cnt = calcCounts(); const {rows, dinerMeals} = computeNeeds(); const cook = isCook(); const rot = rotation();
+  const cnt = calcCounts(); const {rows, dinerMeals} = computeNeeds(); const cook = isCook(); const multi = multiWeek();
   const months = [0,1,2].map(i=>{ const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()+i); return iso(d).slice(0,7); });
   const byCat = new Map(); rows.forEach(r => { const k = r.catId || '_'; if(!byCat.has(k)) byCat.set(k, []); byCat.get(k).push(r); });
   const grand = rows.reduce((s,r)=>s+r.toOrder*r.price,0);
   const fullCost = rows.reduce((s,r)=>s+r.qty*r.price,0);
-  const grid = w => `<div class="wdcount">${DAYS_S.map((n,i)=>`<label>${i===6?'שבתות':'ימי '+n}<input class="sp-num" type="number" min="0" max="6" inputmode="numeric" value="${cnt[w][i]}" aria-label="${(i===6?'שבתות פעילות':'מספר ימי '+DAYS[i])+(rot===2?' '+WEEK_LBL[w+1]:'')}" onchange="with(SP){MN.counts.c[${w}][${i}]=Math.max(0,parseInt(this.value)||0);renderMenu()}"></label>`).join('')}</div>`;
+  const grid = w => `<div class="wdcount">${DAYS_S.map((n,i)=>`<label>${i===6?'שבתות':'ימי '+n}<input class="sp-num" type="number" min="0" max="6" inputmode="numeric" value="${cnt[w][i]}" aria-label="${(i===6?'שבתות פעילות':'מספר ימי '+DAYS[i])+(multi?' '+WEEK_LBL(w+1):'')}" onchange="with(SP){MN.counts.c[${w}][${i}]=Math.max(0,parseInt(this.value)||0);renderMenu()}"></label>`).join('')}</div>`;
   return `<div class="sp-card">
     <div class="seg" role="group" aria-label="תקופה">
       <button aria-pressed="${MN.period==='week'}" onclick="with(SP){MN.period='week';renderMenu()}">שבוע אחד</button>
@@ -10599,8 +10795,9 @@ function menuCalc(){
     ${MN.period==='month' ? `
       <div class="chips">${months.map(m=>`<button class="chip" aria-pressed="${MN.month===m}" onclick="with(SP){MN.month='${m}';MN.counts=null;renderMenu()}">${monthName(m)}</button>`).join('')}</div>
       <p class="muted">כמה פעמים כל יום מופיע ${MN.month===today().slice(0,7)?'מהיום ועד סוף החודש':'בחודש'}. אפשר להוריד ימים שהמוסד סגור, ולקבוע כמה שבתות הוא פעיל.</p>
-      ${rot===2 ? `<span class="muted">${WEEK_LBL[1]}</span>${grid(0)}<span class="muted">${WEEK_LBL[2]}</span>${grid(1)}` : grid(0)}`
-    : `${rot===2 ? `<div class="seg small" role="group" aria-label="איזה שבוע לחשב"><button aria-pressed="${MN.calcWeek===1}" onclick="with(SP){MN.calcWeek=1;renderMenu()}">שבוע א׳</button><button aria-pressed="${MN.calcWeek===2}" onclick="with(SP){MN.calcWeek=2;renderMenu()}">שבוע ב׳</button></div>`:''}
+      ${(()=>{ const auto = monthCounts(MN.month); const ws = activeWeeks().filter(w=>auto[w-1].some(x=>x) || cnt[w-1].some(x=>x));
+        return ws.length ? ws.map(w=>`${multi?`<span class="muted">${WEEK_LBL(w)}</span>`:''}${grid(w-1)}`).join('') : '<p class="muted">אין בתקופה הזו שבועות עם ארוחות.</p>'; })()}`
+    : `${multi ? `<div class="chips" role="group" aria-label="איזה שבוע לחשב">${activeWeeks().map(w=>`<button class="chip" aria-pressed="${MN.calcWeek===w}" onclick="with(SP){MN.calcWeek=${w};renderMenu()}">${WEEK_LBL(w)}</button>`).join('')}</div>`:''}
        <label class="check"><input type="checkbox" ${MN.weekShabbat?'checked':''} onchange="with(SP){MN.weekShabbat=this.checked;renderMenu()}"> המוסד פעיל בשבת של השבוע הזה</label>`}
     <label class="check"><input type="checkbox" ${MN.deduct?'checked':''} onchange="with(SP){MN.deduct=this.checked;renderMenu()}"> לקזז את מה שכבר יש במלאי (ספירה אחרונה ועודפים בתוקף)</label>
     ${!cook ? `<div class="kpis">
@@ -10640,7 +10837,7 @@ function calcToRequests(catId){
 let EXP = null;
 function openMenuExport(){
   const now = today(); const sun = sundayOf(now);
-  EXP = {weeks: rotation(), start: new Date().getDay() >= 4 ? addDays(sun, 7) : sun, diners:true, favs:true, qty:false, busy:''};
+  EXP = {weeks: Math.min(5, rotation()), start: new Date().getDay() >= 4 ? addDays(sun, 7) : sun, diners:true, favs:true, qty:false, busy:''};
   drawExport();
 }
 function exportWeeks(){
@@ -10653,11 +10850,12 @@ function exportTitle(){ const ws = exportWeeks(); return `תפריט ${dm(ws[0].
 function drawExport(){
   const ws = exportWeeks(); const hasMeals = ws.some(w=>w.days.some(d=>d.meals.length));
   modal(`<div class="mhead"><h2>הפקת התפריט</h2>${closeBtn()}</div>
-    <div class="seg" role="group" aria-label="טווח"><button aria-pressed="${EXP.weeks===1}" onclick="with(SP){EXP.weeks=1;drawExport()}">שבוע אחד</button><button aria-pressed="${EXP.weeks===2}" onclick="with(SP){EXP.weeks=2;drawExport()}">שבועיים</button></div>
+    <span class="muted">כמה שבועות להפיק</span>
+    <div class="seg" role="group" aria-label="כמה שבועות להפיק">${[1,2,3,4,5].map(n=>`<button aria-pressed="${EXP.weeks===n}" onclick="with(SP){EXP.weeks=${n};drawExport()}">${n===1?'שבוע':n}</button>`).join('')}</div>
     <label class="f">החל מיום ראשון<input id="sp-expStart" type="date" value="${EXP.start}" onchange="with(SP){if(this.value){EXP.start=sundayOf(this.value);drawExport()}}"></label>
     <div class="sp-card flat" style="gap:4px">
       <b>${esc(exportTitle())}</b>
-      ${ws.map(w=>`<span class="muted">${dm(w.start)}–${dm(w.end)}${rotation()===2?' · '+WEEK_LBL[w.w]:''} · ${w.days.reduce((s,d)=>s+d.meals.length,0)} ארוחות</span>`).join('')}
+      ${ws.map(w=>`<span class="muted">${dm(w.start)}–${dm(w.end)}${multiWeek()||!w.w?' · '+WEEK_LBL(w.w):''} · ${w.days.reduce((s,d)=>s+d.meals.length,0)} ארוחות</span>`).join('')}
     </div>
     <label class="check"><input type="checkbox" ${EXP.diners?'checked':''} onchange="with(SP){EXP.diners=this.checked}"> מספר סועדים בכל ארוחה</label>
     <label class="check"><input type="checkbox" ${EXP.favs?'checked':''} onchange="with(SP){EXP.favs=this.checked}"> סימון מנות מועדפות</label>
@@ -10693,15 +10891,15 @@ async function exportMenuXLSX(){
   const ws = exportWeeks(); const fav = d => EXP.favs && d.fav ? ' ♥' : '';
   const grid = [[exportTitle()], []];
   ws.forEach((w,k) => {
-    grid.push([`${rotation()===2?WEEK_LBL[w.w]+' · ':''}${dm(w.start)}–${fullDate(w.end)}`]);
+    grid.push([`${multiWeek()||!w.w?WEEK_LBL(w.w)+' · ':''}${dm(w.start)}–${fullDate(w.end)}`]);
     grid.push(['ארוחה', ...w.days.map(d=>`${d.day===6?'שבת':DAYS[d.day]} ${dm(d.date)}`)]);
     const meals = [...MEALS_WEEK, ...MEALS_SHABBAT].filter(n => w.days.some(d=>d.meals.some(m=>m.meal===n)));
     meals.forEach(n => grid.push([n, ...w.days.map(d => { const m = d.meals.find(x=>x.meal===n); return m ? m.dishes.map(x=>x.name+fav(x)).join(', ') + (EXP.diners?` (${m.diners} סועדים)`:'') : ''; })]));
     if(k < ws.length-1) grid.push([]);
   });
   if(EXP.favs) grid.push([], ['♥ מנה מועדפת על הסועדים']);
-  const detail = [['תאריך','יום', ...(rotation()===2?['שבוע']:[]), 'ארוחה', ...(EXP.diners?['סועדים']:[]), 'מנה', ...(EXP.favs?['מועדפת']:[])]];
-  ws.forEach(w => w.days.forEach(d => d.meals.forEach(m => m.dishes.forEach(x => detail.push([fullDate(d.date), d.day===6?'שבת':DAYS[d.day], ...(rotation()===2?[WEEK_LBL[w.w]]:[]), m.meal, ...(EXP.diners?[m.diners]:[]), x.name, ...(EXP.favs?[x.fav?'כן':'']:[])])))));
+  const detail = [['תאריך','יום', ...(multiWeek()?['שבוע']:[]), 'ארוחה', ...(EXP.diners?['סועדים']:[]), 'מנה', ...(EXP.favs?['מועדפת']:[])]];
+  ws.forEach(w => w.days.forEach(d => d.meals.forEach(m => m.dishes.forEach(x => detail.push([fullDate(d.date), d.day===6?'שבת':DAYS[d.day], ...(multiWeek()?[WEEK_LBL(w.w)]:[]), m.meal, ...(EXP.diners?[m.diners]:[]), x.name, ...(EXP.favs?[x.fav?'כן':'']:[])])))));
   const wb = XLSX.utils.book_new();
   const s1 = XLSX.utils.aoa_to_sheet(grid); s1['!cols'] = [{wch:14}, ...Array(7).fill({wch:30})];
   XLSX.utils.book_append_sheet(wb, s1, 'תפריט');
@@ -10724,7 +10922,7 @@ function menuDocHTML(){
   const pages = ws.map((w,k) => page(`
     <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid ${C.brand};padding-bottom:8px;margin-bottom:12px">
       <div style="font-family:'Suez One',Rubik,serif;font-size:26px">תפריט שבועי</div>
-      <div style="font-size:15px;color:${C.soft}">${rotation()===2?WEEK_LBL[w.w]+' · ':''}${dm(w.start)}–${fullDate(w.end)}</div>
+      <div style="font-size:15px;color:${C.soft}">${multiWeek()||!w.w?WEEK_LBL(w.w)+' · ':''}${dm(w.start)}–${fullDate(w.end)}</div>
     </div>
     <table style="width:100%;border-collapse:separate;border-spacing:6px 0;table-layout:fixed">
       <tr>${w.days.map(d=>`<th style="background:${d.day===6?C.brand:'#2b2723'};color:#fbf7f0;border-radius:8px 8px 0 0;padding:8px 4px;font-weight:600;font-size:15px">${d.day===6?'שבת קודש':DAYS[d.day]}<div style="font-weight:400;font-size:12px;opacity:.85">${dm(d.date)}</div></th>`).join('')}</tr>
@@ -11478,10 +11676,40 @@ Object.defineProperties(SPX, {
 "sundayOf":{get(){return sundayOf},enumerable:true},
 "addDays":{get(){return addDays},enumerable:true},
 "rotation":{get(){return rotation},enumerable:true},
-"rotStart":{get(){return rotStart},enumerable:true},
 "weekNumOf":{get(){return weekNumOf},enumerable:true},
 "WEEK_LBL":{get(){return WEEK_LBL},enumerable:true},
 "mealsOf":{get(){return mealsOf},enumerable:true},
+"SPECIAL_W":{get(){return SPECIAL_W},enumerable:true},
+"WEEK_LET":{get(){return WEEK_LET},enumerable:true},
+"isDate":{get(){return isDate},enumerable:true},
+"cycle":{get(){return cycle},enumerable:true},
+"hasSpecial":{get(){return hasSpecial},enumerable:true},
+"activeWeeks":{get(){return activeWeeks},enumerable:true},
+"isActiveWeek":{get(){return isActiveWeek},enumerable:true},
+"multiWeek":{get(){return multiWeek},enumerable:true},
+"weekOfMonth":{get(){return weekOfMonth},enumerable:true},
+"cycleWeekOf":{get(){return cycleWeekOf},enumerable:true},
+"normWeek":{get(){return normWeek},enumerable:true},
+"wPill":{get(){return wPill},enumerable:true},
+"monthWeeks":{get(){return monthWeeks},enumerable:true},
+"dishCost1":{get(){return dishCost1},enumerable:true},
+"cycleCard":{get(){return cycleCard},enumerable:true},
+"setCycle":{get(){return setCycle},enumerable:true},
+"cycLen":{get(){return cycLen},enumerable:true},
+"calNav":{get(){return calNav},enumerable:true},
+"calPick":{get(){return calPick},enumerable:true},
+"openWeekOver":{get(){return openWeekOver},enumerable:true},
+"saveWeekOver":{get(){return saveWeekOver},enumerable:true},
+"openCopyWeek":{get(){return openCopyWeek},enumerable:true},
+"stashWeek":{get(){return stashWeek},enumerable:true},
+"doCopyWeek":{get(){return doCopyWeek},enumerable:true},
+"askRestoreWeek":{get(){return askRestoreWeek},enumerable:true},
+"round4":{get(){return round4},enumerable:true},
+"perDiner":{get(){return perDiner},enumerable:true},
+"qtyStep":{get(){return qtyStep},enumerable:true},
+"setPer":{get(){return setPer},enumerable:true},
+"stepIng":{get(){return stepIng},enumerable:true},
+"zeroW":{get(){return zeroW},enumerable:true},
 "dm":{get(){return dm},enumerable:true},
 "MN":{get(){return MN},set(v){MN=v},enumerable:true},
 "setMnView":{get(){return setMnView},enumerable:true},
@@ -11491,9 +11719,6 @@ Object.defineProperties(SPX, {
 "favChip":{get(){return favChip},enumerable:true},
 "toggleFav":{get(){return toggleFav},enumerable:true},
 "menuWeek":{get(){return menuWeek},enumerable:true},
-"setRotation":{get(){return setRotation},enumerable:true},
-"swapRotation":{get(){return swapRotation},enumerable:true},
-"copyWeek":{get(){return copyWeek},enumerable:true},
 "askDelMeal":{get(){return askDelMeal},enumerable:true},
 "addMeal":{get(){return addMeal},enumerable:true},
 "mealDiners":{get(){return mealDiners},enumerable:true},
