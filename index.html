@@ -705,6 +705,18 @@
   .sc-frozen-note{ font-size:12px; color:var(--ink-soft); font-weight:400; }
   .sc-instbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0 12px; }
   .sc-instbar .sc-months-label{ font-weight:700; }
+  .sc-viewseg{ display:inline-flex; background:var(--violet-bg); border-radius:999px; padding:4px; gap:4px; }
+  .sc-viewseg button{ border:none; background:transparent; color:var(--ink-soft); border-radius:999px; padding:0 14px; min-height:36px; font-family:inherit; font-size:13.5px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+  .sc-viewseg button.on{ background:var(--card); color:var(--ink); font-weight:700; box-shadow:0 1px 3px rgba(46,43,37,.18); }
+  .sc-cat-chip{ display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:3px 10px; font-size:12px; font-weight:700; }
+  .sc-cat-chip.same{ background:var(--green-bg); color:#4f5c3a; }
+  .sc-cat-chip.diff{ background:var(--violet-bg); color:var(--ink); }
+  .rc-row{ display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) 40px; gap:8px; align-items:center; border-radius:12px; padding:6px; }
+  .rc-row:nth-child(3n+1){ background:var(--tint-a); } .rc-row:nth-child(3n+2){ background:var(--tint-b); } .rc-row:nth-child(3n){ background:var(--violet-bg); }
+  .rc-head{ display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) 40px; gap:8px; font-size:12px; color:var(--ink-soft); padding:0 6px 4px; }
+  .rc-row input{ width:100%; box-sizing:border-box; }
+  .rc-del{ border:none; background:transparent; width:40px; height:40px; display:grid; place-items:center; cursor:pointer; color:var(--red); }
+  .staff-pay-row{ cursor:pointer; }
   .sc-stats{ display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:14px; }
   .sc-stat{ background:var(--tint-a); border:1px solid var(--line); border-radius:12px; padding:10px 14px; }
   .sc-stat small{ display:block; font-size:12px; color:var(--ink-soft); }
@@ -1328,6 +1340,58 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
     </div>
   </div>
 
+  <div id="roleCatalogModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:640px;max-height:90vh;overflow:auto">
+      <div style="font-weight:700;font-size:16px;margin-bottom:4px">תעריפון תפקידים</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">השכר הראשוני לכל תפקיד. בבחירת התפקיד בכרטיס עובד שעוד אין לו תעריף, התעריף מתמלא מכאן.</div>
+      <div class="rc-head"><span>שם התפקיד</span><span>שכר חודשי (₪)</span><span>בתוקף מ־</span><span></span></div>
+      <div id="roleCatalogRows" style="display:flex;flex-direction:column;gap:6px"></div>
+      <button type="button" class="sc-link-btn" style="margin-top:10px" onclick="addRoleCatalogRow()">+ הוספת תפקיד</button>
+      <div id="roleCatalogError" style="color:var(--red);font-size:12.5px;margin-top:10px;display:none"></div>
+      <div class="sc-cat-chip same" style="display:flex;margin-top:14px;border-radius:12px;padding:10px 12px;font-weight:400;font-size:12.5px">שינוי סכום כאן חל רק על עובדים שיתווספו מעכשיו. עובדים קיימים לא משתנים. להעלאה לעובד קיים משתמשים ב"+ העלאת שכר" בכרטיס שלו.</div>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="btn ghost" onclick="closeRoleCatalogModal()">ביטול</button>
+        <button class="btn" onclick="saveRoleCatalog()">שמירה</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="staffBankModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:820px;max-height:90vh;overflow:auto">
+      <div style="font-weight:700;font-size:16px;margin-bottom:4px">כל פרטי הבנק</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">אותם פרטים כמו בכרטיס העובד. עריכה כאן או שם מתעדכנת בשני המקומות.</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>שם הבחור</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל החשבון</th><th></th></tr></thead>
+          <tbody id="bankBody"></tbody>
+        </table>
+      </div>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="btn ghost" onclick="addBankRow()">+ הוספת שורה</button>
+        <button class="btn" onclick="closeBankModal()">סגירה</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rosterExportModal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:480px">
+      <div style="font-weight:700;font-size:16px;margin-bottom:4px">דוח שמות וסכומים</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px" id="rosterExportSub">כל העובדים בפעימה הנוכחית עם התפקידים</div>
+      <label class="report-check" style="display:flex;gap:10px;align-items:center;font-size:13.5px;cursor:pointer;background:var(--tint-a);border-radius:12px;padding:12px;margin-bottom:14px">
+        <input type="checkbox" id="staffRosterShowRate" checked style="width:auto;margin:0"> להציג תעריף חודשי בדוח
+      </label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="printStaffRoster()"><span class="btn-icon-inline" id="printerIconSlot"></span>הפקת PDF מעוצב</button>
+        <button class="btn" onclick="downloadStaffRosterXLSX()" id="rosterXlsxBtn"><span class="btn-icon-inline"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span>הורדה לאקסל</button>
+        <button class="btn ghost" onclick="copyStaffRosterText()"><span class="btn-icon-inline" id="copyIconSlot"></span>העתקה כטקסט</button>
+      </div>
+      <div class="toolbar" style="margin-top:14px">
+        <div></div>
+        <button class="btn ghost" onclick="closeRosterExportModal()">סגירה</button>
+      </div>
+    </div>
+  </div>
+
   <div id="staffEmployeeReportModal" class="modal-overlay" style="display:none">
     <div class="modal-box" style="max-width:520px">
       <div style="font-weight:700;font-size:16px;margin-bottom:4px" id="staffEmpReportTitle">דוח תשלומים</div>
@@ -1383,7 +1447,7 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
       </div>
       <div class="toolbar">
         <button class="btn ghost" onclick="closeConfirmModal()">ביטול</button>
-        <button class="btn" style="background:var(--red)" onclick="confirmModalYes()">מחיקה</button>
+        <button class="btn" id="confirmModalYesBtn" style="background:var(--red)" onclick="confirmModalYes()">מחיקה</button>
       </div>
     </div>
   </div>
@@ -1465,28 +1529,24 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
     <div class="card">
       <div class="toolbar toolbar-sticky">
         <input type="text" id="staffSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="🔍 חיפוש שם, תפקיד / תורנות, הערה (בכל הפעימות)..." oninput="searchStaff(this.value)" style="max-width:300px">
+        <div class="sc-viewseg" role="group" aria-label="תצוגה">
+          <button type="button" id="staffViewCardsBtn" class="on" onclick="setStaffView('cards')"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/></svg>כרטיסים</button>
+          <button type="button" id="staffViewTableBtn" onclick="setStaffView('table')"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M10 4v16"/></svg>טבלת תשלום</button>
+        </div>
         <button class="btn" onclick="addStaffRow()">+ הוספת שורה</button>
       </div>
       <div class="toolbar">
         <div><span class="saved-flag" id="staffSaved">נשמר</span></div>
         <div></div>
       </div>
-      <div class="toolbar">
-        <label style="display:flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer">
-          <input type="checkbox" id="staffRosterShowRate" checked> להציג תעריף חודשי בדוח
-        </label>
-        <div style="display:flex;gap:8px">
-          <button class="btn ghost" onclick="printStaffRoster()"><span class="btn-icon-inline" id="printerIconSlot"></span>הפקת PDF מעוצב</button>
-          <button class="btn ghost" onclick="copyStaffRosterText()"><span class="btn-icon-inline" id="copyIconSlot"></span>העתקה כטקסט</button>
-        </div>
-      </div>
       <div class="sc-instbar">
         <span>חודשי הפעימה:</span>
         <span class="sc-months-label" id="staffInstMonthsLabel">לא הוגדרו</span>
         <button type="button" class="sc-link-btn" onclick="openInstMonthsModal()">הגדרת חודשים</button>
         <span style="flex:1"></span>
-        <button type="button" class="sc-link-btn" onclick="setAllStaffCardsOpen(true)">פתיחת כל הכרטיסים</button>
-        <button type="button" class="sc-link-btn" onclick="setAllStaffCardsOpen(false)">סגירת הכל</button>
+        <button type="button" class="sc-link-btn" onclick="openRoleCatalogModal()">תעריפון תפקידים</button>
+        <button type="button" class="sc-link-btn" onclick="openBankModal()">כל פרטי הבנק</button>
+        <button type="button" class="sc-link-btn" onclick="openRosterExportModal()">דוח שמות וסכומים</button>
       </div>
       <div class="sc-stats">
         <div class="sc-stat"><small>סה"כ לתשלום לפעימה</small><b id="staffTotal"></b></div>
@@ -1494,39 +1554,27 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
         <div class="sc-stat"><small>שולמו</small><b id="staffPaidCount"></b></div>
       </div>
       <p class="hint">לחיצה על כרטיס עובד פותחת את כל הפרטים שלו. העלאת שכר נרשמת מחודש מסוים בתוך הפעימה ולא משנה את החודשים שלפניה. ברגע שתשלום מסומן "שולם" (בדוח למנהל חשבונות) הסכום ננעל ולא ישתנה גם אם יעודכן תעריף. סימון "אושר לתשלום" קובע אם העובד יופיע בדוח למנהל חשבונות.</p>
-      <div>
+      <div id="staffCardsView">
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px">
+          <button type="button" class="sc-link-btn" onclick="setAllStaffCardsOpen(true)">פתיחת כל הכרטיסים</button>
+          <button type="button" class="sc-link-btn" onclick="setAllStaffCardsOpen(false)">סגירת הכל</button>
+        </div>
         <table class="staff-cards">
           <tbody id="staffBody"></tbody>
         </table>
       </div>
-    </div>
-
-    <details class="card" id="bankAnchor" style="padding:0">
-    <summary class="section-title" style="cursor:pointer;padding:14px 16px;margin:0">טבלת כל פרטי הבנק (אפשר לערוך גם מתוך כרטיס העובד)</summary>
-    <div style="padding:0 16px 16px">
-      <div class="toolbar toolbar-sticky">
-        <div></div>
-        <button class="btn" onclick="addBankRow()">+ הוספת שורה</button>
-      </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>שם הבחור</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל החשבון</th><th></th></tr></thead>
-          <tbody id="bankBody"></tbody>
-        </table>
-      </div>
-      </div>
-    </details>
-
-    <div class="section-title">תשלום מרוכז לפעימה נבחרת</div>
-    <div class="card">
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>שם הבחור</th><th>תפקיד / תורנות</th><th>מספר חודשים לתשלום</th>
-            <th>סה"כ לתשלום</th><th>הערות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל החשבון</th>
-          </tr></thead>
-          <tbody id="paymentBody"></tbody>
-        </table>
+      <div id="staffTableView" style="display:none">
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th>שם העובד</th><th>תפקידים / תורנויות</th><th>חודשים</th>
+              <th>סה"כ לתשלום</th><th>סטטוס</th><th>הערות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל החשבון</th>
+            </tr></thead>
+            <tbody id="paymentBody"></tbody>
+            <tfoot><tr class="total-row"><td>סה"כ לפעימה</td><td id="paymentTotal"></td></tr></tfoot>
+          </table>
+        </div>
+        <p class="hint">לחיצה על שורה פותחת את כרטיס העובד.</p>
       </div>
     </div>
   </section>
@@ -2068,7 +2116,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261018; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261020; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -2807,7 +2855,7 @@ function saveInstallments(){
   clearTimeout(saveTimers["installments"]);
   saveTimers["installments"] = setTimeout(async () => {
     try{
-      await appStorage.set("staff-data", JSON.stringify({installments: data.installments, bank: data.bank, installmentMeta: data.installmentMeta || []}));
+      await appStorage.set("staff-data", JSON.stringify({installments: data.installments, bank: data.bank, installmentMeta: data.installmentMeta || [], roleCatalog: data.roleCatalog || []}));
       const f = document.getElementById("staffSaved");
       if(f){ f.classList.add("show"); setTimeout(()=>f.classList.remove("show"), 1200); }
     }catch(e){ console.error("שגיאת שמירה", e); }
@@ -2832,6 +2880,7 @@ async function loadAll(){
       if(parsed.installments) data.installments = parsed.installments;
       if(parsed.bank) data.bank = parsed.bank;
       if(Array.isArray(parsed.installmentMeta)) data.installmentMeta = parsed.installmentMeta;
+      if(Array.isArray(parsed.roleCatalog)) data.roleCatalog = parsed.roleCatalog;
     }
   }catch(e){ /* keep seed */ }
   if(anyLoadFailed()) return;
@@ -2914,7 +2963,7 @@ const tabQuickLinks = {
     {label:"פעימה 1", action: () => selectInstallment(0)},
     {label:"פעימה 2", action: () => selectInstallment(1)},
     {label:"פעימה 3", action: () => selectInstallment(2)},
-    {label:"🏦 פרטי בנק", action: () => scrollToId("bankAnchor")}
+    {label:"🏦 פרטי בנק", action: () => openBankModal()}
   ],
   accountant: [
     {label:"🧾 תשלומי ספקים", action: () => scrollToId("vendorPayAnchor")},
@@ -4152,6 +4201,24 @@ function roleMonthCount(r){
   const months = parseFloat(r.months) || 0;
   return months > 0 ? months : 1;
 }
+/* מספר החודשים שהפעימה אמורה לכסות: לפי "הגדרת חודשים" של הפעימה, ואם לא הוגדרו — לפי התפקיד הארוך ביותר של העובד */
+function staffExpectedMonths(row, instIdx){
+  const meta = instMeta(instIdx);
+  const c = meta ? (parseInt(meta.count, 10) || 0) : 0;
+  if(c > 0) return c;
+  if(!row) return 0;
+  return Math.max(0, ...[row].concat(row.extraRoles || []).map(r => parseFloat(r && r.months) || 0));
+}
+/* תפקידים שמחושבים לפחות חודשים ממה שהפעימה מכסה (כולל שדה חודשים ריק, שנחשב כחודש אחד) */
+function staffShortRoles(row, instIdx){
+  const exp = staffExpectedMonths(row, instIdx);
+  if(!exp) return [];
+  const out = [];
+  [row].concat(row.extraRoles || []).forEach((r, i) => {
+    if(r && roleMonthCount(r) < exp) out.push({roleIdx: i - 1, months: parseFloat(r.months) || 0});
+  });
+  return out;
+}
 function roleRaises(r){
   return (r.raises || [])
     .filter(x => x && (parseInt(x.fromMonth, 10) || 0) >= 2 && isFinite(parseFloat(x.monthly)))
@@ -4219,7 +4286,7 @@ function addExtraRole(id){
   const row = DOC_TABLES.staff.find(id);
   if(!row) return;
   row.extraRoles = row.extraRoles || [];
-  row.extraRoles.push({role:"", monthly:0, daily:0, missing:0, months:0});
+  row.extraRoles.push({role:"", monthly:0, daily:0, missing:0, months: staffExpectedMonths(row, staffRowInstallmentIndex(id)) || 0});
   saveInstallments();
   refreshSingleStaffRow(id);
 }
@@ -4247,7 +4314,7 @@ function removeOnePayment(id, idx){
 }
 function addStaffRow(){
   const newId = nextId()+4000;
-  data.installments[activeInstallment].push({id: newId, name:"", role:"", monthly:0, daily:0, missing:0, months:0, link:"", notes:"", approved:false});
+  data.installments[activeInstallment].push({id: newId, name:"", role:"", monthly:0, daily:0, missing:0, months: ((instMeta(activeInstallment) || {}).count || 0), link:"", notes:"", approved:false});
   staffOpenCards.add(newId);
   withScrollPreserved(() => renderStaff());
   saveInstallments();
@@ -4284,6 +4351,7 @@ function staffHeadPillsHtml(row){
   let html = `<span class="pill ${row.approved ? 'done' : 'open'}">${row.approved ? "מאושר" : "לא מאושר"}</span>`;
   html += `<span class="pill ${payCls}">${isStaffFrozen(row) ? svgIcon('lock',11) : ""}${escHtml(status)}${isStaffFrozen(row) ? " · נעול" : ""}</span>`;
   if(staffFrozenMismatch(row)) html += `<span class="sc-flag" title="הסכום ששולם שונה מהחישוב הנוכחי">${svgIcon('alert',12)} שונה מהחישוב</span>`;
+  if(!isStaffFrozen(row) && staffShortRoles(row, staffRowInstallmentIndex(row.id)).length) html += `<span class="sc-flag" title="יש תפקיד שמחושב לפחות חודשים מהפעימה">${svgIcon('alert',12)} חסרים חודשים</span>`;
   return html;
 }
 function staffRoleCalcInner(row, r, roleIdx, instIdx){
@@ -4300,12 +4368,27 @@ function staffRoleCalcInner(row, r, roleIdx, instIdx){
   const chips = [`<span class="sc-chip">תעריף בסיס ${fmtMoney(monthly)}</span>`]
     .concat(raises.map(x => `<span style="color:var(--ink-soft)">←</span><span class="sc-chip up">מ${escHtml(instMonthLabel(instIdx, x.fromMonth))} ${fmtMoney(x.monthly)}${frozen ? "" : `<button type="button" title="הסרת ההעלאה" onclick="removeStaffRaise(${row.id},${roleIdx},${x.fromMonth})">✕</button>`}</span>`))
     .join("");
+  const expMonths = staffExpectedMonths(row, instIdx);
+  const shortNote = (!frozen && expMonths && roleMonthCount(r) < expMonths)
+    ? `<div class="sc-deduct" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--red)">${svgIcon('alert',12)} בתפקיד הזה מחושב ${(parseFloat(r.months)||0) > 0 ? (parseFloat(r.months)) + " חודשים" : "חודש אחד בלבד (שדה החודשים ריק)"} מתוך ${expMonths} חודשי הפעימה
+        <button type="button" class="sc-link-btn" onclick="fillStaffRoleMonths(${row.id},${roleIdx},${expMonths})">השלמה ל-${expMonths} חודשים</button></div>`
+    : "";
   const addBtn = frozen
     ? `<span class="sc-frozen-note">${svgIcon('lock',11)} שולם — הסכום נעול</span>`
     : `<button type="button" class="sc-link-btn" onclick="openStaffRaiseModal(${row.id},${roleIdx})">+ העלאת שכר</button>`;
+  const cat = findCatalogRole(r.role);
+  let catHtml = "";
+  if(cat){
+    const catRate = parseFloat(cat.monthly) || 0;
+    catHtml = (Math.abs(catRate - monthly) < 0.005)
+      ? `<div class="sc-raises"><span class="sc-cat-chip same">${svgIcon('check',11)} לפי התעריפון</span></div>`
+      : `<div class="sc-raises"><span class="sc-cat-chip diff">בתעריפון: ${fmtMoney(catRate)}</span>${frozen ? "" : `<button type="button" class="sc-link-btn" onclick="applyCatalogRate(${row.id},${roleIdx})">עדכון לתעריף התעריפון</button>`}</div>`;
+  }
   return `
     <div class="sc-section-title"><span>חישוב לפי חודש${r.role ? " — " + escHtml(r.role) : ""}</span><b>${fmtMoney(computeRoleTotal(r))}</b></div>
+    ${catHtml}
     <div class="sc-months">${tiles}</div>
+    ${shortNote}
     ${deduct}
     <div class="sc-raises">${chips}${addBtn}</div>`;
 }
@@ -4340,7 +4423,7 @@ function buildStaffRowElement(row){
     <div class="sc-extra" data-extra="${i}">
       <div class="sc-section-title"><span>תפקיד נוסף ${i+1}</span><button type="button" class="sc-link-btn" style="border-color:var(--red);color:var(--red)" onclick="confirmRemoveExtraRole(${row.id},${i})">הסרה</button></div>
       <div class="sc-mini-fields">
-        <label>שם התפקיד<input type="text" data-erf="role" data-eridx="${i}" value="${escHtml(er.role||"")}"></label>
+        <label>שם התפקיד<input type="text" list="staffRoleCatalogList" data-erf="role" data-eridx="${i}" value="${escHtml(er.role||"")}"></label>
         <label>תעריף בסיס חודשי<input type="number" data-erf="monthly" data-eridx="${i}" value="${num(er.monthly)}"></label>
         <label>ימי חיסור<input type="number" data-erf="missing" data-eridx="${i}" value="${num(er.missing)}"></label>
         <label>חודשים בפעימה<input type="number" data-erf="months" data-eridx="${i}" value="${num(er.months)}"></label>
@@ -4370,7 +4453,7 @@ function buildStaffRowElement(row){
     <div class="sc-body">
       <div class="sc-fields">
         <label>שם העובד<input type="text" data-f="name" value="${escHtml(row.name||"")}"></label>
-        <label>תפקיד ראשי / תורנות<input type="text" data-f="role" value="${escHtml(row.role||"")}"></label>
+        <label>תפקיד ראשי / תורנות<input type="text" list="staffRoleCatalogList" data-f="role" value="${escHtml(row.role||"")}"></label>
         <label>תעריף בסיס חודשי (₪)<input type="number" data-f="monthly" value="${num(row.monthly)}"></label>
         <label>ימי חיסור<input type="number" data-f="missing" value="${num(row.missing)}"></label>
         <label>חודשים בפעימה<input type="number" data-f="months" value="${num(row.months)}"></label>
@@ -4407,6 +4490,7 @@ function buildStaffRowElement(row){
       patchStaffCard(tr, row);
     });
     inp.addEventListener("change", () => {
+      if(inp.dataset.f === "role" && applyCatalogRateIfEmpty(row, row)){ refreshSingleStaffRow(row.id); renderPayment(); return; }
       if(inp.dataset.f === "name"){
         ensureBankEntry(inp.value);
         const bankBox = tr.querySelector(".sc-bank");
@@ -4430,7 +4514,11 @@ function buildStaffRowElement(row){
       saveInstallments();
       patchStaffCard(tr, row);
     });
-    inp.addEventListener("change", () => { renderPayment(); });
+    inp.addEventListener("change", () => {
+      const er = (row.extraRoles || [])[parseInt(inp.dataset.eridx, 10)];
+      if(inp.dataset.erf === "role" && er && applyCatalogRateIfEmpty(row, er)){ refreshSingleStaffRow(row.id); renderPayment(); return; }
+      renderPayment();
+    });
   });
   tr.querySelectorAll("[data-opf]").forEach(inp => {
     inp.addEventListener("input", () => {
@@ -4497,6 +4585,8 @@ function renderStaff(){
   body.innerHTML = "";
   (data.installments[activeInstallment] || []).forEach(row => body.appendChild(buildStaffRowElement(row)));
   updateStaffSummary();
+  renderRoleCatalogDatalist();
+  applyStaffView();
 }
 function refreshSingleStaffRow(id){
   const body = document.getElementById("staffBody");
@@ -4521,6 +4611,22 @@ function setAllStaffCardsOpen(open){
   (data.installments[activeInstallment] || []).forEach(r => { if(open) staffOpenCards.add(r.id); else staffOpenCards.delete(r.id); });
   document.querySelectorAll("#staffBody tr.sc-tr").forEach(tr => tr.classList.toggle("sc-open", open));
 }
+/* השלמת חודשים לתפקיד — רק בלחיצה ואחרי אישור, ולא בשורה ששולמה (נעולה) */
+function fillStaffRoleMonths(id, roleIdx, n){
+  const row = DOC_TABLES.staff.find(id);
+  if(!row || isStaffFrozen(row)) return;
+  const r = staffRoleObj(row, roleIdx);
+  if(!r) return;
+  const before = computeLiveStaffTotal(row);
+  const after = before - computeRoleTotal(r) + computeRoleTotal(Object.assign({}, r, {months: n}));
+  openConfirmModal(`לעדכן את ${r.role ? '"' + r.role + '"' : "התפקיד"} ל-${n} חודשים? סה"כ העובד ישתנה מ-${fmtMoney(before)} ל-${fmtMoney(after)}.`, () => {
+    r.months = n;
+    saveInstallments();
+    refreshSingleStaffRow(id);
+    renderPayment();
+    renderAccountantReport();
+  }, {yesLabel: "עדכון", icon: "check"});
+}
 function confirmRemoveExtraRole(id, idx){
   openConfirmModal("להסיר את התפקיד הנוסף? לא ניתן לשחזר את הפעולה.", () => removeExtraRole(id, idx));
 }
@@ -4536,7 +4642,7 @@ function refreshFrozenStaffTotal(id){
     refreshSingleStaffRow(id);
     renderPayment();
     renderAccountantReport();
-  });
+  }, {yesLabel: "עדכון", icon: "check"});
 }
 function addStaffBankEntry(id){
   const row = DOC_TABLES.staff.find(id);
@@ -5275,25 +5381,244 @@ function printStaffEmployeeReport(){
 /* ---------- COMBINED PAYMENT VIEW ---------- */
 function renderPayment(){
   const body = document.getElementById("paymentBody");
+  if(!body) return;
   body.innerHTML = "";
-  data.installments[activeInstallment].forEach(row => {
-    const bankRow = data.bank.find(b => b.name && b.name === row.name) || {};
-    const roleParts = [row.role].concat((row.extraRoles||[]).map(er=>er.role)).filter(Boolean);
-    const rolesText = roleParts.length ? roleParts.join(" + ") : "—";
+  const inst = data.installments[activeInstallment] || [];
+  inst.forEach(row => {
+    const bankRow = staffBankRowFor(row) || {};
+    const roles = [row].concat(row.extraRoles || []);
+    const roleParts = roles.map(r => r.role).filter(Boolean);
+    const monthsList = roles.map(r => roleMonthCount(r));
+    const monthsText = monthsList.every(m => m === monthsList[0]) ? String(monthsList[0]) : monthsList.join(" / ");
+    const status = row.paymentStatus || (row.paid ? "שולם" : "ממתין");
+    const payCls = status === "שולם" ? "done" : status === "חסר פרטים" ? "late" : "open";
     const tr = document.createElement("tr");
+    tr.className = "staff-pay-row";
+    tr.title = "פתיחת כרטיס העובד";
     tr.innerHTML = `
-      <td class="primary-field">${row.name||"—"}${roleParts.length ? " — "+rolesText : ""}</td>
-      <td>${row.role||"—"}</td>
-      <td>${row.months||0}</td>
+      <td class="primary-field">${escHtml(row.name || "—")}</td>
+      <td>${escHtml(roleParts.join(" + ") || "—")}</td>
+      <td>${escHtml(monthsText)}</td>
       <td><span class="pill done" style="font-weight:700">${fmtMoney(computeStaffTotal(row))}</span></td>
-      <td>${row.notes||""}</td>
-      <td>${bankRow.bank||"—"}</td>
-      <td>${bankRow.branch||"—"}</td>
-      <td>${bankRow.account||"—"}</td>
-      <td>${bankRow.holder||"—"}</td>
+      <td><span class="pill ${payCls}">${escHtml(status)}</span></td>
+      <td>${escHtml(row.notes || "")}</td>
+      <td>${escHtml(bankRow.bank || "—")}</td>
+      <td>${escHtml(bankRow.branch || "—")}</td>
+      <td>${escHtml(bankRow.account || "—")}</td>
+      <td>${escHtml(bankRow.holder || "—")}</td>
     `;
+    tr.addEventListener("click", () => openStaffCardFromTable(row.id));
     body.appendChild(tr);
   });
+  const tot = document.getElementById("paymentTotal");
+  if(tot) tot.textContent = fmtMoney(inst.reduce((s, r) => s + computeStaffTotal(r), 0));
+}
+
+/* ---------- צוות ותורנים: מתג תצוגה (כרטיסים / טבלת תשלום) ---------- */
+let staffView = "cards";
+try{ if(localStorage.getItem("staffView") === "table") staffView = "table"; }catch(e){}
+function applyStaffView(){
+  const cards = document.getElementById("staffCardsView");
+  const table = document.getElementById("staffTableView");
+  if(!cards || !table) return;
+  cards.style.display = staffView === "cards" ? "" : "none";
+  table.style.display = staffView === "table" ? "" : "none";
+  const cb = document.getElementById("staffViewCardsBtn"), tb = document.getElementById("staffViewTableBtn");
+  if(cb) cb.classList.toggle("on", staffView === "cards");
+  if(tb) tb.classList.toggle("on", staffView === "table");
+  if(staffView === "table") renderPayment();
+}
+function setStaffView(v){
+  staffView = v === "table" ? "table" : "cards";
+  try{ localStorage.setItem("staffView", staffView); }catch(e){}
+  applyStaffView();
+  const q = document.getElementById("staffSearchInput");
+  if(q && q.value) filterRows(staffView === "table" ? "paymentBody" : "staffBody", q.value);
+}
+function openStaffCardFromTable(id){
+  staffOpenCards.add(id);
+  setStaffView("cards");
+  const tr = document.querySelector(`#staffBody tr[data-row-id="${id}"]`);
+  if(tr){ tr.classList.add("sc-open"); tr.scrollIntoView({behavior:"smooth", block:"start"}); }
+}
+
+/* ---------- חלון כל פרטי הבנק ---------- */
+function openBankModal(){
+  renderBank();
+  document.getElementById("staffBankModal").style.display = "flex";
+}
+function closeBankModal(){
+  document.getElementById("staffBankModal").style.display = "none";
+  withScrollPreserved(() => { renderStaff(); renderPayment(); });
+}
+
+/* ---------- תעריפון תפקידים ----------
+   נשמר בתוך נתוני הצוות (staff-data) בשדה roleCatalog. התעריפון הוא רק נקודת התחלה:
+   הוא ממלא תעריף לתפקיד שעוד אין לו תעריף, ולעולם לא משנה סכום קיים בלי לחיצה ואישור. */
+function getRoleCatalog(){ return Array.isArray(data.roleCatalog) ? data.roleCatalog : []; }
+function normRoleName(n){ return String(n || "").trim().replace(/\s+/g, " "); }
+function findCatalogRole(name){
+  const n = normRoleName(name);
+  if(!n) return null;
+  return getRoleCatalog().find(c => normRoleName(c.name) === n) || null;
+}
+function renderRoleCatalogDatalist(){
+  let dl = document.getElementById("staffRoleCatalogList");
+  if(!dl){
+    dl = document.createElement("datalist");
+    dl.id = "staffRoleCatalogList";
+    document.body.appendChild(dl);
+  }
+  dl.innerHTML = getRoleCatalog().filter(c => normRoleName(c.name)).map(c => `<option value="${escHtml(normRoleName(c.name))}"></option>`).join("");
+}
+/* ממלא תעריף מהתעריפון רק כשלתפקיד אין עדיין תעריף (0 או ריק) ורק בשורה שלא שולמה */
+function applyCatalogRateIfEmpty(row, r){
+  if(!row || !r || isStaffFrozen(row)) return false;
+  if((parseFloat(r.monthly) || 0) > 0) return false;
+  const cat = findCatalogRole(r.role);
+  const rate = cat ? (parseFloat(cat.monthly) || 0) : 0;
+  if(!(rate > 0)) return false;
+  r.monthly = rate;
+  saveInstallments();
+  return true;
+}
+function applyCatalogRate(id, roleIdx){
+  const row = DOC_TABLES.staff.find(id);
+  if(!row || isStaffFrozen(row)) return;
+  const r = staffRoleObj(row, roleIdx);
+  const cat = r && findCatalogRole(r.role);
+  if(!cat) return;
+  const rate = parseFloat(cat.monthly) || 0;
+  const before = computeLiveStaffTotal(row);
+  const after = before - computeRoleTotal(r) + computeRoleTotal(Object.assign({}, r, {monthly: rate}));
+  const raiseNote = roleRaises(r).length ? " העלאות השכר שנרשמו לתפקיד יישארו כמו שהן." : "";
+  openConfirmModal(`לעדכן את תעריף הבסיס של "${normRoleName(r.role)}" ל-${fmtMoney(rate)} לפי התעריפון? סה"כ העובד ישתנה מ-${fmtMoney(before)} ל-${fmtMoney(after)}.${raiseNote}`, () => {
+    r.monthly = rate;
+    saveInstallments();
+    refreshSingleStaffRow(id);
+    renderPayment();
+    renderAccountantReport();
+  }, {yesLabel: "עדכון", icon: "check"});
+}
+let roleCatalogDraft = [];
+function openRoleCatalogModal(){
+  roleCatalogDraft = getRoleCatalog().map(c => ({id: c.id, name: c.name || "", monthly: c.monthly || 0, from: c.from || ""}));
+  if(!roleCatalogDraft.length) roleCatalogDraft.push({id: Date.now(), name: "", monthly: 0, from: ""});
+  document.getElementById("roleCatalogError").style.display = "none";
+  renderRoleCatalogRows();
+  document.getElementById("roleCatalogModal").style.display = "flex";
+}
+function closeRoleCatalogModal(){
+  document.getElementById("roleCatalogModal").style.display = "none";
+  roleCatalogDraft = [];
+}
+function renderRoleCatalogRows(){
+  const box = document.getElementById("roleCatalogRows");
+  box.innerHTML = roleCatalogDraft.map((c, i) => `
+    <div class="rc-row">
+      <input type="text" aria-label="שם התפקיד" placeholder="למשל: תורן לילה" data-rcf="name" data-rci="${i}" value="${escHtml(c.name)}">
+      <input type="number" aria-label="שכר חודשי" min="0" step="1" data-rcf="monthly" data-rci="${i}" value="${c.monthly ? escHtml(c.monthly) : ""}">
+      <input type="text" aria-label="בתוקף מ" placeholder="למשל: תשרי תשפ״ז" data-rcf="from" data-rci="${i}" value="${escHtml(c.from)}">
+      <button type="button" class="rc-del" aria-label="הסרת התפקיד" onclick="removeRoleCatalogRow(${i})">${svgIcon('trash',14)}</button>
+    </div>`).join("");
+  box.querySelectorAll("[data-rcf]").forEach(inp => {
+    inp.addEventListener("input", () => {
+      const c = roleCatalogDraft[parseInt(inp.dataset.rci, 10)];
+      if(!c) return;
+      c[inp.dataset.rcf] = inp.type === "number" ? (parseFloat(inp.value) || 0) : inp.value;
+    });
+  });
+}
+function addRoleCatalogRow(){
+  roleCatalogDraft.push({id: Date.now() + roleCatalogDraft.length, name: "", monthly: 0, from: ""});
+  renderRoleCatalogRows();
+  const inputs = document.querySelectorAll('#roleCatalogRows [data-rcf="name"]');
+  if(inputs.length) inputs[inputs.length - 1].focus();
+}
+function removeRoleCatalogRow(i){
+  roleCatalogDraft.splice(i, 1);
+  renderRoleCatalogRows();
+}
+function saveRoleCatalog(){
+  const err = document.getElementById("roleCatalogError");
+  const clean = roleCatalogDraft
+    .map(c => ({id: c.id || Date.now(), name: normRoleName(c.name), monthly: Math.max(0, parseFloat(c.monthly) || 0), from: String(c.from || "").trim()}))
+    .filter(c => c.name);
+  const seen = new Set();
+  for(const c of clean){
+    if(seen.has(c.name)){ err.textContent = `התפקיד "${c.name}" מופיע פעמיים. יש להשאיר אותו רק פעם אחת.`; err.style.display = "block"; return; }
+    seen.add(c.name);
+  }
+  data.roleCatalog = clean;
+  saveInstallments();
+  closeRoleCatalogModal();
+  renderRoleCatalogDatalist();
+  withScrollPreserved(() => renderStaff());
+}
+
+/* ---------- חלון דוח שמות וסכומים (PDF / אקסל / טקסט) ---------- */
+function openRosterExportModal(){
+  const sub = document.getElementById("rosterExportSub");
+  if(sub){ const range = instRangeLabel(activeInstallment); sub.textContent = `כל העובדים בפעימה ${activeInstallment+1}${range ? " (" + range + ")" : ""} עם התפקידים`; }
+  document.getElementById("rosterExportModal").style.display = "flex";
+}
+function closeRosterExportModal(){
+  document.getElementById("rosterExportModal").style.display = "none";
+}
+let staffXlsxLoading = null;
+function loadStaffXLSX(){
+  if(window.XLSX) return Promise.resolve();
+  return staffXlsxLoading = staffXlsxLoading || new Promise((res, rej) => {
+    const sc = document.createElement("script");
+    sc.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    sc.onload = res;
+    sc.onerror = () => { staffXlsxLoading = null; rej(); };
+    document.head.appendChild(sc);
+  });
+}
+async function downloadStaffRosterXLSX(){
+  const showRate = document.getElementById("staffRosterShowRate").checked;
+  const list = getRosterList();
+  if(list.length===0){ alert("אין תורנים עם שם ותפקיד מוגדרים בפעימה הנוכחית."); return; }
+  const btn = document.getElementById("rosterXlsxBtn");
+  if(btn) btn.disabled = true;
+  try{ await loadStaffXLSX(); }
+  catch(e){ if(btn) btn.disabled = false; alert("לא הצלחתי לטעון את רכיב האקסל. בדוק חיבור לאינטרנט ונסה שוב."); return; }
+  try{
+    const range = instRangeLabel(activeInstallment);
+    const head = ["שם", "תפקיד / תורנות"].concat(showRate ? ["תעריף חודשי (₪)"] : []);
+    const aoa = [
+      ["דוח תורנים ותפקידים — פעימה " + (activeInstallment+1) + (range ? " (" + range + ")" : "")],
+      ["תאריך הפקה: " + new Date().toLocaleDateString("he-IL")],
+      [],
+      head
+    ];
+    list.forEach(r => aoa.push([r.name, r.role || ""].concat(showRate ? [parseFloat(r.monthly) || 0] : [])));
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws["!cols"] = [{wch: 24}, {wch: 28}].concat(showRate ? [{wch: 16}] : []);
+    if(showRate){
+      for(let i = 4; i < aoa.length; i++){
+        const cell = ws[XLSX.utils.encode_cell({r: i, c: 2})];
+        if(cell) cell.z = "#,##0";
+      }
+    }
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "פעימה " + (activeInstallment+1));
+    wb.Workbook = {Views: [{RTL: true}]};
+    const buf = XLSX.write(wb, {bookType: "xlsx", type: "array"});
+    const blob = new Blob([buf], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `דוח תורנים - פעימה ${activeInstallment+1} - ${new Date().toISOString().slice(0,10)}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  }catch(e){
+    console.error(e);
+    alert("לא הצלחתי ליצור את קובץ האקסל.");
+  }finally{
+    if(btn) btn.disabled = false;
+  }
 }
 
 /* ---------- CONTACTS ---------- */
@@ -6572,6 +6897,7 @@ function searchStaff(value){
     }
   }
   filterRows("staffBody", value);
+  filterRows("paymentBody", value);
 }
 
 /* ---------- התנהגות שדות חיפוש: Esc מנקה, הוספת שורה מנקה את החיפוש כדי שהשורה החדשה תיראה ---------- */
@@ -6864,10 +7190,17 @@ function confirmCreateVendorPay(){
   alert('נוצרה רשומת תשלום ב"תשלומי ספקים" (לא מאושרת עדיין) — היא תופיע בדוח למנהל חשבונות לאחר שתסמן אותה כמאושרת.');
 }
 let confirmModalCallback = null;
-function openConfirmModal(message, onConfirm){
+/* opts (רשות): {yesLabel, icon} — לאישור עדכון במקום מחיקה. בלי opts ההתנהגות כמו קודם (מחיקה, אדום) */
+function openConfirmModal(message, onConfirm, opts){
+  opts = opts || {};
   document.getElementById("confirmModalMessage").textContent = message;
   const iconSlot = document.getElementById("confirmModalIconSlot");
-  if(iconSlot && !iconSlot.innerHTML) iconSlot.innerHTML = svgIcon("trash", 18);
+  if(iconSlot) iconSlot.innerHTML = svgIcon(opts.icon || "trash", 18);
+  const yesBtn = document.getElementById("confirmModalYesBtn");
+  if(yesBtn){
+    yesBtn.textContent = opts.yesLabel || "מחיקה";
+    yesBtn.style.background = opts.yesLabel ? "var(--brand)" : "var(--red)";
+  }
   confirmModalCallback = onConfirm;
   document.getElementById("confirmModal").style.display = "flex";
 }
@@ -8568,7 +8901,7 @@ function buildFullExportObject(){
   };
   const out = {};
   for(const sk in map) out[sk] = JSON.stringify(data[map[sk]]);
-  out["staff-data"] = JSON.stringify({ installments: data.installments, bank: data.bank, installmentMeta: data.installmentMeta || [] });
+  out["staff-data"] = JSON.stringify({ installments: data.installments, bank: data.bank, installmentMeta: data.installmentMeta || [], roleCatalog: data.roleCatalog || [] });
   out["keys-data"] = JSON.stringify({ inventory: data.keysInventory, log: data.keysLog, holders: data.keysHolders, masters: data.masterKeys, importDone: data.keysImportDone, codeMastersDone: data.codeMasterKeysDone });
   out["food-data"] = JSON.stringify({ priceList: data.foodPriceList, orders: data.foodOrders });
   if(window.SP) Object.assign(out, SP.exportObject());
