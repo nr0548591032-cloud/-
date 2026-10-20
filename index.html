@@ -1335,35 +1335,18 @@ button.tk-chip{ cursor:pointer; }
 <main>
 
   <section class="tab" id="tab-dashboard">
-    <div id="dashTopSlot"></div>
-    <div class="cards" id="dashCards"></div>
-    <div id="dashSchoolYearAlert"></div>
-    <div class="cards" style="grid-template-columns:1fr 1fr;">
-      <div class="card"><div class="section-title" style="margin-top:0">משימות: הושלמו מול פתוחות</div><div id="dashDonut"></div></div>
-      <div class="card"><div class="section-title" style="margin-top:0">בקרה לפי סוג תחזוקה</div><div id="dashBar"></div></div>
-    </div>
-    <div class="section-title">משימות פתוחות קרובות</div>
-    <div class="card"><div class="table-scroll" id="dashTasks"></div></div>
-    <div id="dashLicensingAnchor"></div>
-    <div id="dashLicensingWrap">
-      <div class="section-title">אישורים ובדיקות לתשומת לב</div>
-      <div class="card"><div class="table-scroll" id="dashLicensing"></div></div>
-    </div>
-    <div class="section-title">אישורים בתהליך (טרם התקבל אישור סופי)</div>
-    <div class="card"><div class="table-scroll" id="dashLicInProcess"></div></div>
-    <div id="dashPaymentAlertWrap" style="display:none">
-      <div class="section-title">תשלומים עם פרטים חסרים ⚠️</div>
-      <div class="card"><div class="table-scroll" id="dashPaymentAlert"></div></div>
-    </div>
-    <div class="section-title" id="loginLogTitle" style="display:none">כניסות אחרונות למערכת</div>
-    <div class="card" id="loginLogCard" style="display:none">
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>משתמש</th><th>מועד כניסה</th></tr></thead>
-          <tbody id="loginLogBody"></tbody>
-        </table>
+    <div class="db-wrap" id="dbRoot"></div>
+    <details class="db-login" id="loginLogDetails">
+      <summary id="loginLogTitle" style="display:none">כניסות אחרונות למערכת</summary>
+      <div class="card" id="loginLogCard" style="display:none">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>משתמש</th><th>מועד כניסה</th></tr></thead>
+            <tbody id="loginLogBody"></tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </details>
   </section>
 
   <section class="tab" id="tab-tasks">
@@ -1373,6 +1356,7 @@ button.tk-chip{ cursor:pointer; }
           <div class="tk-title">משימות</div>
           <div class="tk-sub"><span id="tkCountLine"></span><span class="saved-flag" id="tasksSaved">נשמר</span></div>
         </div>
+        <div class="mt-slot" id="tkModeSlot"></div>
         <div class="tk-head-actions">
           <button type="button" class="tk-btn ghost sm tk-more-toggle" aria-expanded="false" onclick="const l=document.getElementById('tkMoreList');const o=l.classList.toggle('open');this.setAttribute('aria-expanded',o)">עוד פעולות</button>
           <div class="tk-more-list" id="tkMoreList">
@@ -1404,6 +1388,7 @@ button.tk-chip{ cursor:pointer; }
 
       <div id="tkView"></div>
     </div>
+    <div id="mtRoot" style="display:none"></div>
   </section>
 
   <div class="tk-scrim" id="tkScrim" onclick="tkClose()"></div>
@@ -2445,7 +2430,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261022; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261024; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -2561,7 +2546,8 @@ const appStorage = {
     }
 
     // זיהוי עדכון ממכשיר אחר: אם הערך בענן שונה ממה שהמכשיר הזה טען, מישהו אחר שמר בינתיים
-    if(!opts.force && originalLoad.hasOwnProperty(key) && prevValue !== originalLoad[key]){
+    const isViewPrefs = key === "uiPrefs-data";   // העדפות תצוגה (סינונים, תצוגה נבחרת) אינן נתונים - אין צורך באישור
+    if(!opts.force && !isViewPrefs && originalLoad.hasOwnProperty(key) && prevValue !== originalLoad[key]){
       const label = (typeof BACKUP_KEY_LABELS !== "undefined" && BACKUP_KEY_LABELS[key]) || key;
       openConfirmModal(`שים לב: מכשיר אחר שמר עדכון ב"${label}" מאז שפתחת את הדף כאן. אם תמשיך, השינוי שלך יחליף את מה שנשמר שם (גיבוי אוטומטי יישמר קודם). מומלץ לרענן ולבדוק לפני שממשיכים. להמשיך בכל זאת?`,
         () => { originalLoad[key] = prevValue; appStorage.set(key, value, opts).catch(e => console.error(e)); });
@@ -2569,7 +2555,7 @@ const appStorage = {
     }
 
     // בדיקת שפיות: מחיקה של יותר מחצי מהרשומות (ולפחות 3) דורשת אישור מפורש
-    if(prevValue !== null && !opts.force){
+    if(prevValue !== null && !opts.force && !isViewPrefs){
       const before = countRecords(prevValue), after = countRecords(value);
       if(before !== null && after !== null && before >= 3 && after < before / 2){
         const label = (typeof BACKUP_KEY_LABELS !== "undefined" && BACKUP_KEY_LABELS[key]) || key;
@@ -2608,7 +2594,8 @@ const BACKUP_KEY_LABELS = {
   "files-data":"קבצים", "projects-data":"פרויקטים", "staff-data":"צוות ותורנים", "keys-data":"מפתחות",
   "food-data":"רכש אוכל", "accountantContact-data":"פרטי מנהל חשבונות", "uiPrefs-data":"העדפות תצוגה", "loginLog-data":"יומן כניסות",
   "supply-data":"רכש ואספקה: מחירונים וספקים", "supplyOrders-data":"רכש ואספקה: הזמנות וחשבוניות", "supplyKitchen-data":"רכש ואספקה: תפריט ומלאי",
-  "equipment-data":"ציוד ואחריות", "serviceContracts-data":"חוזי שירות", "maintBudget-data":"תקציב תחזוקה"
+  "equipment-data":"ציוד ואחריות", "serviceContracts-data":"חוזי שירות", "maintBudget-data":"תקציב תחזוקה",
+  "myTasks-data":"המשימות שלי"
 };
 function fmtWhen(ts){
   if(!ts) return "";
@@ -3237,6 +3224,19 @@ async function loadAll(){
     }
   }catch(e){ /* keep seed */ }
   if(anyLoadFailed()) return;
+  // המשימות שלי: נטען רק למנהל (שאר המשתמשים לא מקבלים את הרשימה בכלל)
+  if(currentRole === "admin"){
+    try{
+      const res = await appStorage.get("myTasks-data");
+      if(res && res.value){
+        let v = null;
+        try{ v = JSON.parse(res.value); }catch(err){ v = null; }
+        if(Array.isArray(v)) data.myTasks = v;
+        else{ mtBlocked = true; console.error("המשימות שלי: המסמך בענן לא תקין - לא יישמר עליו"); }
+      }
+    }catch(e){ /* appStorage סימן את המפתח ככושל, והאפליקציה תיחסם במסך שגיאה */ }
+    if(anyLoadFailed()) return;
+  }
   if(window.SP) await SP.loadFromCloud();   // רכש ואספקה (3 מסמכים)
 }
 
@@ -3378,7 +3378,8 @@ function switchTab(t){
   document.querySelectorAll("#navBar button").forEach(b => {
     b.classList.toggle("active", b.dataset.tab===t);
   });
-  if(t==="dashboard") renderDashboard();
+  if(t==="dashboard") renderDashboard({enter:true});
+  if(t==="tasks") mtSync();
   if(t==="accountant") renderAccountantReport();
   if(t==="finance") renderFinance();
   if(t==="procurement" && window.SP) SP.onShow();
@@ -6157,15 +6158,15 @@ function renderProc(){
     categories[cat] = (categories[cat]||0) + rowTotal;
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><input type="text" value="${row.month}" data-f="month" style="min-width:90px"></td>
-      <td><input type="text" value="${row.sku}" data-f="sku" style="min-width:90px"></td>
-      <td class="primary-field"><input type="text" value="${row.item}" data-f="item" style="min-width:160px"></td>
+      <td><input type="text" value="${escHtml(row.month)}" data-f="month" style="min-width:90px"></td>
+      <td><input type="text" value="${escHtml(row.sku)}" data-f="sku" style="min-width:90px"></td>
+      <td class="primary-field"><input type="text" value="${escHtml(row.item)}" data-f="item" style="min-width:160px"></td>
       <td style="flex-direction:row;align-items:center;gap:4px">${buildSelect(getSupplierNames(), row.supplier, "supplier")}${findContactByName(row.supplier) ? `<button type="button" class="ca-mini" title="יצירת קשר עם הספק" onclick="quickContactWhatsAppByName('${(row.supplier||"").replace(/'/g,"\\'")}')">${svgIcon("whatsapp",12)}</button>` : ""}</td>
-      <td><input type="number" value="${row.qty}" data-f="qty" style="width:60px"></td>
-      <td><input type="text" value="${row.unit}" data-f="unit" style="width:70px"></td>
-      <td><input type="number" value="${row.price}" data-f="price" style="width:70px"></td>
+      <td><input type="number" value="${escHtml(row.qty)}" data-f="qty" style="width:60px"></td>
+      <td><input type="text" value="${escHtml(row.unit)}" data-f="unit" style="width:70px"></td>
+      <td><input type="number" value="${escHtml(row.price)}" data-f="price" style="width:70px"></td>
       <td><input type="text" value="${fmtMoney(rowTotal)}" readonly style="width:80px;font-weight:600"></td>
-      <td><input type="text" value="${row.category}" data-f="category" style="width:100px"></td>
+      <td><input type="text" value="${escHtml(row.category)}" data-f="category" style="width:100px"></td>
       <td>${schoolYearSelectHTML(row.schoolYear)}</td>
       <td class="file-cell"></td>
       <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeProc(${row.id})">${svgIcon('trash',13)}</button></td>
@@ -6261,15 +6262,15 @@ function renderLic(){
     else if(urgency==="done") tr.classList.add("card-ok");
     const priorityColor = row.priority==="גבוהה" ? "late" : row.priority==="בינונית" ? "open" : "done";
     tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${row.type}" data-f="type" style="min-width:200px"></td>
-      <td class="field-narrow"><input type="text" value="${row.freq}" data-f="freq"></td>
-      <td class="field-xnarrow"><input type="date" value="${row.last}" data-f="last"></td>
-      <td class="field-xnarrow"><input type="date" value="${row.expiry}" data-f="expiry"></td>
-      <td><input type="text" value="${row.inspector}" data-f="inspector" style="min-width:140px"></td>
+      <td class="primary-field"><input type="text" value="${escHtml(row.type)}" data-f="type" style="min-width:200px"></td>
+      <td class="field-narrow"><input type="text" value="${escHtml(row.freq)}" data-f="freq"></td>
+      <td class="field-xnarrow"><input type="date" value="${escHtml(row.last)}" data-f="last"></td>
+      <td class="field-xnarrow"><input type="date" value="${escHtml(row.expiry)}" data-f="expiry"></td>
+      <td><input type="text" value="${escHtml(row.inspector)}" data-f="inspector" style="min-width:140px"></td>
       <td class="field-narrow">${schoolYearSelectHTML(row.schoolYear)}</td>
       <td><select data-f="processStatus" data-status-style="licProcess">
             ${LIC_STATUS_ORDER.map(s=>`<option value="${s}" ${row.processStatus===s?"selected":""}>${s}</option>`).join("")}
-            ${(row.processStatus && !LIC_STATUS_ORDER.includes(row.processStatus)) ? `<option value="${row.processStatus}" selected>${row.processStatus}</option>` : ""}
+            ${(row.processStatus && !LIC_STATUS_ORDER.includes(row.processStatus)) ? `<option value="${escHtml(row.processStatus)}" selected>${escHtml(row.processStatus)}</option>` : ""}
             <option value="__custom__">✏️ כתיבה חופשית...</option>
           </select></td>
       <td class="field-xnarrow"><select data-f="priority">
@@ -6277,7 +6278,7 @@ function renderLic(){
             <option value="בינונית" ${(!row.priority||row.priority==="בינונית")?"selected":""}>בינונית</option>
             <option value="נמוכה" ${row.priority==="נמוכה"?"selected":""}>נמוכה</option>
           </select></td>
-      <td class="field-narrow">${urgency ? `<span class="pill ${urgency}">${urgency==="late"?"פג תוקף":urgency==="open"?"מתקרב לתפוגה":"בתוקף"}</span>` : `<input type="text" value="${row.status}" data-f="status">`}</td>
+      <td class="field-narrow">${urgency ? `<span class="pill ${urgency}">${urgency==="late"?"פג תוקף":urgency==="open"?"מתקרב לתפוגה":"בתוקף"}</span>` : `<input type="text" value="${escHtml(row.status)}" data-f="status">`}</td>
       <td class="file-cell"></td>
       <td class="sync-cell field-xnarrow">
         <label class="cal-toggle" title="${row.synced?"מסונכרן ליומן":"סנכרון ליומן"}">
@@ -7101,11 +7102,11 @@ function renderBank(){
   data.bank.forEach(row => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${row.name}" data-f="name" style="min-width:110px"></td>
-      <td class="bank-line-field"><input type="text" value="${row.bank}" data-f="bank"></td>
-      <td class="bank-line-field"><input type="text" value="${row.branch}" data-f="branch"></td>
-      <td class="bank-line-field"><input type="text" value="${row.account}" data-f="account"></td>
-      <td class="bank-line-field"><input type="text" value="${row.holder}" data-f="holder"></td>
+      <td class="primary-field"><input type="text" value="${escHtml(row.name)}" data-f="name" style="min-width:110px"></td>
+      <td class="bank-line-field"><input type="text" value="${escHtml(row.bank)}" data-f="bank"></td>
+      <td class="bank-line-field"><input type="text" value="${escHtml(row.branch)}" data-f="branch"></td>
+      <td class="bank-line-field"><input type="text" value="${escHtml(row.account)}" data-f="account"></td>
+      <td class="bank-line-field"><input type="text" value="${escHtml(row.holder)}" data-f="holder"></td>
       <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeBankRow(${row.id})">${svgIcon('trash',13)}</button></td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
@@ -7139,8 +7140,8 @@ function renderVendorPay(){
             <option value="רכש/ספק" ${(!row.sourceType||row.sourceType==="רכש/ספק")?"selected":""}>רכש/ספק</option>
             <option value="איש מקצוע" ${row.sourceType==="איש מקצוע"?"selected":""}>איש מקצוע</option>
           </select></td>
-      <td><input type="text" value="${row.desc}" data-f="desc" style="min-width:140px"></td>
-      <td><input type="number" value="${row.amount}" data-f="amount" style="width:80px"></td>
+      <td><input type="text" value="${escHtml(row.desc)}" data-f="desc" style="min-width:140px"></td>
+      <td><input type="number" value="${escHtml(row.amount)}" data-f="amount" style="width:80px"></td>
       <td class="sync-cell"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-approved="1" ${row.approved?"checked":""}><span class="pill ${row.approved?'done':'open'}">${row.approved?"מאושר":"לא מאושר"}</span></label></td>
       <td><select class="payment-status-select" data-status-style="paymentStatus">
             <option value="ממתין" ${(row.paymentStatus||(row.paid?"שולם":"ממתין"))==="ממתין"?"selected":""}>ממתין</option>
@@ -7148,16 +7149,16 @@ function renderVendorPay(){
             <option value="חסר פרטים" ${row.paymentStatus==="חסר פרטים"?"selected":""}>חסר פרטים</option>
           </select></td>
       <td><input type="text" class="accountant-note-input" value="${row.accountantNote||""}" placeholder="הערת מנהל חשבונות" style="min-width:130px"></td>
-      <td class="bank-line-field"><input type="text" value="${row.bank}" data-f="bank"></td>
-      <td class="bank-line-field"><input type="text" value="${row.branch}" data-f="branch"></td>
-      <td class="bank-line-field"><input type="text" value="${row.account}" data-f="account"></td>
+      <td class="bank-line-field"><input type="text" value="${escHtml(row.bank)}" data-f="bank"></td>
+      <td class="bank-line-field"><input type="text" value="${escHtml(row.branch)}" data-f="branch"></td>
+      <td class="bank-line-field"><input type="text" value="${escHtml(row.account)}" data-f="account"></td>
       <td class="bank-line-field"><input type="text" value="${row.holder||""}" data-f="holder" placeholder="שם בעל חשבון"></td>
       <td class="contact-actions">
         <button class="contact-action-btn ca-whatsapp" title="שליחת הודעה בוואטסאפ" onclick="sendPaymentReminder('vendor',${row.id},'whatsapp')">${svgIcon("whatsapp",15)}</button>
         <button class="contact-action-btn ca-mail" title="שליחת הודעה במייל" onclick="sendPaymentReminder('vendor',${row.id},'email')">${svgIcon("mail",15)}</button>
       </td>
       <td class="file-cell"></td>
-      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:110px"></td>
+      <td><input type="text" value="${escHtml(row.notes)}" data-f="notes" style="min-width:110px"></td>
       <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeVendorPay(${row.id})">${svgIcon('trash',13)}</button></td>
     `;
     migrateSingleDocToArray(row, "invoiceLink", "docs", "חשבונית");
@@ -7924,16 +7925,16 @@ function renderContacts(){
     const priceLabel = row.priceType === "תעריף שעתי" ? "₪ לשעה" : "מחיר קבוע";
     const extras = row.extraContacts || [];
     tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${row.name}" data-f="name" style="min-width:130px"></td>
+      <td class="primary-field"><input type="text" value="${escHtml(row.name)}" data-f="name" style="min-width:130px"></td>
       <td class="field-narrow"><select data-f="contactType">
             <option value="" ${!row.contactType?"selected":""}></option>
             <option value="איש מקצוע" ${row.contactType==="איש מקצוע"?"selected":""}>איש מקצוע</option>
             <option value="ספק" ${row.contactType==="ספק"?"selected":""}>ספק</option>
             <option value="שניהם" ${row.contactType==="שניהם"?"selected":""}>שניהם</option>
           </select></td>
-      <td><input type="text" value="${row.specialty}" data-f="specialty"></td>
-      <td><input type="text" value="${row.phone}" data-f="phone" style="width:110px"></td>
-      <td><input type="text" value="${row.email}" data-f="email" style="min-width:140px"></td>
+      <td><input type="text" value="${escHtml(row.specialty)}" data-f="specialty"></td>
+      <td><input type="text" value="${escHtml(row.phone)}" data-f="phone" style="width:110px"></td>
+      <td><input type="text" value="${escHtml(row.email)}" data-f="email" style="min-width:140px"></td>
       <td><select data-f="priceType">
             <option value="" ${!row.priceType?"selected":""}></option>
             <option value="מחיר קבוע" ${row.priceType==="מחיר קבוע"?"selected":""}>מחיר קבוע</option>
@@ -7941,8 +7942,8 @@ function renderContacts(){
             <option value="לפי קריאה" ${row.priceType==="לפי קריאה"?"selected":""}>לפי קריאה (משתנה)</option>
             <option value="לא ידוע" ${row.priceType==="לא ידוע"?"selected":""}>לא ידוע מראש</option>
           </select></td>
-      <td><input type="text" value="${row.cost}" data-f="cost" style="width:90px" placeholder="${priceLabel}" ${priceKnown?"":"disabled"}></td>
-      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:120px"></td>
+      <td><input type="text" value="${escHtml(row.cost)}" data-f="cost" style="width:90px" placeholder="${priceLabel}" ${priceKnown?"":"disabled"}></td>
+      <td><input type="text" value="${escHtml(row.notes)}" data-f="notes" style="min-width:120px"></td>
       <td class="contact-actions">
         <button class="contact-action-btn ca-call" title="התקשרות" onclick="callContact(${row.id})">${svgIcon("phoneCall",15)}</button>
         <button class="contact-action-btn ca-whatsapp" title="שליחת וואטסאפ" onclick="handleContactSend(${row.id},'whatsapp')">${svgIcon("whatsapp",15)}</button>
@@ -8048,10 +8049,10 @@ function renderFoodPrice(){
   data.foodPriceList.forEach(row => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${row.item}" data-f="item" style="min-width:140px"></td>
+      <td class="primary-field"><input type="text" value="${escHtml(row.item)}" data-f="item" style="min-width:140px"></td>
       <td style="flex-direction:row;align-items:center;gap:4px">${buildSelect(getSupplierNames(), row.vendor, "vendor")}${findContactByName(row.vendor) ? `<button type="button" class="ca-mini" title="יצירת קשר עם הספק" onclick="quickContactWhatsAppByName('${(row.vendor||"").replace(/'/g,"\\'")}')">${svgIcon("whatsapp",12)}</button>` : ""}</td>
-      <td><input type="text" value="${row.unit}" data-f="unit" style="width:80px"></td>
-      <td><input type="number" value="${row.price}" data-f="price" style="width:80px"></td>
+      <td><input type="text" value="${escHtml(row.unit)}" data-f="unit" style="width:80px"></td>
+      <td><input type="number" value="${escHtml(row.price)}" data-f="price" style="width:80px"></td>
       <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeFoodPrice(${row.id})">${svgIcon('trash',13)}</button></td>
     `;
     tr.querySelectorAll("[data-f]").forEach(inp => {
@@ -8071,7 +8072,7 @@ function buildOrderVendorSelect(){
   if(!sel) return;
   const current = sel.value;
   const vendors = [...new Set(data.foodPriceList.map(r=>r.vendor).filter(Boolean))];
-  sel.innerHTML = vendors.map(v => `<option value="${v}" ${v===current?"selected":""}>${v}</option>`).join("");
+  sel.innerHTML = vendors.map(v => `<option value="${escHtml(v)}" ${v===current?"selected":""}>${escHtml(v)}</option>`).join("");
   renderOrderBuilder();
 }
 function addOrderLine(){
@@ -8095,8 +8096,8 @@ function renderOrderBuilder(){
     total += rowTotal;
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><select data-f="item" style="min-width:140px">${vendorItems.map(it=>`<option value="${it.item}" ${it.item===line.item?"selected":""}>${it.item}</option>`).join("")}</select></td>
-      <td><input type="number" value="${line.qty}" data-f="qty" style="width:60px"></td>
+      <td><select data-f="item" style="min-width:140px">${vendorItems.map(it=>`<option value="${escHtml(it.item)}" ${it.item===line.item?"selected":""}>${escHtml(it.item)}</option>`).join("")}</select></td>
+      <td><input type="number" value="${escHtml(line.qty)}" data-f="qty" style="width:60px"></td>
       <td><input type="text" value="${fmtMoney(line.price)}" readonly style="width:80px"></td>
       <td class="order-line-total">${fmtMoney(rowTotal)}</td>
       <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeOrderLine(${line.id})">${svgIcon('trash',13)}</button></td>
@@ -8274,7 +8275,7 @@ function renderFoodOrders(){
   if(filterSel){
     const vendors = [...new Set(data.foodOrders.map(o=>o.vendor).filter(Boolean))];
     const current = filterSel.value;
-    filterSel.innerHTML = `<option value="">כל הספקים</option>` + vendors.map(v=>`<option value="${v}" ${v===current?"selected":""}>${v}</option>`).join("");
+    filterSel.innerHTML = `<option value="">כל הספקים</option>` + vendors.map(v=>`<option value="${escHtml(v)}" ${v===current?"selected":""}>${escHtml(v)}</option>`).join("");
   }
   const filterVal = filterSel ? filterSel.value : "";
   const list = filterVal ? data.foodOrders.filter(o=>o.vendor===filterVal) : data.foodOrders;
@@ -8375,22 +8376,22 @@ function renderFinance(){
     if(urgency==="late") tr.classList.add("card-bad");
     else if(urgency==="open") tr.classList.add("card-warn");
     tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${row.name}" data-f="name" style="min-width:140px"></td>
-      <td><input type="text" value="${row.vendor}" data-f="vendor" style="min-width:100px"></td>
+      <td class="primary-field"><input type="text" value="${escHtml(row.name)}" data-f="name" style="min-width:140px"></td>
+      <td><input type="text" value="${escHtml(row.vendor)}" data-f="vendor" style="min-width:100px"></td>
       <td><select data-f="category" data-status-style="recurring">
             <option ${row.category==="שוטף"?"selected":""}>שוטף</option>
             <option ${row.category==='בלתי"ם'?"selected":""}>בלתי"ם</option>
           </select></td>
-      <td><input type="number" value="${row.amount}" data-f="amount" style="width:80px"></td>
+      <td><input type="number" value="${escHtml(row.amount)}" data-f="amount" style="width:80px"></td>
       <td><select data-f="freq">
             <option ${row.freq==="חודשי"?"selected":""}>חודשי</option>
             <option ${row.freq==="רבעוני"?"selected":""}>רבעוני</option>
             <option ${row.freq==="שנתי"?"selected":""}>שנתי</option>
             <option ${row.freq==="חד פעמי"?"selected":""}>חד פעמי</option>
           </select></td>
-      <td><input type="date" value="${row.nextDue}" data-f="nextDue"> ${urgency?`<span class="pill ${urgency}">${urgency==="late"?"באיחור":"קרוב"}</span>`:""}</td>
-      <td><input type="text" value="${row.lastPaid}" readonly style="width:90px"></td>
-      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:100px"></td>
+      <td><input type="date" value="${escHtml(row.nextDue)}" data-f="nextDue"> ${urgency?`<span class="pill ${urgency}">${urgency==="late"?"באיחור":"קרוב"}</span>`:""}</td>
+      <td><input type="text" value="${escHtml(row.lastPaid)}" readonly style="width:90px"></td>
+      <td><input type="text" value="${escHtml(row.notes)}" data-f="notes" style="min-width:100px"></td>
       <td class="row-actions">
         <button class="btn ghost" style="padding:5px 8px;font-size:11px" onclick="markPaid(${row.id})">סמן כשולם</button>
         <button class="card-delete-btn" title="מחיקה" onclick="removeRecurring(${row.id})">${svgIcon('trash',13)}</button>
@@ -10613,14 +10614,14 @@ function renderProjects(){
   data.projects.forEach(row => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${row.name}" data-f="name" style="min-width:140px"></td>
+      <td class="primary-field"><input type="text" value="${escHtml(row.name)}" data-f="name" style="min-width:140px"></td>
       <td><select data-f="category">
             <option ${row.category==="שיפוץ"?"selected":""}>שיפוץ</option>
             <option ${row.category==="רכש חדש"?"selected":""}>רכש חדש</option>
             <option ${row.category==="מוצר חשמלי חדש"?"selected":""}>מוצר חשמלי חדש</option>
             <option ${row.category==="אחר"?"selected":""}>אחר</option>
           </select></td>
-      <td><input type="text" value="${row.desc}" data-f="desc" style="min-width:160px"></td>
+      <td><input type="text" value="${escHtml(row.desc)}" data-f="desc" style="min-width:160px"></td>
       <td><select data-f="status" data-status-style="project">
             <option ${row.status==="פתוח"?"selected":""}>פתוח</option>
             <option ${row.status==="בבדיקה"?"selected":""}>בבדיקה</option>
@@ -10699,9 +10700,9 @@ function renderQuotes(){
   p.quotes.forEach(q => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${q.vendor}" data-f="vendor" style="min-width:120px"></td>
-      <td><input type="number" value="${q.price}" data-f="price" style="width:90px"></td>
-      <td><input type="text" value="${q.notes}" data-f="notes" style="min-width:140px"></td>
+      <td class="primary-field"><input type="text" value="${escHtml(q.vendor)}" data-f="vendor" style="min-width:120px"></td>
+      <td><input type="number" value="${escHtml(q.price)}" data-f="price" style="width:90px"></td>
+      <td><input type="text" value="${escHtml(q.notes)}" data-f="notes" style="min-width:140px"></td>
       <td class="file-cell"></td>
       <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeQuote(${q.id})">${svgIcon('trash',13)}</button></td>
     `;
@@ -10849,153 +10850,1107 @@ function renderBarChart(containerId, items){
   el.innerHTML = `<div style="display:flex;gap:12px;align-items:flex-end">${bars}</div>`;
 }
 
-function renderDashboard(){
-  renderLoginLog();
-  const curYear0 = currentSchoolYearStart();
-  const yearTasks = data.tasks.filter(r => Number(r.schoolYear||curYear0) === curYear0);
-  const totalTasks = yearTasks.length;
-  const doneTasks = yearTasks.filter(r=>r.status==="בוצע").length;
-  const openTasks = totalTasks - doneTasks;
-  const procTotal = data.procurement.reduce((s,r)=> s + (parseFloat(r.qty)||0)*(parseFloat(r.price)||0), 0);
-  const licSoon = data.licensing.filter(r => { const u = licUrgency(r.expiry); return u==="open" || u==="late"; }).length;
-  const staffTotal = data.installments.reduce((s, inst) => s + inst.reduce((s2,r)=>s2+computeStaffTotal(r),0), 0);
+/* =====================================================================
+   לוח בקרה חי (אוקטובר 2026)
+   קריאה בלבד: הלוח רק קורא נתונים מכל הטאבים ומציג אותם. הוא לא כותב, לא משנה
+   ולא מוחק שום רשומה. לחיצה על פריט רק מעבירה לטאב המתאים (ופותחת את הפריט).
+   סדר לפי חשיבות: מצב הבניין → דורש טיפול → מדדים → השבוע הקרוב → גרפים → מערכות → פעילות.
+   ===================================================================== */
+const DB = { clock: null, ticks: 0, last: {}, showAll: false, actions: [], wired: false };
+const DB_TONE = { bad: "#b4441a", warn: "#d4772a", info: "#3d7ea6", ok: "#5f7f3a", plum: "#7a5c8f", gold: "#c9952b", soft: "#a89c8a" };
+const DB_ICO = {
+  bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>',
+  wallet: '<path d="M19 7V5.5A1.5 1.5 0 0 0 17.5 4h-12A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16"/><path d="M21 9h-5a3 3 0 0 0 0 6h5z"/>',
+  trend: '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+  done: '<circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.5 2.5 5-5"/>',
+  box: '<path d="M20.5 7.5 12 3 3.5 7.5v9L12 21l8.5-4.5v-9Z"/><path d="M3.7 7.7 12 12l8.3-4.3"/><path d="M12 12v9"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  wrench: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  arrow: '<path d="M15 6l-6 6 6 6"/>',
+  pulse: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+  me: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>'
+};
+function dbIco(name, size){
+  const s = size || 18;
+  if(DB_ICO[name]) return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${DB_ICO[name]}</svg>`;
+  return tkIcon(name, s) || "";
+}
+function dbSafe(fn, fallback){ try{ return fn(); }catch(e){ console.error("לוח בקרה:", e); return fallback; } }
+function dbRel(n){
+  if(n === null || n === undefined) return "";
+  if(n === 0) return "היום";
+  if(n === 1) return "מחר";
+  if(n === -1) return "אתמול";
+  if(n === 2) return "מחרתיים";
+  return n > 0 ? `בעוד ${n} ימים` : `לפני ${-n} ימים`;
+}
+function dbGem(n){
+  n = Math.floor(n);
+  if(!(n > 0)) return "";
+  const H = ["", "ק", "ר", "ש", "ת", "תק", "תר", "תש", "תת", "תתק"], T = ["", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ"], U = ["", "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט"];
+  const h = Math.floor(n / 100) % 10, r = n % 100;
+  let s = H[h];
+  if(r === 15) s += "טו"; else if(r === 16) s += "טז"; else s += T[Math.floor(r / 10)] + U[r % 10];
+  return s.length > 1 ? s.slice(0, -1) + "״" + s.slice(-1) : s + "׳";
+}
+function dbHebDate(d){
+  try{
+    const parts = new Intl.DateTimeFormat("he-u-ca-hebrew", { day: "numeric", month: "long", year: "numeric" }).formatToParts(d);
+    const g = t => (parts.find(p => p.type === t) || {}).value || "";
+    return `${dbGem(Number(g("day")))} ${g("month")} ${dbGem(Number(g("year")) % 1000)}`.trim();
+  }catch(e){ return ""; }
+}
+function dbGreeting(h){ return h >= 5 && h < 12 ? "בוקר טוב" : h >= 12 && h < 17 ? "צהריים טובים" : h >= 17 && h < 21 ? "ערב טוב" : "לילה טוב"; }
+function dbMaintLabel(m){
+  m = String(m || "").trim();
+  if(!m) return "ללא סיווג";
+  if(TK_MAINT.includes(m)) return m;
+  if(m.includes("בלתי")) return "תחזוקה בלתי מתוכננת";
+  if(m.includes("מונע")) return "תחזוקה מונעת";
+  if(m.includes("שוטפ")) return "תחזוקה שוטפת";
+  return m;
+}
+function dbNum(v, fmt, key){
+  // מספר שזז: data-db-to הוא הערך הסופי, data-db-key מאפשר תנועה מהערך הקודם בעדכון חי
+  const shown = fmt === "money" ? fmtMoney(Math.round(v)) : fmt === "pct" ? Math.round(v) + "%" : String(Math.round(v));
+  return `<span class="db-num" data-db-to="${Number(v) || 0}" data-db-fmt="${fmt || "int"}" data-db-key="${escHtml(key || "")}">${shown}</span>`;
+}
+function dbAct(fn){ DB.actions.push(fn); return `data-db-act="${DB.actions.length - 1}"`; }
+function dbGo(tab, after){
+  return () => {
+    if(!allowedTabs().includes(tab)) return;
+    switchTab(tab);
+    window.scrollTo(0, 0);
+    if(after) setTimeout(() => dbSafe(after), 60);
+  };
+}
+function dbAllowed(tab){ return allowedTabs().includes(tab); }
 
-  document.getElementById("dashCards").innerHTML = `
-    <div class="stat warn"><div class="label">משימות פתוחות (${schoolYearLabel(curYear0)})</div><div class="value">${openTasks}</div></div>
-    <div class="stat good"><div class="label">משימות שהושלמו (${schoolYearLabel(curYear0)})</div><div class="value">${doneTasks}</div></div>
-    <div class="stat"><div class="label">סה"כ הזמנות רכש</div><div class="value">${fmtMoney(procTotal)}</div></div>
-    <div class="stat ${licSoon>0?'bad':'good'}"><div class="label">אישורים לתשומת לב</div><div class="value">${licSoon}</div></div>
-    <div class="stat"><div class="label">סה"כ תשלומי צוות (כל הפעימות)</div><div class="value">${fmtMoney(staffTotal)}</div></div>
-  `;
+/* ---------- איסוף נתונים (קריאה בלבד) ---------- */
+function dbCollect(){
+  const Y = currentSchoolYearStart();
+  const today = tkToday();
+  const yearTasks = data.tasks.filter(t => Number(t.schoolYear || Y) === Y);
+  const open = yearTasks.filter(t => tkStatus(t) !== "בוצע");
+  const done = yearTasks.filter(t => tkStatus(t) === "בוצע");
+  const late = open.filter(tkIsLate);
+  const dueToday = open.filter(t => tkDaysTo(t.due) === 0);
+  const week = open.filter(t => { const n = tkDaysTo(t.due); return n !== null && n >= 0 && n <= 7; });
+  const urgent = open.filter(t => tkPrio(t) === 1);
+  const byStatus = TK_STATUSES.map(s => ({ s, n: yearTasks.filter(t => tkStatus(t) === s).length, c: TK_STATUS_COLOR[s] }));
 
-  renderDonutChart("dashDonut", [
-    {label:"הושלמו", value:doneTasks, color:"var(--green)"},
-    {label:"פתוחות", value:openTasks, color:"var(--amber)"}
-  ]);
-
-  const maintTypes = ["תחזוקה מונעת","תחזוקה שוטפת","תחזוקה בלתי מתוכננת"];
-  const maintColors = ["var(--green)","var(--violet)","var(--red)"];
-  const barData = maintTypes.map((mt,i) => ({label:mt.replace("תחזוקה ",""), value:yearTasks.filter(r=>r.maint===mt).length, color:maintColors[i]}));
-  const unclassifiedCount = yearTasks.filter(r=>!r.maint).length;
-  if(unclassifiedCount) barData.push({label:"ללא סיווג", value:unclassifiedCount, color:"var(--ink-soft)"});
-  renderBarChart("dashBar", barData);
-
-  const dashTasks = document.getElementById("dashTasks");
-  const openList = yearTasks.filter(r=>r.status!=="בוצע");
-  if(openList.length===0){
-    dashTasks.innerHTML = "<p class='hint'>אין משימות פתוחות כרגע.</p>";
-  }else{
-    let rows = "<table><thead><tr><th>תיאור</th><th>אחראי</th><th>תאריך יעד</th><th>סטטוס</th></tr></thead><tbody>";
-    openList.forEach(r => {
-      rows += `<tr><td class="primary-field">${r.desc||"—"}</td><td>${r.assignee||"—"}</td><td>${r.due||"—"}</td><td><span class="pill open">${r.status}</span></td></tr>`;
-    });
-    rows += "</tbody></table>";
-    dashTasks.innerHTML = rows;
-  }
-
-  const dashLic = document.getElementById("dashLicensing");
-  const licList = data.licensing.filter(r => { const u = licUrgency(r.expiry); return u==="open" || u==="late"; });
-  if(licList.length===0){
-    dashLic.innerHTML = "<p class='hint'>כל האישורים בתוקף.</p>";
-  }else{
-    let rows = "<table><thead><tr><th>סוג האישור</th><th>תאריך תפוגה</th><th>סטטוס</th></tr></thead><tbody>";
-    licList.forEach(r => {
-      const u = licUrgency(r.expiry);
-      rows += `<tr><td class="primary-field">${r.type||"—"}</td><td>${r.expiry||"—"}</td><td><span class="pill ${u}">${u==="late"?"פג תוקף":"מתקרב לתפוגה"}</span></td></tr>`;
-    });
-    rows += "</tbody></table>";
-    dashLic.innerHTML = rows;
-  }
-
-  const hasExpired = data.licensing.some(r => licUrgency(r.expiry) === "late");
-
-  const today = new Date();
-  const curYear = currentSchoolYearStart();
-  const nextSchoolYearStartDate = new Date(curYear+1, 8, 1); // Sept 1
-  const renewList = data.licensing.filter(r => {
-    if(!r.expiry) return false;
-    const d = new Date(r.expiry+"T00:00:00");
-    return d >= today && d <= nextSchoolYearStartDate;
+  const maintMap = new Map();
+  yearTasks.forEach(t => { const k = dbMaintLabel(t.maint); maintMap.set(k, (maintMap.get(k) || 0) + 1); });
+  const maintOrder = TK_MAINT.concat(["ללא סיווג"]);
+  const maint = [...maintMap.entries()].sort((a, b) => {
+    const ia = maintOrder.indexOf(a[0]), ib = maintOrder.indexOf(b[0]);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || b[1] - a[1];
   });
-  const schoolYearAlertEl = document.getElementById("dashSchoolYearAlert");
-  if(schoolYearAlertEl){
-    if(renewList.length === 0){
-      schoolYearAlertEl.innerHTML = "";
-    }else{
-      schoolYearAlertEl.innerHTML = `
-        <div class="card card-warn" style="margin-bottom:20px">
-          <div style="font-weight:700;margin-bottom:8px">⚠️ יש לחדש לפני תחילת שנת ${schoolYearLabel(curYear+1)} (1 בספטמבר)</div>
-          <div class="table-scroll"><table>
-            <thead><tr><th>סוג האישור</th><th>תאריך תפוגה</th></tr></thead>
-            <tbody>${renewList.map(r=>`<tr><td class="primary-field">${r.type||"—"}</td><td>${r.expiry}</td></tr>`).join("")}</tbody>
-          </table></div>
-        </div>`;
+
+  // השלמות לפי חודש (6 חודשים אחרונים)
+  const spark = [];
+  const now = new Date();
+  for(let i = 5; i >= 0; i--){
+    const m = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}`;
+    spark.push(data.tasks.filter(t => tkStatus(t) === "בוצע" && String(t.doneAt || "").slice(0, 7) === key).length);
+  }
+
+  const jobs = dbSafe(() => collectJobs(), []);
+  const waiting = jobs.filter(j => j.waitingPay && !j.closed);
+  const waitingSum = waiting.reduce((s, j) => s + (j.amount || 0), 0);
+  const noReceipt = jobs.filter(j => j.missingReceipt).length;
+  const noAmount = jobs.filter(j => j.missingAmount);
+
+  const costItems = dbSafe(() => eqCostData(Y), []);
+  const costTotal = costItems.reduce((s, x) => s + x.amount, 0);
+  const budgetObj = (data.maintBudget && data.maintBudget[String(Y)]) || {};
+  const budget = Object.values(budgetObj).reduce((s, v) => s + (Number(v) || 0), 0);
+  const months = (typeof EQ_MONTHS !== "undefined" ? EQ_MONTHS : []).map((l, i) => ({ l, v: costItems.filter(x => x.month === i).reduce((s, x) => s + x.amount, 0) }));
+  const curMonth = dbSafe(() => eqMonthIndex(Y, today), -1);
+
+  const lic = data.licensing.map(r => ({ r, n: r.expiry ? tkDaysTo(r.expiry) : null }));
+  const licWithExp = lic.filter(x => x.n !== null);
+  const licExpired = licWithExp.filter(x => x.n < 0);
+  const licSoon = licWithExp.filter(x => x.n >= 0 && x.n <= 30);
+  const licValid = licWithExp.filter(x => x.n >= 0);
+  const licProc = data.licensing.filter(r => dbSafe(() => licIsInProcess(r), false));
+  const licMissing = data.licensing.filter(r => dbSafe(() => licIsInProcess(r) && licHasMissingDocs(r), false));
+
+  const equip = data.equipment || [], contracts = data.serviceContracts || [];
+  const warrSoon = equip.map(e => ({ e, w: eqWarranty(e) })).filter(x => x.w.k === "soon");
+  const cStates = contracts.map(c => ({ c, st: eqContractState(c), n: c.end ? tkDaysTo(c.end) : null }));
+  const cActive = cStates.filter(x => x.st.k === "active" || x.st.k === "soon");
+  const cSoon = cStates.filter(x => x.st.k === "soon");
+  const cExpiredRecent = cStates.filter(x => x.st.k === "expired" && x.n !== null && x.n >= -30);
+
+  const rec = (data.recurring || []).map(r => ({ r, n: r.nextDue ? tkDaysTo(r.nextDue) : null }));
+  const recLate = rec.filter(x => x.n !== null && x.n < 0);
+  const recSoon = rec.filter(x => x.n !== null && x.n >= 0 && x.n <= 14);
+  const recMonthly = (data.recurring || []).filter(r => r.freq === "חודשי").reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
+
+  const keysLoaned = (data.keysLog || []).filter(l => !l.dateIn);
+  const keysStale = keysLoaned.filter(l => { const h = holderByName(l.holder); return h && h.active === false; });
+
+  const payMissing = [];
+  (data.installments || []).forEach((inst, idx) => (inst || []).forEach(row => {
+    if(row && row.approved && row.paymentStatus === "חסר פרטים") payMissing.push({ name: row.name || "—", type: "צוות · פעימה " + (idx + 1), total: dbSafe(() => computeStaffTotal(row), 0) });
+  }));
+  (data.vendorPayments || []).forEach(row => {
+    if(row && row.approved && row.paymentStatus === "חסר פרטים") payMissing.push({ name: row.vendor || "—", type: "ספק", total: parseFloat(row.amount) || 0 });
+  });
+
+  const lastInstIdx = (data.installments || []).length - 1;
+  const lastInst = lastInstIdx >= 0 ? (data.installments[lastInstIdx] || []).filter(r => r && (r.name || computeStaffTotal(r) > 0)) : [];
+  const staff = {
+    idx: lastInstIdx, count: lastInst.length,
+    total: lastInst.reduce((s, r) => s + dbSafe(() => computeStaffTotal(r), 0), 0),
+    approved: lastInst.filter(r => r.approved).length,
+    paid: lastInst.filter(r => r.paymentStatus === "שולם").length
+  };
+
+  const sp = dbSafe(() => {
+    if(!window.SP || !SP.S) return null;
+    const st = SP.expiringSoon() || [];
+    const expired = st.filter(s => tkDaysTo(s.expiry) < 0);
+    const soon = st.filter(s => tkDaysTo(s.expiry) >= 0);
+    return { expired, soon, below: (SP.belowMin() || []).length, reqs: (SP.openReqs() || []).length, sent: (SP.S.orders || []).filter(o => o.status === "sent").length };
+  }, null);
+
+  const procYear = (data.procurement || []).filter(r => Number(r.schoolYear || Y) === Y).reduce((s, r) => s + (parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0), 0);
+  const proj = { open: (data.projects || []).filter(p => p.status === "פתוח").length, review: (data.projects || []).filter(p => p.status === "בבדיקה").length, done: (data.projects || []).filter(p => p.status === "הושלם").length };
+
+  return { Y, today, yearTasks, open, done, late, dueToday, week, urgent, byStatus, maint, spark, jobs, waiting, waitingSum, noReceipt, noAmount,
+    costItems, costTotal, budget, months, curMonth, lic, licWithExp, licExpired, licSoon, licValid, licProc, licMissing,
+    equip, contracts, warrSoon, cActive, cSoon, cExpiredRecent, rec, recLate, recSoon, recMonthly, keysLoaned, keysStale, payMissing, staff, sp, procYear, proj,
+    my: dbSafe(() => (typeof mtDash === "function" && mtIsAdmin()) ? mtDash() : null, null) };
+}
+
+/* ---------- דורש טיפול: רשימה אחת לפי חומרה ---------- */
+function dbAlerts(D){
+  const A = [];
+  const add = (lvl, ico, title, sub, n, act, tab) => { if(!tab || dbAllowed(tab)) A.push({ lvl, ico, title, sub, n, act }); };
+  D.licExpired.forEach(x => add(1, "shield", `פג תוקף: ${x.r.type || "אישור"}`, x.r.inspector ? `בודק: ${x.r.inspector}` : "רישוי ובטיחות", x.n, dbGo("licensing"), "licensing"));
+  D.late.forEach(t => {
+    const n = tkDaysTo(t.due);
+    add(tkPrio(t) === 1 || n <= -7 ? 1 : 2, "clock", t.desc || "משימה ללא תיאור", [tkCode(t), t.assignee || "ללא אחראי", t.place].filter(Boolean).join(" · "), n, dbGo("tasks", () => tkOpen(t.id)), "tasks");
+  });
+  D.licSoon.forEach(x => add(2, "shield", `מתקרב לתפוגה: ${x.r.type || "אישור"}`, "כדאי לתאם בדיקה מראש", x.n, dbGo("licensing"), "licensing"));
+  D.dueToday.forEach(t => add(2, "tasks", t.desc || "משימה ללא תיאור", ["להיום", t.assignee, t.place].filter(Boolean).join(" · "), 0, dbGo("tasks", () => tkOpen(t.id)), "tasks"));
+  D.payMissing.forEach(m => add(2, "wallet", `חסרים פרטי תשלום: ${m.name}`, `${m.type} · ${fmtMoney(m.total)}`, null, dbGo("accountant"), "accountant"));
+  D.recLate.forEach(x => add(2, "repeat", `תשלום שוטף באיחור: ${x.r.name || "—"}`, [x.r.vendor, x.r.amount ? fmtMoney(parseFloat(x.r.amount) || 0) : ""].filter(Boolean).join(" · "), x.n, dbGo("finance"), "finance"));
+  D.cExpiredRecent.forEach(x => add(2, "report", `חוזה שירות הסתיים: ${x.c.name || x.c.supplier || "חוזה"}`, x.c.supplier || "לבדוק חידוש", x.n, dbGo("equipment", () => { eqUi.view = "contracts"; renderEquipment(); eqOpen("contract", x.c.id); }), "equipment"));
+  if(D.sp && D.sp.expired.length) add(2, "box", `${D.sp.expired.length} מוצרים במלאי שפג תוקפם`, D.sp.expired.slice(0, 3).map(s => s.name).join(", "), null, dbGo("procurement"), "procurement");
+  D.licMissing.forEach(r => add(3, "doc", `מסמכים חסרים: ${r.type || "אישור"}`, r.processStatus || "בתהליך", null, dbGo("licensing"), "licensing"));
+  D.cSoon.forEach(x => add(3, "report", `לחדש חוזה: ${x.c.name || x.c.supplier || "חוזה"}`, x.c.supplier || "", x.n, dbGo("equipment", () => { eqUi.view = "contracts"; renderEquipment(); eqOpen("contract", x.c.id); }), "equipment"));
+  D.warrSoon.forEach(x => add(3, "wrench", `אחריות נגמרת: ${x.e.name || "ציוד"}`, x.e.place || x.e.category || "", tkDaysTo(x.e.warrantyEnd), dbGo("equipment", () => { eqUi.view = "equip"; renderEquipment(); eqOpen("equip", x.e.id); }), "equipment"));
+  D.recSoon.filter(x => x.n <= 3).forEach(x => add(3, "repeat", `תשלום שוטף קרוב: ${x.r.name || "—"}`, [x.r.vendor, x.r.amount ? fmtMoney(parseFloat(x.r.amount) || 0) : ""].filter(Boolean).join(" · "), x.n, dbGo("finance"), "finance"));
+  if(D.noAmount.length) add(3, "receipt", `${D.noAmount.length} חשבוניות בלי סכום`, "צריך להשלים סכום כדי שייכנסו לדוח", null, dbGo("accountant"), "accountant");
+  if(D.sp && D.sp.soon.length) add(3, "box", `${D.sp.soon.length} מוצרים יפוגו השבוע`, D.sp.soon.slice(0, 3).map(s => s.name).join(", "), null, dbGo("procurement"), "procurement");
+  if(D.sp && D.sp.below) add(3, "box", `${D.sp.below} מוצרים מתחת למינימום במלאי`, "רכש ואספקה", null, dbGo("procurement"), "procurement");
+  if(D.sp && D.sp.reqs) add(3, "list", `${D.sp.reqs} בקשות פתוחות מהמטבח`, "רכש ואספקה", null, dbGo("procurement"), "procurement");
+  if(D.keysStale.length) add(3, "keys", `${D.keysStale.length} מפתחות אצל מי שכבר לא פעיל`, [...new Set(D.keysStale.map(l => l.holder))].slice(0, 3).join(", "), null, dbGo("keys"), "keys");
+  A.sort((a, b) => a.lvl - b.lvl || (a.n === null ? 999 : a.n) - (b.n === null ? 999 : b.n));
+  return A;
+}
+function dbHealth(D, alerts){
+  let s = 100;
+  s -= Math.min(45, D.licExpired.length * 15);
+  s -= Math.min(15, D.licSoon.length * 5);
+  s -= Math.min(24, D.late.length * 3);
+  s -= Math.min(12, D.payMissing.length * 4);
+  s -= Math.min(8, D.recLate.length * 4);
+  s -= Math.min(8, D.cExpiredRecent.length * 4);
+  s -= Math.min(10, alerts.filter(a => a.lvl === 3).length * 1.5);
+  s = Math.max(0, Math.min(100, Math.round(s)));
+  const tone = s >= 85 ? "ok" : s >= 65 ? "warn" : "bad";
+  const label = s >= 85 ? "הבניין במצב טוב" : s >= 65 ? "יש כמה דברים לטפל בהם" : "דורש טיפול דחוף";
+  return { s, tone, label };
+}
+
+/* ---------- חלקי התצוגה ---------- */
+function dbHeroHtml(D, H, alerts){
+  const now = new Date();
+  const crit = alerts.filter(a => a.lvl === 1).length, urg = alerts.filter(a => a.lvl === 2).length;
+  const R = 52, C = 2 * Math.PI * R;
+  const summary = alerts.length
+    ? `${alerts.length} פריטים מחכים לך${crit ? ` · <b class="c-bad">${crit} קריטיים</b>` : ""}${urg ? ` · <b class="c-warn">${urg} דחופים</b>` : ""}`
+    : "אין כרגע שום דבר פתוח שדורש טיפול";
+  return `<section class="db-hero db-in" style="--i:0">
+    <div class="db-hero-main">
+      <div class="db-live"><span class="db-dot"></span>מתעדכן בזמן אמת · <span id="dbClock">${now.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}</span></div>
+      <h1 class="db-hi">${dbIco(now.getHours() >= 5 && now.getHours() < 18 ? "sun" : "moon", 26)}<span>${dbGreeting(now.getHours())}</span></h1>
+      <div class="db-date">${escHtml(new Intl.DateTimeFormat("he-IL", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(now))}<span class="db-sep">·</span>${escHtml(dbHebDate(now))}<span class="db-sep">·</span>שנת לימודים ${escHtml(schoolYearLabel(D.Y))}</div>
+      <div class="db-sum">${summary}</div>
+      <div class="db-quick">
+        ${D.my && D.my.st.open.length ? `<button type="button" class="db-chip me" ${dbAct(dbMyGo())}>${dbIco("me", 14)}${D.my.st.open.length} משימות שלי להיום</button>` : ""}
+        ${D.open.length ? `<span class="db-chip">${dbIco("tasks", 14)}${D.open.length} משימות פתוחות</span>` : ""}
+        ${D.week.length ? `<span class="db-chip">${dbIco("calendar", 14)}${D.week.length} השבוע</span>` : ""}
+        ${D.waiting.length ? `<span class="db-chip">${dbIco("wallet", 14)}${fmtMoney(Math.round(D.waitingSum))} ממתין לתשלום</span>` : ""}
+      </div>
+    </div>
+    <div class="db-ring ${H.tone}" role="img" aria-label="מצב הבניין ${H.s} מתוך 100">
+      <svg viewBox="0 0 128 128"><circle class="trk" cx="64" cy="64" r="${R}"/><circle class="val" cx="64" cy="64" r="${R}" stroke-dasharray="${C.toFixed(2)}" style="--off:${(C * (1 - H.s / 100)).toFixed(2)};--c:${C.toFixed(2)}" transform="rotate(-90 64 64)"/></svg>
+      <div class="db-ring-c"><div class="v">${dbNum(H.s, "int", "health")}</div><div class="l">מצב הבניין</div></div>
+      <div class="db-ring-t">${H.label}</div>
+    </div>
+  </section>`;
+}
+function dbAlertsHtml(alerts){
+  const lvlName = { 1: "קריטי", 2: "דחוף", 3: "לתשומת לב" }, lvlTone = { 1: "bad", 2: "warn", 3: "info" };
+  if(!alerts.length) return `<section class="db-sec db-in" style="--i:1"><div class="db-sec-h">${dbIco("done", 18)}דורש טיפול</div>
+    <div class="db-allgood">${dbIco("done", 34)}<div><b>הכל תחת שליטה</b><div>אין אישורים שפג תוקפם, אין משימות באיחור ואין תשלומים תקועים.</div></div></div></section>`;
+  const max = 6, list = DB.showAll ? alerts : alerts.slice(0, max);
+  const cnt = l => alerts.filter(a => a.lvl === l).length;
+  return `<section class="db-sec db-in" style="--i:1">
+    <div class="db-sec-h">${dbIco("alert", 18)}דורש טיפול<span class="db-lvls">${[1, 2, 3].filter(cnt).map(l => `<span class="db-lvl ${lvlTone[l]}">${cnt(l)} ${lvlName[l]}</span>`).join("")}</span></div>
+    <div class="db-alerts">${list.map((a, i) => `<button type="button" class="db-al ${lvlTone[a.lvl]} db-in" style="--i:${1.4 + i * .18}" ${dbAct(a.act)}>
+        <span class="ico">${dbIco(a.ico, 18)}</span>
+        <span class="tx"><span class="t">${escHtml(a.title)}</span>${a.sub ? `<span class="s">${escHtml(a.sub)}</span>` : ""}</span>
+        <span class="when">${a.n !== null && a.n !== undefined ? escHtml(dbRel(a.n)) : `<span class="tag">${lvlName[a.lvl]}</span>`}</span>
+        <span class="go">${dbIco("arrow", 16)}</span>
+      </button>`).join("")}</div>
+    ${alerts.length > max ? `<button type="button" class="db-more" ${dbAct(() => { DB.showAll = !DB.showAll; renderDashboard(); })}>${DB.showAll ? "הצגת פחות" : `הצגת כל ${alerts.length} הפריטים`}</button>` : ""}
+  </section>`;
+}
+function dbMyGo(id){
+  return () => {
+    if(!dbAllowed("tasks")) return;
+    data.uiPrefs = data.uiPrefs || {};
+    if(data.uiPrefs.tasksMode !== "mine"){ data.uiPrefs.tasksMode = "mine"; saveUiPrefs(); }
+    switchTab("tasks");
+    window.scrollTo(0, 0);
+    if(id) setTimeout(() => dbSafe(() => mtOpenEdit(id)), 60);
+  };
+}
+function dbMyHtml(D){
+  const M = D.my, st = M.st;
+  const max = 6, list = M.list.slice(0, max);
+  const rows = list.map(x => {
+    const T = MT_TYPES[mtType(x)], n = mtDays(x), late = !x.done && n !== null && n < 0;
+    const wh = x.done ? "" : late ? (n === -1 ? "אתמול" : `לפני ${-n} ימים`) : (x.time || "");
+    return `<div class="db-myi ${x.done ? "done" : ""} ${late ? "late" : ""}">
+      <button type="button" class="mt-chk ${x.done ? "on" : ""}" ${dbAct(b => mtCheckAnim(b, x.id, () => renderDashboard()))} aria-pressed="${!!x.done}" aria-label="${x.done ? "ביטול סימון" : "סימון כבוצע"}: ${escHtml(x.title)}">${mtIco("check", 14, 3)}</button>
+      <span class="ti" style="color:${T.c};background:${T.bg}">${mtIco(mtType(x), 15)}</span>
+      <button type="button" class="tt" ${dbAct(dbMyGo(x.id))}>${escHtml(x.title)}</button>
+      ${x.star && !x.done ? `<span class="st" title="חשוב"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">${MT_ICO.star}</svg></span>` : ""}
+      ${wh ? `<span class="wh">${escHtml(wh)}</span>` : ""}
+    </div>`;
+  }).join("");
+  return `<section class="db-sec db-my db-in" style="--i:1.2">
+    <div class="db-sec-h">${dbIco("me", 18)}המשימות שלי להיום<span class="r">${st.total ? `${st.done.length} מתוך ${st.total}` : ""}</span></div>
+    ${st.total ? `<div class="db-mybar"><span style="--w:${st.pct}%"></span></div>` : ""}
+    ${rows ? `<div class="db-mylist">${rows}</div>${M.list.length > max ? `<div class="db-myempty">ועוד ${M.list.length - max} להיום</div>` : ""}`
+      : `<div class="db-myempty">${M.open ? `אין משימות שלך להיום · ${M.open} פתוחות לימים הבאים` : "אין לך משימות פתוחות. אפשר להוסיף כאן למטה."}</div>`}
+    <form class="db-myadd" data-db-myadd="1" autocomplete="off"><input type="text" aria-label="משימה מהירה שלי" placeholder="+ משימה מהירה שלי להיום…" enterkeyhint="done"><button type="submit">הוספה</button></form>
+    <button type="button" class="db-mylink" ${dbAct(dbMyGo())}>לכל המשימות שלי${M.open ? ` (${M.open})` : ""}</button>
+  </section>`;
+}
+function dbSpark(vals, color){
+  const max = Math.max(1, ...vals), w = 84, h = 26, step = w / (vals.length - 1 || 1);
+  const pts = vals.map((v, i) => `${(i * step).toFixed(1)},${(h - 3 - (v / max) * (h - 6)).toFixed(1)}`).join(" ");
+  return `<svg class="db-spark" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/></svg>`;
+}
+function dbKpisHtml(D){
+  const total = D.yearTasks.length, donePct = total ? D.done.length / total * 100 : 0;
+  const budPct = D.budget > 0 ? D.costTotal / D.budget * 100 : null;
+  const licPct = D.licWithExp.length ? D.licValid.length / D.licWithExp.length * 100 : null;
+  const K = [];
+  if(dbAllowed("tasks")){
+    K.push({ tone: D.late.length ? "bad" : "warn", ico: "tasks", l: "משימות פתוחות", v: dbNum(D.open.length, "int", "open"), h: `${D.late.length} באיחור · ${D.week.length} בשבוע הקרוב`, bar: total ? (D.open.length / total * 100) : 0, tab: "tasks" });
+    K.push({ tone: "ok", ico: "done", l: "בוצעו השנה", v: dbNum(D.done.length, "int", "done"), h: `${Math.round(donePct)}% מכל המשימות`, spark: dbSpark(D.spark, DB_TONE.ok), tab: "tasks" });
+  }
+  if(dbAllowed("accountant")) K.push({ tone: D.waiting.length ? "gold" : "ok", ico: "wallet", l: "ממתין לתשלום", v: dbNum(D.waitingSum, "money", "wait"), h: `${D.waiting.length} עבודות${D.noReceipt ? ` · ${D.noReceipt} בלי קבלה` : ""}`, tab: "accountant" });
+  if(dbAllowed("equipment")) K.push({ tone: budPct !== null && budPct > 100 ? "bad" : "plum", ico: "wrench", l: "עלות תחזוקה השנה", v: dbNum(D.costTotal, "money", "cost"), h: budPct !== null ? `נוצל ${Math.round(budPct)}% מהתקציב` : "לא הוגדר תקציב", bar: budPct !== null ? Math.min(100, budPct) : null, tab: "equipment", after: () => { eqUi.view = "costs"; renderEquipment(); } });
+  if(dbAllowed("licensing")) K.push({ tone: D.licExpired.length ? "bad" : D.licSoon.length ? "warn" : "ok", ico: "shield", l: "אישורים בתוקף", v: licPct === null ? "—" : dbNum(licPct, "pct", "lic"), h: `${D.licExpired.length} פגי תוקף · ${D.licSoon.length} מתקרבים`, bar: licPct, tab: "licensing" });
+  if(dbAllowed("keys")) K.push({ tone: D.keysStale.length ? "warn" : "info", ico: "keys", l: "מפתחות בהשאלה", v: dbNum(D.keysLoaned.length, "int", "keys"), h: D.keysStale.length ? `${D.keysStale.length} אצל לא פעילים` : "כולם אצל אנשים פעילים", tab: "keys" });
+  return `<section class="db-kpis">${K.map((k, i) => `<button type="button" class="db-kpi ${k.tone} db-in" style="--i:${2 + i * .3}" ${dbAct(dbGo(k.tab, k.after))}>
+      <span class="top"><span class="ico">${dbIco(k.ico, 16)}</span><span class="l">${k.l}</span></span>
+      <span class="v">${k.v}</span>
+      ${k.spark || (k.bar !== null && k.bar !== undefined ? `<span class="db-bar"><span style="--w:${Math.max(0, Math.min(100, k.bar)).toFixed(1)}%"></span></span>` : "")}
+      <span class="h">${escHtml(k.h)}</span>
+    </button>`).join("")}</section>`;
+}
+function dbWeekHtml(D){
+  const days = [];
+  const names = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+  for(let i = 0; i < 7; i++){
+    const iso = tkAddDays(D.today, i), d = tkParse(iso);
+    const items = [];
+    if(dbAllowed("tasks")) D.open.filter(t => t.due === iso).sort((a, b) => tkPrio(a) - tkPrio(b)).forEach(t => items.push({ c: tkPrio(t) === 1 ? DB_TONE.bad : (TK_STATUS_COLOR[tkStatus(t)] || DB_TONE.warn), t: t.desc || "משימה", act: dbGo("tasks", () => tkOpen(t.id)) }));
+    if(dbAllowed("licensing")) D.lic.filter(x => x.r.expiry === iso).forEach(x => items.push({ c: DB_TONE.bad, t: "תפוגה: " + (x.r.type || "אישור"), act: dbGo("licensing") }));
+    if(dbAllowed("finance")) D.rec.filter(x => x.r.nextDue === iso).forEach(x => items.push({ c: DB_TONE.gold, t: "תשלום: " + (x.r.name || ""), act: dbGo("finance") }));
+    if(dbAllowed("equipment")){
+      D.contracts.filter(c => c.end === iso).forEach(c => items.push({ c: DB_TONE.info, t: "סיום חוזה: " + (c.name || c.supplier || ""), act: dbGo("equipment") }));
+      D.equip.filter(e => e.warrantyEnd === iso).forEach(e => items.push({ c: DB_TONE.soft, t: "סוף אחריות: " + (e.name || ""), act: dbGo("equipment") }));
+    }
+    if(D.my && D.my.week[iso]) D.my.week[iso].slice().sort(mtSort).forEach(x => items.push({ c: DB_TONE.plum, t: (x.time ? x.time + " " : "") + x.title, act: dbMyGo(x.id) }));
+    days.push({ i, iso, name: i === 0 ? "היום" : i === 1 ? "מחר" : names[d.getDay()], date: `${d.getDate()}.${d.getMonth() + 1}`, shabbat: d.getDay() === 6, items });
+  }
+  const totalItems = days.reduce((s, d) => s + d.items.length, 0);
+  return `<section class="db-sec db-in" style="--i:4">
+    <div class="db-sec-h">${dbIco("calendar", 18)}השבוע הקרוב${D.my ? `<span class="db-wleg"><span><i style="background:${DB_TONE.warn}"></i>תפעול</span><span><i style="background:${DB_TONE.plum}"></i>שלי</span><span><i style="background:${DB_TONE.bad}"></i>תפוגה</span></span>` : ""}<span class="r">${totalItems ? `${totalItems} אירועים` : "שבוע פנוי"}</span></div>
+    <div class="db-week">${days.map(d => `<div class="db-day ${d.i === 0 ? "today" : ""} ${d.shabbat ? "shab" : ""} ${d.items.length ? "" : "empty"}">
+      <div class="dh"><span class="n">${d.name}</span><span class="d">${d.date}</span>${d.items.length ? `<span class="c">${d.items.length}</span>` : ""}</div>
+      <div class="di">${d.items.slice(0, 4).map(it => `<button type="button" class="db-ev" ${dbAct(it.act)}><i style="background:${it.c}"></i><span>${escHtml(it.t)}</span></button>`).join("")}${d.items.length > 4 ? `<span class="db-evmore">ועוד ${d.items.length - 4}</span>` : ""}${d.items.length ? "" : `<span class="db-free">${d.shabbat ? "שבת שלום" : "פנוי"}</span>`}</div>
+    </div>`).join("")}</div>
+  </section>`;
+}
+function dbChartsHtml(D){
+  const cards = [];
+  if(dbAllowed("tasks")){
+    const tot = D.byStatus.reduce((s, x) => s + x.n, 0);
+    const R = 46, C = 2 * Math.PI * R;
+    let acc = 0;
+    const segs = tot ? D.byStatus.filter(x => x.n > 0).map((x, i) => {
+      const len = x.n / tot * C, gap = D.byStatus.filter(y => y.n > 0).length > 1 ? Math.min(2, len / 3) : 0;
+      const s = `<circle cx="60" cy="60" r="${R}" fill="none" stroke="${x.c}" stroke-width="16" stroke-dasharray="${Math.max(0, len - gap).toFixed(2)} ${(C - Math.max(0, len - gap)).toFixed(2)}" style="--len:${Math.max(0, len - gap).toFixed(2)};--d:${(.5 + i * .15).toFixed(2)}s" transform="rotate(${(acc / C * 360 - 90).toFixed(2)} 60 60)"/>`;
+      acc += len; return s;
+    }).join("") : "";
+    cards.push(`<div class="db-sec db-in" style="--i:5"><div class="db-sec-h">${dbIco("board", 18)}סטטוס משימות<span class="r">${escHtml(schoolYearLabel(D.Y))}</span></div>
+      ${tot ? `<div class="db-donut"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--line)" stroke-width="16"/>${segs}</svg>
+        <div class="db-donut-c"><b>${dbNum(tot, "int", "tot")}</b><span>משימות</span></div></div>
+        <div class="db-leg">${D.byStatus.map(x => `<span><i style="background:${x.c}"></i>${escHtml(x.s)} <b>${x.n}</b></span>`).join("")}</div>` : `<div class="db-empty">אין עדיין משימות בשנה הזו</div>`}
+    </div>`);
+    const mx = Math.max(1, ...D.maint.map(x => x[1]));
+    const mc = { "תחזוקה מונעת": DB_TONE.ok, "תחזוקה שוטפת": DB_TONE.warn, "תחזוקה בלתי מתוכננת": DB_TONE.bad, "ללא סיווג": DB_TONE.soft };
+    cards.push(`<div class="db-sec db-in" style="--i:5.3"><div class="db-sec-h">${dbIco("repeat", 18)}לפי סוג תחזוקה</div>
+      ${D.maint.length ? `<div class="db-hbars">${D.maint.map(([k, v], i) => `<div class="db-hb"><span class="k">${escHtml(k.replace("תחזוקה ", ""))}</span><span class="db-bar lg"><span style="--w:${(v / mx * 100).toFixed(1)}%;background:${mc[k] || DB_TONE.plum};--d:${(.4 + i * .12).toFixed(2)}s"></span></span><b>${v}</b></div>`).join("")}</div>` : `<div class="db-empty">אין נתונים</div>`}
+    </div>`);
+  }
+  if(dbAllowed("equipment") && D.months.length){
+    const mx = Math.max(1, ...D.months.map(m => m.v));
+    cards.push(`<div class="db-sec db-in" style="--i:5.6"><div class="db-sec-h">${dbIco("trend", 18)}עלויות תחזוקה לפי חודש<span class="r">${fmtMoney(Math.round(D.costTotal))}</span></div>
+      <div class="db-cols" role="img" aria-label="עלויות תחזוקה לפי חודש">${D.months.map((m, i) => `<div class="db-col ${i === D.curMonth ? "cur" : ""}" title="${escHtml(m.l)}: ${fmtMoney(Math.round(m.v))}"><span class="b"><span style="--h:${(m.v / mx * 100).toFixed(1)}%;--d:${(.4 + i * .05).toFixed(2)}s"></span></span><span class="m">${escHtml(m.l)}</span></div>`).join("")}</div>
+      ${D.budget > 0 ? `<div class="db-budline">תקציב שנתי ${fmtMoney(D.budget)} · ${D.costTotal > D.budget ? `<b class="c-bad">חריגה של ${fmtMoney(Math.round(D.costTotal - D.budget))}</b>` : `נשאר ${fmtMoney(Math.round(D.budget - D.costTotal))}`}</div>` : ""}
+    </div>`);
+  }
+  return cards.length ? `<section class="db-charts">${cards.join("")}</section>` : "";
+}
+function dbModulesHtml(D){
+  const M = [];
+  const row = (l, v, tone) => `<span class="mr"><span>${l}</span><b class="${tone ? "c-" + tone : ""}">${v}</b></span>`;
+  if(dbAllowed("licensing")) M.push({ tab: "licensing", ico: "licensing", t: "רישוי ובטיחות", tone: D.licExpired.length ? "bad" : D.licSoon.length ? "warn" : "ok",
+    rows: [row("אישורים במעקב", data.licensing.length), row("פגי תוקף", D.licExpired.length, D.licExpired.length ? "bad" : ""), row("בתהליך", D.licProc.length)] });
+  if(dbAllowed("equipment")) M.push({ tab: "equipment", ico: "equipment", t: "ציוד וחוזים", tone: D.cSoon.length || D.warrSoon.length ? "warn" : "ok",
+    rows: [row("פריטי ציוד", D.equip.length), row("חוזים פעילים", D.cActive.length), row("לחידוש בקרוב", D.cSoon.length + D.warrSoon.length, D.cSoon.length + D.warrSoon.length ? "warn" : "")] });
+  if(dbAllowed("procurement")) M.push({ tab: "procurement", ico: "procurement", t: "רכש ואספקה", tone: D.sp && (D.sp.expired.length || D.sp.below) ? "warn" : "ok",
+    rows: D.sp ? [row("משלוחים בדרך", D.sp.sent), row("מתחת למינימום", D.sp.below, D.sp.below ? "warn" : ""), row("פג/יפוג השבוע", D.sp.expired.length + D.sp.soon.length, D.sp.expired.length ? "bad" : "")] : [row("רכש השנה", fmtMoney(Math.round(D.procYear)))] });
+  if(dbAllowed("finance")) M.push({ tab: "finance", ico: "finance", t: "כספים שוטפים", tone: D.recLate.length ? "bad" : D.recSoon.length ? "warn" : "ok",
+    rows: [row("הוצאה חודשית קבועה", fmtMoney(Math.round(D.recMonthly))), row("לתשלום ב-14 יום", D.recSoon.length), row("באיחור", D.recLate.length, D.recLate.length ? "bad" : "")] });
+  if(dbAllowed("staff") && D.staff.idx >= 0) M.push({ tab: "staff", ico: "staff", t: "צוות ותורנים", tone: D.payMissing.length ? "warn" : "ok",
+    rows: [row(`פעימה ${D.staff.idx + 1}`, fmtMoney(Math.round(D.staff.total))), row("אושרו", `${D.staff.approved}/${D.staff.count}`), row("שולמו", `${D.staff.paid}/${D.staff.count}`)] });
+  if(dbAllowed("keys")) M.push({ tab: "keys", ico: "keys", t: "מפתחות", tone: D.keysStale.length ? "warn" : "ok",
+    rows: [row("מפתחות במערכת", (data.keysInventory || []).length), row("בהשאלה", D.keysLoaned.length), row("אצל לא פעילים", D.keysStale.length, D.keysStale.length ? "warn" : "")] });
+  if(dbAllowed("projects")) M.push({ tab: "projects", ico: "projects", t: "פרויקטים", tone: "info",
+    rows: [row("פתוחים", D.proj.open), row("בבדיקה", D.proj.review), row("הושלמו", D.proj.done)] });
+  if(!M.length) return "";
+  return `<section class="db-sec db-in" style="--i:6"><div class="db-sec-h">${dbIco("dashboard", 18)}מבט על המערכות</div>
+    <div class="db-mods">${M.map((m, i) => `<button type="button" class="db-mod ${m.tone} db-in" style="--i:${6.3 + i * .15}" ${dbAct(dbGo(m.tab))}>
+      <span class="mh"><span class="ico">${dbIco(m.ico, 18)}</span><span class="t">${m.t}</span><span class="st"></span></span>
+      <span class="mrs">${m.rows.join("")}</span>
+    </button>`).join("")}</div></section>`;
+}
+function dbActivityHtml(){
+  const ev = [];
+  data.tasks.forEach(t => (Array.isArray(t.log) ? t.log : []).forEach((l, i) => { if(l && l.d) ev.push({ d: l.d, o: i, t: l.t, w: t.desc || "משימה", ico: "tasks", act: dbGo("tasks", () => tkOpen(t.id)), tab: "tasks" }); }));
+  (data.equipment || []).forEach(e => (Array.isArray(e.log) ? e.log : []).forEach((l, i) => { if(l && l.d) ev.push({ d: l.d, o: i, t: l.t, w: e.name || "ציוד", ico: "wrench", act: dbGo("equipment"), tab: "equipment" }); }));
+  (data.serviceContracts || []).forEach(c => (Array.isArray(c.log) ? c.log : []).forEach((l, i) => { if(l && l.d) ev.push({ d: l.d, o: i, t: l.t, w: c.name || "חוזה", ico: "report", act: dbGo("equipment"), tab: "equipment" }); }));
+  const list = ev.filter(e => dbAllowed(e.tab) && e.d <= tkToday()).sort((a, b) => (b.d > a.d ? 1 : b.d < a.d ? -1 : b.o - a.o)).slice(0, 7);
+  if(!list.length) return "";
+  return `<section class="db-sec db-in" style="--i:7"><div class="db-sec-h">${dbIco("history", 18)}פעילות אחרונה</div>
+    <div class="db-feed">${list.map(e => `<button type="button" class="db-fi" ${dbAct(e.act)}><span class="ico">${dbIco(e.ico, 14)}</span><span class="tx"><b>${escHtml(e.w)}</b><span>${escHtml(e.t || "")}</span></span><span class="when">${escHtml(dbRel(tkDaysTo(e.d)))}</span></button>`).join("")}</div></section>`;
+}
+
+/* ---------- תנועה: מספרים רצים, טבעות, עמודות ---------- */
+function dbFmt(v, fmt){ return fmt === "money" ? fmtMoney(Math.round(v)) : fmt === "pct" ? Math.round(v) + "%" : String(Math.round(v)); }
+function dbAnimateNums(root, enter){
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  root.querySelectorAll(".db-num").forEach((el, i) => {
+    const to = Number(el.dataset.dbTo) || 0, fmt = el.dataset.dbFmt, key = el.dataset.dbKey;
+    const from = enter ? 0 : (key && DB.last[key] !== undefined ? DB.last[key] : to);
+    if(key) DB.last[key] = to;
+    if(reduce || from === to){ el.textContent = dbFmt(to, fmt); return; }
+    const dur = enter ? 1100 + Math.min(i, 8) * 60 : 700, delay = enter ? 250 + Math.min(i, 8) * 70 : 0;
+    el.textContent = dbFmt(from, fmt);
+    const start = performance.now() + delay;
+    const step = now => {
+      if(!el.isConnected) return;
+      const p = Math.max(0, Math.min(1, (now - start) / dur));
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = dbFmt(from + (to - from) * e, fmt);
+      if(p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+function dbStartClock(){
+  if(DB.clock) return;
+  DB.ticks = 0;
+  DB.clock = setInterval(() => {
+    const tab = document.getElementById("tab-dashboard");
+    if(!tab || !tab.classList.contains("active")){ clearInterval(DB.clock); DB.clock = null; return; }
+    const el = document.getElementById("dbClock");
+    if(el) el.textContent = new Date().toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" });
+    DB.ticks++;
+    // רענון חי כל דקה: מחשב מחדש (איחורים, תפוגות, מה השתנה) והמספרים זזים לערך החדש
+    const ae = document.activeElement, root = document.getElementById("dbRoot");
+    const typing = ae && root && root.contains(ae) && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA");
+    if(DB.ticks % 60 === 0 && document.visibilityState === "visible" && !typing) renderDashboard();
+  }, 1000);
+}
+function dbWire(root){
+  if(DB.wired) return;
+  DB.wired = true;
+  root.addEventListener("click", e => {
+    const b = e.target.closest("[data-db-act]");
+    if(!b || !root.contains(b)) return;
+    const fn = DB.actions[Number(b.dataset.dbAct)];
+    if(typeof fn === "function") dbSafe(() => fn(b));
+  });
+  root.addEventListener("submit", e => {
+    const f = e.target.closest("[data-db-myadd]");
+    if(!f) return;
+    e.preventDefault();
+    const inp = f.querySelector("input");
+    const p = mtParse(inp ? inp.value : "");
+    if(!p.title){ showToast("כתוב מה צריך לעשות"); return; }
+    if(!p.due) p.due = tkToday();   // מהלוח: ברירת מחדל להיום
+    mtAdd(p);
+    renderDashboard();
+    const n = root.querySelector("[data-db-myadd] input"); if(n) n.focus();
+    showToast("נוספה למשימות שלי");
+  });
+}
+
+function renderDashboard(opts){
+  opts = opts || {};
+  const tab = document.getElementById("tab-dashboard");
+  const root = document.getElementById("dbRoot");
+  if(!tab || !root) return;
+  dbSafe(() => renderLoginLog());
+  // כשהלוח לא מוצג - לא מחשבים. הוא יחושב מחדש ברגע שפותחים אותו.
+  if(!tab.classList.contains("active") && !opts.force) return;
+  const enter = !!opts.enter;
+  DB.actions = [];
+  if(enter) DB.showAll = false;
+  let D, alerts, H;
+  try{
+    D = dbCollect();
+    alerts = dbAlerts(D);
+    H = dbHealth(D, alerts);
+  }catch(e){
+    console.error("לוח בקרה:", e);
+    root.className = "db-wrap";
+    root.innerHTML = `<section class="db-sec"><div class="db-empty">לא הצלחנו לחשב את לוח הבקרה כרגע. שאר הטאבים עובדים כרגיל.</div></section>`;
+    return;
+  }
+  root.className = "db-wrap" + (enter ? " db-enter" : " db-static");
+  root.innerHTML = [
+    dbSafe(() => dbHeroHtml(D, H, alerts), ""),
+    D.my ? `<div class="db-row2">${dbSafe(() => dbAlertsHtml(alerts), "")}${dbSafe(() => dbMyHtml(D), "")}</div>` : dbSafe(() => dbAlertsHtml(alerts), ""),
+    dbSafe(() => dbKpisHtml(D), ""),
+    dbSafe(() => dbWeekHtml(D), ""),
+    dbSafe(() => dbChartsHtml(D), ""),
+    dbSafe(() => dbModulesHtml(D), ""),
+    dbSafe(() => dbActivityHtml(), "")
+  ].join("");
+  dbWire(root);
+  dbAnimateNums(root, enter);
+  if(enter){
+    // פריים כפול: הדפדפן מצייר קודם את מצב ההתחלה (0), ורק אז מפעיל את התנועה
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add("db-go")));
+  }else{
+    root.classList.add("db-go");
+  }
+  dbStartClock();
+}
+
+
+/* =====================================================================
+   המשימות שלי (אוקטובר 2026)
+   רשימת משימות אישית של המנהל, בתוך טאב "משימות" (מתג: תפעול / המשימות שלי).
+   נתונים: מסמך נפרד בענן myTasks-data. לא נוגע במשימות התפעול, לא נכנס
+   למספור המשימות, לדוח למנהל החשבונות או לעלויות. נטען ומוצג רק למנהל.
+   מחיקה רק דרך כפתור "מחיקה" עם חלון אישור. שום דבר לא נמחק אוטומטית,
+   חוץ ממשימה חוזרת שנפתחה הרגע מסימון "בוצע" ולא נגעו בה, כשמבטלים את הסימון.
+   ===================================================================== */
+if(!Array.isArray(data.myTasks)) data.myTasks = [];
+let mtBlocked = false;            // true אם המסמך בענן לא נקרא תקין: לא שומרים עליו
+const MT_TYPES = {
+  phone:   { l: "טלפון",  c: "#3d7ea6", bg: "#dcebf3", p: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>' },
+  mail:    { l: "מייל",   c: "#7a5c8f", bg: "#ece3f3", p: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>' },
+  buy:     { l: "קנייה",  c: "#c67139", bg: "#ffe6d5", p: '<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L21.5 8H6"/>' },
+  meet:    { l: "פגישה",  c: "#a3561c", bg: "#fbe3cf", p: '<circle cx="9" cy="8" r="3.3"/><path d="M3.5 19c0-3 2.5-5.3 5.5-5.3s5.5 2.3 5.5 5.3"/><circle cx="17" cy="8.5" r="2.6"/><path d="M15.5 13.8c2.4.4 4 2.3 4 5.2"/>' },
+  doc:     { l: "מסמך",   c: "#5c6b7a", bg: "#e5e9ee", p: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/>' },
+  field:   { l: "בשטח",   c: "#5f7f3a", bg: "#e1eecc", p: '<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>' },
+  general: { l: "כללי",   c: "#82796a", bg: "#eee7db", p: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.5"/>' }
+};
+const MT_TYPE_KEYS = Object.keys(MT_TYPES);
+const MT_REPEAT = [["", "לא חוזרת"], ["day", "כל יום"], ["week", "כל שבוע"], ["month", "כל חודש"], ["year", "כל שנה"]];
+const MT_DAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+const MT_ICO = {
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+  me: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
+  ops: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  all: '<path d="M5 7h14M5 12h14M5 17h14"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+  repeat: '<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/>',
+  subs: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="m3 6 1 1 2-2M3 12l1 1 2-2"/>',
+  note: '<path d="M4 20h16M4 4h10l6 6v6"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  wa: '<path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.4 8.4 0 1 1 21 11.5z"/>',
+  cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
+  lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  archive: '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><path d="M10 12h4"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M5 7l1 13h12l1-13M9 7V4h6v3"/>'
+};
+function mtIco(name, size, sw){
+  const p = MT_ICO[name] || (MT_TYPES[name] && MT_TYPES[name].p) || "";
+  const s = size || 16;
+  return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="${sw || 2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+}
+let mtUi = { type: "all", showDone: false, draft: null, draftId: null, busy: {} };
+
+function mtIsAdmin(){ return typeof currentRole === "undefined" || currentRole === "admin"; }
+function mtList(){ if(!Array.isArray(data.myTasks)) data.myTasks = []; return data.myTasks; }
+function mtGet(id){ return mtList().find(x => x && x.id === Number(id)) || null; }
+function mtType(x){ return MT_TYPES[x && x.type] ? x.type : "general"; }
+function mtSave(){
+  if(mtBlocked){ showToast("רשימת המשימות שלי לא נטענה תקין, ולכן לא נשמרה. רענן את הדף."); return; }
+  scheduleSave("myTasks", "mtSaved");
+}
+function mtSubs(x){ return Array.isArray(x.subs) ? x.subs.filter(s => s && typeof s === "object") : []; }
+
+/* ---------- זמנים וקבוצות ---------- */
+function mtDays(x){ return x && x.due ? tkDaysTo(x.due) : null; }
+function mtDoneToday(x){ return !!x.done && x.doneAt === tkToday(); }
+function mtGroup(x){
+  if(x.done && !mtDoneToday(x)) return "done";
+  const n = mtDays(x);
+  if(n === null) return "later";
+  if(n < 0) return x.done ? "today" : "late";
+  if(n === 0) return "today";
+  if(n === 1) return "tomorrow";
+  if(n <= 7) return "week";
+  return "later";
+}
+function mtWhen(x){
+  const n = mtDays(x);
+  let s = "";
+  if(n !== null){
+    if(n === 0) s = "היום";
+    else if(n === 1) s = "מחר";
+    else if(n === -1) s = "אתמול";
+    else if(n < -1) s = `לפני ${-n} ימים`;
+    else if(n <= 6){ const d = tkParse(x.due); s = "יום " + MT_DAYS[d.getDay()]; }
+    else s = tkShortDate(x.due);
+  }
+  if(x.time) s = (s ? s + " " : "") + x.time;
+  return s;
+}
+function mtSort(a, b){
+  if(!!a.done !== !!b.done) return a.done ? 1 : -1;
+  if(!!a.star !== !!b.star) return a.star ? -1 : 1;
+  const da = (a.due || "9999-99-99") + (a.time || "99:99"), db = (b.due || "9999-99-99") + (b.time || "99:99");
+  if(da !== db) return da < db ? -1 : 1;
+  return a.id - b.id;
+}
+/* היום שלי: מה שצריך להיום (כולל איחור) + מה שהושלם היום */
+function mtTodayStats(){
+  const L = mtList();
+  const open = L.filter(x => !x.done && mtDays(x) !== null && mtDays(x) <= 0);
+  const done = L.filter(mtDoneToday);
+  const total = open.length + done.length;
+  return { open, done, total, pct: total ? Math.round(done.length / total * 100) : 0 };
+}
+function mtOpenCount(){ return mtList().filter(x => !x.done).length; }
+function mtLateCount(){ return mtList().filter(x => !x.done && mtDays(x) !== null && mtDays(x) < 0).length; }
+
+/* ---------- הוספה מהירה: זיהוי תאריך, שעה, סוג וחשיבות ---------- */
+function mtParse(text){
+  let s = " " + String(text || "").replace(/\s+/g, " ").trim() + " ";
+  const out = { due: "", time: "", type: "", star: false };
+  const B = "(^|\\s)", E = "(?=\\s|$|[,.])";
+  const take = re => { const m = re.exec(s); if(m){ s = s.slice(0, m.index) + " " + s.slice(m.index + m[0].length); } return m; };
+  if(take(new RegExp(B + "!(חשוב|דחוף)?" + E))) out.star = true;
+  const h = take(new RegExp(B + "#(\\S+)" + E));
+  if(h){
+    const w = h[2].replace(/^ב/, "");
+    const k = MT_TYPE_KEYS.find(k => MT_TYPES[k].l === h[2] || MT_TYPES[k].l === w || MT_TYPES[k].l.replace("יי", "י") === h[2] || MT_TYPES[k].l.replace("ב", "") === w);
+    out.type = k || "";
+  }
+  const tm = take(/(^|\s)(?:ב-?|בשעה\s)?(\d{1,2}):(\d{2})(?=\s|$|[,.])/);
+  if(tm){ const H = Number(tm[2]), M = Number(tm[3]); if(H < 24 && M < 60) out.time = String(H).padStart(2, "0") + ":" + String(M).padStart(2, "0"); }
+  const today = tkToday();
+  let m;
+  if((m = take(new RegExp(B + "(היום|הערב|הבוקר)" + E)))) out.due = today;
+  else if((m = take(new RegExp(B + "מחרתיים" + E)))) out.due = tkAddDays(today, 2);
+  else if((m = take(new RegExp(B + "מחר" + E)))) out.due = tkAddDays(today, 1);
+  else if((m = take(new RegExp(B + "בעוד (\\d{1,3}) ימים" + E)))) out.due = tkAddDays(today, Number(m[2]));
+  else if((m = take(new RegExp(B + "(?:ב?יום )?(ראשון|שני|שלישי|רביעי|חמישי|שישי)" + E)))){
+    const want = MT_DAYS.indexOf(m[2]);
+    const cur = tkParse(today).getDay();
+    let diff = (want - cur + 7) % 7; if(diff === 0) diff = 7;
+    out.due = tkAddDays(today, diff);
+  }else if((m = take(/(^|\s)(?:ב-?)?(\d{1,2})[./](\d{1,2})(?:[./](\d{2,4}))?(?=\s|$|[,])/))){
+    const d = Number(m[2]), mo = Number(m[3]);
+    if(d >= 1 && d <= 31 && mo >= 1 && mo <= 12){
+      let y = m[4] ? Number(m[4]) : tkParse(today).getFullYear();
+      if(y < 100) y += 2000;
+      let iso = `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      if(!m[4] && iso < today) iso = `${y + 1}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      if(tkParse(iso)) out.due = iso;
     }
   }
+  if(out.time && !out.due) out.due = today;
+  out.title = s.replace(/\s+/g, " ").trim();
+  if(!out.type) out.type = mtGuessType(out.title);
+  return out;
+}
+function mtGuessType(t){
+  t = String(t || "");
+  if(/(להתקשר|טלפון|לחזור ל|שיחה עם|לצלצל)/.test(t)) return "phone";
+  if(/(מייל|אימייל|לשלוח|לכתוב ל)/.test(t)) return "mail";
+  if(/(להזמין|לקנות|לרכוש|קנייה|קניה)/.test(t)) return "buy";
+  if(/(פגישה|ישיבה|להיפגש)/.test(t)) return "meet";
+  if(/(מסמך|טופס|לחדש|אישור|חוזה|פוליסה|לחתום|ביטוח)/.test(t)) return "doc";
+  if(/(לבדוק|סיור|בדיקה|לעבור ב|לראות את)/.test(t)) return "field";
+  return "general";
+}
+function mtAdd(fields){
+  const f = fields || {};
+  const title = String(f.title || "").trim();
+  if(!title) return null;
+  const x = { id: nextId(), title, type: MT_TYPES[f.type] ? f.type : "general", due: f.due || "", time: f.time || "", star: !!f.star,
+    done: false, doneAt: "", created: tkToday(), repeat: "", subs: [], notes: "", linkTaskId: null };
+  mtList().push(x);
+  mtSave();
+  return x;
+}
 
-  const wrap = document.getElementById("dashLicensingWrap");
-  const anchor = document.getElementById("dashLicensingAnchor");
-  const topSlot = document.getElementById("dashTopSlot");
-  if(wrap && anchor && topSlot){
-    if(hasExpired) topSlot.appendChild(wrap);
-    else anchor.after(wrap);
-  }
-
-  const dashLicInProcess = document.getElementById("dashLicInProcess");
-  if(dashLicInProcess){
-    const inProcessList = data.licensing.filter(r => licIsInProcess(r) || licHasMissingDocs(r));
-    if(inProcessList.length === 0){
-      dashLicInProcess.innerHTML = "<p class='hint'>אין כרגע אישורים בתהליך.</p>";
-    }else{
-      let rows = "<table><thead><tr><th>סוג האישור</th><th>סטטוס טיפול</th><th>עדיפות</th><th>מסמכים</th></tr></thead><tbody>";
-      inProcessList.forEach(r => {
-        const missing = licHasMissingDocs(r);
-        rows += `<tr>
-          <td class="primary-field">${r.type||"—"}</td>
-          <td>${r.processStatus||"—"}</td>
-          <td><span class="pill ${r.priority==="גבוהה"?"late":r.priority==="נמוכה"?"done":"open"}">${r.priority||"בינונית"}</span></td>
-          <td>${missing ? `<span class="pill late">מסמכים חסרים</span>` : `<span class="pill done">מלא</span>`}</td>
-        </tr>`;
-      });
-      rows += "</tbody></table>";
-      dashLicInProcess.innerHTML = rows;
+/* ---------- פעולות ---------- */
+function mtNextDue(x){
+  const base = x.due || tkToday();
+  if(x.repeat === "day") return tkAddDays(base, 1);
+  if(x.repeat === "week") return tkAddDays(base, 7);
+  if(x.repeat === "month") return tkAddMonths(base, 1);
+  if(x.repeat === "year") return tkAddMonths(base, 12);
+  return "";
+}
+function mtToggle(id){
+  const x = mtGet(id);
+  if(!x) return;
+  if(!x.done){
+    x.done = true; x.doneAt = tkToday();
+    if(x.repeat && !x.spawnedId){
+      let due = mtNextDue(x);
+      while(due && due < tkToday()) { const tmp = { due, repeat: x.repeat }; due = mtNextDue(tmp); }   // לא לפתוח משימה חוזרת שכבר באיחור
+      const n = { id: nextId(), title: x.title, type: x.type, due, time: x.time || "", star: !!x.star, done: false, doneAt: "", created: tkToday(),
+        repeat: x.repeat, subs: mtSubs(x).map(s => ({ id: nextId(), t: s.t, done: false })), notes: x.notes || "", linkTaskId: null, spawnedFrom: x.id };
+      mtList().push(n);
+      x.spawnedId = n.id;
+      showToast(`נפתחה המשימה הבאה ל-${fmtDateHe(due)}`);
     }
-  }
-
-  const dashPaymentAlertWrap = document.getElementById("dashPaymentAlertWrap");
-  const dashPaymentAlert = document.getElementById("dashPaymentAlert");
-  if(dashPaymentAlertWrap && dashPaymentAlert){
-    const missingList = [];
-    data.installments.forEach((inst, idx) => {
-      inst.forEach(row => {
-        if(row.approved && row.paymentStatus === "חסר פרטים"){
-          missingList.push({name:row.name||"—", type:"צוות (פעימה "+(idx+1)+")", total:computeStaffTotal(row), note:row.accountantNote||""});
-        }
-      });
-    });
-    data.vendorPayments.forEach(row => {
-      if(row.approved && row.paymentStatus === "חסר פרטים"){
-        missingList.push({name:row.vendor||"—", type:"ספק", total:parseFloat(row.amount)||0, note:row.accountantNote||""});
+  }else{
+    x.done = false; x.doneAt = "";
+    if(x.spawnedId){
+      const n = mtGet(x.spawnedId);
+      // ביטול סימון בטעות: המשימה החוזרת שנפתחה הרגע מוסרת רק אם לא נגעו בה
+      if(n && !n.done && n.spawnedFrom === x.id && n.title === x.title && !n.touched){
+        data.myTasks = mtList().filter(y => y.id !== n.id);
       }
-    });
-    if(missingList.length === 0){
-      dashPaymentAlertWrap.style.display = "none";
-    }else{
-      dashPaymentAlertWrap.style.display = "";
-      let rows = "<table><thead><tr><th>שם</th><th>סוג</th><th>סכום</th><th>הערת מנהל חשבונות</th></tr></thead><tbody>";
-      missingList.forEach(m => {
-        rows += `<tr class="card-bad">
-          <td class="primary-field">${m.name}</td>
-          <td>${m.type}</td>
-          <td style="font-weight:600">${fmtMoney(m.total)}</td>
-          <td>${m.note || "—"}</td>
-        </tr>`;
-      });
-      rows += "</tbody></table>";
-      dashPaymentAlert.innerHTML = rows;
+      delete x.spawnedId;
     }
+  }
+  mtSave();
+}
+function mtStar(id){ const x = mtGet(id); if(!x) return; x.star = !x.star; x.touched = true; mtSave(); }
+function mtMoveToTomorrow(){
+  const L = mtList().filter(x => !x.done && mtDays(x) !== null && mtDays(x) <= 0);
+  if(!L.length){ showToast("אין משימות פתוחות להיום"); return; }
+  openConfirmModal(`להעביר ${L.length} משימות פתוחות (של היום ובאיחור) למחר?`, () => {
+    const t = tkAddDays(tkToday(), 1);
+    L.forEach(x => { x.due = t; x.touched = true; });
+    mtSave(); mtRender(); dbRefreshIfVisible();
+    showToast(`${L.length} משימות הועברו למחר`);
+  }, { yesLabel: "העברה למחר", icon: "calendar" });
+}
+function mtSummaryText(){
+  const st = mtTodayStats();
+  const lines = [`סיכום היום (${fmtDateHe(tkToday())})`];
+  if(st.done.length) lines.push("", "בוצע:", ...st.done.map(x => "✔ " + x.title));
+  if(st.open.length) lines.push("", "נשאר:", ...st.open.sort(mtSort).map(x => "• " + x.title + (mtDays(x) < 0 ? " (באיחור)" : "")));
+  if(!st.done.length && !st.open.length) lines.push("", "אין משימות להיום.");
+  return lines.join("\n");
+}
+function mtWhatsApp(){ window.open("https://wa.me/?text=" + encodeURIComponent(mtSummaryText()), "_blank"); }
+async function mtAddToCalendar(x, btn){
+  if(!x || !x.due){ showToast("כדי להוסיף ליומן צריך תאריך"); return; }
+  if(x.calEventId){ showToast("המשימה כבר נמצאת ביומן"); return; }
+  try{
+    if(btn){ btn.disabled = true; btn.textContent = "מוסיף ליומן…"; }
+    const ev = await createGoogleCalendarEvent(x.due, (x.time ? x.time + " " : "") + x.title, "משימה אישית מאפליקציית ניהול הבניין" + (x.notes ? "\n" + x.notes : ""));
+    x.calEventId = ev && ev.id ? ev.id : "added";
+    mtSave();
+    showToast("נוסף ליומן Google");
+    return true;
+  }catch(e){
+    console.error(e);
+    showToast("ההוספה ליומן לא הצליחה: " + (e.message || ""));
+    return false;
+  }finally{
+    if(btn){ btn.disabled = false; }
   }
 }
+async function mtTodayToCalendar(btn){
+  const L = mtTodayStats().open.filter(x => !x.calEventId);
+  if(!L.length){ showToast("כל המשימות של היום כבר ביומן"); return; }
+  let ok = 0;
+  for(const x of L){ if(await mtAddToCalendar(x)) ok++; else break; }
+  if(ok) showToast(`${ok} משימות נוספו ליומן Google`);
+  mtRender();
+}
+
+/* ---------- מתג תפעול / המשימות שלי ---------- */
+function mtMode(){ return mtIsAdmin() && data.uiPrefs && data.uiPrefs.tasksMode === "mine" ? "mine" : "ops"; }
+function mtSetMode(m){
+  if(!mtIsAdmin()) m = "ops";
+  data.uiPrefs = data.uiPrefs || {};
+  if(data.uiPrefs.tasksMode !== m){ data.uiPrefs.tasksMode = m; saveUiPrefs(); }
+  mtSync();
+}
+function mtSwitchHtml(){
+  const m = mtMode();
+  const opsN = data.tasks.filter(t => tkStatus(t) !== "בוצע" && Number(t.schoolYear || currentSchoolYearStart()) === currentSchoolYearStart()).length;
+  return `<div class="mt-switch" role="tablist" aria-label="סוג משימות">
+    <button type="button" role="tab" aria-selected="${m === "ops"}" class="${m === "ops" ? "on" : ""}" data-mt-mode="ops">${mtIco("ops", 15)}משימות תפעול<span class="n">${opsN}</span></button>
+    <button type="button" role="tab" aria-selected="${m === "mine"}" class="${m === "mine" ? "on" : ""}" data-mt-mode="mine">${mtIco("me", 15)}המשימות שלי<span class="n me">${mtOpenCount()}</span></button>
+  </div>`;
+}
+function mtSync(){
+  const tab = document.getElementById("tab-tasks");
+  if(!tab) return;
+  const wrap = tab.querySelector(".tk-wrap");
+  const root = document.getElementById("mtRoot");
+  const slot = document.getElementById("tkModeSlot");
+  if(!mtIsAdmin()){
+    if(slot) slot.innerHTML = "";
+    if(root){ root.style.display = "none"; root.innerHTML = ""; }
+    if(wrap) wrap.style.display = "";
+    return;
+  }
+  const m = mtMode();
+  if(slot) slot.innerHTML = mtSwitchHtml();
+  if(wrap) wrap.style.display = m === "mine" ? "none" : "";
+  if(root){
+    root.style.display = m === "mine" ? "" : "none";
+    if(m === "mine") mtRender(); else root.innerHTML = "";
+  }
+}
+
+/* ---------- תצוגה ---------- */
+function mtItemHtml(x, i){
+  const T = MT_TYPES[mtType(x)];
+  const g = mtGroup(x);
+  const subs = mtSubs(x);
+  const when = mtWhen(x);
+  const lt = x.linkTaskId ? data.tasks.find(t => t.id === Number(x.linkTaskId)) : null;
+  const whenTone = g === "late" ? "bad" : g === "today" ? "warn" : "";
+  return `<div class="mt-item ${x.done ? "done" : ""}" data-mt-id="${x.id}" style="--i:${Math.min(i, 12)}">
+    <button type="button" class="mt-chk ${x.done ? "on" : ""}" data-mt-act="toggle" data-id="${x.id}" aria-pressed="${!!x.done}" aria-label="${x.done ? "ביטול סימון" : "סימון כבוצע"}: ${escHtml(x.title)}">${mtIco("check", 16, 3)}</button>
+    <span class="mt-ico" style="color:${T.c};background:${T.bg}" title="${T.l}">${mtIco(mtType(x), 19)}</span>
+    <button type="button" class="mt-body" data-mt-act="open" data-id="${x.id}" aria-label="פתיחת המשימה ${escHtml(x.title)}">
+      <span class="mt-title">${escHtml(x.title)}</span>
+      <span class="mt-meta">
+        ${when ? `<span class="mt-tag ${whenTone}">${mtIco("clock", 12, 2.2)}${escHtml(when)}</span>` : ""}
+        ${lt ? `<span class="mt-tag">${mtIco("link", 12, 2.2)}משימה ${escHtml(tkCode(lt))}</span>` : ""}
+        ${x.repeat ? `<span class="mt-tag ok">${mtIco("repeat", 12, 2.2)}${escHtml((MT_REPEAT.find(r => r[0] === x.repeat) || ["", ""])[1])}</span>` : ""}
+        ${subs.length ? `<span class="mt-tag">${mtIco("subs", 12, 2.2)}${subs.filter(s => s.done).length}/${subs.length}</span>` : ""}
+        ${x.notes ? `<span class="mt-tag">${mtIco("note", 12, 2.2)}הערה</span>` : ""}
+        ${x.calEventId ? `<span class="mt-tag info">${mtIco("cal", 12, 2.2)}ביומן</span>` : ""}
+      </span>
+    </button>
+    <button type="button" class="mt-star ${x.star ? "on" : ""}" data-mt-act="star" data-id="${x.id}" aria-pressed="${!!x.star}" aria-label="סימון כחשוב">${x.star ? `<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">${MT_ICO.star}</svg>` : mtIco("star", 19, 1.8)}</button>
+  </div>`;
+}
+function mtRender(){
+  const root = document.getElementById("mtRoot");
+  if(!root || mtMode() !== "mine") return;
+  const L = mtList();
+  const ty = mtUi.type;
+  const vis = L.filter(x => ty === "all" || mtType(x) === ty);
+  const G = [["late", "באיחור", "bad"], ["today", "היום", "warn"], ["tomorrow", "מחר", "info"], ["week", "השבוע", "slate"], ["later", "בהמשך / בלי תאריך", "soft"]];
+  let idx = 0;
+  const groupsHtml = G.map(([k, l, tone]) => {
+    const items = vis.filter(x => mtGroup(x) === k).sort(mtSort);
+    if(!items.length) return "";
+    const openN = items.filter(x => !x.done).length;
+    return `<section class="mt-group ${tone}"><h3><i></i>${l}<span>${openN ? openN + " פתוחות" : "הכל בוצע"}</span></h3>${items.map(x => mtItemHtml(x, idx++)).join("")}</section>`;
+  }).join("");
+  const doneList = vis.filter(x => mtGroup(x) === "done").sort((a, b) => String(b.doneAt || "").localeCompare(String(a.doneAt || "")) || b.id - a.id);
+  const weekAgo = tkAddDays(tkToday(), -7);
+  const doneWeek = doneList.filter(x => (x.doneAt || "") >= weekAgo).length;
+  const st = mtTodayStats();
+  const R = 54, C = 2 * Math.PI * R;
+  const left = st.open.length;
+  const chips = [["all", "הכל"]].concat(MT_TYPE_KEYS.map(k => [k, MT_TYPES[k].l])).map(([k, l]) => {
+    const n = L.filter(x => !x.done && (k === "all" || mtType(x) === k)).length;
+    if(k !== "all" && k === "general" && !n) return "";
+    const c = k === "all" ? "#2b2723" : MT_TYPES[k].c;
+    return `<button type="button" class="mt-chip ${ty === k ? "on" : ""}" data-mt-act="type" data-type="${k}" aria-pressed="${ty === k}"><span class="d" style="background:${c}">${mtIco(k, 12, 2.4)}</span>${l}<span class="n">${n}</span></button>`;
+  }).join("");
+  const empty = !L.length;
+  root.innerHTML = `
+    <div class="mt-head">
+      <div><div class="tk-title">משימות</div><div class="tk-sub">${mtOpenCount()} פתוחות · ${mtLateCount()} באיחור · ${st.done.length} הושלמו היום<span class="saved-flag" id="mtSaved">נשמר</span></div></div>
+      ${mtSwitchHtml()}
+    </div>
+    <div class="mt-grid">
+      <div class="mt-main">
+        <form class="mt-qa" id="mtQaForm" autocomplete="off">
+          <span class="mt-qa-ico">${mtIco("plus", 18, 2.4)}</span>
+          <input type="text" id="mtQaInput" enterkeyhint="done" aria-label="משימה חדשה שלי" placeholder="מה אני צריך לעשות? למשל: להתקשר לחברת החשמל מחר 9:00 !חשוב">
+          <button type="submit" class="tk-btn sm">הוספה</button>
+        </form>
+        <div class="mt-qa-hint" id="mtQaHint">אפשר לכתוב בחופשיות: היום / מחר / יום חמישי / 25.10 · שעה 9:00 · #טלפון #מייל #קנייה #פגישה #מסמך #שטח · !חשוב</div>
+        ${empty ? "" : `<div class="mt-chips">${chips}</div>`}
+        ${empty ? `<div class="mt-empty">${mtIco("me", 34, 1.6)}<b>הרשימה האישית שלך ריקה</b><span>כאן נכנס כל מה שאתה צריך לעשות בעצמך: טלפונים, מיילים, קניות, פגישות ובדיקות בשטח. כתוב משימה בשורה למעלה ולחץ "הוספה".</span></div>`
+          : (groupsHtml || `<div class="mt-empty sm">אין משימות פתוחות מהסוג הזה</div>`)}
+        ${doneList.length ? `<button type="button" class="mt-fold" data-mt-act="fold" aria-expanded="${mtUi.showDone}">${mtIco("archive", 15)}בוצעו${doneWeek ? ` השבוע · ${doneWeek}` : ""}${doneList.length > doneWeek ? ` · סה״כ ${doneList.length}` : ""}<span class="cv">${mtUi.showDone ? "הסתרה" : "הצגה"}</span></button>
+          ${mtUi.showDone ? `<section class="mt-group done">${doneList.slice(0, 60).map(x => mtItemHtml(x, 0)).join("")}${doneList.length > 60 ? `<div class="mt-empty sm">מוצגות 60 האחרונות</div>` : ""}</section>` : ""}` : ""}
+      </div>
+      <aside class="mt-side">
+        <div class="mt-today">
+          <div class="h">היום שלי</div>
+          <div class="ring"><svg viewBox="0 0 132 132" aria-hidden="true"><circle cx="66" cy="66" r="${R}" class="trk"/><circle cx="66" cy="66" r="${R}" class="val" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - st.pct / 100)).toFixed(1)}" transform="rotate(-90 66 66)"/></svg>
+            <div class="c"><b>${st.done.length}/${st.total}</b><span>הושלמו היום</span></div></div>
+          <div class="msg">${st.total === 0 ? "אין משימות להיום" : left === 0 ? "סיימת את כל מה שתכננת להיום" : `נשארו ${left} משימות להיום`}</div>
+        </div>
+        <div class="mt-actions">
+          <div class="h">פעולות מהירות</div>
+          <button type="button" data-mt-act="tomorrow">${mtIco("arrow", 17)}להעביר את מה שנשאר למחר</button>
+          <button type="button" data-mt-act="wa">${mtIco("wa", 17)}סיכום היום לוואטסאפ</button>
+          <button type="button" data-mt-act="cal">${mtIco("cal", 17)}משימות היום ליומן Google</button>
+        </div>
+        <div class="mt-private">${mtIco("lock", 18)}<span>רק אתה רואה את הרשימה הזו. איש תחזוקה ומנהל החשבונות לא רואים אותה.</span></div>
+      </aside>
+    </div>`;
+}
+function mtFlash(id){
+  setTimeout(() => {
+    const el = document.querySelector(`#mtRoot .mt-item[data-mt-id="${id}"]`);
+    if(el){ el.classList.add("flash"); el.scrollIntoView({ block: "nearest", behavior: "smooth" }); setTimeout(() => el.classList.remove("flash"), 1400); }
+  }, 30);
+}
+function dbRefreshIfVisible(){
+  const t = document.getElementById("tab-dashboard");
+  if(t && t.classList.contains("active") && typeof renderDashboard === "function") renderDashboard();
+}
+function mtQaPreview(){
+  const inp = document.getElementById("mtQaInput"), hint = document.getElementById("mtQaHint");
+  if(!inp || !hint) return;
+  const v = inp.value.trim();
+  if(!v){ hint.innerHTML = "אפשר לכתוב בחופשיות: היום / מחר / יום חמישי / 25.10 · שעה 9:00 · #טלפון #מייל #קנייה #פגישה #מסמך #שטח · !חשוב"; hint.classList.remove("live"); return; }
+  const p = mtParse(v);
+  const T = MT_TYPES[p.type];
+  hint.classList.add("live");
+  hint.innerHTML = `יזוהה: <span style="color:${T.c}">${mtIco(p.type, 13)} ${T.l}</span>` + (p.due ? ` · ${escHtml(mtWhen({ due: p.due, time: p.time }))}` : " · בלי תאריך") + (p.star ? " · חשוב ★" : "");
+}
+
+/* ---------- חלון עריכה ---------- */
+function mtModalEl(){
+  let m = document.getElementById("mtModal");
+  if(!m){
+    m = document.createElement("div");
+    m.id = "mtModal";
+    m.className = "modal-overlay mt-modal";
+    m.style.display = "none";
+    m.style.zIndex = "640";
+    m.innerHTML = `<div class="modal-box mt-modal-box" role="dialog" aria-modal="true" aria-label="משימה אישית" id="mtModalBox"></div>`;
+    document.body.appendChild(m);
+    m.addEventListener("click", mtModalClick);
+    m.addEventListener("input", mtModalInput);
+    m.addEventListener("change", mtModalInput);
+    m.addEventListener("keydown", e => {
+      if(e.key === "Escape"){ e.preventDefault(); mtModalClose(); }
+      if(e.key === "Enter" && e.target && e.target.id === "mtSubNew"){ e.preventDefault(); mtAddSub(); }
+    });
+  }
+  return m;
+}
+function mtOpenEdit(id){
+  const x = mtGet(id);
+  if(!x) return;
+  mtUi.draftId = x.id;
+  mtUi.draft = JSON.parse(JSON.stringify(x));
+  mtUi.draft.subs = mtSubs(mtUi.draft);
+  const m = mtModalEl();
+  mtModalRender();
+  m.style.display = "flex";
+  setTimeout(() => { const t = document.getElementById("mtTitle"); if(t) t.focus(); }, 60);
+}
+function mtModalRender(){
+  const d = mtUi.draft;
+  if(!d) return;
+  const box = document.getElementById("mtModalBox");
+  if(!box) return;
+  box.dataset.for = String(d.id);   // שדות של חלון קודם לא ייכתבו לטיוטה הזו
+  const Y = currentSchoolYearStart();
+  const ops = data.tasks.filter(t => t.id === Number(d.linkTaskId) || (tkStatus(t) !== "בוצע" && Number(t.schoolYear || Y) === Y)).sort((a, b) => (a.taskNumber || 0) - (b.taskNumber || 0));
+  box.innerHTML = `
+    <div class="mt-mh"><span class="mt-ico" style="color:${MT_TYPES[mtType(d)].c};background:${MT_TYPES[mtType(d)].bg}">${mtIco(mtType(d), 20)}</span><b>משימה אישית</b>
+      <button type="button" class="mt-x" data-mt-m="close" aria-label="סגירה">${mtIco("x", 18)}</button></div>
+    <label class="mt-f">מה צריך לעשות<input type="text" id="mtTitle" data-mt-f="title" value="${escHtml(d.title)}"></label>
+    <div class="mt-f">סוג
+      <div class="mt-types">${MT_TYPE_KEYS.map(k => `<button type="button" class="${mtType(d) === k ? "on" : ""}" data-mt-m="type" data-type="${k}" aria-pressed="${mtType(d) === k}" style="--c:${MT_TYPES[k].c};--bg:${MT_TYPES[k].bg}">${mtIco(k, 16)}${MT_TYPES[k].l}</button>`).join("")}</div>
+    </div>
+    <div class="mt-row3">
+      <label class="mt-f">תאריך<input type="date" data-mt-f="due" value="${escHtml(d.due || "")}"></label>
+      <label class="mt-f">שעה<input type="time" data-mt-f="time" value="${escHtml(d.time || "")}"></label>
+      <label class="mt-f">חוזרת<select data-mt-f="repeat">${MT_REPEAT.map(([v, l]) => `<option value="${v}" ${(d.repeat || "") === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+    </div>
+    <div class="mt-quickdates">
+      <button type="button" data-mt-m="date" data-n="0">היום</button><button type="button" data-mt-m="date" data-n="1">מחר</button><button type="button" data-mt-m="date" data-n="7">בעוד שבוע</button><button type="button" data-mt-m="date" data-n="clear">בלי תאריך</button>
+    </div>
+    <div class="mt-checks">
+      <label><input type="checkbox" data-mt-f="star" ${d.star ? "checked" : ""}>חשוב ★</label>
+      <label><input type="checkbox" data-mt-f="done" ${d.done ? "checked" : ""}>בוצע</label>
+    </div>
+    <label class="mt-f">קשורה למשימת תפעול<select data-mt-f="linkTaskId"><option value="">לא קשורה</option>${ops.map(t => `<option value="${t.id}" ${Number(d.linkTaskId) === t.id ? "selected" : ""}>${escHtml(tkCode(t))} · ${escHtml(t.desc || "ללא תיאור")}</option>`).join("")}</select></label>
+    <div class="mt-f">תתי-משימות
+      <div class="mt-subs">${d.subs.map((s, i) => `<div class="mt-sub ${s.done ? "done" : ""}"><button type="button" class="mt-chk sm ${s.done ? "on" : ""}" data-mt-m="sub" data-i="${i}" aria-pressed="${!!s.done}" aria-label="סימון תת-משימה">${mtIco("check", 13, 3)}</button><span>${escHtml(s.t)}</span><button type="button" class="mt-x sm" data-mt-m="subdel" data-i="${i}" aria-label="הסרת תת-משימה">${mtIco("x", 14)}</button></div>`).join("")}
+        <div class="mt-subadd"><input type="text" id="mtSubNew" placeholder="תת-משימה חדשה…" aria-label="תת-משימה חדשה"><button type="button" class="tk-btn sm soft" data-mt-m="subadd">הוספה</button></div>
+      </div>
+    </div>
+    <label class="mt-f">הערות<textarea data-mt-f="notes" rows="2">${escHtml(d.notes || "")}</textarea></label>
+    <div class="mt-mfoot">
+      <div class="grp"><button type="button" class="tk-btn sm" data-mt-m="save">שמירה</button><button type="button" class="tk-btn sm ghost" data-mt-m="close">ביטול</button></div>
+      <div class="grp">
+        ${d.due && !d.calEventId ? `<button type="button" class="tk-btn sm soft" data-mt-m="cal">${mtIco("cal", 15)}ליומן Google</button>` : d.calEventId ? `<span class="mt-incal">${mtIco("cal", 15)}נמצא ביומן</span>` : ""}
+        <button type="button" class="tk-btn sm danger" data-mt-m="del">${mtIco("trash", 15)}מחיקה</button>
+      </div>
+    </div>`;
+}
+function mtModalInput(e){
+  const el = e.target.closest("[data-mt-f]");
+  if(!el || !mtUi.draft || !el.isConnected) return;
+  const box = document.getElementById("mtModalBox");
+  if(!box || !box.contains(el) || box.dataset.for !== String(mtUi.draft.id)) return;
+  const f = el.dataset.mtF;
+  if(el.type === "checkbox") mtUi.draft[f] = el.checked;
+  else if(f === "linkTaskId") mtUi.draft[f] = el.value ? Number(el.value) : null;
+  else mtUi.draft[f] = el.value;
+  if(f === "due" && e.type === "change") mtModalRender();
+}
+function mtAddSub(){
+  const inp = document.getElementById("mtSubNew");
+  const v = inp ? inp.value.trim() : "";
+  if(!v || !mtUi.draft) return;
+  mtUi.draft.subs.push({ id: nextId(), t: v, done: false });
+  mtModalRender();
+  setTimeout(() => { const n = document.getElementById("mtSubNew"); if(n) n.focus(); }, 20);
+}
+function mtModalClose(){ const ae = document.activeElement; if(ae && ae.closest && ae.closest("#mtModal")) ae.blur(); const m = document.getElementById("mtModal"); if(m) m.style.display = "none"; mtUi.draft = null; mtUi.draftId = null; }
+function mtModalClick(e){
+  const b = e.target.closest("[data-mt-m]");
+  if(!b) return;
+  const a = b.dataset.mtM, d = mtUi.draft;
+  if(!d) return;
+  if(a === "close") return mtModalClose();
+  if(a === "type"){ d.type = b.dataset.type; return mtModalRender(); }
+  if(a === "date"){ const n = b.dataset.n; d.due = n === "clear" ? "" : tkAddDays(tkToday(), Number(n)); if(n === "clear") d.time = ""; return mtModalRender(); }
+  if(a === "sub"){ const s = d.subs[Number(b.dataset.i)]; if(s) s.done = !s.done; return mtModalRender(); }
+  if(a === "subdel"){ d.subs.splice(Number(b.dataset.i), 1); return mtModalRender(); }
+  if(a === "subadd") return mtAddSub();
+  if(a === "save") return mtCommit();
+  if(a === "cal"){ mtCommit(true); const x = mtGet(d.id); mtAddToCalendar(x, b).then(() => { if(mtUi.draftId === x.id){ mtUi.draft.calEventId = x.calEventId; mtModalRender(); } }); return; }
+  if(a === "del"){
+    const id = d.id, title = d.title;
+    openConfirmModal(`למחוק את המשימה "${title}"? לא ניתן לשחזר.`, () => {
+      data.myTasks = mtList().filter(x => x.id !== id);
+      mtList().forEach(x => { if(x.spawnedId === id) delete x.spawnedId; });
+      mtSave(); mtModalClose(); mtRender(); dbRefreshIfVisible();
+      showToast("המשימה נמחקה");
+    });
+  }
+}
+function mtCommit(keepOpen){
+  const d = mtUi.draft;
+  const x = d ? mtGet(d.id) : null;
+  if(!x){ mtModalClose(); return; }
+  const title = String(d.title || "").trim();
+  if(!title){ showToast("צריך לכתוב מה המשימה"); const t = document.getElementById("mtTitle"); if(t) t.focus(); return; }
+  const wasDone = !!x.done;
+  x.title = title;
+  x.type = MT_TYPES[d.type] ? d.type : "general";
+  x.due = d.due || "";
+  x.time = x.due ? (d.time || "") : "";
+  x.repeat = MT_REPEAT.some(r => r[0] === d.repeat) ? d.repeat : "";
+  x.star = !!d.star;
+  x.linkTaskId = d.linkTaskId ? Number(d.linkTaskId) : null;
+  x.subs = d.subs.map(s => ({ id: s.id || nextId(), t: String(s.t || ""), done: !!s.done })).filter(s => s.t);
+  x.notes = String(d.notes || "");
+  x.touched = true;
+  if(!!d.done !== wasDone) mtToggle(x.id);
+  else mtSave();
+  if(!keepOpen){ mtModalClose(); showToast("נשמר"); }
+  mtRender(); dbRefreshIfVisible();
+}
+
+/* ---------- חיבור אירועים (פעם אחת) ---------- */
+function mtCheckAnim(btn, id, after){
+  if(mtUi.busy[id]) return;
+  mtUi.busy[id] = true;
+  btn.classList.add("pop");
+  const nowOn = btn.classList.toggle("on");
+  const row = btn.closest(".mt-item,.db-myi");
+  if(row) row.classList.toggle("done", nowOn);
+  setTimeout(() => { delete mtUi.busy[id]; mtToggle(id); if(after) after(); }, 320);
+}
+document.addEventListener("click", e => {
+  const mb = e.target.closest("[data-mt-mode]");
+  if(mb){ mtSetMode(mb.dataset.mtMode); return; }
+  const b = e.target.closest("#mtRoot [data-mt-act]");
+  if(!b) return;
+  const a = b.dataset.mtAct, id = Number(b.dataset.id);
+  if(a === "toggle") return mtCheckAnim(b, id, () => { mtRender(); });
+  if(a === "star"){ mtStar(id); return mtRender(); }
+  if(a === "open") return mtOpenEdit(id);
+  if(a === "type"){ mtUi.type = b.dataset.type; return mtRender(); }
+  if(a === "fold"){ mtUi.showDone = !mtUi.showDone; return mtRender(); }
+  if(a === "tomorrow") return mtMoveToTomorrow();
+  if(a === "wa") return mtWhatsApp();
+  if(a === "cal") return mtTodayToCalendar(b);
+});
+document.addEventListener("submit", e => {
+  if(!e.target || e.target.id !== "mtQaForm") return;
+  e.preventDefault();
+  const inp = document.getElementById("mtQaInput");
+  const p = mtParse(inp ? inp.value : "");
+  if(!p.title){ showToast("כתוב מה צריך לעשות"); return; }
+  const x = mtAdd(p);
+  if(!x) return;
+  mtRender();
+  const n = document.getElementById("mtQaInput"); if(n) n.focus();
+  mtFlash(x.id);
+});
+document.addEventListener("input", e => { if(e.target && e.target.id === "mtQaInput") mtQaPreview(); });
+
+/* ---------- נתונים ללוח הבקרה ---------- */
+function mtDash(){
+  const st = mtTodayStats();
+  const list = st.open.slice().sort(mtSort).concat(st.done.slice().sort(mtSort));
+  const week = {};
+  mtList().forEach(x => { if(!x.done && x.due){ const n = mtDays(x); if(n !== null && n >= 0 && n <= 6) (week[x.due] = week[x.due] || []).push(x); } });
+  return { st, list, week, open: mtOpenCount() };
+}
+
 
 function dedupeIds(list){
   if(!Array.isArray(list)) return false;
@@ -11133,6 +12088,7 @@ async function initAppData(){
   buildNav();
   buildInstallmentTabs();
   renderTasks();
+  try{ mtSync(); }catch(e){ console.error(e); }
   renderEquipment();
   renderProc();
   renderLic();
@@ -11161,6 +12117,7 @@ function buildFullExportObject(){
     "loginLog-data":"loginLog", "uiPrefs-data":"uiPrefs", "accountantContact-data":"accountantContact",
     "equipment-data":"equipment", "serviceContracts-data":"serviceContracts", "maintBudget-data":"maintBudget"
   };
+  if(currentRole === "admin" && !mtBlocked) map["myTasks-data"] = "myTasks";
   const out = {};
   for(const sk in map) out[sk] = JSON.stringify(data[map[sk]]);
   out["staff-data"] = JSON.stringify({ installments: data.installments, bank: data.bank, installmentMeta: data.installmentMeta || [], roleCatalog: data.roleCatalog || [] });
@@ -11193,6 +12150,412 @@ async function autoBackupIfDue(){
   }
 }
 </script>
+<style id="dash-style">
+/* ===== לוח בקרה חי (אוקטובר 2026) ===== */
+#tab-dashboard .db-wrap{ --db-bad:#b4441a; --db-warn:#d4772a; --db-info:#3d7ea6; --db-ok:#5f7f3a; --db-plum:#7a5c8f; --db-gold:#c9952b;
+  --db-shadow:0 1px 2px rgba(46,43,37,.08), 0 8px 24px rgba(46,43,37,.07);
+  display:flex; flex-direction:column; gap:16px; max-width:1180px; margin:0 auto; min-width:0; }
+#tab-dashboard .db-wrap *{ box-sizing:border-box; }
+.db-wrap .c-bad{ color:var(--db-bad); } .db-wrap .c-warn{ color:var(--db-warn); }
+
+/* כניסה מדורגת */
+.db-enter .db-in{ opacity:0; transform:translateY(14px); }
+.db-enter.db-go .db-in{ animation:dbRise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i, 0) * 90ms); }
+@keyframes dbRise{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+.db-static *{ transition:none !important; }
+.db-static .db-in{ animation:none !important; opacity:1; transform:none; }
+
+/* Hero */
+.db-hero{ position:relative; overflow:hidden; display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap;
+  background:#2b2723; color:#f9f4ed; border-radius:26px; padding:22px 24px; box-shadow:0 14px 34px rgba(43,39,35,.28); }
+.db-hero::before{ content:""; position:absolute; inset:-40%; pointer-events:none;
+  background:radial-gradient(circle at 85% 20%, rgba(214,123,58,.55), transparent 32%), radial-gradient(circle at 10% 90%, rgba(122,138,94,.45), transparent 30%), radial-gradient(circle at 45% 0%, rgba(201,149,43,.28), transparent 25%);
+  animation:dbGlow 14s ease-in-out infinite alternate; }
+@keyframes dbGlow{ from{ transform:translate(0,0) rotate(0deg); } to{ transform:translate(4%,-3%) rotate(8deg); } }
+.db-hero > *{ position:relative; }
+.db-hero-main{ flex:1 1 320px; min-width:0; display:flex; flex-direction:column; gap:6px; }
+.db-live{ display:inline-flex; align-items:center; gap:8px; font-size:12.5px; color:#e9dccb; letter-spacing:.01em; }
+.db-live #dbClock{ font-variant-numeric:tabular-nums; font-weight:700; color:#fff; }
+.db-dot{ width:9px; height:9px; border-radius:50%; background:#8fd16a; box-shadow:0 0 0 0 rgba(143,209,106,.7); animation:dbPulse 1.8s infinite; flex:0 0 auto; }
+@keyframes dbPulse{ 0%{ box-shadow:0 0 0 0 rgba(143,209,106,.65); } 70%{ box-shadow:0 0 0 9px rgba(143,209,106,0); } 100%{ box-shadow:0 0 0 0 rgba(143,209,106,0); } }
+.db-hi{ margin:2px 0 0; display:flex; align-items:center; gap:10px; font-family:var(--font-heading, "Suez One", serif); font-weight:400; font-size:32px; line-height:1.1; color:#fff; }
+.db-hi svg{ color:#f0b27a; flex:0 0 auto; }
+.db-date{ font-size:13.5px; color:#e9dccb; overflow-wrap:anywhere; }
+.db-sep{ margin:0 7px; opacity:.5; }
+.db-sum{ font-size:15.5px; margin-top:6px; color:#fff; }
+.db-sum .c-bad{ color:#ff9d76; } .db-sum .c-warn{ color:#ffc58a; }
+.db-quick{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+.db-chip{ display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); border-radius:999px; padding:5px 11px; font-size:12.5px; color:#f9f4ed; }
+.db-ring{ position:relative; width:150px; flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:4px; margin-inline:auto; }
+.db-ring svg{ width:128px; height:128px; display:block; }
+.db-ring .trk{ fill:none; stroke:rgba(255,255,255,.12); stroke-width:11; }
+.db-ring .val{ fill:none; stroke-width:11; stroke-linecap:round; stroke-dashoffset:var(--off); transition:stroke-dashoffset 1.6s cubic-bezier(.2,.8,.2,1) .3s; filter:drop-shadow(0 0 6px rgba(255,255,255,.18)); }
+.db-enter .db-ring .val{ stroke-dashoffset:var(--c); }
+.db-enter.db-go .db-ring .val{ stroke-dashoffset:var(--off); }
+.db-ring.ok .val{ stroke:#9bd46e; } .db-ring.warn .val{ stroke:#f3a75a; } .db-ring.bad .val{ stroke:#ff7b4f; }
+.db-ring-c{ position:absolute; top:0; height:128px; width:128px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.db-ring-c .v{ font-family:var(--font-heading, "Suez One", serif); font-size:36px; line-height:1; color:#fff; font-variant-numeric:tabular-nums; }
+.db-ring-c .l{ font-size:11.5px; color:#e9dccb; margin-top:3px; }
+.db-ring-t{ font-size:12.5px; font-weight:700; text-align:center; color:#fff; }
+
+/* מקטעים */
+.db-sec{ background:var(--card); border-radius:22px; padding:16px; box-shadow:var(--db-shadow); min-width:0; display:flex; flex-direction:column; gap:12px; }
+.db-sec-h{ display:flex; align-items:center; gap:9px; font-weight:700; font-size:15.5px; color:var(--ink); flex-wrap:wrap; }
+.db-sec-h > svg{ color:var(--brand); flex:0 0 auto; }
+.db-sec-h .r{ margin-inline-start:auto; font-weight:500; font-size:12.5px; color:var(--ink-soft); }
+.db-empty{ color:var(--ink-soft); font-size:13.5px; padding:14px 0; text-align:center; }
+
+/* דורש טיפול */
+.db-lvls{ margin-inline-start:auto; display:flex; gap:6px; flex-wrap:wrap; }
+.db-lvl{ font-size:11.5px; font-weight:700; border-radius:999px; padding:3px 10px; }
+.db-lvl.bad{ background:#ffd9c8; color:var(--db-bad); } .db-lvl.warn{ background:#ffe6cf; color:#a3561c; } .db-lvl.info{ background:#dcebf3; color:#2e6585; }
+.db-alerts{ display:flex; flex-direction:column; gap:7px; }
+.db-al{ display:grid; grid-template-columns:auto minmax(0,1fr) auto auto; align-items:center; gap:11px; width:100%; text-align:right; font-family:inherit; color:var(--ink);
+  background:var(--bg); border:none; border-inline-start:4px solid var(--db-info); border-radius:14px; padding:10px 12px; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, background .15s; }
+.db-al:hover{ transform:translateX(-3px); box-shadow:0 4px 14px rgba(46,43,37,.12); background:#fff8f1; }
+.db-al .ico{ width:36px; height:36px; border-radius:11px; display:flex; align-items:center; justify-content:center; background:#dcebf3; color:var(--db-info); flex:0 0 auto; }
+.db-al.bad{ border-inline-start-color:var(--db-bad); } .db-al.bad .ico{ background:#ffd9c8; color:var(--db-bad); animation:dbAlarm 2.4s ease-in-out infinite; }
+.db-al.warn{ border-inline-start-color:var(--db-warn); } .db-al.warn .ico{ background:#ffe6cf; color:#b8641f; }
+@keyframes dbAlarm{ 0%,100%{ box-shadow:0 0 0 0 rgba(180,68,26,0); } 50%{ box-shadow:0 0 0 5px rgba(180,68,26,.16); } }
+.db-al .tx{ display:flex; flex-direction:column; min-width:0; }
+.db-al .t{ font-weight:700; font-size:14px; overflow-wrap:anywhere; }
+.db-al .s{ font-size:12.5px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.db-al .when{ font-size:12px; font-weight:700; color:var(--ink-soft); white-space:nowrap; }
+.db-al.bad .when{ color:var(--db-bad); } .db-al.warn .when{ color:#b8641f; }
+.db-al .when .tag{ font-weight:600; font-size:11px; background:rgba(32,30,29,.06); border-radius:999px; padding:2px 8px; }
+.db-al .go{ color:var(--ink-soft); opacity:.6; display:flex; }
+.db-more{ align-self:center; background:none; border:1.5px solid var(--line); border-radius:999px; padding:6px 16px; font-family:inherit; font-size:13px; font-weight:600; color:#8c491a; cursor:pointer; }
+.db-more:hover{ background:var(--bg); }
+.db-allgood{ display:flex; align-items:center; gap:14px; background:linear-gradient(135deg,#eef6e2,#f7fbef); border-radius:16px; padding:16px; color:#3d5426; }
+.db-allgood svg{ color:var(--db-ok); flex:0 0 auto; }
+.db-allgood b{ font-size:16px; }
+.db-allgood div div{ font-size:13px; color:#55663f; margin-top:2px; }
+
+/* מדדים */
+.db-kpis{ display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px; }
+.db-kpi{ --tone:var(--brand); position:relative; overflow:hidden; display:flex; flex-direction:column; gap:5px; text-align:right; font-family:inherit; color:var(--ink);
+  background:var(--card); border:none; border-radius:20px; padding:14px 14px 12px; box-shadow:var(--db-shadow); cursor:pointer; min-width:0; transition:transform .18s ease, box-shadow .18s ease; }
+.db-kpi::before{ content:""; position:absolute; inset-inline:0; top:0; height:4px; background:var(--tone); }
+.db-kpi::after{ content:""; position:absolute; width:120px; height:120px; border-radius:50%; background:var(--tone); opacity:.07; left:-40px; bottom:-60px; }
+.db-kpi:hover{ transform:translateY(-3px); box-shadow:0 10px 26px rgba(46,43,37,.16); }
+.db-kpi.bad{ --tone:var(--db-bad); } .db-kpi.warn{ --tone:var(--db-warn); } .db-kpi.ok{ --tone:var(--db-ok); } .db-kpi.info{ --tone:var(--db-info); } .db-kpi.plum{ --tone:var(--db-plum); } .db-kpi.gold{ --tone:var(--db-gold); }
+.db-kpi .top{ display:flex; align-items:center; gap:7px; }
+.db-kpi .ico{ width:28px; height:28px; border-radius:9px; display:flex; align-items:center; justify-content:center; color:#fff; background:var(--tone); flex:0 0 auto; }
+.db-kpi .l{ font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+.db-kpi .v{ font-family:var(--font-heading, "Suez One", serif); font-size:30px; line-height:1.1; color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.db-kpi .h{ font-size:12px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.db-bar{ display:block; height:6px; border-radius:999px; background:rgba(32,30,29,.08); overflow:hidden; }
+.db-bar > span{ display:block; height:100%; width:0; border-radius:999px; background:var(--tone, var(--brand)); transition:width 1.2s cubic-bezier(.2,.8,.2,1); transition-delay:var(--d, .5s); }
+.db-go .db-bar > span{ width:var(--w); }
+.db-bar.lg{ height:12px; flex:1; }
+.db-spark{ width:84px; height:26px; display:block; }
+.db-spark polyline{ stroke-dasharray:100; stroke-dashoffset:0; }
+.db-enter .db-spark polyline{ stroke-dashoffset:100; }
+.db-enter.db-go .db-spark polyline{ stroke-dashoffset:0; transition:stroke-dashoffset 1.4s ease .7s; }
+
+/* השבוע */
+.db-week{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:8px; }
+.db-day{ background:var(--bg); border-radius:14px; padding:9px 8px; min-width:0; display:flex; flex-direction:column; gap:7px; border:1.5px solid transparent; }
+.db-day.today{ border-color:var(--brand); background:#fff2eb; box-shadow:0 4px 14px rgba(198,113,57,.18); }
+.db-day.shab{ background:linear-gradient(180deg,#f3ecfa,#efe7f6); }
+.db-day .dh{ display:flex; align-items:baseline; gap:5px; flex-wrap:wrap; }
+.db-day .dh .n{ font-weight:700; font-size:13px; }
+.db-day.today .dh .n{ color:#8c491a; }
+.db-day .dh .d{ font-size:11.5px; color:var(--ink-soft); }
+.db-day .dh .c{ margin-inline-start:auto; background:var(--brand); color:#fff; font-size:11px; font-weight:700; border-radius:999px; min-width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; padding:0 6px; }
+.db-day .di{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+.db-ev{ display:flex; align-items:center; gap:6px; background:var(--card); border:none; border-radius:9px; padding:5px 7px; font-family:inherit; font-size:12px; color:var(--ink); text-align:right; cursor:pointer; min-width:0; }
+.db-ev:hover{ box-shadow:0 2px 8px rgba(46,43,37,.12); }
+.db-ev i{ width:7px; height:7px; border-radius:50%; flex:0 0 auto; }
+.db-ev span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+.db-evmore,.db-free{ font-size:11.5px; color:var(--ink-soft); padding:2px 4px; }
+.db-day.empty .di{ flex:1; justify-content:center; }
+
+/* גרפים */
+.db-charts{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
+.db-donut{ position:relative; width:170px; height:170px; margin:0 auto; }
+.db-donut svg{ width:100%; height:100%; display:block; }
+.db-donut svg circle[style]{ stroke-dashoffset:0; transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1); transition-delay:var(--d); }
+.db-enter .db-donut svg circle[style]{ stroke-dashoffset:var(--len); }
+.db-enter.db-go .db-donut svg circle[style]{ stroke-dashoffset:0; }
+.db-donut-c{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.db-donut-c b, .db-donut-c b .db-num{ font-size:34px !important; }
+.db-donut-c b{ font-family:var(--font-heading, "Suez One", serif); font-weight:400; font-size:34px; line-height:1; }
+.db-donut-c span{ font-size:12px; color:var(--ink-soft); }
+.db-leg{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px 14px; font-size:12.5px; color:var(--ink-soft); }
+.db-leg span{ display:inline-flex; align-items:center; gap:6px; }
+.db-leg i{ width:10px; height:10px; border-radius:50%; }
+.db-leg b{ color:var(--ink); }
+.db-hbars{ display:flex; flex-direction:column; gap:13px; padding-top:6px; }
+.db-hb{ display:grid; grid-template-columns:96px minmax(0,1fr) 30px; align-items:center; gap:10px; font-size:13px; }
+.db-hb .k{ color:var(--ink-soft); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.db-hb b{ text-align:left; font-variant-numeric:tabular-nums; }
+.db-cols{ display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); gap:5px; align-items:end; height:150px; }
+.db-col{ display:flex; flex-direction:column; align-items:center; gap:5px; height:100%; min-width:0; }
+.db-col .b{ flex:1; width:100%; max-width:26px; display:flex; align-items:flex-end; background:rgba(32,30,29,.05); border-radius:7px; overflow:hidden; }
+.db-col .b span{ display:block; width:100%; height:0; border-radius:7px 7px 3px 3px; background:linear-gradient(180deg,#e2925a,#c67139); transition:height 1.1s cubic-bezier(.2,.8,.2,1); transition-delay:var(--d); }
+.db-go .db-col .b span{ height:var(--h); }
+.db-col.cur .b span{ background:linear-gradient(180deg,#9b7bb8,#7a5c8f); }
+.db-col .m{ font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+.db-col.cur .m{ color:var(--db-plum); font-weight:700; }
+.db-budline{ font-size:12.5px; color:var(--ink-soft); text-align:center; }
+
+/* מערכות */
+.db-mods{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:10px; }
+.db-mod{ --tone:var(--db-ok); display:flex; flex-direction:column; gap:9px; text-align:right; font-family:inherit; color:var(--ink); background:var(--bg); border:1.5px solid transparent; border-radius:16px; padding:12px; cursor:pointer; min-width:0; transition:transform .15s ease, border-color .15s ease, background .15s; }
+.db-mod:hover{ transform:translateY(-2px); border-color:var(--tone); background:#fff8f1; }
+.db-mod.bad{ --tone:var(--db-bad); } .db-mod.warn{ --tone:var(--db-warn); } .db-mod.info{ --tone:var(--db-info); }
+.db-mod .mh{ display:flex; align-items:center; gap:8px; }
+.db-mod .ico{ width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--card); color:var(--brand); box-shadow:0 1px 2px rgba(46,43,37,.1); flex:0 0 auto; }
+.db-mod .t{ font-weight:700; font-size:14px; }
+.db-mod .st{ margin-inline-start:auto; width:10px; height:10px; border-radius:50%; background:var(--tone); box-shadow:0 0 0 4px color-mix(in srgb, var(--tone) 18%, transparent); }
+.db-mod .mrs{ display:flex; flex-direction:column; gap:4px; }
+.db-mod .mr{ display:flex; justify-content:space-between; gap:8px; font-size:12.5px; color:var(--ink-soft); }
+.db-mod .mr b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+.db-mod .mr b.c-bad{ color:var(--db-bad); } .db-mod .mr b.c-warn{ color:#b8641f; }
+
+/* פעילות */
+.db-feed{ display:flex; flex-direction:column; }
+.db-fi{ display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:10px; align-items:center; padding:9px 4px; border:none; border-bottom:1px solid var(--line); background:none; font-family:inherit; text-align:right; color:var(--ink); cursor:pointer; }
+.db-fi:last-child{ border-bottom:none; }
+.db-fi:hover{ background:var(--bg); border-radius:10px; }
+.db-fi .ico{ width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#fff2eb; color:var(--brand); }
+.db-fi .tx{ display:flex; flex-direction:column; min-width:0; font-size:13px; }
+.db-fi .tx b{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.db-fi .tx span{ color:var(--ink-soft); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.db-fi .when{ font-size:11.5px; color:var(--ink-soft); white-space:nowrap; }
+
+/* כניסות אחרונות (מנהל) */
+.db-login{ max-width:1180px; margin:16px auto 0; }
+.db-login summary{ cursor:pointer; font-weight:700; font-size:14px; color:var(--ink-soft); padding:8px 4px; list-style:none; display:flex; align-items:center; gap:8px; }
+.db-login summary::-webkit-details-marker{ display:none; }
+.db-login summary::before{ content:"▸"; transition:transform .2s; display:inline-block; }
+.db-login[open] summary::before{ transform:rotate(90deg); }
+
+/* טלפון */
+@media (max-width:900px){
+  .db-week{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .db-day.today{ grid-column:1 / -1; }
+}
+@media (max-width:720px){
+  .db-hero{ padding:18px 16px; border-radius:22px; }
+  .db-hi{ font-size:26px; }
+  .db-ring{ width:100%; }
+  .db-ring svg{ width:112px; height:112px; }
+  .db-ring-c{ width:112px; height:112px; }
+  .db-ring-c .v{ font-size:30px; }
+  .db-kpis{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
+  .db-kpi{ padding:12px 11px 10px; border-radius:18px; }
+  .db-kpi .v{ font-size:24px; }
+  .db-sec{ padding:13px; border-radius:18px; }
+  .db-al{ grid-template-columns:auto minmax(0,1fr) auto; padding:9px 10px; gap:9px; }
+  .db-al .go{ display:none; }
+  .db-al .ico{ width:32px; height:32px; }
+  .db-week{ grid-template-columns:minmax(0,1fr); }
+  .db-day{ flex-direction:row; align-items:flex-start; gap:10px; }
+  .db-day .dh{ flex-direction:column; align-items:flex-start; gap:2px; width:62px; flex:0 0 auto; }
+  .db-day .dh .c{ margin-inline-start:0; }
+  .db-day .di{ flex:1; }
+  .db-day.empty{ padding-block:7px; }
+  .db-hb{ grid-template-columns:84px minmax(0,1fr) 26px; }
+  .db-cols{ height:120px; gap:3px; }
+  .db-col .m{ font-size:9px; }
+  .db-mods{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .db-mod{ padding:10px; }
+  .db-mod .mr{ font-size:12px; }
+}
+@media (max-width:380px){ .db-mods{ grid-template-columns:minmax(0,1fr); } }
+@media (prefers-reduced-motion: reduce){
+  .db-wrap *, .db-wrap *::before{ animation:none !important; transition:none !important; }
+  .db-enter .db-in{ opacity:1; transform:none; }
+}
+</style>
+<style id="mytasks-style">
+/* ===== המשימות שלי (אוקטובר 2026) ===== */
+.mt-slot{ display:flex; align-items:flex-end; }
+.mt-slot:empty{ display:none; }
+.mt-switch{ display:inline-flex; background:#ebdfcb; border-radius:14px; padding:4px; gap:4px; max-width:100%; }
+.mt-switch button{ font-family:inherit; border:none; background:transparent; padding:8px 14px; border-radius:11px; font-size:13.5px; font-weight:600; color:#645c50; cursor:pointer; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; transition:background .15s, color .15s, box-shadow .15s; min-height:38px; }
+.mt-switch button:hover{ color:#201e1d; }
+.mt-switch button.on{ background:#fbf7f0; color:#8c491a; font-weight:700; box-shadow:0 1px 2px rgba(46,43,37,.12), 0 4px 10px rgba(46,43,37,.08); }
+.mt-switch .n{ background:rgba(32,30,29,.08); border-radius:999px; padding:1px 8px; font-size:12px; color:inherit; }
+.mt-switch .n.me{ background:#7a5c8f; color:#fff !important; }
+
+#mtRoot{ display:flex; flex-direction:column; gap:16px; max-width:1180px; margin:0 auto; }
+#mtRoot *{ box-sizing:border-box; }
+.mt-head{ display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; justify-content:space-between; }
+.mt-grid{ display:grid; grid-template-columns:minmax(0,1fr) 290px; gap:18px; align-items:start; }
+.mt-main{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+.mt-side{ display:flex; flex-direction:column; gap:14px; position:sticky; top:16px; }
+
+.mt-qa{ display:flex; align-items:center; gap:10px; background:var(--card); border-radius:16px; padding:8px; box-shadow:0 1px 2px rgba(46,43,37,.10), 0 8px 22px rgba(46,43,37,.07); }
+.mt-qa:focus-within{ box-shadow:0 0 0 2px #c67139, 0 8px 22px rgba(46,43,37,.1); }
+.mt-qa-ico{ width:34px; height:34px; border-radius:10px; background:#fff2eb; color:#c67139; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+.mt-qa input{ flex:1; min-width:0; border:none !important; background:transparent !important; font-family:inherit; font-size:15px; color:var(--ink); outline:none; padding:8px 4px; box-shadow:none !important; }
+.mt-qa-hint{ font-size:12px; color:var(--ink-soft); padding:0 6px; margin-top:-6px; }
+.mt-qa-hint.live{ color:var(--ink); font-weight:600; }
+.mt-qa-hint svg{ vertical-align:-2px; }
+
+.mt-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.mt-chip{ font-family:inherit; display:inline-flex; align-items:center; gap:7px; background:var(--card); color:var(--ink); border:1.5px solid transparent; border-radius:999px; padding:6px 12px 6px 10px; font-size:13px; font-weight:600; cursor:pointer; box-shadow:0 1px 2px rgba(46,43,37,.08); transition:all .15s; }
+.mt-chip:hover{ transform:translateY(-1px); }
+.mt-chip .d{ width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; }
+.mt-chip .n{ background:rgba(32,30,29,.07); border-radius:999px; padding:0 7px; font-size:11.5px; color:var(--ink-soft); }
+.mt-chip.on{ background:#2b2723; color:#f9f4ed; border-color:#2b2723; }
+.mt-chip.on .n{ background:rgba(255,255,255,.18); color:#f9f4ed; }
+
+.mt-group{ display:flex; flex-direction:column; gap:8px; --g:#645c50; }
+.mt-group.bad{ --g:#b4441a; } .mt-group.warn{ --g:#a3561c; } .mt-group.info{ --g:#3d7ea6; } .mt-group.slate{ --g:#5c6b7a; }
+.mt-group h3{ margin:6px 0 0; font-size:14.5px; font-weight:700; display:flex; align-items:center; gap:8px; color:var(--g); font-family:inherit; }
+.mt-group h3 i{ width:8px; height:8px; border-radius:50%; background:var(--g); }
+.mt-group h3 span{ font-weight:500; color:var(--ink-soft); font-size:12.5px; }
+
+.mt-item{ display:flex; align-items:center; gap:12px; background:var(--card); border-radius:16px; padding:10px 12px; box-shadow:0 1px 2px rgba(46,43,37,.08), 0 6px 16px rgba(46,43,37,.05);
+  transition:background .2s ease, box-shadow .2s ease, transform .15s ease, opacity .25s; animation:mtIn .35s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i,0) * 25ms); }
+@keyframes mtIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+.mt-item:hover{ box-shadow:0 6px 18px rgba(46,43,37,.12); }
+.mt-item.done{ background:#f3f0ea; }
+.mt-item.done .mt-title{ text-decoration:line-through; color:#8a8073; }
+.mt-item.done .mt-ico{ opacity:.55; }
+.mt-item.flash{ box-shadow:0 0 0 2px #c67139, 0 8px 22px rgba(198,113,57,.25); }
+.mt-chk{ width:30px; height:30px; border-radius:50%; border:2px solid #b8a993; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:0 0 auto; padding:0; color:transparent; transition:all .2s ease; }
+.mt-chk:hover{ border-color:#5f7f3a; color:rgba(95,127,58,.45); box-shadow:0 0 0 4px rgba(95,127,58,.14); }
+.mt-chk.on{ background:#5f7f3a; border-color:#5f7f3a; color:#fff; }
+.mt-chk.pop{ animation:mtPop .32s ease; }
+@keyframes mtPop{ 0%{ transform:scale(1); } 45%{ transform:scale(1.25); } 100%{ transform:scale(1); } }
+.mt-chk.sm{ width:24px; height:24px; }
+.mt-ico{ width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+.mt-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; background:none; border:none; padding:2px 0; font-family:inherit; text-align:right; color:var(--ink); cursor:pointer; }
+.mt-title{ font-weight:600; font-size:14.5px; overflow-wrap:anywhere; }
+.mt-meta{ display:flex; flex-wrap:wrap; gap:6px; }
+.mt-meta:empty{ display:none; }
+.mt-tag{ display:inline-flex; align-items:center; gap:4px; background:#eee7db; color:#645c50; border-radius:8px; padding:2px 8px; font-size:12px; font-weight:500; }
+.mt-tag.bad{ background:#ffd9c8; color:#b4441a; font-weight:700; }
+.mt-tag.warn{ background:#ffe6cf; color:#a3561c; font-weight:700; }
+.mt-tag.ok{ background:#e1eecc; color:#3d5426; }
+.mt-tag.info{ background:#dcebf3; color:#2e6585; }
+.mt-star{ background:none; border:none; cursor:pointer; color:#c9b9a2; padding:7px; border-radius:9px; display:flex; flex:0 0 auto; }
+.mt-star.on{ color:#c9952b; }
+.mt-star:hover{ background:var(--bg); }
+
+.mt-fold{ align-self:flex-start; font-family:inherit; background:none; border:1.5px dashed #c9b9a2; border-radius:12px; padding:8px 14px; color:var(--ink-soft); font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
+.mt-fold .cv{ color:#8c491a; }
+.mt-empty{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; background:var(--card); border-radius:18px; padding:28px 20px; color:var(--ink-soft); font-size:13.5px; }
+.mt-empty svg{ color:#7a5c8f; }
+.mt-empty b{ color:var(--ink); font-size:16px; }
+.mt-empty.sm{ padding:14px; }
+
+.mt-today{ background:#2b2723; color:#f9f4ed; border-radius:22px; padding:16px; display:flex; flex-direction:column; align-items:center; gap:8px; box-shadow:0 14px 30px rgba(43,39,35,.25); }
+.mt-today .h,.mt-actions .h{ font-weight:700; font-size:15px; align-self:stretch; }
+.mt-today .ring{ position:relative; width:132px; height:132px; }
+.mt-today svg{ width:132px; height:132px; display:block; }
+.mt-today .trk{ fill:none; stroke:rgba(255,255,255,.12); stroke-width:12; }
+.mt-today .val{ fill:none; stroke:#9bd46e; stroke-width:12; stroke-linecap:round; transition:stroke-dashoffset .6s ease; }
+.mt-today .c{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.mt-today .c b{ font-family:var(--font-heading, "Suez One", serif); font-weight:400; font-size:32px; line-height:1; color:#fff; }
+.mt-today .c span{ font-size:12px; color:#e9dccb; }
+.mt-today .msg{ font-size:13px; color:#e9dccb; text-align:center; }
+.mt-actions{ background:var(--card); border-radius:20px; padding:14px; display:flex; flex-direction:column; gap:8px; box-shadow:0 1px 2px rgba(46,43,37,.10), 0 8px 22px rgba(46,43,37,.07); }
+.mt-actions button{ font-family:inherit; display:flex; align-items:center; gap:10px; background:var(--bg); border:none; border-radius:12px; padding:10px 12px; font-size:13.5px; color:var(--ink); cursor:pointer; text-align:right; transition:background .15s; }
+.mt-actions button:hover{ background:#fff2eb; }
+.mt-actions button:nth-of-type(1) svg{ color:#c67139; } .mt-actions button:nth-of-type(2) svg{ color:#5f7f3a; } .mt-actions button:nth-of-type(3) svg{ color:#3d7ea6; }
+.mt-private{ background:#f0e7f6; color:#4e3a60; border-radius:16px; padding:12px 14px; font-size:12.5px; display:flex; gap:10px; align-items:flex-start; }
+.mt-private svg{ flex:0 0 auto; }
+
+/* חלון עריכה */
+.mt-modal-box{ max-width:540px !important; width:100%; max-height:92vh; overflow:auto; display:flex; flex-direction:column; gap:12px; direction:rtl; }
+.mt-mh{ display:flex; align-items:center; gap:10px; font-size:16px; }
+.mt-x{ margin-inline-start:auto; background:none; border:none; cursor:pointer; color:var(--ink-soft); width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+.mt-x:hover{ background:var(--bg); }
+.mt-x.sm{ width:28px; height:28px; margin-inline-start:0; }
+.mt-f{ display:flex; flex-direction:column; gap:5px; font-size:12.5px; font-weight:600; color:var(--ink-soft); min-width:0; }
+.mt-f input,.mt-f select,.mt-f textarea{ font-family:inherit; font-size:14.5px; font-weight:400; color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:9px 10px; background:#fff; width:100%; box-sizing:border-box; min-height:42px; }
+.mt-f textarea{ resize:vertical; }
+.mt-f input:focus,.mt-f select:focus,.mt-f textarea:focus{ outline:none; border-color:#c67139; }
+.mt-types{ display:flex; flex-wrap:wrap; gap:6px; }
+.mt-types button{ font-family:inherit; display:inline-flex; align-items:center; gap:6px; border:1.5px solid transparent; background:var(--bg); color:var(--ink); border-radius:11px; padding:7px 11px; font-size:13px; font-weight:600; cursor:pointer; }
+.mt-types button svg{ color:var(--c); }
+.mt-types button.on{ background:#fff; border-color:var(--c); box-shadow:0 2px 8px rgba(46,43,37,.1); }
+.mt-row3{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; }
+.mt-quickdates{ display:flex; flex-wrap:wrap; gap:6px; margin-top:-4px; }
+.mt-quickdates button{ font-family:inherit; border:none; background:var(--bg); border-radius:999px; padding:5px 12px; font-size:12.5px; cursor:pointer; color:var(--ink); }
+.mt-quickdates button:hover{ background:#fff2eb; }
+.mt-checks{ display:flex; flex-wrap:wrap; gap:16px; font-size:14px; }
+.mt-checks label{ display:inline-flex; align-items:center; gap:7px; cursor:pointer; }
+.mt-checks input{ width:18px; height:18px; accent-color:#5f7f3a; }
+.mt-subs{ display:flex; flex-direction:column; gap:6px; }
+.mt-sub{ display:flex; align-items:center; gap:9px; background:var(--bg); border-radius:10px; padding:6px 8px; font-size:14px; font-weight:400; color:var(--ink); }
+.mt-sub span{ flex:1; min-width:0; overflow-wrap:anywhere; }
+.mt-sub.done span{ text-decoration:line-through; color:#8a8073; }
+.mt-subadd{ display:flex; gap:8px; }
+.mt-subadd input{ flex:1; min-width:0; }
+.mt-mfoot{ display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; margin-top:4px; }
+.mt-mfoot .grp{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.mt-incal{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:#2e6585; background:#dcebf3; border-radius:10px; padding:6px 10px; }
+
+/* לוח הבקרה: כרטיס המשימות שלי */
+.db-row2{ display:grid; grid-template-columns:minmax(0,1.45fr) minmax(0,1fr); gap:16px; align-items:start; }
+.db-my{ border-top:4px solid #7a5c8f; }
+.db-my .db-sec-h > svg{ color:#7a5c8f; }
+.db-mybar{ height:8px; border-radius:999px; background:#ece3f3; overflow:hidden; }
+.db-mybar span{ display:block; height:100%; width:0; border-radius:999px; background:#7a5c8f; transition:width 1.1s cubic-bezier(.2,.8,.2,1) .6s; }
+.db-go .db-mybar span{ width:var(--w); }
+.db-static .db-mybar span{ width:var(--w); }
+.db-mylist{ display:flex; flex-direction:column; }
+.db-myi{ display:flex; align-items:center; gap:10px; padding:7px 2px; border-bottom:1px solid var(--line); }
+.db-myi:last-child{ border-bottom:none; }
+.db-myi .mt-chk{ width:26px; height:26px; }
+.db-myi .mt-chk svg{ width:14px; height:14px; }
+.db-myi.late .mt-chk{ border-color:#b4441a; }
+.db-myi .ti{ width:30px; height:30px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+.db-myi .tt{ flex:1; min-width:0; background:none; border:none; padding:0; font-family:inherit; text-align:right; font-size:13.5px; font-weight:600; color:var(--ink); cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.db-myi.done .tt{ text-decoration:line-through; color:#8a8073; font-weight:400; }
+.db-myi .wh{ font-size:11.5px; font-weight:700; color:var(--ink-soft); white-space:nowrap; }
+.db-myi.late .wh{ color:#b4441a; }
+.db-myi .st{ color:#c9952b; display:flex; }
+.db-myadd{ display:flex; gap:8px; background:var(--bg); border-radius:12px; padding:5px; }
+.db-myadd input{ flex:1; min-width:0; border:none !important; background:transparent !important; font-family:inherit; font-size:13.5px; padding:6px 8px; outline:none; box-shadow:none !important; }
+.db-myadd button{ font-family:inherit; border:none; background:#7a5c8f; color:#fff; font-weight:700; font-size:13px; border-radius:9px; padding:0 14px; min-height:36px; cursor:pointer; }
+.db-mylink{ align-self:center; background:none; border:none; font-family:inherit; font-size:13px; font-weight:600; color:#7a5c8f; cursor:pointer; padding:4px 8px; }
+.db-mylink:hover{ text-decoration:underline; }
+.db-myempty{ font-size:13px; color:var(--ink-soft); text-align:center; padding:10px 0; }
+.db-chip.me{ background:#7a5c8f; border-color:#7a5c8f; color:#fff; font-weight:600; cursor:pointer; font-family:inherit; }
+.db-wleg{ margin-inline-start:auto; display:flex; gap:12px; font-size:12px; color:var(--ink-soft); flex-wrap:wrap; }
+.db-wleg span{ display:inline-flex; align-items:center; gap:5px; }
+.db-wleg i{ width:8px; height:8px; border-radius:50%; }
+
+@media (max-width:980px){
+  .mt-grid{ grid-template-columns:minmax(0,1fr); }
+  .mt-side{ position:static; order:-1; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+  .mt-private{ grid-column:1 / -1; }
+  .db-row2{ grid-template-columns:minmax(0,1fr); }
+  .db-row2 .db-my{ order:-1; }
+}
+@media (max-width:720px){
+  .mt-switch{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); width:100%; }
+  .mt-switch button{ justify-content:center; padding:8px 8px; font-size:13px; }
+  .mt-head{ align-items:stretch; flex-direction:column; }
+  .mt-side{ grid-template-columns:minmax(0,1fr); }
+  .mt-today{ flex-direction:row; flex-wrap:wrap; justify-content:center; padding:12px 14px; gap:12px; }
+  .mt-today .h{ display:none; }
+  .mt-today .ring,.mt-today svg{ width:86px; height:86px; }
+  .mt-today .c b{ font-size:22px; }
+  .mt-today .c span{ font-size:10px; }
+  .mt-today .msg{ flex:1; min-width:120px; text-align:right; font-size:14px; color:#fff; }
+  .mt-actions{ flex-direction:row; flex-wrap:wrap; padding:10px; }
+  .mt-actions .h{ display:none; }
+  .mt-actions button{ flex:1 1 140px; font-size:12.5px; padding:9px 10px; }
+  .mt-item{ padding:9px 10px; gap:10px; }
+  .mt-ico{ width:34px; height:34px; border-radius:11px; }
+  .mt-chips{ gap:6px; }
+  .mt-chip{ padding:5px 10px 5px 8px; font-size:12.5px; }
+  .mt-row3{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .mt-row3 .mt-f:last-child{ grid-column:1 / -1; }
+  .mt-qa-hint{ display:none; }
+  .mt-qa-hint.live{ display:block; }
+}
+@media (prefers-reduced-motion: reduce){ .mt-item,.mt-chk.pop{ animation:none !important; } }
+</style>
 <style id="supply-style">
 .spx{--sp-bg:var(--bg,#f5ead8);--sp-card:var(--card,#fbf7f0);--sp-ink:var(--ink,#201e1d);--sp-soft:var(--ink-soft,#645c50);--sp-line:rgba(32,30,29,.14);--sp-brand:var(--brand,#c67139);--sp-brand-ink:#f9f4ed;--sp-brand-dark:#2b2723;--sp-green:#5f6f45;--sp-green-bg:#e1eecc;--sp-red:#8c491a;--sp-red-bg:#ffd3ba;--sp-amber:#a35a1f;--sp-amber-bg:#ffe1d0;--sp-tint-a:#fff2eb;--sp-tint-b:#f0fae1;--sp-chip:#eee7db;--sp-overlay:rgba(32,30,29,.45);--sp-shadow:0 1px 2px rgba(46,43,37,.10), 0 8px 22px rgba(46,43,37,.08);--sp-shadow-up:0 2px 4px rgba(46,43,37,.12), 0 14px 30px rgba(46,43,37,.12);--sp-r:16px;--sp-r-sm:10px;--sp-f-head:var(--font-heading,"Suez One","Rubik",serif);--sp-f-body:"Rubik","Segoe UI","Heebo",Arial,sans-serif;direction:rtl;font-family:var(--sp-f-body);color:var(--sp-ink);font-size:15px;line-height:1.5}
 .spx,.spx *{box-sizing:border-box}
