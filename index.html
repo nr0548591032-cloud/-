@@ -1012,6 +1012,302 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
 }
 .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 </style>
+<style id="tasksV2Styles">
+/* ===== טאב משימות — גרסה 2 (אוקטובר 2026) ===== */
+#tab-tasks .tk-wrap, #tab-equipment .tk-wrap{ display:flex; flex-direction:column; gap:14px; min-width:0; }
+.tk-head{ display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; justify-content:space-between; }
+.tk-title{ font-family:var(--font-heading, var(--font-display)); font-size:30px; line-height:1.1; color:var(--ink); }
+.tk-sub{ font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:3px; }
+.tk-head-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+.tk-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  min-height:40px; padding:0 14px; border-radius:13px; border:none;
+  background:var(--job-accent); color:var(--job-accent-ink) !important;
+  font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap;
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.tk-btn:hover{ transform:translateY(-1px); box-shadow:0 4px 12px rgba(140,73,26,.25); }
+.tk-btn.ghost{ background:transparent; color:#8c491a !important; border:1.5px solid var(--job-accent); }
+.tk-btn.soft{ background:var(--job-idle-bg); color:var(--ink) !important; }
+.tk-btn.ok{ background:var(--job-ok-bg); color:#2f3820 !important; }
+.tk-btn.danger{ background:transparent; color:#8c491a !important; border:1.5px solid rgba(140,73,26,.35); }
+.tk-btn.sm{ min-height:34px; padding:0 12px; font-size:13px; border-radius:11px; }
+.tk-btn svg{ flex:0 0 auto; }
+.tk-btn:focus-visible, .tk-card:focus-visible, .tk-pill:focus-visible, .tk-tile:focus-visible{ outline:2px solid #c67139; outline-offset:2px; }
+.tk-btn[disabled]{ opacity:.5; cursor:default; transform:none; box-shadow:none; }
+
+/* פס מיקוד */
+.tk-focus{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:10px; }
+.tk-tile{
+  background:var(--card); border:1.5px solid transparent; border-top:3px solid var(--job-idle-bg);
+  border-radius:16px; padding:10px 12px; text-align:right; cursor:pointer; font-family:inherit; color:var(--ink);
+  display:flex; flex-direction:column; gap:1px; min-width:0; box-shadow:0 1px 2px rgba(46,43,37,.08);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.tk-tile:hover{ transform:translateY(-1px); box-shadow:var(--job-shadow); }
+.tk-tile .l{ font-size:12px; font-weight:600; color:var(--ink-soft); }
+.tk-tile .v{ font-family:var(--font-heading, var(--font-display)); font-size:26px; line-height:1.15; font-variant-numeric:tabular-nums; }
+.tk-tile .h{ font-size:11.5px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tk-tile.bad{ border-top-color:#b4441a; } .tk-tile.bad .v{ color:#b4441a; }
+.tk-tile.warn{ border-top-color:#c67139; }
+.tk-tile.info{ border-top-color:#4b8aa8; }
+.tk-tile.ok{ border-top-color:var(--green); }
+.tk-tile.active{ border-color:#c67139; background:var(--job-tint-a); }
+@media (max-width:900px){ .tk-focus{ grid-template-columns:repeat(3, minmax(0,1fr)); } }
+.tk-more-list{ display:contents; }
+.tk-more-toggle{ display:none; }
+@media (max-width:640px){
+  .tk-head{ align-items:flex-start; }
+  .tk-head-actions{ width:100%; }
+  .tk-more-toggle{ display:inline-flex; }
+  .tk-head-actions > .tk-btn:last-child{ margin-inline-start:auto; }
+  .tk-more-list{ display:none; order:3; width:100%; flex-wrap:wrap; gap:8px; }
+  .tk-more-list.open{ display:flex; }
+  .tk-focus{ grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; }
+  .tk-tile{ padding:8px 10px; }
+  .tk-tile .v{ font-size:22px; }
+  .tk-tile .h{ display:none; }
+  .tk-view-btn svg{ display:none; }
+  .tk-view-btn{ padding:0 10px; font-size:13px; }
+  .tk-views{ width:100%; justify-content:space-between; }
+  .tk-search{ max-width:none; }
+}
+
+/* הוספה מהירה */
+.tk-qa{ display:flex; gap:8px; align-items:center; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:6px 6px 6px 6px; box-shadow:var(--job-shadow); margin:0; }
+.tk-qa .tk-qa-ico{ color:#c67139; display:flex; padding-inline-start:6px; }
+#tab-tasks .tk-qa input[type=text]{ flex:1 1 auto; min-width:0; border:none !important; background:transparent !important; box-shadow:none !important; font-size:15px; padding:9px 4px; }
+.tk-qa-hint{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:12px; color:var(--ink-soft); margin-top:-6px; padding-inline:6px; }
+.tk-tok{ display:inline-flex; align-items:center; gap:4px; background:var(--job-idle-bg); color:var(--ink); border-radius:999px; padding:2px 9px; font-size:11.5px; font-weight:600; }
+.tk-tok.hit{ background:var(--job-ok-bg); color:var(--job-ok); }
+
+/* סרגל תצוגות / חיפוש / סטטוס */
+.tk-bar{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.tk-views{ display:flex; flex-wrap:wrap; gap:4px; background:var(--card); padding:4px; border-radius:14px; border:1px solid var(--line); }
+.tk-view-btn{ display:inline-flex; align-items:center; gap:6px; min-height:34px; padding:0 12px; border-radius:10px; border:none; background:transparent; color:var(--ink); font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer; }
+.tk-view-btn.active{ background:#2b2723; color:#fbf7f0; }
+.tk-search{ display:flex; align-items:center; gap:8px; min-height:42px; padding:0 12px; background:var(--card); border:1px solid var(--line); border-radius:13px; flex:1 1 200px; max-width:340px; color:var(--ink-soft); min-width:0; }
+#tab-tasks .tk-search input, #tab-equipment .tk-search input{ border:none !important; background:transparent !important; box-shadow:none !important; flex:1; min-width:0; padding:8px 0; font-size:14.5px; }
+#tab-tasks .tk-year, #tab-equipment .tk-year{ width:auto !important; min-height:42px; border-radius:13px; padding:0 10px; }
+.tk-sbar{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.tk-sbar .lbl{ font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-inline-end:2px; }
+.tk-pill{ display:inline-flex; align-items:center; gap:6px; min-height:34px; padding:0 12px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--ink); font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.tk-pill .dot{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+.tk-pill .n{ background:var(--job-idle-bg); border-radius:999px; padding:0 7px; font-size:11.5px; font-variant-numeric:tabular-nums; }
+.tk-pill.active{ background:#2b2723; color:#fbf7f0; border-color:#2b2723; }
+.tk-pill.active .n{ background:rgba(251,247,240,.2); color:#fbf7f0; }
+.tk-sep{ width:1px; height:22px; background:var(--line); margin-inline:4px; }
+.tk-active-filter{ display:inline-flex; align-items:center; gap:6px; background:var(--job-warn-bg); color:var(--job-warn); border-radius:999px; padding:4px 6px 4px 12px; font-size:12.5px; font-weight:600; }
+.tk-active-filter button{ border:none; background:transparent; color:inherit; cursor:pointer; display:flex; padding:2px; }
+
+/* לוח */
+.tk-board{ display:grid; grid-template-columns:repeat(var(--tk-cols,4), minmax(0,1fr)); gap:14px; align-items:start; }
+@media (max-width:1100px){ .tk-board{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
+@media (max-width:640px){ .tk-board{ grid-template-columns:minmax(0,1fr); } }
+.tk-col{ display:flex; flex-direction:column; gap:8px; min-width:0; }
+.tk-col-h{ display:flex; align-items:center; gap:8px; padding:4px 6px; font-weight:700; font-size:14px; background:none; border:none; font-family:inherit; color:var(--ink); cursor:pointer; text-align:right; border-radius:10px; }
+.tk-col-h:hover{ background:rgba(127,110,90,.08); }
+.tk-col-h .dot{ width:10px; height:10px; border-radius:50%; }
+.tk-col-h .n{ margin-inline-start:auto; background:var(--job-idle-bg); border-radius:999px; padding:1px 9px; font-size:12px; font-variant-numeric:tabular-nums; }
+.tk-col-body{ display:flex; flex-direction:column; gap:10px; background:rgba(127,110,90,.07); border-radius:18px; padding:8px; min-height:70px; }
+.tk-empty{ font-size:13px; color:var(--ink-soft); text-align:center; padding:18px 8px; }
+.tk-empty.big{ background:var(--card); border-radius:18px; padding:30px 16px; border:1.5px dashed var(--line); }
+.tk-groups{ display:flex; flex-direction:column; gap:18px; }
+.tk-grp-h{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; margin:0 4px 8px; }
+.tk-grp-h .t{ font-family:var(--font-heading, var(--font-display)); font-size:19px; color:var(--ink); }
+.tk-grp-h .s{ font-size:12.5px; color:var(--ink-soft); }
+.tk-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap:12px; }
+
+/* כרטיס משימה */
+.tk-card{
+  background:var(--job-tint-a); border-radius:18px; padding:12px 14px; box-shadow:var(--job-shadow);
+  display:flex; flex-direction:column; gap:8px; cursor:pointer; min-width:0; position:relative;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.tk-card.alt{ background:var(--job-tint-b); }
+.tk-card:hover{ transform:translateY(-2px); box-shadow:0 2px 4px rgba(46,43,37,.10), 0 14px 30px rgba(46,43,37,.14); }
+.tk-card.late{ box-shadow:inset 0 0 0 1.5px rgba(180,68,26,.55), var(--job-shadow); }
+.tk-card.arch{ opacity:.72; }
+.tk-card.flash{ animation:jobFlash 2.2s ease; }
+.tk-card-top{ display:flex; align-items:center; gap:8px; min-width:0; }
+.tk-prio{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+.tk-prio.p1{ background:#b4441a; } .tk-prio.p2{ background:#c67139; } .tk-prio.p3{ background:transparent; box-shadow:inset 0 0 0 1.5px var(--ink-soft); }
+.tk-topic{ font-family:var(--font-heading, var(--font-display)); font-size:16px; color:#8c491a; line-height:1.2; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+.tk-card.alt .tk-topic{ color:#4f5b3a; }
+.tk-code{ margin-inline-start:auto; font-size:11.5px; color:var(--ink-soft); font-variant-numeric:tabular-nums; direction:ltr; flex:0 0 auto; }
+.tk-card-title{ font-size:15px; font-weight:600; line-height:1.35; color:var(--ink); overflow-wrap:anywhere; }
+.tk-card-title.empty{ color:var(--ink-soft); font-weight:500; font-style:italic; }
+.tk-meta{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.tk-chip{ display:inline-flex; align-items:center; gap:5px; border-radius:999px; padding:3px 9px; font-size:12px; font-weight:600; background:var(--job-idle-bg); color:var(--job-idle); white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis; border:none; font-family:inherit; }
+.tk-chip svg{ flex:0 0 auto; }
+.tk-chip.bad{ background:#ffc6a5; color:#5a2a0c; }
+.tk-chip.warn{ background:var(--job-warn-bg); color:var(--job-warn); }
+.tk-chip.ok{ background:var(--job-ok-bg); color:var(--job-ok); }
+.tk-chip.info{ background:#dfeef5; color:#2a5a73; }
+button.tk-chip{ cursor:pointer; }
+.tk-card-foot{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.tk-who{ display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-soft); min-width:0; }
+.tk-ava{ width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fbf7f0; flex:0 0 auto; }
+.tk-ava.none{ background:var(--job-idle-bg); color:var(--ink-soft); }
+.tk-prog{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-soft); margin-inline-start:auto; font-variant-numeric:tabular-nums; }
+.tk-track{ width:54px; height:6px; border-radius:6px; background:var(--job-idle-bg); overflow:hidden; display:block; }
+.tk-fill{ height:100%; background:var(--green); border-radius:6px; display:block; }
+.tk-money{ font-family:var(--font-heading, var(--font-display)); font-size:16px; white-space:nowrap; color:var(--ink); }
+.tk-mini{ display:flex; gap:3px; }
+.tk-mini i{ width:14px; height:4px; border-radius:3px; background:var(--job-idle-bg); display:block; }
+.tk-mini i.on{ background:var(--green); }
+.tk-next{ display:flex; gap:8px; align-items:center; border-top:1px dashed rgba(32,30,29,.16); padding-top:8px; flex-wrap:wrap; }
+.tk-next .note{ font-size:12px; color:var(--ink-soft); min-width:0; flex:1 1 120px; }
+.tk-closed{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--job-ok); background:var(--job-ok-bg); padding:5px 11px; border-radius:999px; }
+
+/* תיק משימה (מגירה) */
+.tk-scrim{ position:fixed; inset:0; background:rgba(26,23,20,.42); z-index:400; opacity:0; pointer-events:none; transition:opacity .2s ease; }
+.tk-scrim.open{ opacity:1; pointer-events:auto; }
+.tk-drawer{
+  position:fixed; top:0; bottom:0; left:0; width:min(580px, 100%); z-index:401;
+  background:var(--bg); display:flex; flex-direction:column;
+  transform:translateX(-105%); transition:transform .25s ease; box-shadow:0 0 40px rgba(0,0,0,.25);
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); padding-left:env(safe-area-inset-left,0px);
+  visibility:hidden;
+}
+.tk-drawer.open{ transform:none; visibility:visible; }
+@media (prefers-reduced-motion:reduce){ .tk-drawer, .tk-scrim, .tk-card, .tk-btn, .tk-tile{ transition:none; } }
+.tk-dr-head{ background:#2b2723; color:#fbf7f0; padding:14px 16px; display:flex; gap:12px; align-items:flex-start; flex:0 0 auto; }
+.tk-dr-head .t{ flex:1; min-width:0; }
+.tk-dr-head .k{ font-size:12px; opacity:.8; }
+.tk-dr-head .h{ font-family:var(--font-heading, var(--font-display)); font-size:21px; line-height:1.25; margin-top:2px; overflow-wrap:anywhere; }
+.tk-x{ border:none; background:rgba(251,247,240,.14); color:#fbf7f0; width:40px; height:40px; border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+.tk-dr-body{ flex:1 1 auto; overflow-y:auto; padding:14px 16px 40px; display:flex; flex-direction:column; gap:12px; -webkit-overflow-scrolling:touch; }
+.tk-sec{ background:var(--card); border-radius:18px; padding:13px; display:flex; flex-direction:column; gap:10px; box-shadow:0 1px 2px rgba(46,43,37,.08); min-width:0; }
+.tk-sec-h{ font-weight:700; font-size:14px; display:flex; align-items:center; gap:8px; color:var(--ink); }
+.tk-sec-h .r{ margin-inline-start:auto; font-weight:500; font-size:12px; color:var(--ink-soft); }
+.tk-nextbox{ display:flex; align-items:center; gap:10px; background:var(--job-tint-a); border-radius:14px; padding:10px 12px; flex-wrap:wrap; }
+.tk-nextbox .txt{ flex:1 1 140px; font-size:13px; color:var(--ink-soft); min-width:0; }
+.tk-nextbox .txt b{ display:block; font-size:14px; color:var(--ink); }
+.tk-seg{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:4px; background:var(--bg); border-radius:12px; padding:4px; }
+.tk-seg button{ min-height:36px; border:none; border-radius:9px; background:transparent; font-family:inherit; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; padding:0 4px; }
+.tk-seg button .dot{ width:8px; height:8px; border-radius:50%; }
+.tk-seg button.on{ background:#2b2723; color:#fbf7f0; }
+.tk-fields{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
+.tk-field{ display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:var(--ink-soft); min-width:0; margin:0; }
+.tk-field.full{ grid-column:1 / -1; }
+.tk-drawer textarea{ width:100%; border:1px solid var(--line); background:#FBFAF7; padding:8px; font-size:14.5px; font-family:inherit; border-radius:7px; color:var(--ink); resize:vertical; min-height:44px; box-sizing:border-box; }
+.tk-drawer textarea:focus{ outline:none; border-color:#c67139; background:#fff; }
+.tk-drawer .tk-field input, .tk-drawer .tk-field select{ font-weight:400; }
+@media (max-width:420px){ .tk-fields{ grid-template-columns:minmax(0,1fr); } }
+.tk-recur{ background:var(--job-ok-bg); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:8px; color:#2f3820; font-size:13px; }
+.tk-recur .row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.tk-recur select{ width:auto !important; }
+.tk-recur label{ display:inline-flex; align-items:center; gap:6px; font-weight:600; cursor:pointer; }
+.tk-linkbtn{ background:none; border:none; padding:0; font-family:inherit; font-size:inherit; font-weight:700; color:#8c491a; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.tk-person{ display:flex; align-items:center; gap:10px; }
+.tk-person .ava{ width:40px; height:40px; font-size:14px; }
+.tk-person .nm{ font-weight:700; font-size:15px; color:var(--ink); }
+.tk-person .ph{ font-size:12.5px; color:var(--ink-soft); direction:ltr; text-align:right; }
+.tk-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+.tk-sync{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer; }
+.tk-sync input{ width:18px; height:18px; accent-color:#7a8a5e; margin:0; }
+.tk-ck{ display:flex; flex-direction:column; gap:2px; }
+.tk-ck-row{ display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:10px; font-size:14px; color:var(--ink); }
+.tk-ck-row:hover{ background:var(--bg); }
+.tk-ck-row label{ display:flex; align-items:center; gap:10px; flex:1; cursor:pointer; min-width:0; margin:0; }
+.tk-ck-row input{ width:18px; height:18px; accent-color:#7a8a5e; margin:0; flex:0 0 auto; }
+.tk-ck-row input:checked + span{ text-decoration:line-through; color:var(--ink-soft); }
+.tk-ck-row span{ overflow-wrap:anywhere; }
+.tk-ck-del{ border:none; background:transparent; color:var(--ink-soft); cursor:pointer; width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+.tk-ck-del:hover{ background:var(--job-warn-bg); color:#8c491a; }
+.tk-ck-add{ display:flex; gap:8px; }
+.tk-ck-add input{ flex:1; min-width:0; }
+.tk-photos{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; }
+.tk-ph{ aspect-ratio:4/3; max-width:100%; border-radius:12px; overflow:hidden; background:var(--job-idle-bg); border:none; padding:0; cursor:pointer; position:relative; }
+.tk-ph img{ width:100%; height:100%; object-fit:cover; display:block; }
+.tk-ph .tag{ position:absolute; bottom:5px; right:5px; background:rgba(32,30,29,.72); color:#fbf7f0; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:999px; }
+.tk-ph.add{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:transparent; border:1.5px dashed #c67139; color:#8c491a; font-family:inherit; font-size:12px; font-weight:600; }
+.tk-tl{ display:flex; flex-direction:column; position:relative; padding-inline-start:18px; }
+.tk-tl::before{ content:""; position:absolute; top:8px; bottom:8px; right:5px; width:2px; background:var(--job-idle-bg); }
+.tk-tl-i{ position:relative; padding:5px 0; font-size:13px; color:var(--ink); }
+.tk-tl-i::before{ content:""; position:absolute; right:-17px; top:10px; width:10px; height:10px; border-radius:50%; background:var(--card); border:2px solid #c67139; box-sizing:border-box; }
+.tk-tl-i small{ color:var(--ink-soft); font-size:11.5px; margin-inline-start:6px; white-space:nowrap; }
+.tk-dr-foot{ display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; align-items:center; }
+.tk-drawer .job-full{ gap:10px; }
+
+/* מודאל כללי של המודול */
+.tk-modal-box{ max-width:520px !important; max-height:92vh; overflow:auto; }
+.tk-modal-title{ font-weight:700; font-size:16px; margin-bottom:4px; color:var(--ink); }
+.tk-modal-sub{ font-size:12.5px; color:var(--ink-soft); margin-bottom:12px; }
+.tk-modal-body{ display:flex; flex-direction:column; gap:10px; }
+.tk-modal-foot{ display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; margin-top:14px; }
+.tk-modal-foot .grp{ display:flex; flex-wrap:wrap; gap:8px; }
+.tk-sugg{ display:flex; flex-wrap:wrap; gap:6px; }
+.tk-modal-box textarea{ width:100%; border:1px solid var(--line); border-radius:8px; padding:8px; font-family:inherit; font-size:13.5px; box-sizing:border-box; resize:vertical; }
+.tk-hist{ display:flex; flex-direction:column; gap:6px; }
+.tk-hist-i{ display:flex; gap:10px; align-items:center; background:var(--bg); border:none; border-radius:12px; padding:9px 11px; text-align:right; font-family:inherit; cursor:pointer; color:var(--ink); width:100%; }
+.tk-hist-i .m{ flex:1; min-width:0; }
+.tk-hist-i .t{ font-weight:600; font-size:14px; overflow-wrap:anywhere; }
+.tk-hist-i .s{ font-size:12px; color:var(--ink-soft); }
+.tk-hist-i .a{ font-family:var(--font-heading, var(--font-display)); font-size:15px; white-space:nowrap; }
+.tk-hist-sum{ display:flex; gap:10px; }
+.tk-hist-sum div{ flex:1; background:var(--job-tint-a); border-radius:12px; padding:8px 10px; }
+.tk-hist-sum .l{ font-size:11.5px; color:var(--ink-soft); font-weight:600; }
+.tk-hist-sum .v{ font-family:var(--font-heading, var(--font-display)); font-size:19px; }
+.tk-lic-chip{ display:inline-flex; align-items:center; gap:4px; border:none; background:var(--job-ok-bg); color:var(--job-ok); border-radius:999px; padding:3px 9px; font-family:inherit; font-size:11px; font-weight:600; cursor:pointer; }
+/* ===== ציוד ותחזוקה ===== */
+.eq-cover{ display:flex; gap:10px; align-items:flex-start; border-radius:14px; padding:10px 12px; font-size:13px; background:var(--job-idle-bg); color:var(--ink); }
+.eq-cover b{ font-size:14px; }
+.eq-cover > svg{ flex:0 0 auto; margin-top:1px; }
+.eq-cover.ok{ background:var(--job-ok-bg); color:#2f3820; }
+.eq-cover.soon{ background:var(--job-warn-bg); color:var(--job-warn); }
+.eq-cover.expired, .eq-cover.none{ background:var(--job-idle-bg); color:var(--ink); }
+.eq-cover.warn-pay{ background:#ffc6a5; color:#5a2a0c; }
+.eq-docadd{ display:inline-flex; gap:6px; align-items:center; }
+#eqDrawer .eq-docadd select{ width:auto; min-height:34px; padding:4px 8px; font-size:13px; }
+.eq-kpis{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px; }
+.eq-kpi{ background:var(--card); border-radius:16px; padding:11px 13px; display:flex; flex-direction:column; gap:2px; box-shadow:0 1px 2px rgba(46,43,37,.08); min-width:0; }
+.eq-kpi.main{ background:#2b2723; color:#fbf7f0; }
+.eq-kpi .l{ font-size:12px; font-weight:600; opacity:.8; }
+.eq-kpi .v{ font-family:var(--font-heading, var(--font-display)); font-size:24px; line-height:1.15; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.eq-kpi .h{ font-size:12px; opacity:.8; }
+@media (max-width:900px){ .eq-kpis{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
+.eq-cgrid{ display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:12px; align-items:start; }
+.eq-cgrid.three{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+.eq-ccol{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+@media (max-width:980px){ .eq-cgrid, .eq-cgrid.three{ grid-template-columns:minmax(0,1fr); } }
+.eq-crow{ display:flex; flex-direction:column; gap:5px; padding:6px 0; border-bottom:1px dashed rgba(32,30,29,.12); }
+.eq-crow:last-of-type{ border-bottom:none; }
+.eq-crow-top{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.eq-crow-top .nm{ font-weight:700; font-size:14px; flex:1 1 90px; min-width:0; }
+.eq-crow-top .act{ font-family:var(--font-heading, var(--font-display)); font-size:17px; font-variant-numeric:tabular-nums; }
+.eq-bud{ display:inline-flex; align-items:center; gap:4px; font-size:12px; color:var(--ink-soft); font-weight:600; margin:0; }
+#tab-equipment .eq-bud input{ width:96px; padding:5px 7px; font-size:13.5px; }
+.eq-bar{ height:8px; border-radius:6px; background:var(--job-idle-bg); overflow:hidden; }
+.eq-bar span{ display:block; height:100%; border-radius:6px; background:var(--green); }
+.eq-bar span.over{ background:#b4441a; }
+.eq-bar span.nob{ background:#c67139; opacity:.55; }
+.eq-crow-sub{ font-size:12px; color:var(--ink-soft); }
+.eq-crow-sub .over{ color:#8c491a; }
+.eq-addcat{ display:flex; gap:8px; margin:6px 0 0; }
+.eq-addcat input{ flex:1; min-width:0; }
+.eq-stack{ display:flex; height:14px; border-radius:8px; overflow:hidden; background:var(--job-idle-bg); }
+.eq-stack span{ display:block; height:100%; }
+.eq-legend{ display:flex; flex-wrap:wrap; gap:6px 14px; font-size:12px; color:var(--ink-soft); }
+.eq-legend span{ display:inline-flex; align-items:center; gap:6px; }
+.eq-legend i{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+.eq-months{ display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); gap:4px; align-items:end; height:170px; }
+.eq-m{ display:flex; flex-direction:column; align-items:stretch; height:100%; min-width:0; }
+.eq-m-val{ font-size:10px; color:var(--ink-soft); text-align:center; height:14px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.eq-m-col{ flex:1; display:flex; flex-direction:column-reverse; background:rgba(127,110,90,.07); border-radius:6px 6px 2px 2px; overflow:hidden; }
+.eq-m-col .tsk{ background:#c67139; display:block; }
+.eq-m-col .con{ background:#4b8aa8; display:block; }
+.eq-m-l{ font-size:10.5px; color:var(--ink-soft); text-align:center; margin-top:4px; white-space:nowrap; overflow:hidden; }
+.eq-top{ display:flex; flex-direction:column; gap:4px; }
+.eq-top-i{ display:flex; justify-content:space-between; gap:10px; align-items:center; background:var(--bg); border:none; border-radius:10px; padding:8px 10px; font-family:inherit; font-size:13.5px; color:var(--ink); cursor:pointer; text-align:right; }
+.eq-top-i span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.eq-top-i b{ font-variant-numeric:tabular-nums; white-space:nowrap; }
+.tk-eqwarn{ display:flex; gap:10px; align-items:flex-start; border-radius:14px; padding:10px 12px; font-size:13px; background:#ffc6a5; color:#5a2a0c; }
+.tk-eqwarn.contract{ background:#dfeef5; color:#2a5a73; }
+.tk-eqwarn > svg{ flex:0 0 auto; margin-top:1px; }
+</style>
+
 </head>
 <body>
 
@@ -1071,34 +1367,66 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
   </section>
 
   <section class="tab" id="tab-tasks">
-    <div class="cards" id="tasksCards"></div>
-    <div class="card">
-      <div class="toolbar toolbar-sticky">
-        <input type="text" id="tasksSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="🔍 חיפוש לפי תיאור, תחום, אחראי, מזהה..." oninput="filterRows('tasksBody', this.value)" style="max-width:280px">
-        <div>שנת לימודים: <select id="tasksYearFilter" onchange="data.uiPrefs.tasksYear=this.value; saveUiPrefs(); renderTasks();" style="width:170px;display:inline-block"></select></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn ghost" onclick="openTasksReportModal()"><span class="btn-icon-inline" id="tasksReportIconSlot"></span>דוח משימות (PDF)</button>
-          <button class="btn ghost" onclick="openWorkSlipModal()"><span class="btn-icon-inline" id="workSlipIconSlot"></span>שליחת משימות לאיש מקצוע</button>
-          <button class="btn ghost" onclick="rolloverTasksYear()">פתיחת שנת לימודים חדשה</button>
-          <button class="btn" onclick="addTask()">+ הוספת משימה</button>
+    <div class="tk-wrap">
+      <div class="tk-head">
+        <div>
+          <div class="tk-title">משימות</div>
+          <div class="tk-sub"><span id="tkCountLine"></span><span class="saved-flag" id="tasksSaved">נשמר</span></div>
+        </div>
+        <div class="tk-head-actions">
+          <button type="button" class="tk-btn ghost sm tk-more-toggle" aria-expanded="false" onclick="const l=document.getElementById('tkMoreList');const o=l.classList.toggle('open');this.setAttribute('aria-expanded',o)">עוד פעולות</button>
+          <div class="tk-more-list" id="tkMoreList">
+          <button type="button" class="tk-btn ghost sm" onclick="openTasksReportModal()"><span class="btn-icon-inline" id="tasksReportIconSlot"></span>דוח משימות</button>
+          <button type="button" class="tk-btn ghost sm" onclick="openWorkSlipModal()"><span class="btn-icon-inline" id="workSlipIconSlot"></span>שליחה לאיש מקצוע</button>
+          <button type="button" class="tk-btn ghost sm" onclick="tkOpenWeekly()"><span class="btn-icon-inline" data-tk-ico="report"></span>סיכום שבועי</button>
+          <button type="button" class="tk-btn ghost sm" onclick="tkOpenCameraModal()"><span class="btn-icon-inline" data-tk-ico="camera"></span>תקלה במצלמה</button>
+          <button type="button" class="tk-btn ghost sm" onclick="rolloverTasksYear()">פתיחת שנת לימודים חדשה</button>
+          </div>
+          <button type="button" class="tk-btn sm" onclick="addTask()"><span class="btn-icon-inline" data-tk-ico="plus"></span>משימה מלאה</button>
         </div>
       </div>
-      <div class="toolbar">
-        <div><span class="saved-flag" id="tasksSaved">נשמר</span></div>
-        <div></div>
+
+      <div class="tk-focus" id="tkFocus"></div>
+
+      <form class="tk-qa" id="tkQaForm" onsubmit="tkQuickAdd(event)" autocomplete="off">
+        <span class="tk-qa-ico" data-tk-ico="plus"></span>
+        <input type="text" id="tkQaInput" enterkeyhint="done" aria-label="הוספה מהירה של משימה" placeholder="הוספה מהירה: להחליף נורות במסדרון קומה 2 מחר @אבי !דחוף #מסדרון" oninput="tkQaPreview()">
+        <button type="submit" class="tk-btn sm">הוספה</button>
+      </form>
+      <div class="tk-qa-hint" id="tkQaHint"></div>
+
+      <div class="tk-bar">
+        <div class="tk-views" id="tkViews" role="tablist" aria-label="תצוגת משימות"></div>
+        <label class="tk-search"><span data-tk-ico="search"></span><input type="text" id="tasksSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="חיפוש משימה, איש מקצוע, מקום, מזהה…" oninput="tkOnSearch(this.value)" aria-label="חיפוש משימות"></label>
+        <select id="tasksYearFilter" class="tk-year" aria-label="שנת לימודים" onchange="data.uiPrefs.tasksYear=this.value; saveUiPrefs(); renderTasks();"></select>
       </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>מזהה</th><th>תאריך יצירה</th><th>תחום</th><th>תיאור המשימה</th>
-            <th>סטטוס</th><th>אחראי ביצוע</th><th>תאריך יעד</th><th>שנת לימודים</th><th>סנכרון ליומן</th><th>פירוט / הערות</th>
-            <th>סוג תחזוקה</th><th>חשבונית / תמונת ביצוע</th><th>עלות ותשלום</th><th>שליחה לאיש מקצוע</th><th></th>
-          </tr></thead>
-          <tbody id="tasksBody"></tbody>
-        </table>
-      </div>
+      <div class="tk-sbar" id="tkStatusBar"></div>
+
+      <div id="tkView"></div>
     </div>
   </section>
+
+  <div class="tk-scrim" id="tkScrim" onclick="tkClose()"></div>
+  <aside class="tk-drawer" id="tkDrawer" role="dialog" aria-modal="true" aria-label="תיק משימה" aria-hidden="true"></aside>
+  <section class="tab" id="tab-equipment">
+    <div class="tk-wrap">
+      <div class="tk-head">
+        <div>
+          <div class="tk-title">ציוד ותחזוקה</div>
+          <div class="tk-sub"><span id="eqSub"></span><span class="saved-flag" id="eqSaved">נשמר</span></div>
+        </div>
+        <div class="tk-head-actions" id="eqActions"></div>
+      </div>
+      <div class="tk-bar"><div class="tk-views" id="eqViews" role="tablist" aria-label="תצוגת ציוד ותחזוקה"></div></div>
+      <div id="eqBody" class="tk-wrap"></div>
+    </div>
+  </section>
+  <div class="tk-scrim" id="eqScrim" onclick="eqClose()"></div>
+  <aside class="tk-drawer" id="eqDrawer" role="dialog" aria-modal="true" aria-label="כרטיס ציוד או חוזה" aria-hidden="true"></aside>
+  <div id="tkModal" class="modal-overlay" style="display:none;z-index:650" onclick="if(event.target===this) tkModalClose()">
+    <div class="modal-box tk-modal-box" id="tkModalBox" role="dialog" aria-modal="true"></div>
+  </div>
+
 
   <section class="tab" id="tab-procurement">
     <div id="supplyApp" class="spx">
@@ -1225,7 +1553,8 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
         </select></label>
         <label>סטטוס<select id="rptStatus" onchange="updateTasksReportCount()">
           <option value="">כל המשימות</option>
-          <option value="open">פתוחות בלבד (טרם התחיל + בביצוע)</option>
+          <option value="open">פתוחות בלבד (טרם התחיל + בביצוע + ממתין)</option>
+          <option value="ממתין">ממתין בלבד</option>
           <option value="בביצוע">בביצוע בלבד</option>
           <option value="טרם התחיל">טרם התחיל בלבד</option>
           <option value="בוצע">בוצעו בלבד</option>
@@ -2116,7 +2445,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261020; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261022; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -2278,7 +2607,8 @@ const BACKUP_KEY_LABELS = {
   "contacts-data":"אנשי קשר וספקים", "vendorPayments-data":"תשלומי ספקים", "recurring-data":"כספים שוטפים",
   "files-data":"קבצים", "projects-data":"פרויקטים", "staff-data":"צוות ותורנים", "keys-data":"מפתחות",
   "food-data":"רכש אוכל", "accountantContact-data":"פרטי מנהל חשבונות", "uiPrefs-data":"העדפות תצוגה", "loginLog-data":"יומן כניסות",
-  "supply-data":"רכש ואספקה: מחירונים וספקים", "supplyOrders-data":"רכש ואספקה: הזמנות וחשבוניות", "supplyKitchen-data":"רכש ואספקה: תפריט ומלאי"
+  "supply-data":"רכש ואספקה: מחירונים וספקים", "supplyOrders-data":"רכש ואספקה: הזמנות וחשבוניות", "supplyKitchen-data":"רכש ואספקה: תפריט ומלאי",
+  "equipment-data":"ציוד ואחריות", "serviceContracts-data":"חוזי שירות", "maintBudget-data":"תקציב תחזוקה"
 };
 function fmtWhen(ts){
   if(!ts) return "";
@@ -2519,10 +2849,11 @@ let data = {
 };
 
 let activeInstallment = 0;
-const tabs = ["dashboard","tasks","procurement","licensing","staff","accountant","finance","keys","files","projects","contacts"];
+const tabs = ["dashboard","tasks","equipment","procurement","licensing","staff","accountant","finance","keys","files","projects","contacts"];
 const svgIconPaths = {
   dashboard: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
   tasks: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12.5 2.5 2.5 5-5"/>',
+  equipment: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
   procurement: '<path d="M20.5 7.5 12 3 3.5 7.5v9L12 21l8.5-4.5v-9Z"/><path d="M3.7 7.7 12 12l8.3-4.3"/><path d="M12 12v9"/>',
   licensing: '<path d="M12 21c4-1.5 7-4.5 7-9V6l-7-3-7 3v6c0 4.5 3 7.5 7 9Z"/><path d="m9 11.5 2 2 4-4"/>',
   staff: '<circle cx="9" cy="8" r="3.3"/><path d="M3.5 19c0-3 2.5-5.3 5.5-5.3s5.5 2.3 5.5 5.3"/><circle cx="17" cy="8.5" r="2.6"/><path d="M15.5 13.8c2.4.4 4 2.3 4 5.2"/>',
@@ -2554,7 +2885,7 @@ function svgIcon(name, size){
   if(!path) return "";
   return `<svg viewBox="0 0 24 24" width="${size||18}" height="${size||18}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
 }
-const tabIcons = {dashboard:svgIcon("dashboard"), tasks:svgIcon("tasks"), procurement:svgIcon("procurement"), licensing:svgIcon("licensing"), staff:svgIcon("staff"), accountant:svgIcon("accountant"), finance:svgIcon("finance"), keys:svgIcon("keys"), files:svgIcon("files"), projects:svgIcon("projects"), contacts:svgIcon("contacts")};
+const tabIcons = {dashboard:svgIcon("dashboard"), tasks:svgIcon("tasks"), equipment:svgIcon("equipment"), procurement:svgIcon("procurement"), licensing:svgIcon("licensing"), staff:svgIcon("staff"), accountant:svgIcon("accountant"), finance:svgIcon("finance"), keys:svgIcon("keys"), files:svgIcon("files"), projects:svgIcon("projects"), contacts:svgIcon("contacts")};
 {
   const printerSlot = document.getElementById("printerIconSlot");
   const copySlot = document.getElementById("copyIconSlot");
@@ -2577,12 +2908,12 @@ const tabIcons = {dashboard:svgIcon("dashboard"), tasks:svgIcon("tasks"), procur
   const workSlipSlot = document.getElementById("workSlipIconSlot");
   if(workSlipSlot) workSlipSlot.innerHTML = svgIcon("whatsapp", 15);
 }
-const tabLabels = {dashboard:"לוח בקרה", tasks:"משימות", procurement:"רכש ואספקה", licensing:"רישוי ובטיחות", staff:"צוות ותורנים", accountant:"דוח למנהל חשבונות", finance:"כספים שוטפים", keys:"מפתחות", files:"חשבוניות וקבלות", projects:"פרויקטים", contacts:"אנשי קשר וספקים"};
+const tabLabels = {dashboard:"לוח בקרה", tasks:"משימות", equipment:"ציוד ותחזוקה", procurement:"רכש ואספקה", licensing:"רישוי ובטיחות", staff:"צוות ותורנים", accountant:"דוח למנהל חשבונות", finance:"כספים שוטפים", keys:"מפתחות", files:"חשבוניות וקבלות", projects:"פרויקטים", contacts:"אנשי קשר וספקים"};
 
 const ROLES = {
   admin: { label:"מנהל", tabs:null },
   moshe: { label:"משה כהן", tabs:["licensing"] },
-  maintenance: { label:"איש תחזוקה", tabs:["tasks","licensing"] },
+  maintenance: { label:"איש תחזוקה", tabs:["tasks","equipment","licensing"] },
   accountant: { label:"מנהל חשבונות", tabs:["accountant","files"] },
   cook: { label:"טבח", tabs:["procurement"] }
 };
@@ -2864,7 +3195,7 @@ function saveInstallments(){
 
 function anyLoadFailed(){ return Object.values(loadStatus).includes("failed"); }
 async function loadAll(){
-  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"],["projects","projects-data"],["loginLog","loginLog-data"],["uiPrefs","uiPrefs-data"],["accountantContact","accountantContact-data"]];
+  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"],["projects","projects-data"],["loginLog","loginLog-data"],["uiPrefs","uiPrefs-data"],["accountantContact","accountantContact-data"],["equipment","equipment-data"],["serviceContracts","serviceContracts-data"],["maintBudget","maintBudget-data"]];
   for(const [dataKey, storageKey] of simpleKeys){
     if(anyLoadFailed()) return;
     try{
@@ -2954,6 +3285,11 @@ function selectInstallment(idx){
 const tabQuickLinks = {
   tasks: [
     {label:"➕ הוספת משימה", action: () => addTask()}
+  ],
+  equipment: [
+    {label:"➕ פריט ציוד", action: () => eqNewEquip()},
+    {label:"➕ חוזה שירות", action: () => eqNewContract()},
+    {label:"עלויות תחזוקה", action: () => { eqUi.view = "costs"; renderEquipment(); }}
   ],
   get procurement(){ return window.SP ? SP.quickLinks() : []; },
   licensing: [
@@ -3046,6 +3382,7 @@ function switchTab(t){
   if(t==="accountant") renderAccountantReport();
   if(t==="finance") renderFinance();
   if(t==="procurement" && window.SP) SP.onShow();
+  if(t==="equipment") renderEquipment();
 }
 
 /* ---------- CONTACT-DRIVEN DROPDOWNS ---------- */
@@ -3293,7 +3630,7 @@ function openPhotoDoneModal(row, url){
   document.getElementById("photoDonePreview").innerHTML = url ? `<img src="${url}" alt="" style="max-width:100%;max-height:180px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.15)">` : "";
   document.getElementById("photoDoneMessage").textContent = `"${row.desc || "המשימה"}" עדיין בסטטוס "${row.status || "טרם התחיל"}". לסמן אותה כ"בוצע"?`;
   photoDoneCallback = (yes) => {
-    if(yes){ row.status = "בוצע"; scheduleSave("tasks","tasksSaved"); renderTasks(); renderDashboard(); }
+    if(yes){ tkSetStatus(row, "בוצע"); }
   };
   document.getElementById("photoDoneModal").style.display = "flex";
 }
@@ -3364,25 +3701,39 @@ function syncTaskInvoiceToVendorPay(taskRow){
 function rolloverTasksYear(){
   const cur = currentSchoolYearStart();
   const next = cur + 1;
-  const unfinished = data.tasks.filter(r => String(r.schoolYear||cur)===String(cur) && r.status!=="בוצע");
+  // משימות מונעות שכבר נפתחו אוטומטית לשנה הבאה לא מועתקות שוב (בלי כפילויות)
+  const unfinished = data.tasks.filter(r => String(r.schoolYear||cur)===String(cur) && r.status!=="בוצע"
+    && !(r.recurNextId && data.tasks.some(x => x.id === r.recurNextId)));
   if(unfinished.length===0){
-    alert(`אין משימות פתוחות בשנת ${schoolYearLabel(cur)} להעביר. אפשר להמשיך ולהוסיף משימות חדשות ולבחור בהן את שנת ${schoolYearLabel(next)}.`);
+    jobToast(`אין משימות פתוחות בשנת ${schoolYearLabel(cur)} להעביר. אפשר להוסיף משימות חדשות ולבחור בהן את שנת ${schoolYearLabel(next)}.`, 5000);
     return;
   }
-  if(!confirm(`יועברו ${unfinished.length} משימות שטרם הושלמו משנת ${schoolYearLabel(cur)} לשנת ${schoolYearLabel(next)}, כעותקים חדשים (בסטטוס "טרם התחיל"). המשימות המקוריות יישארו בהיסטוריה. להמשיך?`)) return;
-  unfinished.forEach(orig => {
-    data.tasks.push({
-      id: nextId()+1000, created:new Date().toISOString().slice(0,10), category:orig.category,
-      desc:orig.desc, status:"טרם התחיל", assignee:orig.assignee, due:"", notes:orig.notes,
-      maint:orig.maint, link:"", schoolYear:next
+  openConfirmModal(`יועברו ${unfinished.length} משימות שטרם הושלמו משנת ${schoolYearLabel(cur)} לשנת ${schoolYearLabel(next)}, כעותקים חדשים (בסטטוס "טרם התחיל"). המשימות המקוריות יישארו בהיסטוריה. להמשיך?`, () => {
+    unfinished.forEach(orig => {
+      const copy = {
+        id: nextId()+1000, created:tkToday(), category:orig.category,
+        desc:orig.desc, status:"טרם התחיל", assignee:orig.assignee, due:"", notes:orig.notes,
+        maint:orig.maint, link:"", schoolYear:next,
+        prio: orig.prio || 2, place: orig.place || "", licId: orig.licId || null, cameraNo: orig.cameraNo || "",
+        equipId: orig.equipId || null, contractId: orig.contractId || null,
+        checklist: tkChecklist(orig).map(c => ({ t: c.t || "", done: false })),
+        log: [{ d: tkToday(), t: `הועברה משנת ${schoolYearLabel(cur)} (${taskCodeDisplay(orig)})` }]
+      };
+      if(orig.maint === "תחזוקה מונעת"){
+        copy.recurArmed = true;
+        if(orig.recurMonths) copy.recurMonths = orig.recurMonths;
+        copy.recurFromId = orig.id;
+        orig.recurNextId = copy.id;
+      }
+      data.tasks.push(copy);
     });
-  });
-  scheduleSave("tasks","tasksSaved");
-  backfillTaskNumbers();
-  const yearSel = document.getElementById("tasksYearFilter");
-  if(yearSel){ yearSel.value = next; }
-  renderTasks();
-  alert(`הועברו ${unfinished.length} משימות לשנת ${schoolYearLabel(next)}.`);
+    scheduleSave("tasks","tasksSaved");
+    backfillTaskNumbers();
+    const yearSel = document.getElementById("tasksYearFilter");
+    if(yearSel){ yearSel.value = next; }
+    renderTasks();
+    jobToast(`הועברו ${unfinished.length} משימות לשנת ${schoolYearLabel(next)}`, 4200);
+  }, { yesLabel: "העברה", icon: "tasks" });
 }
 function nextTaskNumberForYear(year){
   const nums = data.tasks.filter(t => Number(t.schoolYear)===Number(year)).map(t => t.taskNumber || 0);
@@ -3393,10 +3744,12 @@ function taskCodeDisplay(row){
   return `${yy}-${row.taskNumber || row.id}`;
 }
 function addTask(){
-  const yearSel = document.getElementById("tasksYearFilter");
-  const targetYear = (yearSel && yearSel.value) ? Number(yearSel.value) : currentSchoolYearStart();
-  data.tasks.push({id: nextId()+1000, taskNumber: nextTaskNumberForYear(targetYear), created:"", category:"", desc:"", status:"טרם התחיל", assignee:"", due:"", notes:"", maint:"", link:"", schoolYear: targetYear});
-  renderTasks(); scheduleSave("tasks","tasksSaved");
+  const t = tkNewTask({ schoolYear: tkCurrentYearValue() });
+  t.log = [{ d: tkToday(), t: "נפתחה המשימה" }];
+  tkFreshIds.add(t.id);
+  tkSave();
+  renderTasks();
+  tkOpen(t.id, "desc");
 }
 function removeTask(id){
   openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
@@ -3404,87 +3757,1999 @@ function removeTask(id){
     renderTasks(); scheduleSave("tasks","tasksSaved");
   });
 }
-function renderTasks(){
-  const body = document.getElementById("tasksBody");
-  body.innerHTML = "";
-  const yearSel = document.getElementById("tasksYearFilter");
-  if(yearSel && !yearSel.dataset.built){
-    yearSel.dataset.built = "1";
-    const _hasPref_tasksYear = Object.prototype.hasOwnProperty.call(data.uiPrefs, "tasksYear");
-      const _prefVal_tasksYear = _hasPref_tasksYear ? data.uiPrefs.tasksYear : String(currentSchoolYearStart());
-      yearSel.innerHTML = `<option value="" ${_prefVal_tasksYear===""?"selected":""}>כל השנים</option>` +
-      schoolYearOptions().map(y => `<option value="${y}" ${String(y)===String(_prefVal_tasksYear)?"selected":""}>${schoolYearLabel(y)}</option>`).join("");
-  }
-  const yearFilter = yearSel ? yearSel.value : "";
-  const visibleTasks = yearFilter ? data.tasks.filter(r => String(r.schoolYear||currentSchoolYearStart())===yearFilter) : data.tasks;
-  visibleTasks.forEach(row => {
-    const tr = document.createElement("tr");
-    if(row.status==="בוצע") tr.classList.add("card-ok");
-    else if(row.status==="בביצוע") tr.classList.add("card-warn");
-    tr.innerHTML = `
-      <td><input type="text" value="${taskCodeDisplay(row)}" readonly style="width:56px"></td>
-      <td><input type="date" value="${row.created}" data-f="created"></td>
-      <td>${buildSelect(getContactSpecialties(), row.category, "category")}</td>
-      <td class="primary-field"><input type="text" value="${row.desc}" data-f="desc" style="min-width:180px"></td>
-      <td><select data-f="status" data-status-style="task">
-            <option ${row.status==="בוצע"?"selected":""}>בוצע</option>
-            <option ${row.status==="בביצוע"?"selected":""}>בביצוע</option>
-            <option ${row.status==="טרם התחיל"?"selected":""}>טרם התחיל</option>
-          </select></td>
-      <td>${buildSelect(getContactNames(), row.assignee, "assignee")}</td>
-      <td><input type="date" value="${row.due}" data-f="due"></td>
-      <td>${schoolYearSelectHTML(row.schoolYear)}</td>
-      <td class="sync-cell field-xnarrow">
-        <label class="cal-toggle" title="${row.synced?"מסונכרן ליומן":"סנכרון ליומן"}">
-          <input type="checkbox" data-sync="task" ${row.synced?"checked":""} ${row.syncing?"disabled":""} style="display:none">
-          <span class="cal-toggle-icon">${svgIcon("calendar",15)}</span>
-        </label>
-        <div class="sync-status" id="sync-task-${row.id}">${row.syncing?"מסנכרן…":(row.synced?"✓ סונכרן":"")}</div>
-      </td>
-      <td><input type="text" value="${row.notes}" data-f="notes" style="min-width:140px"></td>
-      <td><select data-f="maint">
-            <option value="" ${!row.maint?"selected":""}></option>
-            <option value="תחזוקה מונעת" ${row.maint==="תחזוקה מונעת"?"selected":""}>תחזוקה מונעת</option>
-            <option value="תחזוקה שוטפת" ${row.maint==="תחזוקה שוטפת"?"selected":""}>תחזוקה שוטפת</option>
-            <option value="תחזוקה בלתי מתוכננת" ${row.maint==="תחזוקה בלתי מתוכננת"?"selected":""}>תחזוקה בלתי מתוכננת</option>
-          </select></td>
-      <td class="file-cell"></td>
-      <td class="job-cell"></td>
-      <td class="contact-actions">
-        <button class="contact-action-btn ca-whatsapp" title="שליחת וואטסאפ לאיש המקצוע" onclick="sendTaskWhatsApp(${row.id})">${svgIcon("whatsapp",15)}</button>
-        <button class="contact-action-btn ca-mail" title="שליחת אימייל לאיש המקצוע" onclick="sendTaskEmail(${row.id})">${svgIcon("mail",15)}</button>
-      </td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeTask(${row.id})">${svgIcon('trash',13)}</button></td>
-    `;
-    migrateSingleDocToArray(row, "link", "docs", "חשבונית");
-    const fileTd = tr.querySelector(".file-cell");
-    fileTd.innerHTML = renderDocsChecklist(row, "docs", "tasks");
-    tr.dataset.taskId = row.id;
-    const jobTd = tr.querySelector(".job-cell");
-    jobTd.innerHTML = renderTaskJobCell(row);
-    if(taskVP(row) || finDocs(row.docs).length || jobCostOpen.has(row.id)) jobTd.classList.add("has-job");
-    tr.querySelectorAll("[data-f]").forEach(inp => {
-      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; scheduleSave("tasks","tasksSaved"); renderTasksCards(); renderDashboard(); });
-      inp.addEventListener("change", () => { row[inp.dataset.f] = inp.value; scheduleSave("tasks","tasksSaved"); renderTasksCards(); renderDashboard(); });
-    });
-    tr.querySelectorAll("[data-sync]").forEach(cb => {
-      cb.addEventListener("change", () => onSyncToggle(cb, row, "task"));
-    });
-    body.appendChild(tr);
+/* =====================================================================
+   משימות — גרסה 2 (אוקטובר 2026)
+   לוח מיקוד, הוספה מהירה, 4 תצוגות, סינון סטטוס, ארכיון, תיק משימה מלא,
+   סטטוס "ממתין", תחזוקה מונעת חוזרת, קישור לרישוי, היסטוריית מקום, סיכום שבועי.
+   עקרון בטיחות: רק מוסיפים שדות למשימה (prio, place, waitFor, checklist, log,
+   recurArmed, recurMonths, recurOff, recurNextId, recurFromId, licId, cameraNo,
+   doneAt, sentAt). שום שדה קיים לא נמחק ולא נדרס, ושום משימה לא נמחקת אוטומטית
+   (חוץ ממשימה ריקה לגמרי שנפתחה הרגע ב"משימה מלאה" ונסגרה בלי למלא כלום).
+   ===================================================================== */
+const TK_STATUSES = ["טרם התחיל", "בביצוע", "ממתין", "בוצע"];
+const TK_STATUS_COLOR = { "טרם התחיל":"#a89c8a", "בביצוע":"#c67139", "ממתין":"#4b8aa8", "בוצע":"#7a8a5e" };
+const TK_PRIO_LABEL = { 1:"דחוף", 2:"רגיל", 3:"נמוך" };
+const TK_MAINT = ["תחזוקה מונעת", "תחזוקה שוטפת", "תחזוקה בלתי מתוכננת"];
+const TK_RECUR_START_YEAR = 2026;   // משימות מונעות משנים קודמות לא נפתחות מחדש אוטומטית (מניעת כפילויות)
+const TK_RECUR_OPTIONS = [[12,"כל שנה"],[6,"כל חצי שנה"],[3,"כל 3 חודשים"],[2,"כל חודשיים"],[1,"כל חודש"]];
+const TK_WAIT_SUGG = ["הצעת מחיר", "חלק שהוזמן", "תיאום הגעה", "אישור הנהלה", "תשובה מהספק"];
+const TK_AVA_COLORS = ["#2a6f8f","#b2622d","#5b7a3a","#7a5c8f","#8f4a3a","#4a5a6f","#9a7b2f","#3f7f6f"];
+const TK_ICON_PATHS = {
+  pin: '<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',
+  repeat: '<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+  report: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/>',
+  shield: '<path d="M12 21c4-1.5 7-4.5 7-9V6l-7-3-7 3v6c0 4.5 3 7.5 7 9Z"/><path d="m9 11.5 2 2 4-4"/>',
+  list: '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>',
+  board: '<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/>',
+  people: '<circle cx="9" cy="8" r="3.3"/><path d="M3.5 19c0-3 2.5-5.3 5.5-5.3s5.5 2.3 5.5 5.3"/><circle cx="17" cy="8.5" r="2.6"/><path d="M15.5 13.8c2.4.4 4 2.3 4 5.2"/>',
+  history: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/>',
+  archive: '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><path d="M10 12h4"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  play: '<path d="M7 5l11 7-11 7z"/>'
+};
+function tkIcon(name, size){
+  const s = size || 16;
+  if(TK_ICON_PATHS[name]) return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TK_ICON_PATHS[name]}</svg>`;
+  if(typeof JOB_ICONS !== "undefined" && JOB_ICONS[name]) return jobIcon(name, s);
+  return svgIcon(name, s);
+}
+function tkFillIcons(root){
+  (root || document).querySelectorAll("[data-tk-ico]").forEach(el => {
+    if(el.dataset.tkIcoDone) return;
+    el.dataset.tkIcoDone = "1";
+    el.innerHTML = tkIcon(el.dataset.tkIco, 16);
   });
-  renderTasksCards();
 }
-function renderTasksCards(){
-  const cards = document.getElementById("tasksCards");
-  const total = data.tasks.length;
-  const done = data.tasks.filter(r=>r.status==="בוצע").length;
-  const open = total - done;
-  cards.innerHTML = `
-    <div class="stat"><div class="label">סה"כ משימות</div><div class="value">${total}</div></div>
-    <div class="stat good"><div class="label">משימות שהושלמו</div><div class="value">${done}</div></div>
-    <div class="stat warn"><div class="label">משימות פתוחות</div><div class="value">${open}</div></div>
-  `;
+
+let tkUi = { q: "", focus: "", openId: null };
+const tkFreshIds = new Set();
+
+/* ---------- תאריכים (לפי השעון המקומי, לא UTC) ---------- */
+function tkIso(d){ return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function tkToday(){ return tkIso(new Date()); }
+function tkParse(iso){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ""));
+  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null;
 }
+function tkDaysTo(iso){
+  const d = tkParse(iso);
+  if(!d) return null;
+  return Math.round((d - tkParse(tkToday())) / 86400000);
+}
+function tkAddDays(iso, n){ const d = tkParse(iso) || tkParse(tkToday()); d.setDate(d.getDate() + n); return tkIso(d); }
+function tkAddMonths(iso, n){
+  const d = tkParse(iso) || tkParse(tkToday());
+  const day = d.getDate();
+  const r = new Date(d.getFullYear(), d.getMonth() + n, 1);
+  const last = new Date(r.getFullYear(), r.getMonth() + 1, 0).getDate();
+  r.setDate(Math.min(day, last));
+  return tkIso(r);
+}
+function tkYearOfDate(iso){
+  const d = tkParse(iso);
+  if(!d) return currentSchoolYearStart();
+  return d.getMonth() + 1 >= 9 ? d.getFullYear() : d.getFullYear() - 1;
+}
+function tkShortDate(iso){ const d = tkParse(iso); return d ? `${d.getDate()}.${d.getMonth() + 1}` : ""; }
+
+/* ---------- העדפות תצוגה (נשמרות ב-uiPrefs) ---------- */
+function tkPrefs(){
+  const p = data.uiPrefs || (data.uiPrefs = {});
+  const views = ["board", "list", "pro", "place"];
+  return {
+    view: views.includes(p.tasksView) ? p.tasksView : "board",
+    statuses: Array.isArray(p.tasksStatuses) ? p.tasksStatuses.filter(s => TK_STATUSES.includes(s)) : [],
+    archive: !!p.tasksShowArchive
+  };
+}
+function tkSetPref(key, val){ data.uiPrefs[key] = val; saveUiPrefs(); }
+
+/* ---------- גישה לנתוני משימה ---------- */
+function tkStatus(t){ return TK_STATUSES.includes(t.status) ? t.status : "טרם התחיל"; }
+function tkPrio(t){ const p = Number(t.prio); return (p === 1 || p === 3) ? p : 2; }
+function tkCode(t){ return taskCodeDisplay(t); }
+function tkLog(t, text){
+  if(!Array.isArray(t.log)) t.log = [];
+  t.log.push({ d: tkToday(), t: String(text) });
+  if(t.log.length > 150) t.log.splice(0, t.log.length - 150);
+}
+function tkJob(t){
+  const vp = taskVP(t);
+  if(!vp && !finDocs(t.docs).length) return null;
+  return buildJob(t, null, vp);
+}
+function tkArchived(t){
+  if(tkStatus(t) !== "בוצע") return false;
+  const j = tkJob(t);
+  return !j || j.closed;
+}
+function tkIsLate(t){ const n = tkDaysTo(t.due); return tkStatus(t) !== "בוצע" && n !== null && n < 0; }
+function tkContact(t){ return t.assignee ? findContactByName(t.assignee) : null; }
+function tkFirstName(n){ return String(n || "").replace(/\(.*?\)/g, "").trim().split(/\s+/)[0] || ""; }
+function tkInitials(n){ return String(n || "").replace(/\(.*?\)/g, "").trim().split(/\s+/).filter(Boolean).slice(0, 2).map(w => w.charAt(0)).join("") || "?"; }
+function tkAvaColor(n){ let h = 0; String(n || "").split("").forEach(c => { h = (h * 31 + c.charCodeAt(0)) >>> 0; }); return TK_AVA_COLORS[h % TK_AVA_COLORS.length]; }
+function tkPhotos(t){ return (t.docs || []).filter(d => d && d.fileUrl && isPhotoDocType(d.docType)); }
+function tkChecklist(t){ return Array.isArray(t.checklist) ? t.checklist.filter(c => c && typeof c === "object") : []; }
+function tkAllPlaces(){ return [...new Set(data.tasks.map(t => (t.place || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "he")); }
+function tkLic(t){ return t.licId ? data.licensing.find(l => l.id === Number(t.licId)) || null : null; }
+function tkIsRecurring(t){ return t.maint === "תחזוקה מונעת" && !t.recurOff; }
+function tkRecurMonths(t){ const m = Number(t.recurMonths); return [1, 2, 3, 6, 12].includes(m) ? m : 12; }
+function tkRecurLabel(t){ const o = TK_RECUR_OPTIONS.find(x => x[0] === tkRecurMonths(t)); return o ? o[1] : "כל שנה"; }
+function tkSave(){ scheduleSave("tasks", "tasksSaved"); }
+function tkNewTask(fields){
+  const year = Number(fields.schoolYear) || currentSchoolYearStart();
+  const t = Object.assign({
+    id: nextId() + 1000, taskNumber: nextTaskNumberForYear(year), created: tkToday(), category: "", desc: "",
+    status: "טרם התחיל", assignee: "", due: "", notes: "", maint: "", link: "", schoolYear: year,
+    prio: 2, place: "", checklist: [], docs: [], log: []
+  }, fields, { schoolYear: year });
+  if(t.maint === "תחזוקה מונעת") t.recurArmed = true;
+  data.tasks.push(t);
+  return t;
+}
+function tkCurrentYearValue(){
+  const s = document.getElementById("tasksYearFilter");
+  return s && s.value ? Number(s.value) : currentSchoolYearStart();
+}
+
+/* ---------- הצעד הבא ---------- */
+function tkNext(t){
+  const st = tkStatus(t);
+  if(st !== "בוצע"){
+    if(!t.assignee) return { note: "עדיין לא שובץ מי מבצע", act: "assign", label: "שיבוץ איש מקצוע", icon: "person" };
+    if(st === "ממתין") return { note: "ממתין" + (t.waitFor ? " ל" + t.waitFor : ""), act: "nudge", label: "שליחת תזכורת", icon: "whatsapp" };
+    if(st === "טרם התחיל"){
+      if(!t.sentAt) return { note: "עוד לא יצאה לדרך", act: "send", label: "שליחה ל" + tkFirstName(t.assignee), icon: "whatsapp" };
+      return { note: "נשלח ב-" + tkShortDate(t.sentAt), act: "start", label: "העבודה התחילה", icon: "play" };
+    }
+    return { note: "בעבודה", act: "done", label: "סימון כבוצע", icon: "check" };
+  }
+  const j = tkJob(t);
+  if(!j) return null;
+  const n = jobNextAction(j);
+  if(!n) return null;
+  return { note: jobStatus(j).text, jobAct: n.act, jobKey: j.key, label: n.label, icon: n.icon };
+}
+function tkNextBtn(t, n, extra){
+  if(!n) return "";
+  if(n.jobAct){
+    if(!isJobAdmin()) return "";
+    return `<button type="button" class="tk-btn sm ${n.jobAct === "approve" || n.jobAct === "paid" ? "ghost" : "soft"} ${extra || ""}" data-job-act="${n.jobAct}" data-job-key="${n.jobKey}">${tkIcon(n.icon, 15)}${escHtml(n.label)}</button>`;
+  }
+  return `<button type="button" class="tk-btn sm ${n.act === "done" ? "" : "soft"} ${extra || ""}" data-tk-act="${n.act}" data-tk-id="${t.id}">${tkIcon(n.icon, 15)}${escHtml(n.label)}</button>`;
+}
+
+/* ---------- סינון ---------- */
+const TK_FOCUS = [
+  { k: "late", l: "באיחור", tone: "bad", f: t => tkIsLate(t) },
+  { k: "soon", l: "היום ומחר", tone: "warn", f: t => { const d = tkDaysTo(t.due); return tkStatus(t) !== "בוצע" && d !== null && d >= 0 && d <= 1; } },
+  { k: "week", l: "בשבוע הקרוב", tone: "", f: t => { const d = tkDaysTo(t.due); return tkStatus(t) !== "בוצע" && d !== null && d >= 0 && d <= 7; } },
+  { k: "wait", l: "ממתין לאחרים", tone: "info", f: t => tkStatus(t) === "ממתין" },
+  { k: "money", l: "פתוח כספית", tone: "ok", f: t => { if(tkStatus(t) !== "בוצע") return false; const j = tkJob(t); return !!j && !j.closed; } }
+];
+function tkYearBase(){
+  const s = document.getElementById("tasksYearFilter");
+  const y = s ? s.value : "";
+  return data.tasks.filter(t => !y || String(t.schoolYear || currentSchoolYearStart()) === y);
+}
+function tkSearchHay(t){
+  const eq = t.equipId ? eqItem(t.equipId) : null;
+  return [t.desc, t.category, t.assignee, t.place, t.notes, t.waitFor, t.maint, tkStatus(t), tkCode(t), t.cameraNo ? "מצלמה " + t.cameraNo : "", eq ? eq.name : ""]
+    .join(" ").toLowerCase();
+}
+function tkMatches(t, q){
+  if(!q) return true;
+  const hay = tkSearchHay(t);
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every(w => hay.includes(w));
+}
+function tkSort(list){
+  return list.slice().sort((a, b) => {
+    const da = tkStatus(a) === "בוצע", db = tkStatus(b) === "בוצע";
+    if(da !== db) return da ? 1 : -1;
+    if(da && db) return String(b.doneAt || b.due || b.created || "").localeCompare(String(a.doneAt || a.due || a.created || "")) || (b.id - a.id);
+    const pa = tkPrio(a), pb = tkPrio(b);
+    if(pa !== pb) return pa - pb;
+    const xa = a.due || "9999-99-99", xb = b.due || "9999-99-99";
+    if(xa !== xb) return xa < xb ? -1 : 1;
+    return b.id - a.id;
+  });
+}
+function tkVisible(){
+  const pr = tkPrefs();
+  const q = (tkUi.q || "").trim();
+  let list = tkYearBase();
+  if(tkUi.focus){ const f = TK_FOCUS.find(x => x.k === tkUi.focus); if(f) list = list.filter(f.f); }
+  if(pr.statuses.length) list = list.filter(t => pr.statuses.includes(tkStatus(t)));
+  if(q) list = list.filter(t => tkMatches(t, q));
+  else if(!pr.archive) list = list.filter(t => !tkArchived(t));
+  return tkSort(list);
+}
+
+/* ---------- תחזוקה מונעת חוזרת ---------- */
+function tkSpawnNext(t){
+  const cur = currentSchoolYearStart();
+  const months = tkRecurMonths(t);
+  let year, due = "";
+  if(months >= 12){
+    year = Number(t.schoolYear || cur) + 1;
+    due = t.due ? tkAddMonths(t.due, 12) : "";
+  }else{
+    let base = t.due || t.doneAt || tkToday();
+    if(t.doneAt && t.doneAt > base) base = t.doneAt;
+    due = tkAddMonths(base, months);
+    year = tkYearOfDate(due);
+  }
+  const descKey = String(t.desc || "").trim();
+  const dup = data.tasks.find(x => x !== t && Number(x.schoolYear) === year && (
+    x.recurFromId === t.id ||
+    (months >= 12 && descKey && x.maint === "תחזוקה מונעת" && String(x.desc || "").trim() === descKey && String(x.place || "").trim() === String(t.place || "").trim())
+  ));
+  if(dup){
+    t.recurNextId = dup.id;
+    if(dup.recurArmed === undefined) dup.recurArmed = true;
+    return null;
+  }
+  const n = tkNewTask({
+    category: t.category || "", desc: t.desc || "", assignee: t.assignee || "", due, notes: t.notes || "",
+    maint: t.maint, schoolYear: year, prio: tkPrio(t), place: t.place || "",
+    checklist: tkChecklist(t).map(c => ({ t: c.t || "", done: false })),
+    recurMonths: t.recurMonths || 12, recurArmed: true, recurFromId: t.id,
+    licId: t.licId || null, cameraNo: t.cameraNo || "", equipId: t.equipId || null, contractId: t.contractId || null
+  });
+  n.log = [{ d: tkToday(), t: `נוצרה אוטומטית — תחזוקה מונעת ${tkRecurLabel(t)} (מהמשימה ${tkCode(t)})` }];
+  t.recurNextId = n.id;
+  tkLog(t, `נפתחה המשימה הבאה ${tkCode(n)} · ${due ? "יעד " + fmtDateHe(due) : schoolYearLabel(year)}`);
+  return n;
+}
+function tkEnsureRecurrences(){
+  const cur = currentSchoolYearStart();
+  const created = [];
+  let armedChanged = false;
+  // שלב חד-פעמי: הפעלת מחזוריות למשימות מונעות קיימות של השנה הנוכחית ואילך בלבד
+  data.tasks.forEach(t => {
+    if(t.recurArmed === undefined && t.maint === "תחזוקה מונעת"){
+      t.recurArmed = Number(t.schoolYear || cur) >= Math.max(TK_RECUR_START_YEAR, cur);
+      armedChanged = true;
+    }
+  });
+  for(let pass = 0; pass < 6; pass++){
+    let any = false;
+    data.tasks.slice().forEach(t => {
+      if(!tkIsRecurring(t) || t.recurArmed !== true || t.recurNextId) return;
+      const months = tkRecurMonths(t);
+      const done = tkStatus(t) === "בוצע";
+      const yearPassed = months >= 12 && Number(t.schoolYear || cur) < cur;
+      if(!done && !yearPassed) return;
+      const n = tkSpawnNext(t);
+      if(n){ created.push(n); any = true; }
+      else if(t.recurNextId) any = true;
+    });
+    if(!any) break;
+  }
+  if(armedChanged || created.length) tkSave();
+  return created;
+}
+
+/* ---------- ציור הטאב ---------- */
+function tkBuildYearSelect(){
+  const yearSel = document.getElementById("tasksYearFilter");
+  if(!yearSel || yearSel.dataset.built) return;
+  yearSel.dataset.built = "1";
+  const hasPref = Object.prototype.hasOwnProperty.call(data.uiPrefs, "tasksYear");
+  const pref = hasPref ? data.uiPrefs.tasksYear : String(currentSchoolYearStart());
+  yearSel.innerHTML = `<option value="" ${pref === "" ? "selected" : ""}>כל השנים</option>` +
+    schoolYearOptions().map(y => `<option value="${y}" ${String(y) === String(pref) ? "selected" : ""}>${schoolYearLabel(y)}</option>`).join("");
+}
+function renderTasks(){
+  if(!document.getElementById("tkView")) return;
+  tkBuildYearSelect();
+  (data.tasks || []).forEach(row => migrateSingleDocToArray(row, "link", "docs", "חשבונית"));
+  if(typeof cloudReady !== "undefined" && cloudReady){
+    const created = tkEnsureRecurrences();
+    if(created.length) setTimeout(() => jobToast(created.length === 1
+      ? `נפתחה אוטומטית משימת תחזוקה מונעת: ${created[0].desc || tkCode(created[0])}`
+      : `נפתחו אוטומטית ${created.length} משימות תחזוקה מונעת`, 4200), 0);
+  }
+  tkRenderList();
+  if(tkUi.openId !== null) tkRenderDrawer();
+}
+function renderTasksCards(){ tkRenderFocus(); }
+let tkListTimer = null;
+function tkRenderListSoon(){ clearTimeout(tkListTimer); tkListTimer = setTimeout(tkRenderList, 250); }
+function tkRenderList(){
+  clearTimeout(tkListTimer);
+  const view = document.getElementById("tkView");
+  if(!view) return;
+  tkFillIcons(document.getElementById("tab-tasks"));
+  const hint = document.getElementById("tkQaHint");
+  if(hint && !hint.innerHTML) tkQaPreview();
+  const base = tkYearBase();
+  const open = base.filter(t => tkStatus(t) !== "בוצע").length;
+  const late = base.filter(tkIsLate).length;
+  const cl = document.getElementById("tkCountLine");
+  if(cl) cl.textContent = `${open} פתוחות · ${base.length - open} בוצעו${late ? ` · ${late} באיחור` : ""}`;
+  tkRenderFocus();
+  tkRenderViews();
+  tkRenderStatusBar();
+  const pr = tkPrefs();
+  const list = tkVisible();
+  let html = "";
+  if(tkUi.focus){
+    const f = TK_FOCUS.find(x => x.k === tkUi.focus);
+    if(f) html += `<div style="margin-bottom:10px"><span class="tk-active-filter">מסונן: ${escHtml(f.l)}<button type="button" data-tk-focus="" aria-label="ניקוי הסינון">${tkIcon("x", 14)}</button></span></div>`;
+  }
+  if(!data.tasks.length){
+    html += `<div class="tk-empty big">עדיין אין משימות. אפשר לכתוב משימה בשורת ההוספה המהירה למעלה, או ללחוץ "משימה מלאה".</div>`;
+  }else if(!list.length){
+    // אין תוצאות: ההודעה מוצגת למטה
+  }else if(pr.view === "board"){
+    const cols = pr.statuses.length ? TK_STATUSES.filter(s => pr.statuses.includes(s)) : TK_STATUSES;
+    if(cols.length === 1){
+      html += tkGroupHtml(cols[0], "", list);
+    }else{
+      html += `<div class="tk-board" style="--tk-cols:${cols.length}">` + cols.map(s => {
+        const L = list.filter(t => tkStatus(t) === s);
+        const archN = (s === "בוצע" && !pr.archive && !tkUi.q) ? tkYearBase().filter(tkArchived).length : 0;
+        return `<div class="tk-col">
+          <button type="button" class="tk-col-h" data-tk-col="${escHtml(s)}" title="להציג רק ${escHtml(s)}"><span class="dot" style="background:${TK_STATUS_COLOR[s]}"></span>${escHtml(s)}<span class="n">${L.length}</span></button>
+          <div class="tk-col-body">${L.length ? L.map(tkCardHtml).join("") : `<div class="tk-empty">${archN ? "כל מה שבוצע כבר נסגר ועבר לארכיון" : "אין כאן משימות"}</div>`}</div>
+        </div>`;
+      }).join("") + `</div>`;
+    }
+  }else{
+    let groups = [];
+    if(pr.view === "list"){
+      const bucket = t => {
+        if(tkStatus(t) === "בוצע") return "בוצעו";
+        const d = tkDaysTo(t.due);
+        if(d === null) return "ללא תאריך יעד";
+        if(d < 0) return "באיחור";
+        if(d <= 1) return "היום ומחר";
+        if(d <= 7) return "בשבוע הקרוב";
+        return "בהמשך";
+      };
+      groups = ["באיחור", "היום ומחר", "בשבוע הקרוב", "בהמשך", "ללא תאריך יעד", "בוצעו"].map(g => [g, list.filter(t => bucket(t) === g), ""]);
+    }else if(pr.view === "pro"){
+      const keys = [...new Set(list.map(t => t.assignee || ""))].sort((a, b) => !a ? 1 : !b ? -1 : a.localeCompare(b, "he"));
+      groups = keys.map(k => {
+        const L = list.filter(t => (t.assignee || "") === k);
+        const openN = L.filter(t => tkStatus(t) !== "בוצע").length;
+        const extra = k ? `${openN ? `<button type="button" class="tk-btn sm ghost" data-tk-slip="${escHtml(k)}">${svgIcon("whatsapp", 14)}שליחת ${openN === 1 ? "המשימה הפתוחה" : `${openN} הפתוחות`}</button>` : ""}<button type="button" class="tk-btn sm soft" data-pro="${escHtml(k)}">${tkIcon("person", 14)}כל העבודות</button>` : "";
+        return [k || "לא שובץ איש מקצוע", L, extra];
+      });
+    }else{
+      const keys = [...new Set(list.map(t => (t.place || "").trim()))].sort((a, b) => !a ? 1 : !b ? -1 : a.localeCompare(b, "he"));
+      groups = keys.map(k => {
+        const L = list.filter(t => (t.place || "").trim() === k);
+        const extra = k ? `<button type="button" class="tk-btn sm soft" data-tk-place="${escHtml(k)}">${tkIcon("history", 14)}היסטוריה ועלויות</button>` : "";
+        return [k || "לא צוין מקום", L, extra];
+      });
+    }
+    groups = groups.filter(g => g[1].length);
+    html += groups.length ? `<div class="tk-groups">${groups.map(g => tkGroupHtml(g[0], g[2], g[1])).join("")}</div>` : "";
+  }
+  if(data.tasks.length && !list.length){
+    const ys = document.getElementById("tasksYearFilter");
+    const otherYears = (tkUi.q && ys && ys.value) ? data.tasks.filter(t => tkMatches(t, tkUi.q.trim())).length : 0;
+    html += `<div class="tk-empty big">אין משימות שמתאימות לסינון.${otherYears ? ` <button type="button" class="tk-linkbtn" data-tk-allyears="1">${otherYears === 1 ? "נמצאה משימה אחת" : `נמצאו ${otherYears} משימות`} בשנים אחרות · להציג</button>` : ""}${(pr.statuses.length || tkUi.focus || tkUi.q) ? ` <button type="button" class="tk-linkbtn" data-tk-clear="1">ניקוי כל הסינונים</button>` : ""}</div>`;
+  }
+  view.innerHTML = html;
+  fillJobIcons(view);
+}
+function tkGroupHtml(title, extra, L){
+  return `<section><div class="tk-grp-h"><span class="t">${escHtml(title)}</span><span class="s">${L.length} משימות</span>${extra || ""}</div><div class="tk-grid">${L.map(tkCardHtml).join("")}</div></section>`;
+}
+function tkRenderFocus(){
+  const el = document.getElementById("tkFocus");
+  if(!el) return;
+  const base = tkYearBase();
+  el.innerHTML = TK_FOCUS.map(f => {
+    const L = tkSort(base.filter(f.f));
+    let hint = L.length ? (L[0].desc || "ללא תיאור") : "אין";
+    if(f.k === "money" && L.length){
+      const sum = L.reduce((s, t) => { const j = tkJob(t); return s + (j ? j.amount : 0); }, 0);
+      if(sum > 0) hint = fmtMoney(sum);
+    }
+    const on = tkUi.focus === f.k;
+    return `<button type="button" class="tk-tile ${f.tone} ${on ? "active" : ""}" data-tk-focus="${f.k}" aria-pressed="${on}"><span class="l">${f.l}</span><span class="v">${L.length}</span><span class="h">${escHtml(hint)}</span></button>`;
+  }).join("");
+}
+function tkRenderViews(){
+  const el = document.getElementById("tkViews");
+  if(!el) return;
+  const v = tkPrefs().view;
+  const V = [["board", "לוח", "board"], ["list", "לפי מועד", "list"], ["pro", "לפי איש מקצוע", "people"], ["place", "לפי מקום", "pin"]];
+  el.innerHTML = V.map(([k, l, ic]) => `<button type="button" class="tk-view-btn ${v === k ? "active" : ""}" data-tk-view="${k}" role="tab" aria-selected="${v === k}">${tkIcon(ic, 15)}${l}</button>`).join("");
+}
+function tkRenderStatusBar(){
+  const el = document.getElementById("tkStatusBar");
+  if(!el) return;
+  const pr = tkPrefs();
+  const base = tkYearBase();
+  const archN = base.filter(tkArchived).length;
+  const pill = (key, label, n, color) => {
+    const on = key === "" ? !pr.statuses.length : pr.statuses.includes(key);
+    return `<button type="button" class="tk-pill ${on ? "active" : ""}" data-tk-status="${escHtml(key)}" aria-pressed="${on}">${color ? `<span class="dot" style="background:${color}"></span>` : ""}${label}${n !== null ? ` <span class="n">${n}</span>` : ""}</button>`;
+  };
+  el.innerHTML = `<span class="lbl">סטטוס:</span>` + pill("", "הכל", null, "") +
+    TK_STATUSES.map(s => pill(s, s, base.filter(t => tkStatus(t) === s).length, TK_STATUS_COLOR[s])).join("") +
+    `<span class="tk-sep" aria-hidden="true"></span>` +
+    `<button type="button" class="tk-pill ${pr.archive ? "active" : ""}" data-tk-archive="1" aria-pressed="${pr.archive}" title="משימות שבוצעו ונסגרו כספית">${tkIcon("archive", 14)}ארכיון <span class="n">${archN}</span></button>`;
+}
+function tkCardHtml(t, i){
+  const st = tkStatus(t);
+  const late = tkIsLate(t);
+  const j = tkJob(t);
+  const n = tkNext(t);
+  const ck = tkChecklist(t);
+  const ckDone = ck.filter(c => c.done).length;
+  const photos = tkPhotos(t).length;
+  const lic = tkLic(t);
+  const d = tkDaysTo(t.due);
+  let due = "";
+  if(st === "בוצע") due = t.doneAt ? `<span class="tk-chip ok">${tkIcon("check", 13)}בוצע ${tkShortDate(t.doneAt)}</span>` : "";
+  else if(d !== null){
+    if(d < 0) due = `<span class="tk-chip bad">${svgIcon("calendar", 13)}באיחור ${-d === 1 ? "יום" : -d + " ימים"}</span>`;
+    else if(d === 0) due = `<span class="tk-chip warn">${svgIcon("calendar", 13)}היום</span>`;
+    else if(d === 1) due = `<span class="tk-chip warn">${svgIcon("calendar", 13)}מחר</span>`;
+    else due = `<span class="tk-chip">${svgIcon("calendar", 13)}${tkShortDate(t.due)}</span>`;
+  }
+  const meta = [
+    due,
+    t.place ? `<span class="tk-chip">${tkIcon("pin", 13)}${escHtml(t.place)}</span>` : "",
+    st === "ממתין" ? `<span class="tk-chip info">${tkIcon("clock", 13)}${escHtml(t.waitFor ? "ממתין ל" + t.waitFor : "ממתין")}</span>` : "",
+    tkIsRecurring(t) && t.recurArmed ? `<span class="tk-chip ok">${tkIcon("repeat", 13)}${tkRecurLabel(t)}</span>` : "",
+    lic ? `<span class="tk-chip info">${tkIcon("shield", 13)}רישוי</span>` : "",
+    (() => { const cov = eqCoverage(t); if(!cov || !cov.covered) return ""; const j2 = tkJob(t); if(j2 && j2.paid) return ""; return `<span class="tk-chip warn">${tkIcon("shield", 13)}${cov.w.k === "ok" || cov.w.k === "soon" ? "באחריות" : "בחוזה שירות"}</span>`; })(),
+    photos ? `<span class="tk-chip">${svgIcon("camera", 13)}${photos}</span>` : ""
+  ].filter(Boolean).join("");
+  const who = t.assignee
+    ? `<span class="tk-ava" style="background:${tkAvaColor(t.assignee)}">${escHtml(tkInitials(t.assignee))}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(t.assignee)}</span>`
+    : `<span class="tk-ava none">?</span>לא שובץ`;
+  const money = j && j.amount > 0 ? `<span class="tk-money">${fmtMoney(j.amount)}</span><span class="tk-mini" title="${escHtml(jobStatus(j).text)}">${j.steps.map(x => `<i class="${x ? "on" : ""}"></i>`).join("")}</span>` : "";
+  const prog = ck.length ? `<span class="tk-prog"><span class="tk-track"><span class="tk-fill" style="width:${Math.round(ckDone / ck.length * 100)}%"></span></span>${ckDone}/${ck.length}</span>` : "";
+  let next;
+  if(n) next = `<div class="tk-next"><span class="note">${escHtml(n.note)}</span>${tkNextBtn(t, n)}</div>`;
+  else if(st === "בוצע") next = `<div class="tk-next"><span class="tk-closed">${tkIcon("check", 14)}התיק סגור</span></div>`;
+  else next = "";
+  const topic = t.category || t.maint || "כללי";
+  return `<div class="tk-card ${i % 2 ? "alt" : ""} ${late ? "late" : ""} ${tkArchived(t) ? "arch" : ""}" data-tk-open="${t.id}" data-tk-card="${t.id}" role="button" tabindex="0" aria-label="פתיחת תיק המשימה ${escHtml(t.desc || tkCode(t))}">
+    <div class="tk-card-top"><span class="tk-prio p${tkPrio(t)}" title="עדיפות: ${TK_PRIO_LABEL[tkPrio(t)]}"></span><span class="tk-topic">${escHtml(topic)}</span><span class="tk-code">${escHtml(tkCode(t))}</span></div>
+    <div class="tk-card-title ${t.desc ? "" : "empty"}">${escHtml(t.desc || "משימה ללא תיאור")}</div>
+    ${meta ? `<div class="tk-meta">${meta}</div>` : ""}
+    <div class="tk-card-foot"><span class="tk-who">${who}</span>${money}${prog}</div>
+    ${next}
+  </div>`;
+}
+
+/* ---------- תיק משימה (מגירה) ---------- */
+function tkOpen(id, focusField){
+  const t = data.tasks.find(x => x.id === id);
+  if(!t) return;
+  tkUi.openId = id;
+  tkRenderDrawer();
+  const dr = document.getElementById("tkDrawer");
+  dr.classList.add("open");
+  dr.setAttribute("aria-hidden", "false");
+  document.getElementById("tkScrim").classList.add("open");
+  document.body.style.overflow = "hidden";
+  const body = dr.querySelector(".tk-dr-body");
+  if(body) body.scrollTop = 0;
+  setTimeout(() => {
+    const el = focusField ? dr.querySelector(`[data-tk-f="${focusField}"]`) : dr.querySelector(".tk-x");
+    if(el){ el.focus(); if(focusField && el.scrollIntoView) el.scrollIntoView({ block: "center" }); }
+  }, 260);
+}
+function tkClose(){
+  const id = tkUi.openId;
+  tkUi.openId = null;
+  const dr = document.getElementById("tkDrawer");
+  if(dr){ dr.classList.remove("open"); dr.setAttribute("aria-hidden", "true"); }
+  const sc = document.getElementById("tkScrim");
+  if(sc) sc.classList.remove("open");
+  const fv = document.getElementById("fileViewer"), ps = document.getElementById("proSheet");
+  if((!fv || fv.style.display === "none") && (!ps || ps.style.display === "none")) document.body.style.overflow = "";
+  if(id !== null && tkFreshIds.has(id)){
+    tkFreshIds.delete(id);
+    const t = data.tasks.find(x => x.id === id);
+    const untouched = t && !String(t.desc || "").trim() && !t.assignee && !t.category && !t.due && !String(t.notes || "").trim()
+      && !(t.docs || []).length && !t.vendorPayId && !tkChecklist(t).length && !String(t.place || "").trim() && !t.maint && !t.licId;
+    if(untouched){
+      data.tasks = data.tasks.filter(x => x !== t);
+      tkSave();
+    }
+  }
+  tkRenderList();
+  if(id !== null){
+    const card = document.querySelector(`#tkView [data-tk-card="${id}"]`);
+    if(card) card.focus({ preventScroll: true });
+  }
+}
+function tkEqBannerHtml(t){
+  const cov = eqCoverage(t);
+  if(!cov) return "";
+  const e = cov.e;
+  const link = `<button type="button" class="tk-linkbtn" data-tk-equip="${e.id}">${escHtml(e.name || "הציוד")}</button>`;
+  if(!cov.covered) return `<div class="eq-cover none">${tkIcon("shield", 18)}<div>${link} · ${escHtml(cov.w.label)}, ואין חוזה שירות פעיל</div></div>`;
+  const parts = [];
+  if(cov.w.k === "ok" || cov.w.k === "soon") parts.push(`<div class="tk-eqwarn">${tkIcon("shield", 18)}<div><b>${link} ${escHtml(cov.w.label)}</b><div>לפני שמשלמים על התיקון, כדאי לפנות ל${escHtml(e.supplier || "ספק")} במסגרת האחריות${e.warrantyNotes ? " (" + escHtml(e.warrantyNotes) + ")" : ""}.</div></div></div>`);
+  cov.cs.forEach(c => parts.push(`<div class="tk-eqwarn contract">${tkIcon("report", 18)}<div><b>${link} מכוסה בחוזה שירות: ${escHtml(c.name || "")}${c.supplier ? " · " + escHtml(c.supplier) : ""}</b>${c.includes ? `<div>${escHtml(c.includes)}</div>` : ""}</div></div>`));
+  return parts.join("");
+}
+function tkFieldsHtml(t){
+  const opt = (list, cur, emptyLabel) => {
+    const s = new Set(list.filter(Boolean));
+    if(cur) s.add(cur);
+    return `<option value="" ${!cur ? "selected" : ""}>${emptyLabel || ""}</option>` + [...s].map(o => `<option value="${escHtml(o)}" ${o === cur ? "selected" : ""}>${escHtml(o)}</option>`).join("");
+  };
+  const year = Number(t.schoolYear || currentSchoolYearStart());
+  const years = schoolYearOptions();
+  if(!years.includes(year)) years.push(year);
+  const showCam = !!t.cameraNo || /מצלמ/.test((t.category || "") + " " + (t.desc || ""));
+  const lics = data.licensing.slice().sort((a, b) => String(a.type || "").localeCompare(String(b.type || ""), "he"));
+  return `<div class="tk-fields">
+    <label class="tk-field full">תיאור המשימה<textarea data-tk-f="desc" rows="2" placeholder="מה צריך לעשות?">${escHtml(t.desc || "")}</textarea></label>
+    <label class="tk-field">תחום<select data-tk-f="category">${opt(getContactSpecialties(), t.category || "", "בחירה…")}</select></label>
+    <label class="tk-field">אחראי ביצוע<select data-tk-f="assignee">${opt(getContactNames(), t.assignee || "", "לא שובץ")}</select></label>
+    <label class="tk-field">תאריך יעד<input type="date" data-tk-f="due" value="${escHtml(t.due || "")}"></label>
+    <label class="tk-field">עדיפות<select data-tk-f="prio">${[1, 2, 3].map(p => `<option value="${p}" ${tkPrio(t) === p ? "selected" : ""}>${TK_PRIO_LABEL[p]}</option>`).join("")}</select></label>
+    <label class="tk-field">מקום בבניין<input type="text" data-tk-f="place" list="tkPlacesList" value="${escHtml(t.place || "")}" placeholder="למשל: מטבח, קומה 2"></label>
+    ${data.equipment && data.equipment.length ? `<label class="tk-field">ציוד<select data-tk-f="equipId"><option value="">לא קשור לציוד</option>${data.equipment.slice().sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "he")).map(e => `<option value="${e.id}" ${Number(t.equipId) === e.id ? "selected" : ""}>${escHtml((e.name || "ללא שם") + (e.place ? " · " + e.place : ""))}</option>`).join("")}</select></label>` : ""}
+    <label class="tk-field">סוג תחזוקה<select data-tk-f="maint">${opt(TK_MAINT, t.maint || "", "ללא סיווג")}</select></label>
+    ${t.maint === "תחזוקה מונעת" ? tkRecurHtml(t) : ""}
+    <label class="tk-field">שנת לימודים<select data-tk-f="schoolYear">${years.sort().map(y => `<option value="${y}" ${y === year ? "selected" : ""}>${schoolYearLabel(y)}</option>`).join("")}</select></label>
+    <label class="tk-field">תאריך פתיחה<input type="date" data-tk-f="created" value="${escHtml(t.created || "")}"></label>
+    ${showCam ? `<label class="tk-field">מספר מצלמה<input type="number" min="1" max="999" inputmode="numeric" data-tk-f="cameraNo" value="${escHtml(t.cameraNo || "")}"></label>` : ""}
+    ${lics.length ? `<label class="tk-field ${showCam ? "" : "full"}">קשור לרישוי ובטיחות<select data-tk-f="licId"><option value="">לא קשור</option>${lics.map(l => `<option value="${l.id}" ${Number(t.licId) === l.id ? "selected" : ""}>${escHtml((l.type || "ללא שם") + (l.schoolYear ? " · " + schoolYearLabel(Number(l.schoolYear)) : ""))}</option>`).join("")}</select></label>` : ""}
+    <label class="tk-field full">פירוט / הערות<textarea data-tk-f="notes" rows="2" placeholder="פרטים שאיש המקצוע צריך לדעת">${escHtml(t.notes || "")}</textarea></label>
+  </div>
+  <datalist id="tkPlacesList">${tkAllPlaces().map(p => `<option value="${escHtml(p)}"></option>`).join("")}</datalist>`;
+}
+function tkRecurHtml(t){
+  const next = t.recurNextId ? data.tasks.find(x => x.id === t.recurNextId) : null;
+  const from = t.recurFromId ? data.tasks.find(x => x.id === t.recurFromId) : null;
+  let info;
+  if(t.recurOff) info = "המשימה לא תיפתח מחדש.";
+  else if(next) info = `המשימה הבאה כבר נפתחה: <button type="button" class="tk-linkbtn" data-tk-goto="${next.id}">${escHtml(tkCode(next))}</button>${next.due ? " · יעד " + fmtDateHe(next.due) : " · " + schoolYearLabel(Number(next.schoolYear))}`;
+  else if(tkRecurMonths(t) >= 12) info = `תיפתח מחדש אוטומטית ב${schoolYearLabel(Number(t.schoolYear || currentSchoolYearStart()) + 1)}, או מיד כשתסמן אותה כבוצעה.`;
+  else info = "המשימה הבאה תיפתח אוטומטית כשתסמן את זו כבוצעה.";
+  return `<div class="tk-field full"><div class="tk-recur">
+    <div class="row">${tkIcon("repeat", 16)}<b>תחזוקה מונעת חוזרת</b>
+      <select data-tk-f="recurMonths" aria-label="תדירות">${TK_RECUR_OPTIONS.map(([m, l]) => `<option value="${m}" ${tkRecurMonths(t) === m ? "selected" : ""}>${l}</option>`).join("")}</select>
+      <label><input type="checkbox" data-tk-f="recurOff" ${t.recurOff ? "checked" : ""}>לא לחזור</label></div>
+    <div>${info}${from ? ` · נפתחה מ-<button type="button" class="tk-linkbtn" data-tk-goto="${from.id}">${escHtml(tkCode(from))}</button>` : ""}</div>
+  </div></div>`;
+}
+function tkTimeline(t){
+  const items = [];
+  (Array.isArray(t.log) ? t.log : []).forEach((l, i) => { if(l && l.t) items.push({ d: l.d || "", t: l.t, o: 1000 + i }); });
+  (t.docs || []).forEach((d, i) => {
+    if(!d || !d.fileUrl || !d.uploadedAt) return;
+    const kind = isPhotoDocType(d.docType) ? "צורפה תמונת ביצוע" : isReceiptDocType(d.docType) ? "צורפה קבלה" : "צורפה חשבונית";
+    items.push({ d: d.uploadedAt, t: kind, o: 500 + i });
+  });
+  if(t.created && !items.some(x => /נפתחה|נוצרה/.test(x.t))) items.push({ d: t.created, t: "נפתחה המשימה", o: 0 });
+  if(t.sentAt && !items.some(x => /נשלח/.test(x.t))) items.push({ d: t.sentAt, t: "נשלחה לאיש המקצוע", o: 1 });
+  items.sort((a, b) => (String(b.d).localeCompare(String(a.d))) || (b.o - a.o));
+  return items;
+}
+function tkRenderDrawer(){
+  const dr = document.getElementById("tkDrawer");
+  const t = data.tasks.find(x => x.id === tkUi.openId);
+  if(!dr) return;
+  if(!t){ tkClose(); return; }
+  const oldBody = dr.querySelector(".tk-dr-body");
+  const scroll = oldBody ? oldBody.scrollTop : 0;
+  const active = document.activeElement && dr.contains(document.activeElement) && document.activeElement.dataset ? document.activeElement.dataset.tkF : null;
+  const st = tkStatus(t);
+  const j = tkJob(t);
+  const n = tkNext(t);
+  const flow = [true, !!t.assignee, st !== "טרם התחיל", st === "בוצע", st === "בוצע" && (!j || j.closed)];
+  const cur = flow.indexOf(false);
+  const flowHtml = `<div class="job-steps" role="list" aria-label="מסלול המשימה">` + ["נפתחה", "שובצה", "יצאה לדרך", "בוצעה", "נסגרה"].map((l, i) =>
+    `<div class="job-step ${flow[i] ? "done" : i === cur ? "cur" : "todo"}" role="listitem"><span class="job-step-dot">${flow[i] ? jobIcon("check", 12) : ""}</span><span class="job-step-lbl">${l}</span></div>`).join("") + `</div>`;
+  const nextBox = n
+    ? `<div class="tk-nextbox"><div class="txt"><b>הצעד הבא</b>${escHtml(n.note)}</div>${tkNextBtn(t, n)}</div>`
+    : `<div class="tk-nextbox"><div class="txt"><b>התיק סגור</b>${st === "בוצע" ? "המשימה בוצעה ואין תשלום פתוח" : ""}</div></div>`;
+  const seg = `<div class="tk-seg" role="radiogroup" aria-label="סטטוס">${TK_STATUSES.map(s => `<button type="button" role="radio" aria-checked="${st === s}" class="${st === s ? "on" : ""}" data-tk-setstatus="${escHtml(s)}"><span class="dot" style="background:${TK_STATUS_COLOR[s]}"></span>${s}</button>`).join("")}</div>`;
+  const wait = st === "ממתין" ? `<label class="tk-field">למה ממתינים?<input type="text" data-tk-f="waitFor" value="${escHtml(t.waitFor || "")}" placeholder="למשל: הצעת מחיר, חלק שהוזמן"></label>` : "";
+  const c = tkContact(t);
+  const person = t.assignee ? `
+    <div class="tk-person"><span class="tk-ava ava" style="background:${tkAvaColor(t.assignee)}">${escHtml(tkInitials(t.assignee))}</span>
+      <div style="flex:1;min-width:0"><div class="nm">${escHtml(t.assignee)}</div><div class="ph">${escHtml((c && c.phone) || "אין טלפון באנשי קשר")}</div></div></div>
+    <div class="tk-actions">
+      <button type="button" class="tk-btn sm soft" data-tk-act="${st === "ממתין" ? "nudge" : "send"}" data-tk-id="${t.id}">${svgIcon("whatsapp", 15)}${st === "ממתין" ? "תזכורת בוואטסאפ" : "וואטסאפ"}</button>
+      <button type="button" class="tk-btn sm soft" data-tk-act="mail" data-tk-id="${t.id}">${svgIcon("mail", 15)}מייל (Gmail)</button>
+      <button type="button" class="tk-btn sm soft" data-pro="${escHtml(t.assignee)}">${tkIcon("person", 15)}כל העבודות שלו</button>
+    </div>` : `<div class="tk-actions"><button type="button" class="tk-btn sm" data-tk-act="assign" data-tk-id="${t.id}">${tkIcon("person", 15)}שיבוץ איש מקצוע</button></div>`;
+  const ck = tkChecklist(t);
+  const ckHtml = `<div class="tk-ck">${ck.map((x, i) => `<div class="tk-ck-row"><label><input type="checkbox" data-tk-ck="${i}" ${x.done ? "checked" : ""}><span>${escHtml(x.t || "")}</span></label><button type="button" class="tk-ck-del" data-tk-ckdel="${i}" aria-label="הסרת השלב">${tkIcon("x", 14)}</button></div>`).join("")}</div>
+    <form class="tk-ck-add" data-tk-ckform="1"><input type="text" id="tkCkInput" placeholder="שלב חדש, למשל: פירוק הברז הישן" aria-label="שלב חדש"><button type="submit" class="tk-btn sm soft">הוספה</button></form>`;
+  const photos = tkPhotos(t);
+  const photosHtml = `<div class="tk-photos">${photos.map((p, i) => `<button type="button" class="tk-ph" data-fv-url="${escHtml(p.fileUrl)}" data-fv-title="${escHtml(p.name || "תמונת ביצוע")}"><img src="${escHtml(p.fileUrl)}" alt="${escHtml(p.name || "תמונת ביצוע")}" loading="lazy"><span class="tag">${i === 0 && photos.length > 1 ? "לפני" : (i === photos.length - 1 && photos.length > 1 ? "אחרי" : escHtml(fmtDateHe(p.uploadedAt || "")))}</span></button>`).join("")}
+    <button type="button" class="tk-ph add" data-tk-act="photo" data-tk-id="${t.id}">${svgIcon("camera", 20)}הוספת תמונה</button></div>`;
+  const tl = tkTimeline(t);
+  const lic = tkLic(t);
+  const year = Number(t.schoolYear || currentSchoolYearStart());
+  dr.innerHTML = `
+    <div class="tk-dr-head">
+      <div class="t"><div class="k">תיק משימה ${escHtml(tkCode(t))} · ${escHtml(t.category || "ללא תחום")} · ${escHtml(schoolYearLabel(year))}</div><div class="h">${escHtml(t.desc || "משימה חדשה")}</div></div>
+      <button type="button" class="tk-x" onclick="tkClose()" aria-label="סגירת תיק המשימה">${tkIcon("x", 20)}</button>
+    </div>
+    <div class="tk-dr-body">
+      <div class="tk-sec">${flowHtml}${nextBox}${tkEqBannerHtml(t)}${seg}${wait}</div>
+      <div class="tk-sec"><div class="tk-sec-h">פרטי המשימה</div>${tkFieldsHtml(t)}</div>
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("person", 16)}מי מבצע</div>${person}
+        <label class="tk-sync"><input type="checkbox" id="tkSyncCb" ${t.synced ? "checked" : ""} ${t.syncing ? "disabled" : ""}>${svgIcon("calendar", 15)}סנכרון ליומן Google</label>
+        <div class="sync-status ${t.synced ? "ok" : ""}" id="sync-task-${t.id}">${t.syncing ? "מסנכרן…" : (t.synced ? "✓ מסונכרן ליומן" : "")}</div>
+        ${lic ? `<div style="font-size:13px">${tkIcon("shield", 14)} קשור לרישוי: <button type="button" class="tk-linkbtn" data-tk-lic="${lic.id}">${escHtml(lic.type || "רישוי ובטיחות")}</button> · כשהמשימה תסומן כבוצעה, יירשם עדכון בכרטיס הרישוי.</div>` : ""}
+      </div>
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("check", 16)}שלבי העבודה<span class="r">${ck.length ? `${ck.filter(x => x.done).length} מתוך ${ck.length}` : ""}</span></div>${ckHtml}</div>
+      <div class="tk-sec"><div class="tk-sec-h">${svgIcon("camera", 16)}תמונות לפני ואחרי<span class="r">${photos.length ? photos.length + " תמונות" : "אפשר לצלם ישר מהטלפון"}</span></div>${photosHtml}</div>
+      <div class="tk-sec"><div class="tk-sec-h">${svgIcon("cash", 16)}עלות, חשבוניות וקבלות</div>
+        <div class="tk-docs">${renderDocsChecklist(t, "docs", "tasks")}</div>
+        <div class="tk-cost">${renderTaskJobCell(t)}</div>
+      </div>
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("history", 16)}מה קרה עד עכשיו</div>
+        ${tl.length ? `<div class="tk-tl">${tl.map(x => `<div class="tk-tl-i">${escHtml(x.t)}<small>${escHtml(fmtDateHe(x.d))}</small></div>`).join("")}</div>` : `<div class="tk-empty">עדיין אין פעולות</div>`}
+      </div>
+      <div class="tk-dr-foot">
+        ${t.place ? `<button type="button" class="tk-btn sm soft" data-tk-place="${escHtml(t.place)}">${tkIcon("history", 15)}כל מה שנעשה ב${escHtml(t.place)}</button>` : "<span></span>"}
+        <button type="button" class="tk-btn sm danger" data-tk-act="delete" data-tk-id="${t.id}">${svgIcon("trash", 15)}מחיקת המשימה</button>
+      </div>
+    </div>`;
+  fillJobIcons(dr);
+  const nb = dr.querySelector(".tk-dr-body");
+  if(nb) nb.scrollTop = scroll;
+  if(active){ const el = dr.querySelector(`[data-tk-f="${active}"]`); if(el) el.focus({ preventScroll: true }); }
+  tkWireDrawer(t, dr);
+}
+function tkWireDrawer(t, dr){
+  dr.querySelectorAll("[data-tk-f]").forEach(el => {
+    const f = el.dataset.tkF;
+    const isText = el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && (el.type === "text" || el.type === "number"));
+    if(isText){
+      el.addEventListener("input", () => { tkApplyField(t, f, el, false); });
+      el.addEventListener("change", () => { tkApplyField(t, f, el, true); });
+    }else{
+      el.addEventListener("change", () => { tkApplyField(t, f, el, true); });
+    }
+  });
+  const cb = dr.querySelector("#tkSyncCb");
+  if(cb) cb.addEventListener("change", () => onSyncToggle(cb, t, "task"));
+  dr.querySelectorAll("[data-tk-ck]").forEach(el => el.addEventListener("change", () => {
+    const list = tkChecklist(t);
+    const item = list[Number(el.dataset.tkCk)];
+    if(!item) return;
+    item.done = el.checked;
+    t.checklist = list;
+    if(el.checked) tkLog(t, `הושלם שלב: ${item.t}`);
+    tkSave();
+    if(el.checked && list.length && list.every(x => x.done) && tkStatus(t) !== "בוצע"){
+      jobToast("כל השלבים הושלמו · אפשר לסמן את המשימה כבוצעה");
+    }
+    tkRenderDrawer(); tkRenderListSoon();
+  }));
+  const form = dr.querySelector("[data-tk-ckform]");
+  if(form) form.addEventListener("submit", e => {
+    e.preventDefault();
+    const inp = form.querySelector("input");
+    const v = (inp.value || "").trim();
+    if(!v) return;
+    const list = tkChecklist(t);
+    list.push({ t: v, done: false });
+    t.checklist = list;
+    tkSave();
+    tkRenderDrawer(); tkRenderListSoon();
+    const again = document.getElementById("tkCkInput");
+    if(again) again.focus();
+  });
+}
+let tkFieldSaveTimer = null;
+function tkApplyField(t, f, el, committed){
+  let v = el.type === "checkbox" ? el.checked : el.value;
+  const before = t[f];
+  if(f === "prio" || f === "recurMonths") v = Number(v);
+  if(f === "schoolYear") v = Number(v) || currentSchoolYearStart();
+  if(f === "licId" || f === "equipId") v = v ? Number(v) : null;
+  if(f === "desc" || f === "notes" || f === "place" || f === "waitFor") v = String(v);
+  if(!committed){
+    t[f] = v;
+    clearTimeout(tkFieldSaveTimer);
+    tkFieldSaveTimer = setTimeout(tkSave, 400);
+    if(f === "desc"){ const h = document.querySelector("#tkDrawer .tk-dr-head .h"); if(h) h.textContent = v || "משימה חדשה"; }
+    tkRenderListSoon();
+    return;
+  }
+  t[f] = v;
+  if(f === "place") t.place = String(v).trim();
+  if(f === "assignee" && v !== before){
+    tkLog(t, v ? `שובץ: ${v}` : "הוסר השיבוץ");
+    if(v && !t.category){ const c = findContactByName(v); if(c && c.specialty) t.category = c.specialty; }
+    delete t.sentAt;
+  }
+  if(f === "maint" && v !== before){
+    tkLog(t, `סוג תחזוקה: ${v || "ללא סיווג"}`);
+    if(v === "תחזוקה מונעת"){ t.recurArmed = true; jobToast("המשימה תיפתח מחדש אוטומטית בכל שנה. אפשר לשנות תדירות בתיק."); }
+  }
+  if(f === "recurOff" && v === false){ t.recurArmed = true; }
+  if(f === "recurMonths" && v !== before) tkLog(t, `תדירות חזרה: ${tkRecurLabel(t)}`);
+  if(f === "due" && v !== before && v) tkLog(t, `תאריך יעד: ${fmtDateHe(v)}`);
+  if(f === "prio" && v !== before) tkLog(t, `עדיפות: ${TK_PRIO_LABEL[v]}`);
+  if(f === "licId" && v !== before && v){ const l = tkLic(t); if(l) tkLog(t, `קושר לרישוי: ${l.type || ""}`); }
+  if(f === "schoolYear" && v !== before) t.taskNumber = nextTaskNumberForYear(v);
+  if(f === "equipId" && v !== before && v){
+    const e = eqItem(v);
+    if(e){
+      tkLog(t, `קושר לציוד: ${e.name || ""}`);
+      if(!t.place && e.place) t.place = e.place;
+      if(!t.category && e.category) t.category = e.category;
+      const cov = eqCoverage(t);
+      if(cov && cov.covered) jobToast("שים לב: הציוד הזה באחריות או בחוזה שירות", 4200);
+    }
+  }
+  clearTimeout(tkFieldSaveTimer);
+  tkSave();
+  try{ renderDashboard(); }catch(e){ console.error(e); }
+  // שדות בחירה מציירים מחדש את כל התיק; שדות הקלדה מעדכנים רק את הרשימה, כדי לא לאבד לחיצה או מיקום סמן
+  if(el.tagName === "SELECT" || el.type === "checkbox") renderTasks();
+  else { tkRenderList(); if(f === "desc"){ const h = document.querySelector("#tkDrawer .tk-dr-head .h"); if(h) h.textContent = t.desc || "משימה חדשה"; } }
+}
+
+/* ---------- שינוי סטטוס ---------- */
+function tkSetStatus(t, s, opts){
+  opts = opts || {};
+  if(!TK_STATUSES.includes(s)) return;
+  const old = tkStatus(t);
+  if(s === "ממתין" && opts.waitFor === undefined && !t.waitFor){ tkAskWait(t); return; }
+  if(opts.waitFor !== undefined) t.waitFor = opts.waitFor;
+  if(old === s && t.status === s) return;
+  t.status = s;
+  tkLog(t, s === "ממתין" ? `הסטטוס עבר ל"ממתין"${t.waitFor ? " · " + t.waitFor : ""}` : `הסטטוס עבר מ"${old}" ל"${s}"`);
+  let msg = "";
+  if(s === "בוצע"){
+    t.doneAt = tkToday();
+    const lic = tkLic(t);
+    if(lic){
+      lic.statusLog = Array.isArray(lic.statusLog) ? lic.statusLog : [];
+      lic.statusLog.unshift({ date: tkToday(), status: lic.processStatus || "", note: `משימה ${tkCode(t)} בוצעה: ${t.desc || ""}${t.assignee ? " (" + t.assignee + ")" : ""}` });
+      scheduleSave("licensing", "licSaved");
+      try{ renderLic(); }catch(e){ console.error(e); }
+      msg = " · נרשם עדכון בכרטיס הרישוי";
+    }
+  }
+  tkSave();
+  const created = (s === "בוצע") ? tkEnsureRecurrences() : [];
+  renderTasks();
+  try{ renderDashboard(); }catch(e){ console.error(e); }
+  if(s === "בוצע"){
+    const nx = created.find(x => x.recurFromId === t.id);
+    jobToast(nx ? `סומן כבוצע · המשימה החוזרת הבאה נפתחה (${nx.due ? fmtDateHe(nx.due) : schoolYearLabel(Number(nx.schoolYear))})${msg}` : `סומן כבוצע${msg}`, 4000);
+  }
+}
+function tkAskWait(t){
+  tkModalOpen(`
+    <div class="tk-modal-title">למה ממתינים?</div>
+    <div class="tk-modal-sub">${escHtml(t.desc || tkCode(t))}</div>
+    <div class="tk-modal-body">
+      <div class="tk-sugg">${TK_WAIT_SUGG.map(s => `<button type="button" class="tk-pill" data-tk-wsugg="${escHtml(s)}">${escHtml(s)}</button>`).join("")}</div>
+      <input type="text" id="tkWaitInput" placeholder="או לכתוב בחופשיות" value="${escHtml(t.waitFor || "")}">
+    </div>
+    <div class="tk-modal-foot"><button type="button" class="tk-btn ghost sm" onclick="tkModalClose()">ביטול</button><button type="button" class="tk-btn sm" id="tkWaitOk">העברה ל"ממתין"</button></div>`, box => {
+    const inp = box.querySelector("#tkWaitInput");
+    box.querySelectorAll("[data-tk-wsugg]").forEach(b => b.addEventListener("click", () => { inp.value = b.dataset.tkWsugg; inp.focus(); }));
+    const ok = () => { const v = inp.value.trim(); tkModalClose(); tkSetStatus(t, "ממתין", { waitFor: v }); };
+    box.querySelector("#tkWaitOk").addEventListener("click", ok);
+    inp.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); ok(); } });
+    setTimeout(() => inp.focus(), 50);
+  });
+}
+
+/* ---------- פעולות ---------- */
+function tkGmailUrl(to, subject, body){
+  return `https://mail.google.com/mail/?view=cm&fs=1${to ? "&to=" + encodeURIComponent(to) : ""}&su=${encodeURIComponent(subject || "")}&body=${encodeURIComponent(body || "")}`;
+}
+function tkWhatsApp(t, text, logText){
+  const c = tkContact(t);
+  if(!c || !c.phone){
+    jobToast(t.assignee ? `אין מספר טלפון ל${t.assignee} באנשי קשר. אפשר להוסיף בטאב אנשי קשר וספקים.` : "קודם צריך לשבץ איש מקצוע", 4200);
+    if(tkUi.openId !== t.id) tkOpen(t.id, "assignee");
+    return false;
+  }
+  window.open(`https://wa.me/${formatPhoneForWhatsApp(c.phone)}?text=${encodeURIComponent(text)}`, "_blank");
+  tkLog(t, logText);
+  tkSave();
+  return true;
+}
+function tkAction(act, id){
+  const t = data.tasks.find(x => x.id === id);
+  if(!t) return;
+  if(act === "assign") return tkOpen(id, "assignee");
+  if(act === "send"){
+    if(tkWhatsApp(t, buildTaskMessageText(t), `נשלחה הודעת וואטסאפ ל${t.assignee}`)){ t.sentAt = tkToday(); tkSave(); renderTasks(); }
+    return;
+  }
+  if(act === "nudge"){
+    const name = tkFirstName(t.assignee);
+    const text = `שלום ${name} 👋\nרציתי לבדוק לגבי: *${t.desc || ""}*${t.waitFor ? `\n⏳ מחכה ל: ${t.waitFor}` : ""}\nיש עדכון? 🙏`;
+    if(tkWhatsApp(t, text, `נשלחה תזכורת ל${t.assignee}${t.waitFor ? " · " + t.waitFor : ""}`)){ t.lastNudge = tkToday(); tkSave(); renderTasks(); }
+    return;
+  }
+  if(act === "mail"){
+    const c = tkContact(t);
+    window.open(tkGmailUrl(c && c.email ? c.email : "", "משימה: " + (t.desc || ""), buildTaskMessageText(t)), "_blank");
+    tkLog(t, `נפתח מייל ל${t.assignee || "איש המקצוע"}`);
+    tkSave(); if(tkUi.openId === id) tkRenderDrawer();
+    return;
+  }
+  if(act === "start") return tkSetStatus(t, "בביצוע");
+  if(act === "done") return tkSetStatus(t, "בוצע");
+  if(act === "photo") return addCompletionPhoto(id);
+  if(act === "delete") return removeTask(id);
+}
+
+/* ---------- הוספה מהירה ---------- */
+const TK_WEEKDAYS = { "ראשון":0, "א":0, "שני":1, "ב":1, "שלישי":2, "ג":2, "רביעי":3, "ד":3, "חמישי":4, "ה":4, "שישי":5, "ו":5, "שבת":6 };
+function tkParseQuick(text){
+  let s = " " + String(text || "") + " ";
+  const out = { desc: "", due: "", prio: 2, assignee: "", place: "", tokens: [] };
+  const take = (re, fn) => { const m = re.exec(s); if(m){ fn(m); s = s.slice(0, m.index) + " " + s.slice(m.index + m[0].length); return true; } return false; };
+  // עדיפות
+  if(!take(/!\s*דחוף/, () => { out.prio = 1; })) if(!take(/!\s*נמוך/, () => { out.prio = 3; })) take(/(^|\s)דחוף(?=[\s,.!]|$)/, () => { out.prio = 1; });
+  if(out.prio === 1) out.tokens.push("דחוף"); else if(out.prio === 3) out.tokens.push("עדיפות נמוכה");
+  // איש מקצוע
+  const at = s.indexOf("@");
+  if(at >= 0){
+    const rest = s.slice(at + 1);
+    const names = getContactNames().slice().sort((a, b) => b.length - a.length);
+    let hit = names.find(n => rest.startsWith(n));
+    let consumed = hit ? hit.length : 0;
+    if(!hit){
+      const w = (rest.match(/^[^\s@#!]+/) || [""])[0];
+      if(w){
+        hit = names.find(n => n.startsWith(w)) || names.find(n => n.split(/\s+/).includes(w)) || names.find(n => n.includes(w)) || w;
+        consumed = w.length;
+      }
+    }
+    if(hit){ out.assignee = hit; s = s.slice(0, at) + " " + rest.slice(consumed); out.tokens.push("@" + hit); }
+    else s = s.slice(0, at) + " " + rest;
+  }
+  // מקום
+  take(/#([^\s#@!]+)/, m => {
+    const raw = m[1].replace(/_/g, " ");
+    const known = tkAllPlaces().find(p => p === raw) || tkAllPlaces().find(p => p.startsWith(raw));
+    out.place = known || raw;
+    out.tokens.push("מקום: " + out.place);
+  });
+  // תאריך
+  const today = tkToday();
+  let due = "";
+  if(take(/(^|\s)מחרתיים(?=[\s,.]|$)/, () => { due = tkAddDays(today, 2); })){}
+  else if(take(/(^|\s)(?:עד\s+)?מחר(?=[\s,.]|$)/, () => { due = tkAddDays(today, 1); })){}
+  else if(take(/(^|\s)(?:עד\s+)?היום(?=[\s,.]|$)/, () => { due = today; })){}
+  else if(take(/(^|\s)(?:עד\s+)?(?:ב)?שבוע הבא(?=[\s,.]|$)/, () => { due = tkAddDays(today, 7); })){}
+  else if(take(/(^|\s)(?:עד\s+)?ב?יום\s+(ראשון|שני|שלישי|רביעי|חמישי|שישי|שבת|[אבגדהו]['׳]?)(?=[\s,.]|$)/, m => {
+    const key = m[2].replace(/['׳]/g, "");
+    const wd = TK_WEEKDAYS[key];
+    if(wd !== undefined){ const d = tkParse(today); let add = (wd - d.getDay() + 7) % 7; if(add === 0) add = 7; due = tkAddDays(today, add); }
+  })){}
+  else take(/(^|\s)(?:עד\s+)?(\d{1,2})[./](\d{1,2})(?:[./](\d{2,4}))?(?=[\s,.]|$)/, m => {
+    const dd = Number(m[2]), mm = Number(m[3]);
+    if(dd < 1 || dd > 31 || mm < 1 || mm > 12) return;
+    let yy = m[4] ? Number(m[4]) : tkParse(today).getFullYear();
+    if(yy < 100) yy += 2000;
+    let iso = `${yy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
+    if(!m[4] && tkDaysTo(iso) < -30) iso = `${yy + 1}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
+    if(tkParse(iso) && tkIso(tkParse(iso)) === iso) due = iso;
+  });
+  if(due){ out.due = due; out.tokens.push("יעד: " + fmtDateHe(due)); }
+  out.desc = s.replace(/\s+/g, " ").replace(/^[\s,.\-–]+|[\s,\-–]+$/g, "").trim();
+  return out;
+}
+function tkQaPreview(){
+  const el = document.getElementById("tkQaHint");
+  const inp = document.getElementById("tkQaInput");
+  if(!el || !inp) return;
+  const v = inp.value.trim();
+  if(!v){
+    el.innerHTML = `אפשר לכתוב בחופשיות. המערכת מזהה לבד: <span class="tk-tok">מחר / ביום חמישי / 25.10</span><span class="tk-tok">@איש מקצוע</span><span class="tk-tok">!דחוף</span><span class="tk-tok">#מקום</span>`;
+    return;
+  }
+  const p = tkParseQuick(v);
+  el.innerHTML = `זוהה: ` + (p.tokens.length ? p.tokens.map(x => `<span class="tk-tok hit">${escHtml(x)}</span>`).join("") : `<span class="tk-tok">רק תיאור</span>`);
+}
+function tkQuickAdd(e){
+  if(e) e.preventDefault();
+  const inp = document.getElementById("tkQaInput");
+  const v = (inp.value || "").trim();
+  if(!v) return;
+  const p = tkParseQuick(v);
+  if(!p.desc){ jobToast("צריך לכתוב גם מה המשימה"); return; }
+  const c = p.assignee ? findContactByName(p.assignee) : null;
+  const t = tkNewTask({
+    desc: p.desc, due: p.due, prio: p.prio, assignee: p.assignee, place: p.place,
+    category: c && c.specialty ? c.specialty : "", schoolYear: tkCurrentYearValue()
+  });
+  t.log = [{ d: tkToday(), t: "נפתחה בהוספה מהירה" }];
+  tkSave();
+  inp.value = "";
+  tkQaPreview();
+  tkUi.focus = "";
+  const pr = tkPrefs();
+  if(pr.statuses.length && !pr.statuses.includes("טרם התחיל")) tkSetPref("tasksStatuses", []);
+  if(tkUi.q && !tkMatches(t, tkUi.q)){ tkUi.q = ""; const s = document.getElementById("tasksSearchInput"); if(s) s.value = ""; }
+  renderTasks();
+  try{ renderDashboard(); }catch(err){ console.error(err); }
+  jobToast(`נוספה משימה ${tkCode(t)}`);
+  tkFlashCard(t.id);
+}
+function tkFlashCard(id){
+  setTimeout(() => {
+    const card = document.querySelector(`#tkView [data-tk-card="${id}"]`);
+    if(!card) return;
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    card.classList.add("flash");
+    setTimeout(() => card.classList.remove("flash"), 2300);
+  }, 60);
+}
+
+/* ---------- מודאל כללי ---------- */
+function tkModalOpen(html, wire){
+  const box = document.getElementById("tkModalBox");
+  box.innerHTML = html;
+  document.getElementById("tkModal").style.display = "flex";
+  if(wire) wire(box);
+}
+function tkModalClose(){ const m = document.getElementById("tkModal"); if(m) m.style.display = "none"; }
+
+/* ---------- תקלה במצלמה ---------- */
+function tkOpenCameraModal(){
+  const names = getContactNames();
+  const camPro = data.contacts.find(c => /מצלמ/.test((c.specialty || "") + " " + (c.name || "")));
+  tkModalOpen(`
+    <div class="tk-modal-title">תקלה במצלמה</div>
+    <div class="tk-modal-sub">פותח משימה בתחום "מצלמות" עם מספר המצלמה ומיקומה.</div>
+    <div class="tk-modal-body">
+      <div class="report-form">
+        <label>מספר מצלמה<input type="number" id="tkCamNo" min="1" max="999" inputmode="numeric" placeholder="למשל 17"></label>
+        <label>עדיפות<select id="tkCamPrio"><option value="1">דחוף</option><option value="2">רגיל</option><option value="3">נמוך</option></select></label>
+        <label style="grid-column:1/-1">מה התקלה?<input type="text" id="tkCamDesc" value="לא משדרת"></label>
+        <label>איפה המצלמה (לא חובה)<input type="text" id="tkCamPlace" list="tkCamPlaces" placeholder="למשל: חניה"></label>
+        <label>מי מטפל<select id="tkCamWho"><option value="">לא שובץ</option>${names.map(n => `<option value="${escHtml(n)}" ${camPro && camPro.name === n ? "selected" : ""}>${escHtml(n)}</option>`).join("")}</select></label>
+      </div>
+      <datalist id="tkCamPlaces">${tkAllPlaces().map(p => `<option value="${escHtml(p)}"></option>`).join("")}</datalist>
+    </div>
+    <div class="tk-modal-foot"><button type="button" class="tk-btn ghost sm" onclick="tkModalClose()">ביטול</button><button type="button" class="tk-btn sm" id="tkCamOk">פתיחת משימה</button></div>`, box => {
+    box.querySelector("#tkCamPrio").value = "1";
+    const ok = () => {
+      const no = String(box.querySelector("#tkCamNo").value || "").trim();
+      if(!no){ jobToast("צריך למלא מספר מצלמה"); box.querySelector("#tkCamNo").focus(); return; }
+      const what = box.querySelector("#tkCamDesc").value.trim() || "תקלה";
+      const where = box.querySelector("#tkCamPlace").value.trim();
+      const who = box.querySelector("#tkCamWho").value;
+      const t = tkNewTask({
+        desc: `מצלמה ${no}: ${what}`, category: "מצלמות", cameraNo: no, place: where || `מצלמה ${no}`,
+        prio: Number(box.querySelector("#tkCamPrio").value) || 1, assignee: who, schoolYear: tkCurrentYearValue(), due: tkToday()
+      });
+      t.log = [{ d: tkToday(), t: "נפתחה מדיווח תקלה במצלמה" }];
+      tkSave();
+      tkModalClose();
+      renderTasks();
+      jobToast(`נפתחה משימה ${tkCode(t)}`);
+      tkOpen(t.id);
+    };
+    box.querySelector("#tkCamOk").addEventListener("click", ok);
+    setTimeout(() => box.querySelector("#tkCamNo").focus(), 50);
+  });
+}
+
+/* ---------- היסטוריית מקום ---------- */
+function tkOpenPlace(place){
+  const key = String(place || "").trim();
+  const list = data.tasks.filter(t => String(t.place || "").trim() === key)
+    .sort((a, b) => String(b.doneAt || b.created || b.due || "").localeCompare(String(a.doneAt || a.created || a.due || "")) || (b.id - a.id));
+  const total = list.reduce((s, t) => { const j = tkJob(t); return s + (j ? j.amount : 0); }, 0);
+  const done = list.filter(t => tkStatus(t) === "בוצע").length;
+  tkModalOpen(`
+    <div class="tk-modal-title">כל מה שנעשה ב${escHtml(key)}</div>
+    <div class="tk-modal-sub">כל השנים · לחיצה על משימה פותחת את התיק שלה</div>
+    <div class="tk-modal-body">
+      <div class="tk-hist-sum"><div><div class="l">משימות</div><div class="v">${list.length}</div></div><div><div class="l">בוצעו</div><div class="v">${done}</div></div><div><div class="l">עלות כוללת</div><div class="v">${fmtMoney(total)}</div></div></div>
+      <div class="tk-hist">${list.map(t => {
+        const j = tkJob(t);
+        return `<button type="button" class="tk-hist-i" data-tk-hist="${t.id}"><div class="m"><div class="t">${escHtml(t.desc || "ללא תיאור")}</div><div class="s">${escHtml([tkCode(t), tkStatus(t), t.assignee, fmtDateHe(t.doneAt || t.created || t.due || "")].filter(x => x && x !== "—").join(" · "))}</div></div><div class="a">${j && j.amount > 0 ? fmtMoney(j.amount) : "—"}</div></button>`;
+      }).join("")}</div>
+    </div>
+    <div class="tk-modal-foot"><span></span><button type="button" class="tk-btn ghost sm" onclick="tkModalClose()">סגירה</button></div>`, box => {
+    box.querySelectorAll("[data-tk-hist]").forEach(b => b.addEventListener("click", () => {
+      const id = Number(b.dataset.tkHist);
+      const t = data.tasks.find(x => x.id === id);
+      tkModalClose();
+      if(t){
+        const ys = document.getElementById("tasksYearFilter");
+        if(ys && ys.value && ys.value !== String(t.schoolYear || currentSchoolYearStart())){ ys.value = ""; data.uiPrefs.tasksYear = ""; saveUiPrefs(); renderTasks(); }
+        tkOpen(id);
+      }
+    }));
+  });
+}
+
+/* ---------- סיכום שבועי ---------- */
+function tkWeeklyText(){
+  const all = data.tasks;
+  const today = tkToday();
+  const weekAgo = tkAddDays(today, -7);
+  const line = "━━━━━━━━━━━━━━━";
+  const doneW = all.filter(t => tkStatus(t) === "בוצע" && t.doneAt && t.doneAt >= weekAgo && t.doneAt <= today);
+  const late = tkSort(all.filter(tkIsLate));
+  const waiting = tkSort(all.filter(t => tkStatus(t) === "ממתין"));
+  const nextW = tkSort(all.filter(t => { const d = tkDaysTo(t.due); return tkStatus(t) !== "בוצע" && t.status !== "ממתין" && d !== null && d >= 0 && d <= 7; }));
+  const money = all.filter(t => { if(tkStatus(t) !== "בוצע") return false; const j = tkJob(t); return !!j && !j.closed; });
+  const moneySum = money.reduce((s, t) => { const j = tkJob(t); return s + (j ? j.amount : 0); }, 0);
+  const who = t => t.assignee ? ` · ${t.assignee}` : "";
+  let msg = `🏢 *סיכום משימות שבועי*\n📅 ${fmtDateHe(today)}\n${line}\n`;
+  msg += `\n✅ *בוצעו השבוע (${doneW.length})*\n` + (doneW.length ? doneW.map(t => `• ${t.desc || tkCode(t)}${who(t)}`).join("\n") : "• אין") + "\n";
+  msg += `\n⏰ *באיחור (${late.length})*\n` + (late.length ? late.map(t => `• ${t.desc || tkCode(t)} · יעד ${tkShortDate(t.due)}${who(t)}`).join("\n") : "• אין 🎉") + "\n";
+  msg += `\n⏳ *ממתינות (${waiting.length})*\n` + (waiting.length ? waiting.map(t => `• ${t.desc || tkCode(t)}${t.waitFor ? " · ממתין ל" + t.waitFor : ""}`).join("\n") : "• אין") + "\n";
+  msg += `\n📌 *לשבוע הקרוב (${nextW.length})*\n` + (nextW.length ? nextW.map(t => `• ${t.desc || tkCode(t)} · ${tkShortDate(t.due)}${who(t)}`).join("\n") : "• אין") + "\n";
+  msg += `\n💰 *פתוח כספית:* ${money.length} עבודות${moneySum > 0 ? ` · ${fmtMoney(moneySum)}` : ""}\n${line}`;
+  return msg;
+}
+function tkOpenWeekly(){
+  const text = tkWeeklyText();
+  tkModalOpen(`
+    <div class="tk-modal-title">סיכום שבועי</div>
+    <div class="tk-modal-sub">מה בוצע השבוע, מה באיחור, מה ממתין ומה בשבוע הקרוב. אפשר לערוך לפני השליחה.</div>
+    <div class="tk-modal-body"><textarea id="tkWeeklyText" rows="14">${escHtml(text)}</textarea></div>
+    <div class="tk-modal-foot">
+      <button type="button" class="tk-btn ghost sm" onclick="tkModalClose()">סגירה</button>
+      <div class="grp">
+        <button type="button" class="tk-btn soft sm" id="tkWkCopy">${svgIcon("copy", 15)}העתקה</button>
+        <button type="button" class="tk-btn soft sm" id="tkWkMail">${svgIcon("mail", 15)}Gmail</button>
+        <button type="button" class="tk-btn sm" id="tkWkWa">${svgIcon("whatsapp", 15)}וואטסאפ</button>
+      </div>
+    </div>`, box => {
+    const ta = box.querySelector("#tkWeeklyText");
+    box.querySelector("#tkWkWa").addEventListener("click", () => window.open(`https://wa.me/?text=${encodeURIComponent(ta.value)}`, "_blank"));
+    box.querySelector("#tkWkMail").addEventListener("click", () => window.open(tkGmailUrl("", "סיכום משימות שבועי · " + fmtDateHe(tkToday()), ta.value.replace(/\*/g, "")), "_blank"));
+    box.querySelector("#tkWkCopy").addEventListener("click", () => {
+      const done = () => jobToast("הסיכום הועתק");
+      if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, () => { ta.select(); document.execCommand("copy"); done(); });
+      else { ta.select(); document.execCommand("copy"); done(); }
+    });
+  });
+}
+
+/* ---------- שליחה מרוכזת לאיש מקצוע ---------- */
+function tkOpenSlipFor(name){
+  openWorkSlipModal();
+  const sel = document.getElementById("wsAssignee");
+  if(!sel) return;
+  if(![...sel.options].some(o => o.value === name)) return;
+  sel.value = name;
+  const ys = document.getElementById("wsYear");
+  if(ys) ys.value = "";
+  wsSelectedIds = workSlipCandidates().map(r => r.id);
+  renderWorkSlipTasks();
+}
+
+/* ---------- משימה מתוך רישוי ובטיחות ---------- */
+function tkCreateFromLic(licId){
+  const lic = data.licensing.find(l => l.id === licId);
+  if(!lic) return;
+  const t = tkNewTask({
+    desc: lic.type || "בדיקת רישוי", category: "בטיחות", licId: lic.id, due: lic.expiry || "",
+    schoolYear: Number(lic.schoolYear) || currentSchoolYearStart(), prio: lic.priority === "גבוהה" ? 1 : 2
+  });
+  t.log = [{ d: tkToday(), t: `נפתחה מרישוי ובטיחות: ${lic.type || ""}` }];
+  tkSave();
+  try{ renderLic(); }catch(e){ console.error(e); }
+  goToTask(t.id);
+}
+function tkLicTasksHtml(licId){
+  if(!canOpenTab("tasks")) return "";
+  const linked = data.tasks.filter(t => Number(t.licId) === licId && tkStatus(t) !== "בוצע");
+  return `<button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="tkCreateFromLic(${licId})">${svgIcon("plus", 12)} משימה</button>` +
+    linked.map(t => `<button type="button" class="tk-lic-chip" onclick="goToTask(${t.id})">${svgIcon("tasks", 11)}${escHtml(tkCode(t))} · ${escHtml(tkStatus(t))}</button>`).join("");
+}
+
+/* ---------- האזנה ללחיצות במודול ---------- */
+function tkOnSearch(v){
+  tkUi.q = v || "";
+  clearTimeout(tkOnSearch._t);
+  tkOnSearch._t = setTimeout(tkRenderList, 120);
+}
+document.addEventListener("click", e => {
+  const t = e.target;
+  if(!t || !t.closest) return;
+  const inTasks = t.closest("#tab-tasks, #tkDrawer");
+  if(!inTasks) return;
+  const costOpen = t.closest("[data-task-cost-open]");
+  if(costOpen && t.closest("#tkDrawer")){
+    e.preventDefault(); e.stopImmediatePropagation();
+    jobCostOpen.add(Number(costOpen.dataset.taskCostOpen));
+    tkRenderDrawer();
+    const inp = document.querySelector("#tkDrawer [data-job-amount]");
+    if(inp) inp.focus();
+    return;
+  }
+  const act = t.closest("[data-tk-act]");
+  if(act){ e.preventDefault(); tkAction(act.dataset.tkAct, Number(act.dataset.tkId)); return; }
+  const setSt = t.closest("[data-tk-setstatus]");
+  if(setSt){
+    const task = data.tasks.find(x => x.id === tkUi.openId);
+    if(task) tkSetStatus(task, setSt.dataset.tkSetstatus);
+    return;
+  }
+  const go = t.closest("[data-tk-goto]");
+  if(go){ e.preventDefault(); goToTask(Number(go.dataset.tkGoto)); return; }
+  const eqb = t.closest("[data-tk-equip]");
+  if(eqb){ e.preventDefault(); const id = Number(eqb.dataset.tkEquip); tkClose(); if(canOpenTab("equipment")){ switchTab("equipment"); eqUi.view = "equip"; renderEquipment(); eqOpen("equip", id); } return; }
+  const lic = t.closest("[data-tk-lic]");
+  if(lic){ e.preventDefault(); tkClose(); if(canOpenTab("licensing")) switchTab("licensing"); return; }
+  const place = t.closest("[data-tk-place]");
+  if(place){ e.preventDefault(); tkOpenPlace(place.dataset.tkPlace); return; }
+  const slip = t.closest("[data-tk-slip]");
+  if(slip){ e.preventDefault(); tkOpenSlipFor(slip.dataset.tkSlip); return; }
+  const ckDel = t.closest("[data-tk-ckdel]");
+  if(ckDel){
+    const task = data.tasks.find(x => x.id === tkUi.openId);
+    if(!task) return;
+    const list = tkChecklist(task);
+    const idx = Number(ckDel.dataset.tkCkdel);
+    if(list[idx]){ list.splice(idx, 1); task.checklist = list; tkSave(); tkRenderDrawer(); tkRenderListSoon(); }
+    return;
+  }
+  const focus = t.closest("[data-tk-focus]");
+  if(focus){ const k = focus.dataset.tkFocus; tkUi.focus = (k && tkUi.focus !== k) ? k : ""; tkRenderList(); return; }
+  const view = t.closest("[data-tk-view]");
+  if(view){ tkSetPref("tasksView", view.dataset.tkView); tkRenderList(); return; }
+  const stp = t.closest("[data-tk-status]");
+  if(stp){
+    const k = stp.dataset.tkStatus;
+    let cur = tkPrefs().statuses;
+    if(!k) cur = [];
+    else cur = cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k);
+    if(cur.length === TK_STATUSES.length) cur = [];
+    tkSetPref("tasksStatuses", cur);
+    tkRenderList();
+    return;
+  }
+  const col = t.closest("[data-tk-col]");
+  if(col){
+    const k = col.dataset.tkCol;
+    const cur = tkPrefs().statuses;
+    tkSetPref("tasksStatuses", (cur.length === 1 && cur[0] === k) ? [] : [k]);
+    tkRenderList();
+    return;
+  }
+  if(t.closest("[data-tk-archive]")){ tkSetPref("tasksShowArchive", !tkPrefs().archive); tkRenderList(); return; }
+  if(t.closest("[data-tk-allyears]")){
+    const ys = document.getElementById("tasksYearFilter");
+    if(ys){ ys.value = ""; data.uiPrefs.tasksYear = ""; saveUiPrefs(); }
+    renderTasks();
+    return;
+  }
+  if(t.closest("[data-tk-clear]")){
+    tkUi.focus = ""; tkUi.q = "";
+    const s = document.getElementById("tasksSearchInput"); if(s) s.value = "";
+    tkSetPref("tasksStatuses", []);
+    tkRenderList();
+    return;
+  }
+  const card = t.closest("[data-tk-open]");
+  if(card && !t.closest("button, a, input, select, textarea, label")){ tkOpen(Number(card.dataset.tkOpen)); }
+});
+document.addEventListener("keydown", e => {
+  const t = e.target;
+  if((e.key === "Enter" || e.key === " ") && t && t.matches && t.matches("[data-tk-open]")){
+    e.preventDefault(); tkOpen(Number(t.dataset.tkOpen)); return;
+  }
+  if(e.key === "Escape"){
+    const m = document.getElementById("tkModal");
+    if(m && m.style.display !== "none"){ tkModalClose(); return; }
+    if(tkUi.openId === null) return;
+    const blocking = Array.from(document.querySelectorAll(".modal-overlay, .fv-overlay")).some(el => el.id !== "tkModal" && el.style.display && el.style.display !== "none");
+    if(!blocking) tkClose();
+  }
+});
+
+/* =====================================================================
+   ציוד ותחזוקה (אוקטובר 2026): ציוד ואחריות · חוזי שירות · עלויות תחזוקה שנתיות
+   נתונים: equipment-data, serviceContracts-data, maintBudget-data (מפתחות חדשים בענן).
+   הטאב רק קורא ממשימות ומתשלומי ספקים לצורך עלויות, ולא משנה בהם דבר
+   (חוץ מיצירת משימה חדשה כשלוחצים "פתיחת תקלה" או "משימת ביקור חוזרת").
+   ===================================================================== */
+if(!Array.isArray(data.equipment)) data.equipment = [];
+if(!Array.isArray(data.serviceContracts)) data.serviceContracts = [];
+if(!data.maintBudget || typeof data.maintBudget !== "object" || Array.isArray(data.maintBudget)) data.maintBudget = {};
+
+const EQ_CATS = ["מיזוג", "חשמל", "אינסטלציה", "מעליות", "גנרטור", "בטיחות ואש", "מטבח", "מצלמות ואבטחה", "תקשורת ומחשבים", "ריהוט", "אחר"];
+const EQ_DOC_TYPES = ["תעודת אחריות", "חשבונית קנייה", "חוזה", "מדריך הפעלה", "תמונה", "אחר"];
+const EQ_VISITS = [[0, "ללא ביקורים קבועים"], [1, "ביקור בשנה"], [2, "2 ביקורים בשנה"], [4, "4 ביקורים בשנה"], [6, "6 ביקורים בשנה"], [12, "ביקור כל חודש"]];
+const EQ_VISIT_MONTHS = { 1: 12, 2: 6, 4: 3, 6: 2, 12: 1 };
+const EQ_SOON_DAYS = 60;
+const EQ_MONTHS = ["ספט׳", "אוק׳", "נוב׳", "דצמ׳", "ינו׳", "פבר׳", "מרץ", "אפר׳", "מאי", "יוני", "יולי", "אוג׳"];
+let eqUi = { view: "equip", q: "", filter: "", cat: "", cfilter: "", year: null, openKind: null, openId: null };
+const eqFreshIds = new Set();
+
+function eqSaveEquip(){ scheduleSave("equipment", "eqSaved"); }
+function eqSaveContracts(){ scheduleSave("serviceContracts", "eqSaved"); }
+function eqSaveBudget(){ scheduleSave("maintBudget", "eqSaved"); }
+function eqIsAdmin(){ return isJobAdmin(); }
+function eqItem(id){ return data.equipment.find(e => e.id === Number(id)) || null; }
+function eqContract(id){ return data.serviceContracts.find(c => c.id === Number(id)) || null; }
+function eqLog(rec, text){
+  if(!Array.isArray(rec.log)) rec.log = [];
+  rec.log.push({ d: tkToday(), t: String(text) });
+  if(rec.log.length > 100) rec.log.splice(0, rec.log.length - 100);
+}
+function eqCats(){
+  const s = new Set(EQ_CATS);
+  getContactSpecialties().forEach(x => s.add(x));
+  data.equipment.forEach(e => { if(e.category) s.add(e.category); });
+  return [...s];
+}
+function eqPlaces(){
+  const s = new Set(tkAllPlaces());
+  data.equipment.forEach(e => { if(e.place) s.add(String(e.place).trim()); });
+  return [...s].filter(Boolean).sort((a, b) => a.localeCompare(b, "he"));
+}
+
+/* ---------- מצב אחריות וחוזה ---------- */
+function eqWarranty(e){
+  if(!e || !e.warrantyEnd) return { k: "none", tone: "", label: "אין פרטי אחריות", short: "אין אחריות" };
+  const d = tkDaysTo(e.warrantyEnd);
+  if(d === null) return { k: "none", tone: "", label: "אין פרטי אחריות", short: "אין אחריות" };
+  if(d < 0) return { k: "expired", tone: "", label: `האחריות הסתיימה ב-${fmtDateHe(e.warrantyEnd)}`, short: "אחריות הסתיימה" };
+  if(d <= EQ_SOON_DAYS) return { k: "soon", tone: "warn", label: d === 0 ? "האחריות נגמרת היום" : `האחריות נגמרת בעוד ${d} ימים`, short: `אחריות: עוד ${d} ימים` };
+  return { k: "ok", tone: "ok", label: `באחריות עד ${fmtDateHe(e.warrantyEnd)}`, short: `באחריות עד ${tkShortDate(e.warrantyEnd)}` };
+}
+function eqNotice(c){ const n = Number(c.noticeDays); return n > 0 ? n : EQ_SOON_DAYS; }
+function eqContractState(c){
+  const s = c.start ? tkDaysTo(c.start) : null;
+  const e = c.end ? tkDaysTo(c.end) : null;
+  if(s !== null && s > 0){
+    // חוזה שחודש מראש: התקופה הקודמת עדיין בתוקף היום
+    const cur = (Array.isArray(c.prevPeriods) ? c.prevPeriods : []).find(p => (!p.start || tkDaysTo(p.start) <= 0) && (!p.end || tkDaysTo(p.end) >= 0));
+    if(cur) return { k: "active", tone: "ok", label: `פעיל · חודש עד ${fmtDateHe(c.end || "")}` };
+    return { k: "future", tone: "info", label: `מתחיל ב-${fmtDateHe(c.start)}` };
+  }
+  if(e === null) return { k: "active", tone: "ok", label: "פעיל · ללא תאריך סיום" };
+  if(e < 0) return { k: "expired", tone: "bad", label: `הסתיים ב-${fmtDateHe(c.end)}` };
+  if(e <= eqNotice(c)) return { k: "soon", tone: "warn", label: e === 0 ? "מסתיים היום" : `לחידוש · מסתיים בעוד ${e} ימים` };
+  return { k: "active", tone: "ok", label: `פעיל עד ${fmtDateHe(c.end)}` };
+}
+function eqContractActive(c){ const k = eqContractState(c).k; return k === "active" || k === "soon"; }
+function eqContractsFor(e){ return data.serviceContracts.filter(c => Array.isArray(c.equipIds) && c.equipIds.includes(e.id)); }
+function eqActiveContractsFor(e){ return eqContractsFor(e).filter(eqContractActive); }
+function eqTasksFor(e){ return data.tasks.filter(t => Number(t.equipId) === e.id); }
+function eqTaskCost(t){ const j = tkJob(t); return j ? j.amount : 0; }
+/* כיסוי של משימה: אחריות פעילה / חוזה שירות פעיל על הציוד שלה */
+function eqCoverage(t){
+  const e = t && t.equipId ? eqItem(t.equipId) : null;
+  if(!e) return null;
+  const w = eqWarranty(e);
+  const cs = eqActiveContractsFor(e);
+  if(w.k !== "ok" && w.k !== "soon" && !cs.length) return { e, w, cs, covered: false };
+  return { e, w, cs, covered: true };
+}
+
+/* ---------- ציור הטאב ---------- */
+function renderEquipment(opts){
+  opts = opts || {};
+  const body = document.getElementById("eqBody");
+  if(!body) return;
+  if(!Array.isArray(data.equipment)) data.equipment = [];
+  if(!Array.isArray(data.serviceContracts)) data.serviceContracts = [];
+  if(!data.maintBudget || typeof data.maintBudget !== "object" || Array.isArray(data.maintBudget)) data.maintBudget = {};
+  if(eqUi.view === "costs" && !eqIsAdmin()) eqUi.view = "equip";
+  tkFillIcons(document.getElementById("tab-equipment"));
+  const views = [["equip", "ציוד ואחריות", "shield"], ["contracts", "חוזי שירות", "report"]];
+  if(eqIsAdmin()) views.push(["costs", "עלויות תחזוקה", "cash"]);
+  document.getElementById("eqViews").innerHTML = views.map(([k, l, ic]) =>
+    `<button type="button" class="tk-view-btn ${eqUi.view === k ? "active" : ""}" data-eq-view="${k}" role="tab" aria-selected="${eqUi.view === k}">${tkIcon(ic, 15)}${l}</button>`).join("");
+  const act = document.getElementById("eqActions");
+  if(eqUi.view === "equip") act.innerHTML = `<button type="button" class="tk-btn sm" data-eq-new="equip">${svgIcon("plus", 15)}פריט ציוד</button>`;
+  else if(eqUi.view === "contracts") act.innerHTML = `<button type="button" class="tk-btn sm" data-eq-new="contract">${svgIcon("plus", 15)}חוזה שירות</button>`;
+  else act.innerHTML = `<button type="button" class="tk-btn ghost sm" data-eq-report="1">${svgIcon("printer", 15)}דוח עלויות (PDF)</button>`;
+  const sub = document.getElementById("eqSub");
+  const warnN = data.equipment.filter(e => eqWarranty(e).k === "soon").length + data.serviceContracts.filter(c => eqContractState(c).k === "soon").length;
+  sub.textContent = `${data.equipment.length} פריטי ציוד · ${data.serviceContracts.filter(eqContractActive).length} חוזים פעילים${warnN ? ` · ${warnN} דורשים תשומת לב` : ""}`;
+  if(eqUi.view === "equip") body.innerHTML = eqEquipViewHtml();
+  else if(eqUi.view === "contracts") body.innerHTML = eqContractsViewHtml();
+  else body.innerHTML = eqCostsViewHtml();
+  if(eqUi.openId !== null){ if(opts.skipDrawer) eqRefreshCover(); else eqRenderDrawer(); }
+}
+function eqRefreshCover(){
+  const box = document.querySelector("#eqDrawer [data-eq-coverbox]");
+  if(!box) return;
+  const rec = eqUi.openKind === "equip" ? eqItem(eqUi.openId) : eqContract(eqUi.openId);
+  if(!rec) return;
+  box.innerHTML = eqUi.openKind === "equip" ? eqEquipCoverHtml(rec) : eqContractCoverHtml(rec);
+  const h = document.querySelector("#eqDrawer .tk-dr-head .h");
+  if(h) h.textContent = rec.name || (eqUi.openKind === "equip" ? "פריט ציוד חדש" : "חוזה שירות חדש");
+}
+
+/* ----- ציוד ----- */
+const EQ_FILTERS = [
+  { k: "", l: "כל הציוד", tone: "", f: () => true },
+  { k: "ok", l: "באחריות", tone: "ok", f: e => eqWarranty(e).k === "ok" },
+  { k: "soon", l: `נגמרת ב-${EQ_SOON_DAYS} יום`, tone: "warn", f: e => eqWarranty(e).k === "soon" },
+  { k: "contract", l: "בחוזה שירות", tone: "info", f: e => eqActiveContractsFor(e).length > 0 },
+  { k: "none", l: "ללא כיסוי", tone: "bad", f: e => { const w = eqWarranty(e).k; return w !== "ok" && w !== "soon" && !eqActiveContractsFor(e).length; } }
+];
+function eqEquipViewHtml(){
+  const all = data.equipment;
+  const tiles = `<div class="tk-focus">${EQ_FILTERS.map(f => {
+    const n = all.filter(f.f).length;
+    const on = eqUi.filter === f.k;
+    return `<button type="button" class="tk-tile ${f.tone} ${on ? "active" : ""}" data-eq-filter="${f.k}" aria-pressed="${on}"><span class="l">${f.l}</span><span class="v">${n}</span><span class="h">${f.k === "soon" && n ? escHtml(all.filter(f.f)[0].name || "") : ""}</span></button>`;
+  }).join("")}</div>`;
+  const cats = [...new Set(all.map(e => e.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "he"));
+  const bar = `<div class="tk-bar">
+    <label class="tk-search"><span>${tkIcon("search", 16)}</span><input type="text" id="eqSearch" data-search-input autocomplete="off" placeholder="חיפוש לפי שם, מקום, יצרן, מספר סידורי…" value="${escHtml(eqUi.q)}" aria-label="חיפוש ציוד"></label>
+    ${cats.length ? `<select id="eqCatFilter" class="tk-year" aria-label="סינון לפי תחום"><option value="">כל התחומים</option>${cats.map(c => `<option value="${escHtml(c)}" ${eqUi.cat === c ? "selected" : ""}>${escHtml(c)}</option>`).join("")}</select>` : ""}
+  </div>`;
+  if(!all.length){
+    return tiles + `<div class="tk-empty big">עדיין אין ציוד. כדאי להתחיל מהציוד היקר או זה שיש לו אחריות: מזגנים, דוודים, מעלית, גנרטור, מערכת מצלמות.<br><br><button type="button" class="tk-btn sm" data-eq-new="equip">${svgIcon("plus", 15)}הוספת פריט ציוד ראשון</button></div>`;
+  }
+  const f = EQ_FILTERS.find(x => x.k === eqUi.filter) || EQ_FILTERS[0];
+  const q = eqUi.q.trim().toLowerCase();
+  let list = all.filter(f.f).filter(e => !eqUi.cat || e.category === eqUi.cat)
+    .filter(e => !q || q.split(/\s+/).every(w => [e.name, e.category, e.place, e.brand, e.model, e.serial, e.supplier, e.notes].join(" ").toLowerCase().includes(w)));
+  const rank = e => ({ soon: 0, ok: 1, expired: 2, none: 3 })[eqWarranty(e).k];
+  list = list.slice().sort((a, b) => (rank(a) - rank(b)) || String(a.name || "").localeCompare(String(b.name || ""), "he"));
+  return tiles + bar + (list.length ? `<div class="tk-grid">${list.map(eqCardHtml).join("")}</div>` : `<div class="tk-empty big">אין ציוד שמתאים לסינון.</div>`);
+}
+function eqCardHtml(e, i){
+  const w = eqWarranty(e);
+  const cs = eqActiveContractsFor(e);
+  const tasks = eqTasksFor(e);
+  const open = tasks.filter(t => tkStatus(t) !== "בוצע").length;
+  const cost = tasks.reduce((s, t) => s + eqTaskCost(t), 0);
+  const chips = [
+    e.place ? `<span class="tk-chip">${tkIcon("pin", 13)}${escHtml(e.place)}</span>` : "",
+    `<span class="tk-chip ${w.k === "ok" ? "ok" : w.k === "soon" ? "warn" : ""}">${tkIcon("shield", 13)}${escHtml(w.short)}</span>`,
+    cs.length ? `<span class="tk-chip info">${tkIcon("report", 13)}חוזה: ${escHtml(cs[0].supplier || cs[0].name || "")}</span>` : "",
+    open ? `<span class="tk-chip bad">${svgIcon("tasks", 13)}${open} תקלות פתוחות</span>` : ""
+  ].filter(Boolean).join("");
+  const sub = [e.brand, e.model].filter(Boolean).join(" · ");
+  return `<div class="tk-card ${i % 2 ? "alt" : ""}" data-eq-open="equip:${e.id}" role="button" tabindex="0" aria-label="פתיחת כרטיס הציוד ${escHtml(e.name || "")}">
+    <div class="tk-card-top"><span class="tk-topic">${escHtml(e.category || "ציוד")}</span>${e.serial ? `<span class="tk-code">${escHtml(e.serial)}</span>` : ""}</div>
+    <div class="tk-card-title ${e.name ? "" : "empty"}">${escHtml(e.name || "פריט ללא שם")}</div>
+    ${sub ? `<div style="font-size:12.5px;color:var(--ink-soft)">${escHtml(sub)}</div>` : ""}
+    <div class="tk-meta">${chips}</div>
+    <div class="tk-next"><span class="note">${tasks.length ? `${tasks.length} משימות${cost > 0 && eqIsAdmin() ? ` · תיקונים ${fmtMoney(cost)}` : ""}` : "אין עדיין תקלות"}</span><button type="button" class="tk-btn sm soft" data-eq-fault="${e.id}">${svgIcon("plus", 14)}פתיחת תקלה</button></div>
+  </div>`;
+}
+
+/* ----- חוזי שירות ----- */
+const EQ_CFILTERS = [
+  { k: "", l: "כל החוזים", tone: "", f: () => true },
+  { k: "active", l: "פעילים", tone: "ok", f: c => eqContractActive(c) },
+  { k: "soon", l: "לחידוש בקרוב", tone: "warn", f: c => eqContractState(c).k === "soon" },
+  { k: "expired", l: "הסתיימו", tone: "bad", f: c => eqContractState(c).k === "expired" }
+];
+function eqContractsViewHtml(){
+  const all = data.serviceContracts;
+  const yearly = all.filter(eqContractActive).reduce((s, c) => s + (Number(c.annualCost) || 0), 0);
+  const tiles = `<div class="tk-focus">${EQ_CFILTERS.map(f => {
+    const n = all.filter(f.f).length; const on = eqUi.cfilter === f.k;
+    return `<button type="button" class="tk-tile ${f.tone} ${on ? "active" : ""}" data-eq-cfilter="${f.k}" aria-pressed="${on}"><span class="l">${f.l}</span><span class="v">${n}</span><span class="h">${f.k === "soon" && n ? escHtml(all.filter(f.f)[0].name || "") : ""}</span></button>`;
+  }).join("")}${eqIsAdmin() ? `<div class="tk-tile ok" style="cursor:default"><span class="l">עלות שנתית (פעילים)</span><span class="v">${fmtMoney(yearly)}</span><span class="h">${fmtMoney(Math.round(yearly / 12))} לחודש</span></div>` : ""}</div>`;
+  if(!all.length){
+    return tiles + `<div class="tk-empty big">עדיין אין חוזי שירות. למשל: חוזה מעליות, חברת מטפים, שירות מזגנים, מוקד אבטחה.<br><br><button type="button" class="tk-btn sm" data-eq-new="contract">${svgIcon("plus", 15)}הוספת חוזה ראשון</button></div>`;
+  }
+  const f = EQ_CFILTERS.find(x => x.k === eqUi.cfilter) || EQ_CFILTERS[0];
+  const rank = c => ({ soon: 0, expired: 1, active: 2, future: 3 })[eqContractState(c).k];
+  const list = all.filter(f.f).slice().sort((a, b) => (rank(a) - rank(b)) || String(a.end || "9999").localeCompare(String(b.end || "9999")));
+  return tiles + (list.length ? `<div class="tk-grid">${list.map(eqContractCardHtml).join("")}</div>` : `<div class="tk-empty big">אין חוזים שמתאימים לסינון.</div>`);
+}
+function eqContractCardHtml(c, i){
+  const st = eqContractState(c);
+  const eqN = (c.equipIds || []).filter(id => eqItem(id)).length;
+  const visits = Number(c.visitsPerYear) || 0;
+  const chips = [
+    `<span class="tk-chip ${st.tone}">${tkIcon("clock", 13)}${escHtml(st.label)}</span>`,
+    eqN ? `<span class="tk-chip">${tkIcon("shield", 13)}${eqN} פריטי ציוד</span>` : "",
+    visits ? `<span class="tk-chip info">${tkIcon("repeat", 13)}${escHtml((EQ_VISITS.find(v => v[0] === visits) || [0, visits + " ביקורים"])[1])}</span>` : "",
+    c.autoRenew ? `<span class="tk-chip">מתחדש אוטומטית</span>` : ""
+  ].filter(Boolean).join("");
+  const nextBtn = st.k === "soon" || st.k === "expired"
+    ? `<button type="button" class="tk-btn sm" data-eq-renew="${c.id}">${tkIcon("repeat", 14)}חידוש לשנה</button>`
+    : `<button type="button" class="tk-btn sm soft" data-eq-open="contract:${c.id}">פתיחה</button>`;
+  return `<div class="tk-card ${i % 2 ? "alt" : ""} ${st.k === "soon" ? "late" : ""}" data-eq-open="contract:${c.id}" role="button" tabindex="0" aria-label="פתיחת החוזה ${escHtml(c.name || "")}">
+    <div class="tk-card-top"><span class="tk-topic">${escHtml(c.category || "חוזה שירות")}</span>${eqIsAdmin() && Number(c.annualCost) ? `<span class="tk-code" style="direction:rtl">${fmtMoney(Number(c.annualCost))} לשנה</span>` : ""}</div>
+    <div class="tk-card-title ${c.name ? "" : "empty"}">${escHtml(c.name || "חוזה ללא שם")}</div>
+    ${c.supplier ? `<div class="tk-who"><span class="tk-ava" style="background:${tkAvaColor(c.supplier)}">${escHtml(tkInitials(c.supplier))}</span>${escHtml(c.supplier)}</div>` : ""}
+    <div class="tk-meta">${chips}</div>
+    <div class="tk-next"><span class="note">${escHtml(c.includes ? String(c.includes).slice(0, 70) : (c.start ? `מ-${fmtDateHe(c.start)}` : ""))}</span>${nextBtn}</div>
+  </div>`;
+}
+
+/* ----- עלויות תחזוקה שנתיות ----- */
+function eqYearRange(Y){ return { s: `${Y}-09-01`, e: `${Y + 1}-08-31` }; }
+function eqMonthKeys(Y){ const out = []; for(let i = 0; i < 12; i++){ const m = (8 + i) % 12; const y = m >= 8 ? Y : Y + 1; out.push(`${y}-${String(m + 1).padStart(2, "0")}`); } return out; }
+function eqMonthIndex(Y, iso){
+  const d = tkParse(iso); if(!d) return -1;
+  return eqMonthKeys(Y).indexOf(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
+}
+/* עלות חוזה בשנה: 1/12 מהעלות השנתית לכל חודש בשנת הלימודים שבו החוזה בתוקף.
+   כולל תקופות קודמות של החוזה (לפני חידוש), כל אחת עם העלות שלה. */
+function eqContractMonthly(c, Y){
+  const periods = (Array.isArray(c.prevPeriods) ? c.prevPeriods : []).concat([{ start: c.start, end: c.end, annualCost: c.annualCost }]);
+  return eqMonthKeys(Y).map(k => {
+    let amt = 0;
+    periods.forEach(p => {
+      const s = p.start ? String(p.start).slice(0, 7) : "0000-00";
+      const e = p.end ? String(p.end).slice(0, 7) : "9999-99";
+      if(k >= s && k <= e) amt = (Number(p.annualCost) || 0) / 12;   // התקופה המאוחרת גוברת
+    });
+    return amt;
+  });
+}
+function eqCostData(Y){
+  const tasks = data.tasks.filter(t => Number(t.schoolYear || currentSchoolYearStart()) === Y);
+  const items = [];
+  tasks.forEach(t => {
+    const j = tkJob(t);
+    if(!j || !(j.amount > 0)) return;
+    const date = t.doneAt || t.due || t.created || "";
+    let mi = eqMonthIndex(Y, date);
+    if(mi < 0) mi = Math.max(0, eqMonthIndex(Y, t.created || ""));
+    items.push({ kind: "task", t, amount: j.amount, paid: j.paid, cat: t.category || "כללי", maint: t.maint || "ללא סיווג", month: mi, pro: (j.pro || t.assignee || "").trim(), equip: t.equipId ? eqItem(t.equipId) : null });
+  });
+  data.serviceContracts.forEach(c => {
+    eqContractMonthly(c, Y).forEach((amt, mi) => {
+      if(amt > 0) items.push({ kind: "contract", c, amount: amt, paid: false, cat: c.category || "חוזי שירות", maint: "חוזי שירות", month: mi, pro: c.supplier || "", equip: null });
+    });
+  });
+  return items;
+}
+function eqSum(list){ return list.reduce((s, x) => s + x.amount, 0); }
+function eqCostsViewHtml(){
+  if(eqUi.year === null) eqUi.year = currentSchoolYearStart();
+  const Y = eqUi.year;
+  const items = eqCostData(Y);
+  const prev = eqSum(eqCostData(Y - 1));
+  const total = eqSum(items);
+  const budget = data.maintBudget[String(Y)] || {};
+  const budgetTotal = Object.values(budget).reduce((s, v) => s + (Number(v) || 0), 0);
+  const taskItems = items.filter(x => x.kind === "task");
+  const paid = eqSum(taskItems.filter(x => x.paid));
+  const unpaid = eqSum(taskItems.filter(x => !x.paid));
+  const contracts = eqSum(items.filter(x => x.kind === "contract"));
+  const years = schoolYearOptions(); if(!years.includes(Y)) years.push(Y);
+  const delta = prev > 0 ? Math.round((total - prev) / prev * 100) : null;
+  // תחומים
+  const cats = new Set(Object.keys(budget));
+  items.forEach(x => cats.add(x.cat));
+  const catRows = [...cats].map(cat => ({ cat, actual: eqSum(items.filter(x => x.cat === cat)), budget: Number(budget[cat]) || 0 }))
+    .sort((a, b) => (b.actual - a.actual) || (b.budget - a.budget));
+  const catHtml = catRows.length ? catRows.map(r => {
+    const pct = r.budget > 0 ? Math.round(r.actual / r.budget * 100) : null;
+    const over = pct !== null && pct > 100;
+    const w = r.budget > 0 ? Math.min(100, pct) : (total > 0 ? Math.round(r.actual / total * 100) : 0);
+    return `<div class="eq-crow">
+      <div class="eq-crow-top"><span class="nm">${escHtml(r.cat)}</span><span class="act">${fmtMoney(Math.round(r.actual))}</span>
+        <label class="eq-bud">תקציב <span>₪</span><input type="number" min="0" step="100" inputmode="numeric" data-eq-budget="${escHtml(r.cat)}" value="${r.budget || ""}" placeholder="—" aria-label="תקציב ל${escHtml(r.cat)}"></label></div>
+      <div class="eq-bar"><span class="${over ? "over" : r.budget ? "" : "nob"}" style="width:${w}%"></span></div>
+      <div class="eq-crow-sub">${r.budget ? (over ? `<b class="over">חריגה של ${fmtMoney(Math.round(r.actual - r.budget))} (${pct}%)</b>` : `נוצל ${pct}% · נשאר ${fmtMoney(Math.round(r.budget - r.actual))}`) : "לא הוגדר תקציב"}</div>
+    </div>`;
+  }).join("") : `<div class="tk-empty">אין עדיין עלויות בשנה הזו. עלויות נכנסות מכל משימה שיש בה סכום, ומחוזי שירות.</div>`;
+  // סוג תחזוקה
+  const types = ["תחזוקה מונעת", "תחזוקה שוטפת", "תחזוקה בלתי מתוכננת", "חוזי שירות", "ללא סיווג"];
+  const typeColors = { "תחזוקה מונעת": "#7a8a5e", "תחזוקה שוטפת": "#c67139", "תחזוקה בלתי מתוכננת": "#b4441a", "חוזי שירות": "#4b8aa8", "ללא סיווג": "#a89c8a" };
+  const typeRows = types.map(k => ({ k, v: eqSum(items.filter(x => x.maint === k)) })).filter(r => r.v > 0);
+  const typeHtml = typeRows.length ? `<div class="eq-stack">${typeRows.map(r => `<span style="width:${(r.v / total * 100).toFixed(2)}%;background:${typeColors[r.k]}" title="${escHtml(r.k)}"></span>`).join("")}</div>
+    <div class="eq-legend">${typeRows.map(r => `<span><i style="background:${typeColors[r.k]}"></i>${escHtml(r.k.replace("תחזוקה ", ""))} · ${fmtMoney(Math.round(r.v))} (${Math.round(r.v / total * 100)}%)</span>`).join("")}</div>` : `<div class="tk-empty">אין נתונים</div>`;
+  // חודשים
+  const months = EQ_MONTHS.map((l, i) => ({ l, task: eqSum(items.filter(x => x.month === i && x.kind === "task")), con: eqSum(items.filter(x => x.month === i && x.kind === "contract")) }));
+  const maxM = Math.max(1, ...months.map(m => m.task + m.con));
+  const monthHtml = `<div class="eq-months" role="img" aria-label="עלויות לפי חודש">${months.map(m => {
+    const tot = m.task + m.con;
+    return `<div class="eq-m" title="${m.l}: ${fmtMoney(Math.round(tot))}"><div class="eq-m-val">${tot > 0 ? (tot >= 1000 ? (tot / 1000).toFixed(tot >= 10000 ? 0 : 1) + "K" : Math.round(tot)) : ""}</div><div class="eq-m-col"><span class="con" style="height:${(m.con / maxM * 100).toFixed(1)}%"></span><span class="tsk" style="height:${(m.task / maxM * 100).toFixed(1)}%"></span></div><div class="eq-m-l">${m.l}</div></div>`;
+  }).join("")}</div><div class="eq-legend"><span><i style="background:#c67139"></i>עבודות</span><span><i style="background:#4b8aa8"></i>חוזי שירות</span></div>`;
+  // מובילים
+  const topBy = (keyFn, list) => {
+    const m = new Map();
+    list.forEach(x => { const k = keyFn(x); if(!k) return; m.set(k, (m.get(k) || 0) + x.amount); });
+    return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+  };
+  const topEq = topBy(x => x.equip ? x.equip.id : null, taskItems).map(([id, v]) => [eqItem(id), v]).filter(x => x[0]);
+  const topPro = topBy(x => x.pro, items);
+  const topPlace = topBy(x => x.kind === "task" ? String(x.t.place || "").trim() : "", taskItems);
+  const topList = (rows, fmtName, attr) => rows.length ? `<div class="eq-top">${rows.map(([k, v]) => `<button type="button" class="eq-top-i" ${attr ? attr(k) : ""}><span>${escHtml(fmtName(k))}</span><b>${fmtMoney(Math.round(v))}</b></button>`).join("")}</div>` : `<div class="tk-empty">אין נתונים</div>`;
+  return `
+    <div class="tk-bar"><label class="tk-field" style="flex-direction:row;align-items:center;gap:8px">שנת לימודים
+      <select id="eqYear" class="tk-year">${years.sort().map(y => `<option value="${y}" ${y === Y ? "selected" : ""}>${schoolYearLabel(y)}</option>`).join("")}</select></label></div>
+    <div class="eq-kpis">
+      <div class="eq-kpi main"><div class="l">סה״כ עלות תחזוקה</div><div class="v">${fmtMoney(Math.round(total))}</div><div class="h">${delta === null ? "אין נתונים לשנה הקודמת" : `${delta > 0 ? "▲" : delta < 0 ? "▼" : ""} ${Math.abs(delta)}% מול ${schoolYearLabel(Y - 1)} (${fmtMoney(Math.round(prev))})`}</div></div>
+      <div class="eq-kpi"><div class="l">תקציב</div><div class="v">${budgetTotal ? fmtMoney(budgetTotal) : "—"}</div><div class="h">${budgetTotal ? (total > budgetTotal ? `חריגה ${fmtMoney(Math.round(total - budgetTotal))}` : `נשאר ${fmtMoney(Math.round(budgetTotal - total))}`) : "אפשר להגדיר לכל תחום למטה"}</div></div>
+      <div class="eq-kpi"><div class="l">עבודות ששולמו</div><div class="v">${fmtMoney(Math.round(paid))}</div><div class="h">ממתין לתשלום ${fmtMoney(Math.round(unpaid))}</div></div>
+      <div class="eq-kpi"><div class="l">חוזי שירות</div><div class="v">${fmtMoney(Math.round(contracts))}</div><div class="h">ממוצע לחודש ${fmtMoney(Math.round(total / 12))}</div></div>
+    </div>
+    <div class="eq-cgrid">
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("report", 16)}תקציב מול ביצוע לפי תחום</div>${catHtml}
+        <form class="eq-addcat" data-eq-addcat="1"><input type="text" list="eqCatList" placeholder="תחום נוסף לתקציב" aria-label="תחום נוסף"><button type="submit" class="tk-btn sm soft">הוספה</button></form>
+        <datalist id="eqCatList">${eqCats().map(c => `<option value="${escHtml(c)}"></option>`).join("")}</datalist></div>
+      <div class="eq-ccol">
+        <div class="tk-sec"><div class="tk-sec-h">${tkIcon("clock", 16)}לפי חודש</div>${monthHtml}</div>
+        <div class="tk-sec"><div class="tk-sec-h">${tkIcon("repeat", 16)}לפי סוג תחזוקה</div>${typeHtml}</div>
+      </div>
+    </div>
+    <div class="eq-cgrid three">
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("shield", 16)}הציוד שעלה הכי הרבה</div>${topList(topEq, e => e.name || "ציוד", e => `data-eq-open="equip:${e.id}"`)}</div>
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("person", 16)}אנשי מקצוע וספקים</div>${topList(topPro, n => n, n => `data-pro="${escHtml(n)}"`)}</div>
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("pin", 16)}מקומות בבניין</div>${topList(topPlace, n => n, n => `data-tk-place="${escHtml(n)}"`)}</div>
+    </div>`;
+}
+function eqCostsReport(){
+  const Y = eqUi.year === null ? currentSchoolYearStart() : eqUi.year;
+  const items = eqCostData(Y);
+  const total = eqSum(items);
+  const budget = data.maintBudget[String(Y)] || {};
+  const cats = new Set(Object.keys(budget).filter(k => Number(budget[k]) > 0)); items.forEach(x => cats.add(x.cat));
+  const rows = [...cats].map(cat => ({ cat, a: eqSum(items.filter(x => x.cat === cat)), b: Number(budget[cat]) || 0 })).sort((x, y) => y.a - x.a);
+  const taskRows = items.filter(x => x.kind === "task").sort((a, b) => b.amount - a.amount);
+  const contracts = data.serviceContracts.map(c => ({ c, v: eqSum(items.filter(x => x.kind === "contract" && x.c === c)) })).filter(x => x.v > 0);
+  const html = `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>עלויות תחזוקה ${escHtml(schoolYearLabel(Y))}</title><style>${reportBaseCss()}</style></head><body>
+    <div class="head"><div><h1>עלויות תחזוקה שנתיות</h1><div class="sub">${escHtml(schoolYearLabel(Y))} · הופק ${fmtDateHe(tkToday())}</div></div><div class="logo">${reportLogoSvg()}</div></div>
+    <div class="stats"><div class="stat"><div class="l">סה״כ</div><div class="v">${fmtMoney(Math.round(total))}</div></div>
+      <div class="stat good"><div class="l">תקציב</div><div class="v">${fmtMoney(Object.values(budget).reduce((s, v) => s + (Number(v) || 0), 0))}</div></div>
+      <div class="stat warn"><div class="l">חוזי שירות</div><div class="v">${fmtMoney(Math.round(eqSum(items.filter(x => x.kind === "contract"))))}</div></div></div>
+    <div class="group"><h2>לפי תחום</h2><table><thead><tr><th>תחום</th><th>תקציב</th><th>בפועל</th><th>הפרש</th></tr></thead><tbody>
+      ${rows.map(r => `<tr><td class="desc">${escHtml(r.cat)}</td><td>${r.b ? fmtMoney(r.b) : "—"}</td><td>${fmtMoney(Math.round(r.a))}</td><td>${r.b ? fmtMoney(Math.round(r.b - r.a)) : "—"}</td></tr>`).join("") || `<tr><td colspan="4" class="empty">אין נתונים</td></tr>`}
+    </tbody></table></div>
+    ${contracts.length ? `<div class="group"><h2>חוזי שירות</h2><table><thead><tr><th>חוזה</th><th>ספק</th><th>תקופה</th><th>עלות בשנה זו</th></tr></thead><tbody>
+      ${contracts.map(x => `<tr><td class="desc">${escHtml(x.c.name || "")}</td><td>${escHtml(x.c.supplier || "")}</td><td>${x.c.start ? fmtDateHe(x.c.start) : "—"} – ${x.c.end ? fmtDateHe(x.c.end) : "—"}</td><td>${fmtMoney(Math.round(x.v))}</td></tr>`).join("")}
+    </tbody></table></div>` : ""}
+    <h2>עבודות <span>${taskRows.length} עבודות</span></h2><table><thead><tr><th>מזהה</th><th>עבודה</th><th>תחום</th><th>איש מקצוע</th><th>סכום</th><th>סטטוס תשלום</th></tr></thead><tbody>
+      ${taskRows.map(x => `<tr><td class="code">${escHtml(tkCode(x.t))}</td><td class="desc">${escHtml(x.t.desc || "")}</td><td>${escHtml(x.cat)}</td><td>${escHtml(x.pro || "—")}</td><td>${fmtMoney(Math.round(x.amount))}</td><td>${x.paid ? "שולם" : "טרם שולם"}</td></tr>`).join("") || `<tr><td colspan="6" class="empty">אין עבודות עם סכום</td></tr>`}
+    </tbody></table>
+    <div class="foot">עלות חוזה מחושבת כ-1/12 מהעלות השנתית לכל חודש בשנת הלימודים שבו החוזה בתוקף.</div></body></html>`;
+  openPrintWindow(html);
+}
+
+/* ---------- כרטיס ציוד / חוזה (מגירה) ---------- */
+function eqOpen(kind, id, focusField){
+  eqUi.openKind = kind; eqUi.openId = Number(id);
+  eqRenderDrawer();
+  const dr = document.getElementById("eqDrawer");
+  dr.classList.add("open"); dr.setAttribute("aria-hidden", "false");
+  document.getElementById("eqScrim").classList.add("open");
+  document.body.style.overflow = "hidden";
+  const b = dr.querySelector(".tk-dr-body"); if(b) b.scrollTop = 0;
+  setTimeout(() => { const el = focusField ? dr.querySelector(`[data-eq-f="${focusField}"]`) : dr.querySelector(".tk-x"); if(el) el.focus(); }, 260);
+}
+function eqClose(){
+  const kind = eqUi.openKind, id = eqUi.openId;
+  eqUi.openKind = null; eqUi.openId = null;
+  const dr = document.getElementById("eqDrawer");
+  if(dr){ dr.classList.remove("open"); dr.setAttribute("aria-hidden", "true"); }
+  const sc = document.getElementById("eqScrim"); if(sc) sc.classList.remove("open");
+  const fv = document.getElementById("fileViewer"), ps = document.getElementById("proSheet");
+  if((!fv || fv.style.display === "none") && (!ps || ps.style.display === "none")) document.body.style.overflow = "";
+  if(id !== null && eqFreshIds.has(kind + id)){
+    eqFreshIds.delete(kind + id);
+    if(kind === "equip"){
+      const e = eqItem(id);
+      if(e && !String(e.name || "").trim() && !e.category && !e.place && !e.warrantyEnd && !(e.docs || []).length && !String(e.notes || "").trim()){
+        data.equipment = data.equipment.filter(x => x !== e); eqSaveEquip();
+      }
+    }else{
+      const c = eqContract(id);
+      if(c && !String(c.name || "").trim() && !c.supplier && !c.end && !Number(c.annualCost) && !(c.docs || []).length && !(c.equipIds || []).length){
+        data.serviceContracts = data.serviceContracts.filter(x => x !== c); eqSaveContracts();
+      }
+    }
+  }
+  renderEquipment();
+}
+function eqNewEquip(){
+  const e = { id: nextId() + 20000, name: "", category: "", place: "", brand: "", model: "", serial: "", supplier: "", installDate: "", warrantyEnd: "", warrantyNotes: "", notes: "", docs: [], created: tkToday(), log: [{ d: tkToday(), t: "נוצר כרטיס הציוד" }] };
+  data.equipment.push(e); eqFreshIds.add("equip" + e.id); eqSaveEquip();
+  eqUi.view = "equip"; renderEquipment(); eqOpen("equip", e.id, "name");
+}
+function eqNewContract(){
+  const c = { id: nextId() + 21000, name: "", supplier: "", category: "", start: tkToday(), end: tkAddDays(tkAddMonths(tkToday(), 12), -1), annualCost: 0, visitsPerYear: 0, noticeDays: EQ_SOON_DAYS, autoRenew: false, includes: "", notes: "", equipIds: [], docs: [], log: [{ d: tkToday(), t: "נוצר החוזה" }] };
+  data.serviceContracts.push(c); eqFreshIds.add("contract" + c.id); eqSaveContracts();
+  eqUi.view = "contracts"; renderEquipment(); eqOpen("contract", c.id, "name");
+}
+function eqOpt(list, cur, emptyLabel){
+  const s = new Set(list.filter(Boolean)); if(cur) s.add(cur);
+  return `<option value="" ${!cur ? "selected" : ""}>${emptyLabel || ""}</option>` + [...s].map(o => `<option value="${escHtml(o)}" ${o === cur ? "selected" : ""}>${escHtml(o)}</option>`).join("");
+}
+function eqDocsHtml(rec, kind){
+  const docs = (rec.docs || []).filter(d => d && d.fileUrl);
+  return `<div class="tk-meta">${docs.map((d, i) => `<span class="tk-chip ok" style="padding-inline-end:4px"><button type="button" class="tk-chip ok" style="padding:0" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml((d.docType || "מסמך") + " · " + (rec.name || ""))}">${tkIcon("report", 13)}${escHtml(d.docType || d.name || "מסמך")}${d.uploadedAt ? ` · ${tkShortDate(d.uploadedAt)}` : ""}</button><button type="button" class="tk-ck-del" style="width:22px;height:22px" data-eq-docdel="${i}" aria-label="הסרת המסמך">${tkIcon("x", 12)}</button></span>`).join("")}
+    <span class="eq-docadd"><select id="eqDocType" aria-label="סוג מסמך">${EQ_DOC_TYPES.map(t => `<option ${kind === "contract" && t === "חוזה" ? "selected" : ""}>${t}</option>`).join("")}</select><button type="button" class="tk-btn sm soft" data-eq-docup="1">${tkIcon("upload", 14)}העלאת מסמך</button></span></div>`;
+}
+function eqTimelineHtml(rec){
+  const items = (Array.isArray(rec.log) ? rec.log : []).slice().reverse();
+  return items.length ? `<div class="tk-tl">${items.map(x => `<div class="tk-tl-i">${escHtml(x.t)}<small>${escHtml(fmtDateHe(x.d))}</small></div>`).join("")}</div>` : `<div class="tk-empty">אין עדיין פעולות</div>`;
+}
+function eqRenderDrawer(){
+  const dr = document.getElementById("eqDrawer");
+  if(!dr) return;
+  const rec = eqUi.openKind === "equip" ? eqItem(eqUi.openId) : eqContract(eqUi.openId);
+  if(!rec){ eqClose(); return; }
+  const old = dr.querySelector(".tk-dr-body"); const scroll = old ? old.scrollTop : 0;
+  const active = document.activeElement && dr.contains(document.activeElement) && document.activeElement.dataset ? document.activeElement.dataset.eqF : null;
+  dr.innerHTML = eqUi.openKind === "equip" ? eqEquipDrawerHtml(rec) : eqContractDrawerHtml(rec);
+  fillJobIcons(dr);
+  const nb = dr.querySelector(".tk-dr-body"); if(nb) nb.scrollTop = scroll;
+  if(active){ const el = dr.querySelector(`[data-eq-f="${active}"]`); if(el) el.focus({ preventScroll: true }); }
+  dr.querySelectorAll("[data-eq-f]").forEach(el => {
+    const isText = el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && (el.type === "text" || el.type === "number"));
+    if(isText) el.addEventListener("input", () => eqApplyField(rec, el, false));
+    el.addEventListener("change", () => eqApplyField(rec, el, true));
+  });
+  dr.querySelectorAll("[data-eq-cover]").forEach(cb => cb.addEventListener("change", () => {
+    const eid = Number(cb.dataset.eqCover);
+    rec.equipIds = Array.isArray(rec.equipIds) ? rec.equipIds : [];
+    if(cb.checked){ if(!rec.equipIds.includes(eid)) rec.equipIds.push(eid); }
+    else rec.equipIds = rec.equipIds.filter(x => x !== eid);
+    const e = eqItem(eid); eqLog(rec, `${cb.checked ? "נוסף לכיסוי" : "הוסר מהכיסוי"}: ${e ? e.name : ""}`);
+    eqSaveContracts(); renderEquipment();
+  }));
+}
+function eqEquipCoverHtml(e){
+  const w = eqWarranty(e);
+  const cs = eqContractsFor(e);
+  return `<div class="eq-cover ${w.k}">${tkIcon("shield", 18)}<div><b>${escHtml(w.label)}</b>${e.warrantyNotes ? `<div>${escHtml(e.warrantyNotes)}</div>` : ""}</div></div>
+    ${cs.map(c => { const st = eqContractState(c); return `<div class="eq-cover ${eqContractActive(c) ? "ok" : "expired"}">${tkIcon("report", 18)}<div><b>חוזה שירות: <button type="button" class="tk-linkbtn" data-eq-open="contract:${c.id}">${escHtml(c.name || c.supplier || "חוזה")}</button></b><div>${escHtml(st.label)}${c.supplier ? " · " + escHtml(c.supplier) : ""}</div></div></div>`; }).join("")}
+    <div class="tk-actions"><button type="button" class="tk-btn sm" data-eq-fault="${e.id}">${svgIcon("plus", 15)}פתיחת תקלה על הציוד</button>
+      ${e.warrantyEnd ? `<button type="button" class="tk-btn sm soft" data-eq-cal="equip">${svgIcon("calendar", 15)}${e.calEventId ? "התזכורת ביומן ✓" : "תזכורת ביומן לפני סוף האחריות"}</button>` : ""}</div>`;
+}
+function eqEquipDrawerHtml(e){
+  const tasks = eqTasksFor(e).slice().sort((a, b) => String(b.doneAt || b.created || "").localeCompare(String(a.doneAt || a.created || "")) || (b.id - a.id));
+  const cost = tasks.reduce((s, t) => s + eqTaskCost(t), 0);
+  const adm = eqIsAdmin();
+  const base = e.installDate || "";
+  return `
+    <div class="tk-dr-head"><div class="t"><div class="k">כרטיס ציוד · ${escHtml(e.category || "ללא תחום")}${e.place ? " · " + escHtml(e.place) : ""}</div><div class="h">${escHtml(e.name || "פריט ציוד חדש")}</div></div>
+      <button type="button" class="tk-x" data-eq-close="1" aria-label="סגירת כרטיס הציוד">${tkIcon("x", 20)}</button></div>
+    <div class="tk-dr-body">
+      <div class="tk-sec" data-eq-coverbox="1">${eqEquipCoverHtml(e)}</div>
+      <div class="tk-sec"><div class="tk-sec-h">פרטי הציוד</div>
+        <div class="tk-fields">
+          <label class="tk-field full">שם הפריט<input type="text" data-eq-f="name" value="${escHtml(e.name || "")}" placeholder="למשל: מזגן כיתה 3, דוד שמש מטבח"></label>
+          <label class="tk-field">תחום<select data-eq-f="category">${eqOpt(eqCats(), e.category || "", "בחירה…")}</select></label>
+          <label class="tk-field">מקום בבניין<input type="text" data-eq-f="place" list="eqPlaceList" value="${escHtml(e.place || "")}" placeholder="למשל: מטבח"></label>
+          <label class="tk-field">יצרן<input type="text" data-eq-f="brand" value="${escHtml(e.brand || "")}"></label>
+          <label class="tk-field">דגם<input type="text" data-eq-f="model" value="${escHtml(e.model || "")}"></label>
+          <label class="tk-field">מספר סידורי<input type="text" data-eq-f="serial" value="${escHtml(e.serial || "")}" dir="ltr" style="text-align:right"></label>
+          <label class="tk-field">ספק / מתקין<select data-eq-f="supplier">${eqOpt(getContactNames(), e.supplier || "", "לא צוין")}</select></label>
+          <label class="tk-field">תאריך קנייה / התקנה<input type="date" data-eq-f="installDate" value="${escHtml(e.installDate || "")}"></label>
+          <label class="tk-field">אחריות עד<input type="date" data-eq-f="warrantyEnd" value="${escHtml(e.warrantyEnd || "")}"></label>
+          ${base ? `<div class="tk-field full"><span>חישוב מהיר מתאריך הקנייה</span><div class="tk-actions">${[1, 2, 3, 5].map(n => `<button type="button" class="tk-pill" data-eq-wy="${n}">${n === 1 ? "שנה" : n + " שנים"}</button>`).join("")}</div></div>` : ""}
+          <label class="tk-field full">מה האחריות כוללת<input type="text" data-eq-f="warrantyNotes" value="${escHtml(e.warrantyNotes || "")}" placeholder="למשל: חלקים ועבודה, מדחס 5 שנים"></label>
+          <label class="tk-field full">הערות<textarea data-eq-f="notes" rows="2">${escHtml(e.notes || "")}</textarea></label>
+        </div>
+        <datalist id="eqPlaceList">${eqPlaces().map(p => `<option value="${escHtml(p)}"></option>`).join("")}</datalist>
+      </div>
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("report", 16)}מסמכים<span class="r">תעודת אחריות, חשבונית, מדריך</span></div>${eqDocsHtml(e, "equip")}</div>
+      <div class="tk-sec"><div class="tk-sec-h">${svgIcon("tasks", 16)}היסטוריית תקלות ותיקונים<span class="r">${tasks.length} משימות${adm && cost > 0 ? ` · ${fmtMoney(cost)}` : ""}</span></div>
+        ${tasks.length ? `<div class="tk-hist">${tasks.map(t => `<button type="button" class="tk-hist-i" data-tk-goto="${t.id}"><div class="m"><div class="t">${escHtml(t.desc || "ללא תיאור")}</div><div class="s">${escHtml([tkCode(t), tkStatus(t), t.assignee, fmtDateHe(t.doneAt || t.created || "")].filter(x => x && x !== "—").join(" · "))}</div></div><div class="a">${adm && eqTaskCost(t) > 0 ? fmtMoney(eqTaskCost(t)) : ""}</div></button>`).join("")}</div>` : `<div class="tk-empty">אין עדיין משימות על הציוד הזה. משימה מקושרת דרך "פתיחת תקלה", או מתוך תיק המשימה בשדה "ציוד".</div>`}
+      </div>
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("history", 16)}מה קרה עד עכשיו</div>${eqTimelineHtml(e)}</div>
+      <div class="tk-dr-foot"><span></span><button type="button" class="tk-btn sm danger" data-eq-del="1">${svgIcon("trash", 15)}מחיקת הפריט</button></div>
+    </div>`;
+}
+function eqContractCoverHtml(c){
+  const st = eqContractState(c);
+  const contact = c.supplier ? findContactByName(c.supplier) : null;
+  return `<div class="eq-cover ${st.k === "active" ? "ok" : st.k === "soon" ? "soon" : st.k === "future" ? "ok" : "expired"}">${tkIcon("clock", 18)}<div><b>${escHtml(st.label)}</b>${c.autoRenew ? "<div>מתחדש אוטומטית</div>" : ""}</div></div>
+    <div class="tk-actions">
+      <button type="button" class="tk-btn sm ${st.k === "soon" || st.k === "expired" ? "" : "soft"}" data-eq-renew="${c.id}">${tkIcon("repeat", 15)}חידוש לשנה נוספת</button>
+      ${c.end ? `<button type="button" class="tk-btn sm soft" data-eq-cal="contract">${svgIcon("calendar", 15)}${c.calEventId ? "התזכורת ביומן ✓" : "תזכורת חידוש ביומן"}</button>` : ""}
+      ${contact && contact.phone ? `<a class="tk-btn sm soft" href="https://wa.me/${formatPhoneForWhatsApp(contact.phone)}" target="_blank" rel="noopener">${svgIcon("whatsapp", 15)}וואטסאפ לספק</a>` : ""}
+    </div>`;
+}
+function eqContractDrawerHtml(c){
+  const st = eqContractState(c);
+  const adm = eqIsAdmin();
+  const covered = new Set(c.equipIds || []);
+  const eqs = data.equipment.slice().sort((a, b) => String(a.category || "").localeCompare(String(b.category || ""), "he") || String(a.name || "").localeCompare(String(b.name || ""), "he"));
+  const visitTask = c.visitTaskId ? data.tasks.find(t => t.id === c.visitTaskId) : null;
+  return `
+    <div class="tk-dr-head"><div class="t"><div class="k">חוזה שירות · ${escHtml(c.category || "ללא תחום")}</div><div class="h">${escHtml(c.name || "חוזה שירות חדש")}</div></div>
+      <button type="button" class="tk-x" data-eq-close="1" aria-label="סגירת החוזה">${tkIcon("x", 20)}</button></div>
+    <div class="tk-dr-body">
+      <div class="tk-sec" data-eq-coverbox="1">${eqContractCoverHtml(c)}</div>
+      <div class="tk-sec"><div class="tk-sec-h">פרטי החוזה</div>
+        <div class="tk-fields">
+          <label class="tk-field full">שם החוזה<input type="text" data-eq-f="name" value="${escHtml(c.name || "")}" placeholder="למשל: שירות מעליות, בדיקת מטפים"></label>
+          <label class="tk-field">ספק<select data-eq-f="supplier">${eqOpt(getContactNames(), c.supplier || "", "בחירה…")}</select></label>
+          <label class="tk-field">תחום<select data-eq-f="category">${eqOpt(eqCats(), c.category || "", "בחירה…")}</select></label>
+          <label class="tk-field">תחילת החוזה<input type="date" data-eq-f="start" value="${escHtml(c.start || "")}"></label>
+          <label class="tk-field">סיום החוזה<input type="date" data-eq-f="end" value="${escHtml(c.end || "")}"></label>
+          ${adm ? `<label class="tk-field">עלות שנתית (₪)<input type="number" min="0" step="any" inputmode="decimal" data-eq-f="annualCost" value="${Number(c.annualCost) || ""}"></label>` : ""}
+          <label class="tk-field">ביקורי שירות<select data-eq-f="visitsPerYear">${EQ_VISITS.map(([n, l]) => `<option value="${n}" ${Number(c.visitsPerYear || 0) === n ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+          <label class="tk-field">תזכורת לחידוש (ימים לפני)<input type="number" min="1" max="365" inputmode="numeric" data-eq-f="noticeDays" value="${eqNotice(c)}"></label>
+          <label class="tk-field" style="flex-direction:row;align-items:center;gap:8px;padding-top:18px"><input type="checkbox" data-eq-f="autoRenew" ${c.autoRenew ? "checked" : ""} style="width:18px;height:18px;accent-color:#7a8a5e">מתחדש אוטומטית</label>
+          <label class="tk-field full">מה החוזה כולל<textarea data-eq-f="includes" rows="2" placeholder="למשל: ביקור רבעוני, חלקים עד 500 ₪, קריאת שירות תוך 24 שעות">${escHtml(c.includes || "")}</textarea></label>
+          <label class="tk-field full">הערות<textarea data-eq-f="notes" rows="2">${escHtml(c.notes || "")}</textarea></label>
+        </div>
+      </div>
+      ${Number(c.visitsPerYear) ? `<div class="tk-sec"><div class="tk-sec-h">${tkIcon("repeat", 16)}ביקורי שירות</div>
+        ${visitTask ? `<div style="font-size:13px">משימת הביקור החוזרת: <button type="button" class="tk-linkbtn" data-tk-goto="${visitTask.id}">${escHtml(tkCode(visitTask))} · ${escHtml(visitTask.desc || "")}</button> · ${escHtml(tkRecurLabel(visitTask))}</div>`
+          : `<div style="font-size:13px;color:var(--ink-soft)">יוצר משימת תחזוקה מונעת שנפתחת מחדש לבד אחרי כל ביקור, כדי לוודא שהספק באמת מגיע.</div><div class="tk-actions"><button type="button" class="tk-btn sm" data-eq-visit="${c.id}">${svgIcon("plus", 15)}יצירת משימת ביקור חוזרת</button></div>`}
+      </div>` : ""}
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("shield", 16)}ציוד שהחוזה מכסה<span class="r">${covered.size} פריטים</span></div>
+        ${eqs.length ? `<div class="tk-ck">${eqs.map(e => `<div class="tk-ck-row"><label><input type="checkbox" data-eq-cover="${e.id}" ${covered.has(e.id) ? "checked" : ""}><span>${escHtml(e.name || "ללא שם")}${e.place ? ` <small style="color:var(--ink-soft)">· ${escHtml(e.place)}</small>` : ""}</span></label></div>`).join("")}</div>` : `<div class="tk-empty">עדיין אין ציוד ברשימה. אפשר להוסיף בלשונית "ציוד ואחריות".</div>`}
+      </div>
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("report", 16)}מסמכים<span class="r">החוזה החתום, הצעת מחיר</span></div>${eqDocsHtml(c, "contract")}</div>
+      <div class="tk-sec"><div class="tk-sec-h">${tkIcon("history", 16)}מה קרה עד עכשיו</div>${eqTimelineHtml(c)}</div>
+      <div class="tk-dr-foot"><span></span><button type="button" class="tk-btn sm danger" data-eq-del="1">${svgIcon("trash", 15)}מחיקת החוזה</button></div>
+    </div>`;
+}
+let eqSaveTimer = null;
+function eqApplyField(rec, el, committed){
+  const f = el.dataset.eqF;
+  let v = el.type === "checkbox" ? el.checked : el.value;
+  if(f === "annualCost") v = Math.max(0, Number(v) || 0);
+  if(f === "visitsPerYear" || f === "noticeDays") v = Math.max(0, Number(v) || 0);
+  if(typeof v === "string" && committed) v = v.trim();
+  const before = rec[f];
+  rec[f] = v;
+  const isEquip = eqUi.openKind === "equip";
+  const save = isEquip ? eqSaveEquip : eqSaveContracts;
+  if(!committed){
+    clearTimeout(eqSaveTimer); eqSaveTimer = setTimeout(save, 400);
+    if(f === "name"){ const h = document.querySelector("#eqDrawer .tk-dr-head .h"); if(h) h.textContent = v || (isEquip ? "פריט ציוד חדש" : "חוזה שירות חדש"); }
+    return;
+  }
+  if(v !== before){
+    if(f === "warrantyEnd" && v) eqLog(rec, `אחריות עד ${fmtDateHe(v)}`);
+    if((f === "start" || f === "end") && v) eqLog(rec, `${f === "start" ? "תחילת" : "סיום"} החוזה: ${fmtDateHe(v)}`);
+    if(f === "annualCost") eqLog(rec, `עלות שנתית: ${fmtMoney(v)}`);
+    if(f === "supplier" && v) eqLog(rec, `ספק: ${v}`);
+    if((f === "warrantyEnd" || f === "end") && rec.calEventId){ eqLog(rec, "שים לב: התאריך השתנה, כדאי לעדכן את התזכורת ביומן"); rec.calEventId = null; }
+  }
+  clearTimeout(eqSaveTimer);
+  save();
+  // שדות בחירה מציירים מחדש את כל הכרטיס; שדות הקלדה ותאריך מעדכנים רק את הרשימה ואת שורת הכיסוי
+  if(el.tagName === "SELECT" || el.type === "checkbox") renderEquipment();
+  else renderEquipment({ skipDrawer: true });
+}
+function eqUploadDoc(){
+  const rec = eqUi.openKind === "equip" ? eqItem(eqUi.openId) : eqContract(eqUi.openId);
+  if(!rec) return;
+  const kind = eqUi.openKind;
+  const typeSel = document.getElementById("eqDocType");
+  const docType = typeSel ? typeSel.value : "אחר";
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*,application/pdf";
+  input.onchange = async () => {
+    if(!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    jobToast("מעלה את הקובץ…", 60000);
+    try{
+      const ref = storage.ref().child(`uploads/${kind === "equip" ? "equipment" : "service-contracts"}/${Date.now()}_${file.name}`);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      const fresh = kind === "equip" ? eqItem(rec.id) : eqContract(rec.id);
+      if(!fresh){ jobToast("הרשומה לא נמצאה, הקובץ לא נשמר"); return; }
+      fresh.docs = Array.isArray(fresh.docs) ? fresh.docs : [];
+      fresh.docs.push({ name: docType, docType, fileUrl: url, uploadedAt: tkToday() });
+      eqLog(fresh, `צורף מסמך: ${docType}`);
+      if(kind === "equip") eqSaveEquip(); else eqSaveContracts();
+      renderEquipment();
+      jobToast("המסמך נשמר ✓");
+    }catch(err){
+      console.error(err);
+      jobToast("שגיאת העלאה: " + err.message, 5000);
+    }
+  };
+  input.click();
+}
+function eqFault(eid){
+  const e = eqItem(eid);
+  if(!e) return;
+  const cov = eqCoverage({ equipId: e.id });
+  const t = tkNewTask({
+    desc: `${e.name || "ציוד"}: תקלה`, category: e.category || "", place: e.place || "", equipId: e.id,
+    assignee: (cov && cov.cs.length && cov.cs[0].supplier) || "", schoolYear: currentSchoolYearStart(), prio: 2
+  });
+  t.log = [{ d: tkToday(), t: `נפתחה מכרטיס הציוד: ${e.name || ""}` }];
+  tkSave();
+  eqLog(e, `נפתחה תקלה ${tkCode(t)}`);
+  eqSaveEquip();
+  eqClose();
+  goToTask(t.id);
+  setTimeout(() => {
+    const el = document.querySelector('#tkDrawer [data-tk-f="desc"]');
+    if(el){ el.focus(); el.select(); }
+    if(cov && cov.covered) jobToast(cov.w.k === "ok" || cov.w.k === "soon" ? "שים לב: הציוד באחריות. כדאי לפנות קודם לספק במסגרת האחריות." : "שים לב: הציוד מכוסה בחוזה שירות.", 5200);
+  }, 320);
+}
+function eqRenew(cid){
+  const c = eqContract(cid);
+  if(!c) return;
+  const base = c.end && tkDaysTo(c.end) !== null ? c.end : tkToday();
+  const newStart = tkAddDays(base, 1);
+  const newEnd = tkAddDays(tkAddMonths(newStart, 12), -1);
+  openConfirmModal(`לחדש את "${c.name || "החוזה"}" לשנה נוספת, מ-${fmtDateHe(newStart)} עד ${fmtDateHe(newEnd)}? אפשר לעדכן אחר כך את העלות.`, () => {
+    eqLog(c, `חודש לשנה נוספת: ${fmtDateHe(newStart)} – ${fmtDateHe(newEnd)} (קודם: ${c.start ? fmtDateHe(c.start) : "—"} – ${c.end ? fmtDateHe(c.end) : "—"})`);
+    c.prevPeriods = Array.isArray(c.prevPeriods) ? c.prevPeriods : [];
+    c.prevPeriods.push({ start: c.start || "", end: c.end || "", annualCost: Number(c.annualCost) || 0 });
+    c.start = newStart; c.end = newEnd;
+    if(c.calEventId) c.calEventId = null;
+    eqSaveContracts();
+    renderEquipment();
+    jobToast("החוזה חודש עד " + fmtDateHe(newEnd));
+  }, { yesLabel: "חידוש", icon: "calendar" });
+}
+function eqVisitTask(cid){
+  const c = eqContract(cid);
+  if(!c) return;
+  const visits = Number(c.visitsPerYear) || 0;
+  const months = EQ_VISIT_MONTHS[visits];
+  if(!months) return;
+  const firstEq = (c.equipIds || []).map(eqItem).find(Boolean);
+  const t = tkNewTask({
+    desc: `ביקור שירות: ${c.name || c.supplier || "חוזה שירות"}`, category: c.category || "", assignee: c.supplier || "",
+    maint: "תחזוקה מונעת", recurMonths: months, place: firstEq ? firstEq.place || "" : "", equipId: firstEq ? firstEq.id : null,
+    contractId: c.id, due: tkAddMonths(tkToday(), Math.min(months, 1)), schoolYear: currentSchoolYearStart(), notes: c.includes || ""
+  });
+  t.log = [{ d: tkToday(), t: `נפתחה מחוזה השירות: ${c.name || ""}` }];
+  c.visitTaskId = t.id;
+  eqLog(c, `נוצרה משימת ביקור חוזרת ${tkCode(t)}`);
+  tkSave(); eqSaveContracts();
+  renderEquipment();
+  try{ renderTasks(); }catch(err){ console.error(err); }
+  jobToast(`נוצרה משימת ביקור ${tkCode(t)} שחוזרת ${tkRecurLabel(t)}`, 4200);
+}
+async function eqCalendar(kind){
+  const rec = kind === "equip" ? eqItem(eqUi.openId) : eqContract(eqUi.openId);
+  if(!rec) return;
+  if(rec.calEventId){ jobToast("כבר נוספה תזכורת ביומן"); return; }
+  const end = kind === "equip" ? rec.warrantyEnd : rec.end;
+  if(!end) return;
+  const before = kind === "equip" ? 30 : eqNotice(rec);
+  let date = tkAddDays(end, -before);
+  if(tkDaysTo(date) < 0) date = tkToday();
+  const title = kind === "equip" ? `סוף אחריות: ${rec.name || "ציוד"}` : `חידוש חוזה שירות: ${rec.name || ""}`;
+  const details = kind === "equip"
+    ? `האחריות על ${rec.name || ""} נגמרת ב-${fmtDateHe(end)}.${rec.supplier ? " ספק: " + rec.supplier + "." : ""} כדאי לבדוק את הציוד ולפנות לספק לפני כן.`
+    : `החוזה עם ${rec.supplier || "הספק"} מסתיים ב-${fmtDateHe(end)}.${rec.annualCost ? " עלות שנתית: " + fmtMoney(Number(rec.annualCost)) + "." : ""}`;
+  jobToast("מוסיף ליומן…", 30000);
+  try{
+    const res = await createGoogleCalendarEvent(date, title, details);
+    rec.calEventId = res && res.id ? res.id : "ok";
+    eqLog(rec, `נוספה תזכורת ביומן ל-${fmtDateHe(date)}`);
+    if(kind === "equip") eqSaveEquip(); else eqSaveContracts();
+    renderEquipment();
+    jobToast(`התזכורת נוספה ליומן ל-${fmtDateHe(date)}`);
+  }catch(err){
+    console.error(err);
+    jobToast("לא הצלחנו להוסיף ליומן: " + (err.message || err), 5000);
+  }
+}
+function eqDelete(){
+  const kind = eqUi.openKind, id = eqUi.openId;
+  const rec = kind === "equip" ? eqItem(id) : eqContract(id);
+  if(!rec) return;
+  const linked = kind === "equip" ? eqTasksFor(rec).length : 0;
+  openConfirmModal(`למחוק את "${rec.name || (kind === "equip" ? "הפריט" : "החוזה")}"? לא ניתן לשחזר את הפעולה.${linked ? ` ${linked} משימות שקשורות אליו יישארו כמו שהן.` : ""}`, () => {
+    eqFreshIds.delete(kind + id);
+    if(kind === "equip"){
+      data.equipment = data.equipment.filter(x => x.id !== id);
+      eqSaveEquip();
+    }else{
+      data.serviceContracts = data.serviceContracts.filter(x => x.id !== id);
+      eqSaveContracts();
+    }
+    eqUi.openId = null; eqUi.openKind = null;
+    eqClose();
+  });
+}
+
+/* ---------- האזנה ---------- */
+document.addEventListener("click", e => {
+  const t = e.target;
+  if(!t || !t.closest || !t.closest("#tab-equipment, #eqDrawer")) return;
+  if(t.closest("[data-eq-close]")){ eqClose(); return; }
+  const v = t.closest("[data-eq-view]"); if(v){ eqUi.view = v.dataset.eqView; renderEquipment(); return; }
+  const nw = t.closest("[data-eq-new]"); if(nw){ if(nw.dataset.eqNew === "equip") eqNewEquip(); else eqNewContract(); return; }
+  if(t.closest("[data-eq-report]")){ eqCostsReport(); return; }
+  const fl = t.closest("[data-eq-filter]"); if(fl){ const k = fl.dataset.eqFilter; eqUi.filter = eqUi.filter === k ? "" : k; renderEquipment(); return; }
+  const cf = t.closest("[data-eq-cfilter]"); if(cf){ const k = cf.dataset.eqCfilter; eqUi.cfilter = eqUi.cfilter === k ? "" : k; renderEquipment(); return; }
+  const fa = t.closest("[data-eq-fault]"); if(fa){ e.preventDefault(); eqFault(Number(fa.dataset.eqFault)); return; }
+  const rn = t.closest("[data-eq-renew]"); if(rn){ e.preventDefault(); eqRenew(Number(rn.dataset.eqRenew)); return; }
+  const vs = t.closest("[data-eq-visit]"); if(vs){ eqVisitTask(Number(vs.dataset.eqVisit)); return; }
+  const cl = t.closest("[data-eq-cal]"); if(cl){ eqCalendar(cl.dataset.eqCal); return; }
+  if(t.closest("[data-eq-docup]")){ eqUploadDoc(); return; }
+  const dd = t.closest("[data-eq-docdel]");
+  if(dd){
+    const rec = eqUi.openKind === "equip" ? eqItem(eqUi.openId) : eqContract(eqUi.openId);
+    const list = rec ? (rec.docs || []).filter(d => d && d.fileUrl) : [];
+    const doc = list[Number(dd.dataset.eqDocdel)];
+    if(!doc) return;
+    openConfirmModal(`להסיר את המסמך "${doc.docType || doc.name || ""}" מהכרטיס? הקובץ עצמו לא נמחק מהאחסון.`, () => {
+      rec.docs = rec.docs.filter(d => d !== doc);
+      eqLog(rec, `הוסר מסמך: ${doc.docType || doc.name || ""}`);
+      if(eqUi.openKind === "equip") eqSaveEquip(); else eqSaveContracts();
+      renderEquipment();
+    }, { yesLabel: "הסרה" });
+    return;
+  }
+  const wy = t.closest("[data-eq-wy]");
+  if(wy){
+    const rec = eqItem(eqUi.openId);
+    if(rec && rec.installDate){
+      rec.warrantyEnd = tkAddMonths(rec.installDate, 12 * Number(wy.dataset.eqWy));
+      eqLog(rec, `אחריות עד ${fmtDateHe(rec.warrantyEnd)}`);
+      eqSaveEquip(); renderEquipment();
+    }
+    return;
+  }
+  if(t.closest("[data-eq-del]")){ eqDelete(); return; }
+  const op = t.closest("[data-eq-open]");
+  if(op && (!t.closest("button, a, input, select, textarea, label") || t.closest("button") === op)){
+    e.preventDefault();
+    const [kind, id] = op.dataset.eqOpen.split(":");
+    eqOpen(kind, Number(id));
+    return;
+  }
+  const go = t.closest("[data-tk-goto]");
+  if(go && t.closest("#eqDrawer")){ e.preventDefault(); const id = Number(go.dataset.tkGoto); eqClose(); goToTask(id); return; }
+  const pl = t.closest("[data-tk-place]");
+  if(pl && t.closest("#tab-equipment")){ e.preventDefault(); tkOpenPlace(pl.dataset.tkPlace); return; }
+});
+document.addEventListener("input", e => {
+  const t = e.target;
+  if(t && t.id === "eqSearch"){
+    eqUi.q = t.value || "";
+    clearTimeout(eqUi._qt);
+    eqUi._qt = setTimeout(() => { renderEquipment(); const s = document.getElementById("eqSearch"); if(s){ s.focus(); s.setSelectionRange(s.value.length, s.value.length); } }, 200);
+  }
+});
+document.addEventListener("change", e => {
+  const t = e.target;
+  if(!t) return;
+  if(t.id === "eqCatFilter"){ eqUi.cat = t.value; renderEquipment(); }
+  if(t.id === "eqYear"){ eqUi.year = Number(t.value) || currentSchoolYearStart(); renderEquipment(); }
+  if(t.matches && t.matches("[data-eq-budget]")){
+    const Y = String(eqUi.year === null ? currentSchoolYearStart() : eqUi.year);
+    const cat = t.dataset.eqBudget;
+    data.maintBudget[Y] = data.maintBudget[Y] || {};
+    const v = Math.max(0, Number(t.value) || 0);
+    if(v) data.maintBudget[Y][cat] = v; else delete data.maintBudget[Y][cat];
+    eqSaveBudget();
+    renderEquipment();
+  }
+});
+document.addEventListener("submit", e => {
+  const f = e.target;
+  if(!f || !f.matches || !f.matches("[data-eq-addcat]")) return;
+  e.preventDefault();
+  const inp = f.querySelector("input");
+  const cat = (inp.value || "").trim();
+  if(!cat) return;
+  const Y = String(eqUi.year === null ? currentSchoolYearStart() : eqUi.year);
+  data.maintBudget[Y] = data.maintBudget[Y] || {};
+  if(!Object.prototype.hasOwnProperty.call(data.maintBudget[Y], cat)) data.maintBudget[Y][cat] = 0;
+  eqSaveBudget();
+  renderEquipment();
+  setTimeout(() => { const el = document.querySelector(`[data-eq-budget="${CSS.escape(cat)}"]`); if(el){ el.focus(); el.select(); } }, 30);
+});
+document.addEventListener("keydown", e => {
+  const t = e.target;
+  if((e.key === "Enter" || e.key === " ") && t && t.matches && t.matches("div[data-eq-open]")){
+    e.preventDefault(); const [kind, id] = t.dataset.eqOpen.split(":"); eqOpen(kind, Number(id)); return;
+  }
+  if(e.key === "Escape" && eqUi.openId !== null){
+    const blocking = Array.from(document.querySelectorAll(".modal-overlay, .fv-overlay")).some(el => el.style.display && el.style.display !== "none");
+    if(!blocking) eqClose();
+  }
+});
 
 /* ---------- TASKS REPORT (PDF) + WORK SLIP ---------- */
 function escHtml(s){
@@ -3521,7 +5786,8 @@ function sortTasksForReport(list){
 const TASK_STATUS_PRINT = {
   "בוצע":      {bg:"#e1eecc", fg:"#4f5f33"},
   "בביצוע":    {bg:"#ffe1d0", fg:"#8c491a"},
-  "טרם התחיל": {bg:"#eee7db", fg:"#645c50"}
+  "טרם התחיל": {bg:"#eee7db", fg:"#645c50"},
+  "ממתין":     {bg:"#dfeef5", fg:"#2a5a73"}
 };
 const MAINT_PRINT = {
   "תחזוקה מונעת":         {bg:"#dfeef5", fg:"#2a5a73"},
@@ -3802,7 +6068,8 @@ function updateWorkSlipPreview(){
 }
 function markWorkSlipSent(list){
   const today = new Date().toISOString().slice(0,10);
-  list.forEach(r => { r.sentAt = today; });
+  const whoSent = (document.getElementById("wsAssignee")||{}).value || "";
+  list.forEach(r => { r.sentAt = today; tkLog(r, `נשלחה לאיש המקצוע${whoSent ? " (" + whoSent + ")" : ""} בשליחה מרוכזת`); });
   scheduleSave("tasks","tasksSaved");
   renderWorkSlipTasks();
 }
@@ -4061,6 +6328,7 @@ function renderLic(){
       </div>
       <div>
         <button type="button" class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="addLicStatusNote(${row.id})">${svgIcon('plus',12)} עדכון סטטוס</button>
+        ${tkLicTasksHtml(row.id)}
         <div style="margin-top:4px">${logEntries}</div>
       </div>
     `;
@@ -7633,20 +9901,12 @@ function goToTask(id){
   if(!t || !canOpenTab("tasks")) return;
   closeProSheet();
   closeFileViewer(true);
+  tkModalClose();
   switchTab("tasks");
   const yearSel = document.getElementById("tasksYearFilter");
   if(yearSel && yearSel.value && yearSel.value !== String(t.schoolYear || currentSchoolYearStart())) yearSel.value = "";
   renderTasks();
-  setTimeout(() => {
-    const tr = document.querySelector(`#tasksBody tr[data-task-id="${id}"]`);
-    if(!tr) return;
-    tr.classList.add("mob-open");
-    const tog = tr.querySelector(".mob-toggle");
-    if(tog) tog.textContent = "▴";
-    tr.scrollIntoView({ behavior: "smooth", block: "center" });
-    tr.classList.add("job-flash");
-    setTimeout(() => tr.classList.remove("job-flash"), 2300);
-  }, 90);
+  tkOpen(id);
 }
 
 /* ---------- רכיבי תצוגה משותפים ---------- */
@@ -8873,6 +11133,7 @@ async function initAppData(){
   buildNav();
   buildInstallmentTabs();
   renderTasks();
+  renderEquipment();
   renderProc();
   renderLic();
   renderStaff();
@@ -8897,7 +11158,8 @@ function buildFullExportObject(){
   const map = {
     "tasks-data":"tasks", "procurement-data":"procurement", "licensing-data":"licensing", "contacts-data":"contacts",
     "vendorPayments-data":"vendorPayments", "recurring-data":"recurring", "files-data":"files", "projects-data":"projects",
-    "loginLog-data":"loginLog", "uiPrefs-data":"uiPrefs", "accountantContact-data":"accountantContact"
+    "loginLog-data":"loginLog", "uiPrefs-data":"uiPrefs", "accountantContact-data":"accountantContact",
+    "equipment-data":"equipment", "serviceContracts-data":"serviceContracts", "maintBudget-data":"maintBudget"
   };
   const out = {};
   for(const sk in map) out[sk] = JSON.stringify(data[map[sk]]);
