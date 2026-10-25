@@ -2166,7 +2166,10 @@ button.tk-chip{ cursor:pointer; }
       <div id="hfHeldKeysNote" style="font-size:11.5px;color:var(--ink-soft);margin:8px 0 14px"></div>
       <div class="toolbar">
         <button class="btn ghost" onclick="closeModalOverlay('holderFormModal')">ביטול</button>
-        <button class="btn" id="hfSubmitBtn" onclick="submitHolderForm()">הוספה</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" id="hfDeleteBtn" style="display:none;color:var(--red);border-color:var(--red-bg)" onclick="deleteHolderFromForm()">מחיקת איש</button>
+          <button class="btn" id="hfSubmitBtn" onclick="submitHolderForm()">הוספה</button>
+        </div>
       </div>
     </div>
   </div>
@@ -8727,6 +8730,7 @@ function openHolderFormModal(id){
   const h = id ? holderById(id) : null;
   document.getElementById("hfTitle").textContent = h ? "עריכת איש מפתח" : "איש מפתח חדש";
   document.getElementById("hfSubmitBtn").textContent = h ? "שמירת שינויים" : "הוספה";
+  document.getElementById("hfDeleteBtn").style.display = h ? "inline-flex" : "none";
   document.getElementById("hfName").value = h ? h.name : "";
   document.getElementById("hfPhone").value = h ? (h.phone||"") : "";
   document.getElementById("hfActive").value = h && h.active===false ? "0" : "1";
@@ -8812,6 +8816,32 @@ function toggleHolderActive(){
   openHolderDetail(h.id);
 }
 function editHolderFromDetail(){ closeModalOverlay("holderDetailModal"); openHolderFormModal(currentHolderDetailId); }
+/* מחיקת איש מפתח — רק אם אינו מחזיק כרגע אף מפתח. רשומות היסטוריות ביומן נשארות כמו שהן */
+function deleteHolderFromForm(){
+  const id = editingHolderId;
+  const h = id ? holderById(id) : null;
+  if(!h) return;
+  const openCount = data.keysLog.filter(l => l.holder === h.name && !l.dateIn).length;
+  closeModalOverlay("holderFormModal");
+  if(openCount > 0){
+    openConfirmModal(
+      `${h.name} מחזיק כרגע ב-${openCount} מפתחות, ולכן אי אפשר למחוק אותו. יש לסמן קודם החזרה של המפתחות בכרטיס שלו. לחלופין אפשר להפוך אותו ל"לא פעיל".`,
+      () => {
+        h.active = false;
+        saveKeys(); renderKeysTab();
+        openHolderDetail(h.id);
+      },
+      {yesLabel: h.active === false ? "פתיחת הכרטיס" : "הפיכה ללא פעיל", icon: "alert"}
+    );
+    return;
+  }
+  openConfirmModal(`למחוק את ${h.name} מרשימת אנשי המפתח? ההיסטוריה ביומן הפעילות תישמר.`, () => {
+    data.keysHolders = data.keysHolders.filter(r => r.id !== id);
+    if(currentHolderDetailId === id){ currentHolderDetailId = null; closeModalOverlay("holderDetailModal"); }
+    editingHolderId = null;
+    saveKeys(); renderKeysTab();
+  });
+}
 
 /* ---- יומן פעילות ---- */
 function populateLoanSelectors(preselectKeyId){
