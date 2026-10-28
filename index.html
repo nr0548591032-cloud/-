@@ -729,6 +729,37 @@
     .sc-total{ min-width:0; }
     .sc-body{ padding:4px 12px 14px; }
   }
+
+/* ===================== תיק נתונים ושטח (2026-10) ===================== */
+#licRoot.lc-ttd-mode #lcKpis, #licRoot.lc-ttd-mode .lc-bar{ display:none; }
+.ttd-wrap{ display:flex; flex-direction:column; gap:12px; }
+.ttd-top{ padding:12px 14px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; border-inline-start-color:var(--brand); overflow:visible; }
+.ttd-top-r{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.ttd-g{ display:flex; flex-direction:column; gap:8px; }
+.ttd-gh{ display:flex; gap:6px; align-items:center; font-weight:700; font-size:13px; color:var(--ink-soft); margin-top:6px; }
+.ttd-sec{ border-inline-start-color:var(--brand); }
+.ttd-h{ appearance:none; background:none; border:0; color:inherit; font:inherit; text-align:right; box-sizing:border-box; width:100%; display:flex; align-items:center; gap:8px; padding:11px 14px; cursor:pointer; font-weight:600; }
+.ttd-h:focus-visible{ outline:2px solid var(--brand); outline-offset:-2px; }
+.ttd-ht{ flex:1; min-width:0; }
+.ttd-cnt{ font-size:12px; color:var(--ink-soft); font-weight:400; white-space:nowrap; }
+.ttd-h .lc-ico{ transition:transform .2s; }
+.ttd-sec.open .ttd-h .lc-ico{ transform:rotate(180deg); }
+.ttd-b{ padding:0 14px 14px; display:flex; flex-direction:column; gap:8px; }
+.ttd-list{ display:flex; flex-direction:column; gap:8px; }
+.ttd-row{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:8px; align-items:end; border:1px solid var(--line); border-radius:12px; padding:10px; }
+.ttd-kv{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:8px; }
+.ttd-f{ display:flex; flex-direction:column; gap:3px; font-size:11.5px; color:var(--ink-soft); min-width:0; }
+.ttd-f.wide{ grid-column:1/-1; }
+.ttd-f .lc-in{ color:var(--ink); resize:vertical; }
+.ttd-n{ grid-column:1/-1; font-size:11px; font-weight:700; color:var(--ink-soft); }
+.ttd-item{ grid-column:1/-1; font-size:13px; }
+.ttd-ops{ grid-column:1/-1; display:flex; gap:6px; justify-content:flex-end; }
+.ttd-add{ align-self:flex-start; }
+.ttd-sub{ font-size:12px; color:var(--ink-soft); }
+.ttd-checks{ grid-column:1/-1; display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:8px; }
+.ttd-chk{ display:grid; grid-template-columns:auto 1fr 1fr; gap:4px; align-items:center; font-size:12px; }
+.ttd-tpl{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:13px; padding:8px 10px; border:1px dashed var(--line); border-radius:10px; }
+.ttd-tpl span{ flex:1; min-width:0; }
 /* ===================== רישוי ובטיחות — עיצוב כרטיסים (2026-10) ===================== */
 #tab-licensing .lc-wrap{ display:flex; flex-direction:column; gap:16px; }
 .lc-ico{ width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex:none; vertical-align:middle; }
@@ -2638,7 +2669,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261028; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261029; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -2803,7 +2834,7 @@ const BACKUP_KEY_LABELS = {
   "food-data":"רכש אוכל", "accountantContact-data":"פרטי מנהל חשבונות", "uiPrefs-data":"העדפות תצוגה", "loginLog-data":"יומן כניסות",
   "supply-data":"רכש ואספקה: מחירונים וספקים", "supplyOrders-data":"רכש ואספקה: הזמנות וחשבוניות", "supplyKitchen-data":"רכש ואספקה: תפריט ומלאי",
   "equipment-data":"ציוד ואחריות", "serviceContracts-data":"חוזי שירות", "maintBudget-data":"תקציב תחזוקה",
-  "myTasks-data":"המשימות שלי"
+  "myTasks-data":"המשימות שלי", "ttd-data":"תיק נתונים ושטח"
 };
 function fmtWhen(ts){
   if(!ts) return "";
@@ -3390,7 +3421,7 @@ function saveInstallments(){
 
 function anyLoadFailed(){ return Object.values(loadStatus).includes("failed"); }
 async function loadAll(){
-  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"],["projects","projects-data"],["loginLog","loginLog-data"],["uiPrefs","uiPrefs-data"],["accountantContact","accountantContact-data"],["equipment","equipment-data"],["serviceContracts","serviceContracts-data"],["maintBudget","maintBudget-data"]];
+  const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"],["projects","projects-data"],["loginLog","loginLog-data"],["uiPrefs","uiPrefs-data"],["accountantContact","accountantContact-data"],["equipment","equipment-data"],["serviceContracts","serviceContracts-data"],["maintBudget","maintBudget-data"],["ttd","ttd-data"]];
   for(const [dataKey, storageKey] of simpleKeys){
     if(anyLoadFailed()) return;
     try{
@@ -6650,6 +6681,7 @@ function lcBuildShell(root){
         <div><h2>רישוי ובטיחות</h2><div class="lc-sub" id="lcSub"></div></div></div>
       <div class="lc-actions">
         <span class="saved-flag" id="licSaved">נשמר</span>
+        <button type="button" class="lc-btn ghost" data-lc-act="view" data-v="ttd">${lcIco("doc", 16)}תיק נתונים ושטח</button>
         <button type="button" class="lc-btn ghost" data-lc-act="pack">${lcIco("folder", 16)}תיק רישוי להורדה</button>
         <button type="button" class="lc-btn ghost" data-lc-act="view" data-v="visit">${lcIco("phone", 16)}מצב ביקור בודק</button>
         <button type="button" class="lc-btn" data-lc-act="new">${lcIco("plus", 16)}אישור חדש</button>
@@ -6736,11 +6768,500 @@ function renderLic(){
   document.querySelectorAll("#lcViews button").forEach(b => b.classList.toggle("on", b.dataset.v === licUi.view));
 
   const main = document.getElementById("lcMain");
+  root.classList.toggle("lc-ttd-mode", licUi.view === "ttd");
+  if(licUi.view === "ttd"){ ttdRender(main); return; }
   if(licUi.view === "year") main.innerHTML = lcYearHtml(all);
   else if(licUi.view === "visit") main.innerHTML = lcVisitHtml(all);
   else main.innerHTML = lcCardsHtml(all);
   lcWireMain(main);
   lcAnimate(root, animate);
+}
+
+/* =====================================================================
+   תיק נתונים ושטח, ביטחון וחירום מוסדי — מודול בתוך "רישוי ובטיחות" (2026-10)
+   נתונים: ttd-data  =  { v:1, years:[ { year, updatedAt, t:{ <tag>: ... } } ] }
+   הקובץ המלא (Word) נבנה מתבנית: קובץ ה־docx של התיק, שבו כל טבלה מסומנת
+   בסימנייה בשם ttd_<tag>. האפליקציה ממלאת את הטבלאות מהנתונים ומורידה קובץ חדש.
+   רשימות תלמידים וקוד הכספת לא נשמרים כאן.
+   ===================================================================== */
+if(!data.ttd || typeof data.ttd !== "object" || Array.isArray(data.ttd)) data.ttd = { v:1, years:[] };
+
+const TTD_W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+const TTD_STATUS = [["", "—"], ["ok", "קיים ותקין"], ["bad", "קיים, לא תקין"], ["none", "לא קיים"]];
+// kind: rows (טבלה עם שורות), kv (שדה/ערך), fixed (שורות קבועות), teams, cover
+const TTD_SCHEMA = [
+  { g:"שער התיק", ico:"doc", items:[
+    { tag:"cover", t:"שם המוסד ותאריך עדכון (עמוד השער)", kind:"cover" } ]},
+  { g:"נתונים כלליים", ico:"info", items:[
+    { tag:"inst", t:"1.1 פרטי המוסד החינוכי", kind:"kv" },
+    { tag:"roles_in", t:"1.2.1 בעלי תפקידים חיוניים במוסד", kind:"rows", num:true, cols:["תפקיד","שם פרטי ומשפחה","כתובת","טל' נייד","טלפון בית","הערות"] },
+    { tag:"roles_out", t:"1.2.2 בעלי תפקידים מחוץ למוסד", kind:"rows", num:true, cols:["תפקיד","שם פרטי ומשפחה","כתובת","טל' נייד","אימייל","הערות"] },
+    { tag:"services", t:"1.2.3 שירותים חיוניים", kind:"rows", num:true, cols:["הגורם","מס' טלפון","בעל תפקיד/גורם","כתובת","הערות"] },
+    { tag:"population", t:"1.2.4 אוכלוסיית המוסד", kind:"kv" },
+    { tag:"hours", t:"1.2.5 שעות פעילות", kind:"kv" },
+    { tag:"classes", t:"1.2.6 התפלגות הכיתות", kind:"rows", cols:["מס\"ד","שכבת הכיתה","מס' כיתות","מס' תלמידים בשכבה","הערות"] } ]},
+  { g:"המבנה והסביבה", ico:"grid", items:[
+    { tag:"routes", t:"3.2 דרכי גישה למוסד", kind:"rows", cols:["נתיב","כתובת / תיאור המיקום"] },
+    { tag:"bldg_name", t:"3.3 שם המבנה והאחראי", kind:"kv" },
+    { tag:"floors", t:"קומות ומספר חדרים", kind:"rows", cols:["קומה","מס' חדרים"] },
+    { tag:"stairs", t:"גרמי מדרגות", kind:"rows", cols:["גרם מדרגות מס'","סוג","מיקום"] },
+    { tag:"contact_event", t:"5.1.2 דרכי התקשרות בעת אירוע", kind:"rows", num:true, cols:["תפקיד","שם ומשפחה","טלפון עבודה","סלולרי","טלפון בית"] },
+    { tag:"phone24", t:"טלפון חירום 24 שעות", kind:"kv" },
+    { tag:"entrances", t:"כניסות ופתחים למבנה", kind:"rows", num:true, cols:["סוג הכניסה","מיקום הכניסה","תיאור"] },
+    { tag:"windows", t:"חלונות מסורגים", kind:"rows", num:true, cols:["קומה","חדר","מס' חלונות","סוג חלונות","סורגים יש/אין"] },
+    { tag:"corridors", t:"מסדרונות במבנה", kind:"rows", num:true, cols:["הסוג","מיקום/קומה","תיאור"] },
+    { tag:"keys", t:"מיקום מפתחות מאסטר", kind:"rows", num:true, cols:["סוג המפתח","הדלת","סוג/קוד","מחזיק המפתח + טלפון"], hint:"את קוד הכספת לא שומרים כאן. כתבו ____ במקומו, ובהפקת התיק אפשר להקליד אותו (הוא לא נשמר)." },
+    { tag:"power", t:"תאורה / מפסקי חשמל", kind:"rows", num:true, cols:["הסוג","מיקום המפסק","סוג ראשי/משני"] } ]},
+  { g:"מרכיבי ביטחון ונתוני המרחב", ico:"shield", items:[
+    { tag:"components", t:"מרכיבי ביטחון וחירום במוסד", kind:"fixed" },
+    { tag:"cp", t:"מיקום חפ\"ק בעת אירוע", kind:"rows", num:true, cols:["מיקום","תיאור המקום","דרך גישה"] },
+    { tag:"heli", t:"נ.צ להנחתת מסוק", kind:"rows", num:true, cols:["מיקום","תיאור המקום","נ.צ"] },
+    { tag:"rally", t:"נקודות חבירת כוחות", kind:"rows", num:true, cols:["מיקום","תיאור המקום","דרך גישה"] },
+    { tag:"blocks", t:"מיקום חסימות בעת אירוע", kind:"rows", num:true, cols:["מיקום","תיאור המקום","דרך גישה"] } ]},
+  { g:"תכנית אבטחה", ico:"user", items:[
+    { tag:"guards", t:"6.1 המאבטחים", kind:"rows", cols:["שם המאבטח","מיקומו במוסד","משמרת / הערות"] },
+    { tag:"scan_names", t:"שמות הסורקים", kind:"kv" },
+    { tag:"scan_hours", t:"שעות הסריקה", kind:"kv" } ]},
+  { g:"מרחבים מוגנים ופינוי", ico:"alert", items:[
+    { tag:"shelters", t:"6.2.2 מקלטים ומרחבים מוגנים", kind:"rows", num:true, cols:["מקלט / מרחב מוגן","שם קוד בתרשים","שטח מ\"ר","קיבולת (0.5 מ\"ר)","פער","הערות"], hint:"הקיבולת מחושבת לבד לפי השטח (שטח ÷ 0.5) כשהשדה ריק. הסה\"כ מחושב בהפקה." },
+    { tag:"alarm_day", t:"שיבוץ באזעקה - שעות היום", kind:"rows", cols:["שיעור","ממ\"ד ומיקום"] },
+    { tag:"alarm_night", t:"שיבוץ באזעקה - שעות הלילה", kind:"rows", cols:["שיעור","ממ\"ד ומיקום"] },
+    { tag:"safest", t:"\"הכי מוגן שיש\" - לא הספקת להגיע", kind:"rows", cols:["מיקום","היכן לתפוס מחסה"] },
+    { tag:"mamad_day", t:"שיבוץ ממ\"דים - יום", kind:"rows", num:true, cols:["מרחב מוגן","שלט זיהוי","קיבולת","כיתה (אם/ספח)","מחנך/מורה","אחראי מרחב מוגן"] },
+    { tag:"mamad_night", t:"שיבוץ ממ\"דים - לילה", kind:"rows", num:true, cols:["מרחב מוגן","שלט זיהוי","קיבולת","כיתה (אם/ספח)","מחנך/מורה","אחראי מרחב מוגן"] },
+    { tag:"quake", t:"רעידת אדמה - הנחיות לפי קומות", kind:"rows", cols:["שוהים בקומות","הנחיה"] },
+    { tag:"assembly", t:"נקודות הערכות לפינוי", kind:"rows", cols:["נקודת הערכות","שיעור","ירידה דרך"] },
+    { tag:"evac_routes", t:"נתיבי פינוי והימלטות", kind:"rows", cols:["אופציה","נתיב"] },
+    { tag:"shelter_check", t:"נספח ד' - בדיקת תקינות מרחבים מוגנים", kind:"fixed" } ]},
+  { g:"צוותי חירום (נספח ג')", ico:"task", items:[
+    { tag:"teams_day", t:"צוותי חירום ביום 7:00-21:00", kind:"teams" },
+    { tag:"teams_night", t:"צוותי חירום בלילה 21:00-7:00", kind:"teams" } ]},
+  { g:"אישור ועדכון התיק", ico:"check", items:[
+    { tag:"approve_coord", t:"8.1 רכז/ת הביטחון", kind:"rows", cols:["שם פרטי ומשפחה","תפקיד","תאריך כתיבת התיק","חתימה"] },
+    { tag:"approve_kabat", t:"8.2 קב\"ט מוסדות חינוך ברשות", kind:"rows", cols:["שם פרטי ומשפחה","תפקיד","תאריך תיקוף","חתימה"] },
+    { tag:"approve_police", t:"8.3 קצין האבטחה במשטרה", kind:"rows", cols:["שם פרטי ומשפחה","תפקיד","תאריך תיקוף","חתימה"] } ]}
+];
+const TTD_TEAM_COLS = ["סוג הצוות","מורה/תלמיד","שם פרטי ומשפחה","שיעור","אזור אחריות","הערות"];
+const TTD_ITEMS = TTD_SCHEMA.flatMap(g => g.items);
+const TTD_ITEM = Object.fromEntries(TTD_ITEMS.map(x => [x.tag, x]));
+
+let ttdUi = { year: null, open: new Set(["inst"]), tpl: null, tplName: "", tplAt: 0 };
+
+/* ---------- נתונים ---------- */
+function ttdYears(){ if(!Array.isArray(data.ttd.years)) data.ttd.years = []; return data.ttd.years; }
+function ttdYearObj(y, create){
+  let o = ttdYears().find(x => Number(x.year) === Number(y));
+  if(!o && create){ o = { year: Number(y), updatedAt: Date.now(), t: {} }; ttdYears().push(o); }
+  return o || null;
+}
+function ttdHasData(o){ return !!(o && o.t && Object.keys(o.t).length); }
+function ttdCurYear(){
+  if(ttdUi.year) return ttdUi.year;
+  const pref = data.uiPrefs && data.uiPrefs.ttdYear;
+  return ttdUi.year = Number(pref) || currentSchoolYearStart();
+}
+function ttdSave(){ const o = ttdYearObj(ttdCurYear(), false); if(o) o.updatedAt = Date.now(); scheduleSave("ttd", "ttdSaved"); }
+function ttdYearList(){
+  const s = new Set(schoolYearOptions().map(Number));
+  ttdYears().forEach(x => s.add(Number(x.year)));
+  return [...s].sort((a, b) => b - a);
+}
+function ttdClone(v){ return JSON.parse(JSON.stringify(v)); }
+function ttdMaskCode(s){ return String(s || "").replace(/(קוד\s*[-:]?\s*)\d{3,}/g, "$1____"); }
+
+/* ---------- XML של Word ---------- */
+function ttdEls(node, name){ return Array.from(node.childNodes).filter(n => n.nodeType === 1 && n.localName === name && n.namespaceURI === TTD_W); }
+function ttdFindBookmark(doc, tag){
+  const all = doc.getElementsByTagNameNS(TTD_W, "bookmarkStart");
+  for(let i = 0; i < all.length; i++) if(all[i].getAttributeNS(TTD_W, "name") === "ttd_" + tag) return all[i];
+  return null;
+}
+function ttdTable(doc, tag){
+  let n = ttdFindBookmark(doc, tag);
+  while(n && !(n.localName === "tbl" && n.namespaceURI === TTD_W)) n = n.parentNode;
+  return n;
+}
+function ttdRows(tbl){ return ttdEls(tbl, "tr"); }
+function ttdCells(tr){ return ttdEls(tr, "tc"); }
+function ttdCellText(tc){
+  return ttdEls(tc, "p").map(p => Array.from(p.getElementsByTagNameNS(TTD_W, "t")).map(t => t.textContent).join("")).join("\n").trim();
+}
+function ttdSetCell(tc, text){
+  const doc = tc.ownerDocument;
+  const ps = ttdEls(tc, "p");
+  const p0 = ps[0];
+  const tplRun = tc.getElementsByTagNameNS(TTD_W, "r")[0] || null;
+  const runModel = tplRun ? tplRun.cloneNode(true) : null;
+  ps.slice(1).forEach(p => tc.removeChild(p));
+  ttdEls(p0, "r").forEach(r => p0.removeChild(r));
+  const pPr = ttdEls(p0, "pPr")[0];
+  String(text == null ? "" : text).split("\n").forEach((line, i) => {
+    let p = p0;
+    if(i > 0){ p = doc.createElementNS(TTD_W, "w:p"); if(pPr) p.appendChild(pPr.cloneNode(true)); tc.appendChild(p); }
+    let r;
+    if(runModel){
+      r = runModel.cloneNode(true);
+      Array.from(r.childNodes).forEach(c => { if(c.nodeType === 1 && c.localName !== "rPr") r.removeChild(c); });
+    }else{
+      r = doc.createElementNS(TTD_W, "w:r");
+      const rPr = doc.createElementNS(TTD_W, "w:rPr");
+      const f = doc.createElementNS(TTD_W, "w:rFonts"); ["ascii","hAnsi","cs"].forEach(a => f.setAttributeNS(TTD_W, "w:" + a, "Arial")); rPr.appendChild(f);
+      const sz = doc.createElementNS(TTD_W, "w:sz"); sz.setAttributeNS(TTD_W, "w:val", "20"); rPr.appendChild(sz);
+      const szc = doc.createElementNS(TTD_W, "w:szCs"); szc.setAttributeNS(TTD_W, "w:val", "20"); rPr.appendChild(szc);
+      rPr.appendChild(doc.createElementNS(TTD_W, "w:rtl")); r.appendChild(rPr);
+    }
+    const t = doc.createElementNS(TTD_W, "w:t");
+    t.setAttributeNS("http://www.w3.org/XML/1998/namespace", "xml:space", "preserve");
+    t.textContent = line;
+    r.appendChild(t); p.appendChild(r);
+  });
+}
+const TTD_HEADER = { components:1, shelter_check:2 };   // שאר הטבלאות: שורת כותרת אחת (ב־kv אין כותרת)
+function ttdHead(it){ return it.kind === "kv" ? 0 : (TTD_HEADER[it.tag] ?? 1); }
+
+/* קריאת הנתונים מתוך קובץ התיק (לייבוא חד-פעמי לשנה) */
+function ttdParseDoc(doc){
+  const out = {}, missing = [];
+  TTD_ITEMS.forEach(it => {
+    if(it.kind === "cover"){
+      const tbl = ttdTable(doc, "cover_name");
+      const bm = ttdFindBookmark(doc, "cover_date");
+      let date = "";
+      if(bm){ const p = bm.parentNode; const ts = Array.from(p.getElementsByTagNameNS(TTD_W, "t")); date = ts.length ? ts[ts.length - 1].textContent.trim() : ""; }
+      out.cover = { name: tbl ? ttdCellText(ttdCells(ttdRows(tbl)[0])[0]) : "", date };
+      if(!tbl) missing.push(it.t);
+      return;
+    }
+    const tbl = ttdTable(doc, it.tag);
+    if(!tbl){ missing.push(it.t); return; }
+    const rows = ttdRows(tbl).slice(ttdHead(it)).map(tr => ttdCells(tr).map(ttdCellText));
+    if(it.kind === "kv") out[it.tag] = rows.map(r => [r[0] || "", r[1] || ""]);
+    else if(it.tag === "components") out[it.tag] = rows.map(r => {
+      const st = r[4] === "X" ? "none" : r[3] === "V" ? (r[6] === "V" ? "bad" : "ok") : "";
+      return { item: r[1] || "", qty: r[2] || "", st, note: r[7] || "" };
+    });
+    else if(it.tag === "shelter_check") out[it.tag] = rows.map(r => ({ item: r[1] || "", v: r.slice(2, 10) }));
+    else if(it.kind === "teams"){
+      let team = "";
+      out[it.tag] = rows.map(r => { if(r[1]) team = r[1]; return [team, r[2] || "", r[3] || "", r[4] || "", r[5] || "", r[6] || ""]; });
+    }
+    else out[it.tag] = rows.map(r => (it.num ? r.slice(1) : r).slice(0, it.cols.length)).map(r => { while(r.length < it.cols.length) r.push(""); return r; });
+  });
+  if(out.keys) out.keys = out.keys.map(r => r.map(ttdMaskCode));
+  return { t: out, missing };
+}
+
+/* מילוי התבנית מהנתונים */
+function ttdFillDoc(doc, t, opts){
+  opts = opts || {};
+  const skipped = [];
+  TTD_ITEMS.forEach(it => {
+    const v = t[it.tag];
+    if(it.kind === "cover"){
+      const c = t.cover || {};
+      const tbl = ttdTable(doc, "cover_name");
+      if(tbl && c.name) ttdSetCell(ttdCells(ttdRows(tbl)[0])[0], c.name);
+      const bm = ttdFindBookmark(doc, "cover_date");
+      const date = opts.coverDate || c.date;
+      if(bm && date){ const runs = bm.parentNode.getElementsByTagNameNS(TTD_W, "t"); if(runs.length) runs[runs.length - 1].textContent = date; }
+      return;
+    }
+    if(v === undefined) return;
+    const tbl = ttdTable(doc, it.tag);
+    if(!tbl){ skipped.push(it.t); return; }
+    const h = ttdHead(it);
+    const rows = ttdRows(tbl);
+    if(it.kind === "kv"){
+      v.forEach((pair, i) => { const tr = rows[h + i]; if(tr){ const cs = ttdCells(tr); if(cs[1]) ttdSetCell(cs[1], pair[1] || " "); } });
+      return;
+    }
+    if(it.tag === "components"){
+      v.forEach((r, i) => {
+        const tr = rows[h + i]; if(!tr) return; const cs = ttdCells(tr);
+        const m = { ok:["V","","V",""], bad:["V","","","V"], none:["","X","",""], "":["","","",""] }[r.st || ""];
+        ttdSetCell(cs[2], r.qty || ""); [3,4,5,6].forEach((c, k) => ttdSetCell(cs[c], m[k]));
+      });
+      return;
+    }
+    if(it.tag === "shelter_check"){
+      v.forEach((r, i) => { const tr = rows[h + i]; if(!tr) return; const cs = ttdCells(tr); (r.v || []).forEach((x, k) => { if(cs[2 + k]) ttdSetCell(cs[2 + k], x || ""); }); });
+      return;
+    }
+    // טבלאות שורות: משכפלים את שורת הנתונים הראשונה בתבנית
+    const tplRows = rows.slice(h);
+    if(!tplRows.length){ skipped.push(it.t); return; }
+    const headTpl = tplRows[0], memTpl = tplRows[1] || tplRows[0];
+    tplRows.forEach(tr => tbl.removeChild(tr));
+    if(it.kind === "teams"){
+      let prev = null, no = 0;
+      v.forEach(r => {
+        const first = r[0] !== prev; if(first) no++; prev = r[0];
+        const tr = (first ? headTpl : memTpl).cloneNode(true); const cs = ttdCells(tr);
+        ttdSetCell(cs[0], first ? String(no) : ""); ttdSetCell(cs[1], first ? r[0] : "");
+        for(let k = 1; k < 6; k++) if(cs[k + 1]) ttdSetCell(cs[k + 1], r[k] || "");
+        tbl.appendChild(tr);
+      });
+      return;
+    }
+    v.forEach((r, i) => {
+      const tr = headTpl.cloneNode(true); const cs = ttdCells(tr);
+      let vals = it.num ? [String(i + 1), ...r] : r.slice();
+      if(it.tag === "keys" && opts.safeCode) vals = vals.map(x => String(x).replace(/_{3,}/g, opts.safeCode));
+      if(it.tag === "shelters"){ const a = parseFloat(r[2]); if(!String(r[3] || "").trim() && a > 0) vals[4] = String(Math.floor(a / 0.5)); }
+      cs.forEach((tc, k) => ttdSetCell(tc, vals[k] || ""));
+      tbl.appendChild(tr);
+    });
+    if(it.tag === "shelters"){
+      const tot = ttdTable(doc, "shelters_total");
+      if(tot){
+        const cs = ttdCells(ttdRows(tot)[0]);
+        const area = v.reduce((s, r) => s + (parseFloat(r[2]) || 0), 0);
+        const cap = v.reduce((s, r) => s + (parseFloat(r[3]) || Math.floor((parseFloat(r[2]) || 0) / 0.5)), 0);
+        if(cs[1]) ttdSetCell(cs[1], String(area)); if(cs[2]) ttdSetCell(cs[2], String(cap));
+      }
+    }
+  });
+  return skipped;
+}
+
+/* ---------- קבצים ---------- */
+let ttdZipP = null;
+function ttdLoadZip(){
+  if(window.JSZip) return Promise.resolve();
+  return ttdZipP = ttdZipP || new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"; s.onload = res; s.onerror = () => { ttdZipP = null; rej(new Error("load")); }; document.head.appendChild(s); });
+}
+function ttdIdb(){
+  return new Promise((res, rej) => {
+    try{ const r = indexedDB.open("ttdTemplateDb", 1); r.onupgradeneeded = () => r.result.createObjectStore("f"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }catch(e){ rej(e); }
+  });
+}
+async function ttdTplStore(buf, name){
+  try{ const db = await ttdIdb(); await new Promise((res, rej) => { const tx = db.transaction("f", "readwrite"); tx.objectStore("f").put({ buf, name, at: Date.now() }, "tpl"); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); }
+  catch(e){ console.warn("שמירת התבנית במכשיר נכשלה", e); }
+}
+async function ttdTplLoad(){
+  if(ttdUi.tpl) return ttdUi.tpl;
+  try{
+    const db = await ttdIdb();
+    const v = await new Promise((res, rej) => { const tx = db.transaction("f", "readonly"); const q = tx.objectStore("f").get("tpl"); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
+    if(v && v.buf){ ttdUi.tpl = v.buf; ttdUi.tplName = v.name; ttdUi.tplAt = v.at; }
+  }catch(e){ console.warn("אין גישה לתבנית השמורה במכשיר", e); }
+  return ttdUi.tpl;
+}
+async function ttdOpenDoc(buf){
+  await ttdLoadZip();
+  const zip = await JSZip.loadAsync(buf);
+  const f = zip.file("word/document.xml");
+  if(!f) throw new Error("הקובץ שנבחר אינו קובץ Word תקין.");
+  const xml = await f.async("string");
+  const doc = new DOMParser().parseFromString(xml, "application/xml");
+  if(doc.getElementsByTagName("parsererror").length) throw new Error("לא הצלחתי לקרוא את תוכן הקובץ.");
+  return { zip, doc };
+}
+function ttdPickFile(){
+  return new Promise(res => {
+    const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    inp.onchange = () => res(inp.files && inp.files[0] || null); inp.click();
+  });
+}
+async function ttdChooseTemplate(){
+  const f = await ttdPickFile(); if(!f) return null;
+  const buf = await f.arrayBuffer();
+  const { doc } = await ttdOpenDoc(buf);
+  const found = TTD_ITEMS.filter(it => it.kind === "cover" ? ttdTable(doc, "cover_name") : ttdTable(doc, it.tag)).length;
+  if(found < 5) throw new Error("בקובץ הזה לא נמצאו הטבלאות המסומנות של התיק. יש לבחור את קובץ ה-Word של התיק שנבנה עבור האפליקציה.");
+  ttdUi.tpl = buf; ttdUi.tplName = f.name; ttdUi.tplAt = Date.now();
+  await ttdTplStore(buf, f.name);
+  return { buf, doc, found };
+}
+
+/* ---------- פעולות ---------- */
+async function ttdImportFromFile(){
+  try{
+    const r = await ttdChooseTemplate(); if(!r) return;
+    const parsed = ttdParseDoc(r.doc);
+    const y = ttdCurYear();
+    const apply = () => {
+      const o = ttdYearObj(y, true); o.t = parsed.t; o.updatedAt = Date.now();
+      ttdSave(); ttdRerender();
+      showToast(`הנתונים יובאו לשנת ${schoolYearLabel(y)}${parsed.missing.length ? " (חסרים: " + parsed.missing.length + ")" : ""}`);
+    };
+    if(ttdHasData(ttdYearObj(y))) openConfirmModal(`לשנת ${schoolYearLabel(y)} כבר יש נתונים. להחליף אותם בנתונים מהקובץ? (הגרסה הקודמת תישמר בגיבוי האוטומטי)`, apply, { yesLabel: "החלפה", icon: "upload" });
+    else apply();
+  }catch(e){ console.error(e); showToast(e.message || "הייבוא נכשל"); }
+}
+function ttdCopyFrom(fromYear){
+  const src = ttdYearObj(fromYear); if(!ttdHasData(src)) return;
+  const y = ttdCurYear();
+  const apply = () => { const o = ttdYearObj(y, true); o.t = ttdClone(src.t); o.updatedAt = Date.now(); ttdSave(); ttdRerender(); showToast(`הנתונים הועתקו מ${schoolYearLabel(fromYear)}`); };
+  if(ttdHasData(ttdYearObj(y))) openConfirmModal(`להחליף את הנתונים של ${schoolYearLabel(y)} בהעתק מ${schoolYearLabel(fromYear)}?`, apply, { yesLabel: "החלפה", icon: "copy" });
+  else apply();
+}
+function ttdToday(){ const d = new Date(); return `${d.getDate()}/${d.getMonth() + 1}/${String(d.getFullYear()).slice(2)}`; }
+async function ttdOpenGenerate(){
+  const y = ttdCurYear(), o = ttdYearObj(y);
+  if(!ttdHasData(o)){ showToast("אין עדיין נתונים לשנה הזו"); return; }
+  await ttdTplLoad();
+  const m = lcModal(`${lcModalHead("doc", "הפקת התיק המעודכן")}
+    <div class="lc-modal-b"><div class="lc-form">
+      <div class="lc-sub">שנת ${escHtml(schoolYearLabel(y))}. הקובץ ייבנה מתבנית התיק, והטבלאות יתמלאו מהנתונים כאן. התמונות, השרטוטים והנוסח הקבוע נשארים כמו בתבנית.</div>
+      <div class="ttd-tpl">${lcIco("doc", 16)}<span id="ttdG_tpl">${ttdUi.tpl ? "תבנית: " + escHtml(ttdUi.tplName || "קובץ התיק") : "עדיין לא נבחרה תבנית במכשיר הזה"}</span>
+        <button type="button" class="lc-btn ghost sm" id="ttdG_pick">${ttdUi.tpl ? "החלפה" : "בחירת קובץ התיק"}</button></div>
+      <label>תאריך עדכון בשער<input type="text" id="ttdG_date" value="${escHtml(ttdToday())}"></label>
+      <label>קוד הכספת להדפסה (לא נשמר באפליקציה)<input type="text" id="ttdG_code" inputmode="numeric" autocomplete="off" placeholder="אם ריק, יישאר ____ למילוי ביד"></label>
+    </div></div>
+    <div class="lc-modal-f"><button type="button" class="lc-btn" id="ttdG_go">${lcIco("upload", 16)}הורדת התיק (Word)</button><button type="button" class="lc-btn ghost" data-lc-close>ביטול</button></div>`);
+  m.querySelector("#ttdG_pick").onclick = async () => {
+    try{ const r = await ttdChooseTemplate(); if(r){ m.querySelector("#ttdG_tpl").textContent = "תבנית: " + (ttdUi.tplName || ""); m.querySelector("#ttdG_pick").textContent = "החלפה"; } }
+    catch(e){ showToast(e.message || "הקובץ לא נקלט"); }
+  };
+  m.querySelector("#ttdG_go").onclick = async () => {
+    const btn = m.querySelector("#ttdG_go");
+    try{
+      if(!ttdUi.tpl){ const r = await ttdChooseTemplate(); if(!r) return; }
+      btn.disabled = true; btn.textContent = "בונה את הקובץ…";
+      const { zip, doc } = await ttdOpenDoc(ttdUi.tpl);
+      const skipped = ttdFillDoc(doc, o.t, { coverDate: m.querySelector("#ttdG_date").value.trim(), safeCode: m.querySelector("#ttdG_code").value.trim() });
+      zip.file("word/document.xml", new XMLSerializer().serializeToString(doc));
+      const blob = await zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", compression: "DEFLATE" });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = `תיק נתונים ושטח ${schoolYearLabel(y).replace(/"/g, "״")}.docx`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      lcCloseModal();
+      showToast(skipped.length ? `התיק ירד. לא נמצאו בתבנית: ${skipped.join(", ")}` : "התיק המעודכן ירד לתיקיית ההורדות");
+    }catch(e){ console.error(e); btn.disabled = false; btn.textContent = "הורדת התיק (Word)"; showToast(e.message || "הבנייה נכשלה"); }
+  };
+}
+
+/* ---------- תצוגה ---------- */
+function ttdCount(it, v){
+  if(!v) return 0;
+  if(it.kind === "cover") return v.name ? 1 : 0;
+  return Array.isArray(v) ? v.length : 0;
+}
+function ttdField(label, key, val, extra){
+  return `<label class="ttd-f${extra && extra.wide ? " wide" : ""}"><span>${escHtml(label)}</span>${extra && extra.area
+    ? `<textarea class="lc-in" rows="2" data-ttd-k="${key}">${escHtml(val)}</textarea>`
+    : `<input class="lc-in" type="text" data-ttd-k="${key}" value="${escHtml(val)}" ${extra && extra.ro ? "readonly" : ""}>`}</label>`;
+}
+function ttdBodyHtml(it, v){
+  const T = it.tag;
+  if(it.kind === "cover"){
+    v = v || {};
+    return `<div class="ttd-row">${ttdField("שם המוסד (שורה חדשה = Enter)", `${T}|name`, v.name || "", { area: true, wide: true })}${ttdField("תאריך עדכון", `${T}|date`, v.date || "")}</div>`;
+  }
+  if(!v) return `<div class="lc-sub">אין נתונים לטבלה הזו. אפשר לייבא מהקובץ.</div>`;
+  if(it.kind === "kv"){
+    return `<div class="ttd-kv">${v.map((p, i) => ttdField(p[0] || "—", `${T}|${i}|1`, p[1] || "")).join("")}</div>`;
+  }
+  if(T === "components"){
+    return `<div class="ttd-list">${v.map((r, i) => `<div class="ttd-row ttd-comp"><div class="ttd-n">${i + 1}</div><b class="ttd-item">${escHtml(r.item)}</b>
+      ${ttdField("כמות", `${T}|${i}|qty`, r.qty || "")}
+      <label class="ttd-f"><span>מצב</span><select class="lc-in" data-ttd-k="${T}|${i}|st">${TTD_STATUS.map(([k, l]) => `<option value="${k}" ${r.st === k ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>`).join("")}</div>`;
+  }
+  if(T === "shelter_check"){
+    const names = ["ממ\"ד 2","ממ\"ד 3","ממ\"ד 4","ממ\"ד 5"];
+    return `<div class="ttd-sub">לכל מרחב: קיים / תקין (V = כן, X = לא)</div><div class="ttd-list">${v.map((r, i) => `<div class="ttd-row"><div class="ttd-n">${i + 1}</div><b class="ttd-item">${escHtml(r.item)}</b>
+      <div class="ttd-checks">${names.map((n, s) => `<div class="ttd-chk"><span>${n}</span>${[0, 1].map(k => `<select class="lc-in" aria-label="${n} ${k ? "תקין" : "קיים"}" data-ttd-k="${T}|${i}|${s * 2 + k}">${["", "V", "X"].map(o => `<option ${String((r.v || [])[s * 2 + k] || "") === o ? "selected" : ""}>${o}</option>`).join("")}</select>`).join("")}</div>`).join("")}</div></div>`).join("")}</div>`;
+  }
+  const cols = it.kind === "teams" ? TTD_TEAM_COLS : it.cols;
+  const rows = v.map((r, i) => `<div class="ttd-row">${it.num || it.kind === "teams" ? `<div class="ttd-n">${i + 1}</div>` : ""}
+      ${cols.map((c, k) => ttdField(c, `${T}|${i}|${k}`, r[k] || "", { area: String(r[k] || "").length > 40 || String(r[k] || "").includes("\n") })).join("")}
+      <div class="ttd-ops">
+        <button type="button" class="lc-btn ghost sm" title="הזזה למעלה" data-ttd-op="up" data-t="${T}" data-i="${i}" ${i ? "" : "disabled"}>▲</button>
+        <button type="button" class="lc-btn ghost sm" title="שכפול שורה" data-ttd-op="dup" data-t="${T}" data-i="${i}">${lcIco("copy", 14)}</button>
+        <button type="button" class="lc-btn ghost sm" title="מחיקת שורה" data-ttd-op="del" data-t="${T}" data-i="${i}">${lcIco("trash", 14)}</button>
+      </div></div>`).join("");
+  return `${it.hint ? `<div class="ttd-sub">${escHtml(it.hint)}</div>` : ""}<div class="ttd-list">${rows}</div>
+    <button type="button" class="lc-btn ghost sm ttd-add" data-ttd-op="add" data-t="${T}">${lcIco("plus", 14)}הוספת שורה</button>`;
+}
+function ttdHtml(){
+  const y = ttdCurYear(), o = ttdYearObj(y), has = ttdHasData(o);
+  const others = ttdYears().filter(x => Number(x.year) !== y && ttdHasData(x)).sort((a, b) => b.year - a.year);
+  const upd = o && o.updatedAt ? new Date(o.updatedAt).toLocaleDateString("he-IL") : "";
+  let body;
+  if(!has){
+    body = `<div class="lc-empty">${lcIco("doc", 34)}<b>אין עדיין נתונים לשנת ${escHtml(schoolYearLabel(y))}</b>
+      <span>${others.length ? "אפשר להעתיק משנה קודמת ולעדכן רק מה שהשתנה, או לייבא מקובץ ה-Word של התיק." : "בפעם הראשונה מייבאים את הנתונים מקובץ ה-Word של התיק. הקובץ נקרא במכשיר ולא נשלח לשום מקום."}</span>
+      <div class="lc-actions" style="justify-content:center">${others.map(x => `<button type="button" class="lc-btn" data-ttd-op="copy" data-y="${x.year}">${lcIco("copy", 16)}העתקה מ${escHtml(schoolYearLabel(x.year))}</button>`).join("")}
+      <button type="button" class="lc-btn ${others.length ? "ghost" : ""}" data-ttd-op="import">${lcIco("upload", 16)}ייבוא מקובץ התיק</button></div></div>`;
+  }else{
+    body = TTD_SCHEMA.map(g => `<div class="ttd-g"><div class="ttd-gh">${lcIco(g.ico, 16)}${escHtml(g.g)}</div>${g.items.map(it => {
+      const v = o.t[it.tag], open = ttdUi.open.has(it.tag), n = ttdCount(it, v);
+      return `<div class="lc-card ttd-sec ${open ? "open" : ""}"><button type="button" class="ttd-h" data-ttd-op="toggle" data-t="${it.tag}" aria-expanded="${open}">
+        <span class="ttd-ht">${escHtml(it.t)}</span><span class="ttd-cnt">${it.kind === "kv" || it.kind === "cover" ? "" : n + " שורות"}</span>${lcIco("chev", 16)}</button>
+        ${open ? `<div class="ttd-b">${ttdBodyHtml(it, v)}</div>` : ""}</div>`;
+    }).join("")}</div>`).join("");
+  }
+  return `<div class="ttd-wrap">
+    <div class="lc-card ttd-top">
+      <div class="ttd-top-r"><button type="button" class="lc-btn ghost sm" data-lc-act="view" data-v="cards">→ חזרה לרישוי</button>
+        <div><b>תיק נתונים ושטח, ביטחון וחירום</b><div class="lc-sub">${has ? `עודכן ${escHtml(upd)} · נשמר אוטומטית` : "עדכון שנתי של טבלאות התיק"}</div></div></div>
+      <div class="lc-actions">
+        <select class="lc-sel" id="ttdYear" aria-label="שנת לימודים">${ttdYearList().map(x => `<option value="${x}" ${x === y ? "selected" : ""}>${escHtml(schoolYearLabel(x))}${ttdHasData(ttdYearObj(x)) ? " ✓" : ""}</option>`).join("")}</select>
+        <span class="saved-flag" id="ttdSaved">נשמר</span>
+        ${has ? `<button type="button" class="lc-btn ghost" data-ttd-op="expand">${lcIco("grid", 16)}${ttdUi.open.size > 3 ? "סגירת הכל" : "פתיחת הכל"}</button>
+        <button type="button" class="lc-btn" data-ttd-op="gen">${lcIco("doc", 16)}הפקת התיק (Word)</button>` : ""}
+      </div>
+    </div>${body}</div>`;
+}
+function ttdRender(main){
+  const ae = document.activeElement;
+  const key = ae && ae.dataset && ae.dataset.ttdK;
+  const caret = key && typeof ae.selectionStart === "number" ? [ae.selectionStart, ae.selectionEnd] : null;
+  const sy = window.scrollY;
+  main.innerHTML = ttdHtml();
+  const sel = main.querySelector("#ttdYear");
+  if(sel) sel.addEventListener("change", () => { ttdUi.year = Number(sel.value); data.uiPrefs.ttdYear = sel.value; saveUiPrefs(); ttdRerender(); });
+  if(!main.dataset.ttdWired){
+    main.dataset.ttdWired = "1";
+    main.addEventListener("input", ttdOnInput);
+    main.addEventListener("change", ttdOnInput);
+    main.addEventListener("click", ttdOnClick);
+  }
+  if(key){ const el = main.querySelector(`[data-ttd-k="${CSS.escape(key)}"]`); if(el){ el.focus({ preventScroll: true }); if(caret && el.setSelectionRange) try{ el.setSelectionRange(caret[0], caret[1]); }catch(e){} } }
+  window.scrollTo(0, sy);
+}
+function ttdRerender(){ const main = document.getElementById("lcMain"); if(main && licUi.view === "ttd") ttdRender(main); }
+function ttdOnInput(e){
+  const el = e.target; if(!el || !el.dataset || !el.dataset.ttdK) return;
+  if(licUi.view !== "ttd") return;
+  const o = ttdYearObj(ttdCurYear()); if(!o) return;
+  const [T, a, b] = el.dataset.ttdK.split("|");
+  const val = el.value;
+  if(T === "cover"){ o.t.cover = o.t.cover || {}; o.t.cover[a] = val; }
+  else{
+    const v = o.t[T]; if(!v) return; const r = v[Number(a)]; if(!r) return;
+    if(T === "components") r[b] = val;
+    else if(T === "shelter_check"){ r.v = r.v || []; r.v[Number(b)] = val; }
+    else r[Number(b)] = val;
+  }
+  ttdSave();
+}
+function ttdOnClick(e){
+  const b = e.target.closest && e.target.closest("[data-ttd-op]"); if(!b) return;
+  const op = b.dataset.ttdOp, T = b.dataset.t, i = Number(b.dataset.i);
+  const o = ttdYearObj(ttdCurYear());
+  switch(op){
+    case "toggle": if(ttdUi.open.has(T)) ttdUi.open.delete(T); else ttdUi.open.add(T); ttdRerender(); break;
+    case "expand": if(ttdUi.open.size > 3) ttdUi.open.clear(); else TTD_ITEMS.forEach(x => ttdUi.open.add(x.tag)); ttdRerender(); break;
+    case "import": ttdImportFromFile(); break;
+    case "copy": ttdCopyFrom(Number(b.dataset.y)); break;
+    case "gen": ttdOpenGenerate(); break;
+    case "add": {
+      const it = TTD_ITEM[T]; if(!o) return; o.t[T] = o.t[T] || [];
+      const n = it.kind === "teams" ? TTD_TEAM_COLS.length : it.cols.length;
+      const last = o.t[T][o.t[T].length - 1];
+      const row = Array(n).fill(""); if(it.kind === "teams" && last){ row[0] = last[0]; row[1] = "תלמיד"; }
+      o.t[T].push(row); ttdSave(); ttdRerender(); break;
+    }
+    case "dup": if(o && o.t[T] && o.t[T][i]){ o.t[T].splice(i + 1, 0, ttdClone(o.t[T][i])); ttdSave(); ttdRerender(); } break;
+    case "up": if(o && o.t[T] && i > 0){ const v = o.t[T]; [v[i - 1], v[i]] = [v[i], v[i - 1]]; ttdSave(); ttdRerender(); } break;
+    case "del": if(o && o.t[T] && o.t[T][i]){
+      const r = o.t[T][i]; const label = r.filter(x => x).slice(0, 2).join(" · ") || "שורה ריקה";
+      openConfirmModal(`למחוק את השורה "${label}" מ"${TTD_ITEM[T].t}"?`, () => { const k = o.t[T].indexOf(r); if(k >= 0){ o.t[T].splice(k, 1); ttdSave(); ttdRerender(); } });
+    } break;
+  }
 }
 
 function lcCardsHtml(all){
@@ -13433,7 +13954,8 @@ function buildFullExportObject(){
     "tasks-data":"tasks", "procurement-data":"procurement", "licensing-data":"licensing", "contacts-data":"contacts",
     "vendorPayments-data":"vendorPayments", "recurring-data":"recurring", "files-data":"files", "projects-data":"projects",
     "loginLog-data":"loginLog", "uiPrefs-data":"uiPrefs", "accountantContact-data":"accountantContact",
-    "equipment-data":"equipment", "serviceContracts-data":"serviceContracts", "maintBudget-data":"maintBudget"
+    "equipment-data":"equipment", "serviceContracts-data":"serviceContracts", "maintBudget-data":"maintBudget",
+    "ttd-data":"ttd"
   };
   if(currentRole === "admin" && !mtBlocked) map["myTasks-data"] = "myTasks";
   const out = {};
