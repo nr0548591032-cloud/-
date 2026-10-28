@@ -886,6 +886,9 @@
 
 .lc-bundle{ background:linear-gradient(135deg, var(--amber-bg), var(--card) 62%); border-radius:18px; padding:15px; box-shadow:0 1px 2px rgba(60,40,20,.08), 0 8px 22px -12px rgba(60,40,20,.25); display:flex; flex-direction:column; gap:12px; }
 .lc-bundle-top{ display:flex; gap:13px; align-items:center; flex-wrap:wrap; }
+.lc-bundle-top .lc-bh{ display:flex; gap:13px; align-items:center; flex:1 1 260px; min-width:0; border:0; background:transparent; padding:0; font:inherit; color:inherit; text-align:right; cursor:pointer; border-radius:12px; }
+.lc-modal [hidden], #licRoot [hidden]{ display:none !important; }
+.lc-bundle-top .lc-bh:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
 .lc-bundle-top .txt{ flex:1 1 220px; min-width:0; }
 .lc-bundle-top h4{ margin:0; font-size:16px; font-weight:600; }
 .lc-kids{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:8px; }
@@ -2635,7 +2638,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261025; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261028; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -6782,9 +6785,11 @@ function lcBundleHtml(p, kids){
   };
   return `<div class="lc-bundle">
     <div class="lc-bundle-top">
-      ${lcRingHtml(p)}
-      <div class="txt"><h4>${escHtml(p.type || "אישור מרוכז")}</h4>
-        <div class="lc-sub">תיק הגשה · נאסף אוטומטית מ־${all.length} אישורי משנה${p.expiry ? " · יעד " + fmtDateHe(p.expiry) : ""}${p.processStatus ? " · " + escHtml(p.processStatus) : ""}</div></div>
+      <button type="button" class="lc-bh" data-lc-act="toggle" data-id="${p.id}" aria-expanded="${licUi.open.has(p.id)}">
+        ${lcRingHtml(p)}
+        <div class="txt"><h4>${escHtml(p.type || "אישור מרוכז")}</h4>
+          <div class="lc-sub">תיק הגשה · נאסף אוטומטית מ־${all.length} אישורי משנה${p.expiry ? " · יעד " + fmtDateHe(p.expiry) : ""}${p.processStatus ? " · " + escHtml(p.processStatus) : ""}</div></div>
+      </button>
       <span class="lc-tag ${tone}">${ready} מתוך ${all.length} מוכנים להגשה</span>
       <button type="button" class="lc-btn sm" data-lc-act="bundle" data-id="${p.id}">${lcIco("folder", 15)}פתיחת תיק הגשה</button>
       <button type="button" class="lc-btn sm ghost" data-lc-act="toggle" data-id="${p.id}">${licUi.open.has(p.id) ? "סגירה" : "פרטים"}</button>
@@ -7204,7 +7209,7 @@ function lcOpenEdit(row, isNew){
     <div class="lc-modal-b"><div class="lc-form">
       <label class="full">שם האישור / הבדיקה<input id="lcE_type" value="${escHtml(r.type || "")}" placeholder="למשל: בדיקת מטפים ועמדות כיבוי"></label>
       <label>מסלול<select id="lcE_track">${LIC_TRACKS.map(t => `<option value="${t.k}" ${lcTrackKey(r) === t.k ? "selected" : ""}>${t.l}</option>`).join("")}</select></label>
-      ${r.isBundle ? `<label>סוג<input value="אישור מרוכז (תיק הגשה)" disabled></label>` : `<label>שייך לאישור מרוכז<select id="lcE_parent"><option value="">לא שייך</option>${bundles.map(p => `<option value="${p.id}" ${Number(r.parentId) === p.id ? "selected" : ""}>${escHtml((p.type || "אישור מרוכז") + (p.schoolYear ? " · " + schoolYearLabel(Number(p.schoolYear)) : ""))}</option>`).join("")}</select></label>`}
+      ${`<label id="lcE_parentWrap" ${r.isBundle ? "hidden" : ""}>שייך לאישור מרוכז<select id="lcE_parent"><option value="">לא שייך</option>${bundles.map(p => `<option value="${p.id}" ${Number(r.parentId) === p.id ? "selected" : ""}>${escHtml((p.type || "אישור מרוכז") + (p.schoolYear ? " · " + schoolYearLabel(Number(p.schoolYear)) : ""))}</option>`).join("")}</select></label>`}
       <label>תדירות<select id="lcE_freq">${freqOpts}</select></label>
       <label>עדיפות<select id="lcE_prio">${["גבוהה","בינונית","נמוכה"].map(p => `<option ${ (r.priority || "בינונית") === p ? "selected" : ""}>${p}</option>`).join("")}</select></label>
       <label>בדיקה אחרונה<input type="date" id="lcE_last" value="${escHtml(r.last || "")}"></label>
@@ -7213,7 +7218,8 @@ function lcOpenEdit(row, isNew){
       <label>גורם בודק (מאנשי קשר)<select id="lcE_contact"><option value="">— בחירה —</option>${contacts.map(x => `<option value="${x.id}" ${c && c.id === x.id ? "selected" : ""}>${escHtml(x.name + (x.specialty ? " · " + x.specialty : ""))}</option>`).join("")}</select></label>
       <label>או שם חופשי<input id="lcE_insp" value="${escHtml(c ? "" : (r.inspector || ""))}" placeholder="שם הבודק / החברה"></label>
       <label>שנת לימודים<select id="lcE_year">${schoolYearOptions().map(y => `<option value="${y}" ${Number(r.schoolYear || currentSchoolYearStart()) === y ? "selected" : ""}>${schoolYearLabel(y)}</option>`).join("")}</select></label>
-      ${r.isBundle ? "" : `<label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);align-self:end;padding-bottom:8px"><input type="checkbox" id="lcE_bundle" style="width:auto;accent-color:var(--brand)">זהו אישור מרוכז (תיק הגשה)</label>`}
+      <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);align-self:end;padding-bottom:8px"><input type="checkbox" id="lcE_bundle" ${r.isBundle ? "checked" : ""} style="width:auto;accent-color:var(--brand)">זהו אישור מרוכז (תיק הגשה)</label>
+      <div class="full lc-note" id="lcE_bundleNote" hidden></div>
       ${eqs.length ? `<div class="full"><div class="lc-sub" style="margin-bottom:4px">ציוד קשור (מטאב ציוד ותחזוקה)</div><div class="lc-chkgrid">${eqs.map(e => `<label><input type="checkbox" value="${e.id}" data-lc-eq ${eqSet.has(e.id) ? "checked" : ""}>${escHtml((e.name || "ללא שם") + (e.place ? " · " + e.place : ""))}</label>`).join("")}</div></div>` : ""}
       <label class="full">הערות<textarea id="lcE_notes" rows="2">${escHtml(r.notes || "")}</textarea></label>
     </div></div>
@@ -7230,6 +7236,23 @@ function lcOpenEdit(row, isNew){
   };
   $("#lcE_freq").addEventListener("change", recalc);
   $("#lcE_last").addEventListener("change", recalc);
+  const kidsNow = isNew ? [] : lcKids(r);
+  let unbundleOk = false;
+  const bundleUi = () => {
+    const on = $("#lcE_bundle").checked;
+    $("#lcE_parentWrap").hidden = on;
+    const note = $("#lcE_bundleNote");
+    unbundleOk = false;
+    $("#lcE_ok").textContent = isNew ? "יצירה" : "שמירה";
+    if(r.isBundle && !on){
+      note.hidden = false;
+      note.innerHTML = `${lcIco("info")}<div>הכרטיס יחזור להיות אישור רגיל, עם אזור דוח ליקויים. המסמכים, ההיסטוריה והליקויים שלו נשארים כמו שהם.${kidsNow.length ? ` <b>${kidsNow.length === 1 ? "אישור משנה אחד משויך" : kidsNow.length + " אישורי משנה משויכים"} אליו (${kidsNow.map(k => escHtml(k.type || "ללא שם")).join(", ")}).</b> הם לא יימחקו, רק ינותקו ויוצגו ככרטיסים רגילים.` : ""}</div>`;
+    }else if(!r.isBundle && on){
+      note.hidden = false;
+      note.innerHTML = `${lcIco("info")}<div>אישור מרוכז הוא תיק הגשה שמרכז כמה אישורי משנה (למשל אישור כבאות שמורכב ממטפים, גלאים והצהרת מהנדס). בכרטיס כזה לא מוצג אזור דוח ליקויים. אפשר לבטל את הסימון בכל עת.</div>`;
+    }else note.hidden = true;
+  };
+  $("#lcE_bundle").addEventListener("change", bundleUi);
   $("#lcE_ok").onclick = () => {
     const type = $("#lcE_type").value.trim();
     if(!type){ $("#lcE_type").focus(); $("#lcE_type").style.borderColor = "var(--red)"; return; }
@@ -7238,8 +7261,23 @@ function lcOpenEdit(row, isNew){
     const beforeLast = target.last, beforeExp = target.expiry;
     target.type = type;
     target.track = $("#lcE_track").value;
-    if($("#lcE_parent")) target.parentId = Number($("#lcE_parent").value) || null;
-    if($("#lcE_bundle") && $("#lcE_bundle").checked){ target.isBundle = true; target.parentId = null; }
+    const wantBundle = $("#lcE_bundle").checked;
+    if(!isNew && target.isBundle && !wantBundle && kidsNow.length && !unbundleOk){
+      unbundleOk = true;
+      $("#lcE_ok").textContent = "אישור ושמירה";
+      $("#lcE_bundleNote").scrollIntoView({ block: "nearest" });
+      return;
+    }
+    if(wantBundle){ target.isBundle = true; target.parentId = null; }
+    else{
+      if(target.isBundle){
+        target.isBundle = false;
+        kidsNow.forEach(k => { const kr = lcRow(k.id); if(kr && Number(kr.parentId) === target.id){ kr.parentId = null; lcLog(kr, `נותק מהאישור המרוכז "${type}"`, true); } });
+        if(!isNew) lcLog(target, "הוגדר כאישור רגיל (לא מרוכז)", true);
+      }
+      const pv = Number($("#lcE_parent").value) || null;
+      target.parentId = pv && pv !== target.id ? pv : null;
+    }
     const fv = $("#lcE_freq").value;
     if(fv === "custom"){ /* משאירים את הטקסט הקיים */ }
     else if(fv){ const n = Number(fv); target.freqMonths = n; target.freq = (LIC_FREQS.find(x => x[1] === n) || [""])[0]; }
@@ -7257,7 +7295,7 @@ function lcOpenEdit(row, isNew){
     if(isNew){
       target.statusLog = [{ date: lcToday(), status: target.processStatus || "לא התחיל", note: "האישור נוצר", auto: true }];
       data.licensing.push(target);
-      if(Array.isArray(target._kids)){ target._kids.forEach(k => { k.parentId = target.id; k.schoolYear = target.schoolYear; k.track = target.track; data.licensing.push(k); }); }
+      if(Array.isArray(target._kids)){ target._kids.forEach(k => { k.parentId = target.isBundle ? target.id : null; k.schoolYear = target.schoolYear; k.track = target.track; data.licensing.push(k); }); }
       delete target._kids;
       licUi.open.add(target.id);
       const ys = document.getElementById("licYearFilter");
