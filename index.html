@@ -573,6 +573,37 @@
   .ws-task .ws-meta{ font-size:12px; color:var(--ink-soft); margin-top:3px; display:flex; flex-wrap:wrap; gap:6px 12px; }
   .ws-task .ws-sent{ display:inline-block; font-size:11px; padding:2px 8px; border-radius:999px; background:var(--green-bg); color:var(--green); font-weight:600; }
   .ws-empty{ padding:16px; text-align:center; color:var(--ink-soft); font-size:13px; border:2px dashed var(--line); border-radius:12px; }
+  /* הודעה לאיש מקצוע: תמונות, נוסח קבוע, שליחה */
+  .ws-photos-wrap{ margin-top:12px; border:1px solid var(--line); border-radius:12px; padding:10px; background:var(--tint-b, #faf6ef); }
+  .ws-ph-h{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--ink); flex-wrap:wrap; }
+  .ws-ph-h small{ font-weight:400; color:var(--ink-soft); }
+  .ws-ph-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(78px, 1fr)); gap:8px; margin-top:8px; }
+  .ws-ph{ position:relative; aspect-ratio:1/1; border-radius:10px; overflow:hidden; border:2px solid transparent; padding:0; cursor:pointer; background:#eee; }
+  .ws-ph img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .ws-ph .ck{ position:absolute; top:5px; right:5px; width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,.92); border:1.5px solid #bbb; display:flex; align-items:center; justify-content:center; color:#fff; }
+  .ws-ph.on{ border-color:var(--green); box-shadow:0 0 0 2px rgba(91,122,58,.25); }
+  .ws-ph.on .ck{ background:var(--green); border-color:var(--green); }
+  .ws-ph .st{ position:absolute; bottom:0; inset-inline:0; font-size:10.5px; background:rgba(0,0,0,.55); color:#fff; padding:2px 4px; text-align:center; }
+  .ws-ph.add{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; border:2px dashed var(--line); background:var(--card, #fff); color:var(--brand); font-family:inherit; font-size:12px; font-weight:700; }
+  .ws-ph.add[disabled]{ opacity:.6; cursor:wait; }
+  .ws-ph-to{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-soft); margin-top:8px; flex-wrap:wrap; }
+  .ws-ph-to select{ width:auto; max-width:100%; font-size:12.5px; }
+  .ws-tpl{ margin-top:12px; border:1px solid var(--line); border-radius:12px; padding:0 12px; }
+  .ws-tpl summary{ cursor:pointer; font-size:13px; font-weight:700; padding:10px 0; color:var(--ink); }
+  .ws-tpl-body{ display:flex; flex-direction:column; gap:9px; padding-bottom:12px; }
+  .ws-tpl-body label{ display:flex; flex-direction:column; gap:4px; font-size:12.5px; color:var(--ink-soft); font-weight:600; }
+  .ws-tpl-body label small{ font-weight:400; }
+  .ws-tpl-body label.ws-tpl-days{ flex-direction:row; align-items:center; flex-wrap:wrap; gap:6px; }
+  .ws-tpl-body label.ws-tpl-days input{ width:64px; text-align:center; }
+  .ws-tpl-acts{ display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; }
+  .ws-send-panel{ margin-top:12px; border-radius:12px; padding:12px; background:var(--green-bg); border:1px solid var(--green); font-size:13px; color:var(--ink); display:flex; flex-direction:column; gap:8px; }
+  .ws-send-panel.warn{ background:#fff4e5; border-color:#e0a24a; }
+  .ws-send-panel b{ font-size:13.5px; }
+  .ws-send-panel .row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .ws-send-panel .btn{ display:inline-flex; align-items:center; gap:6px; }
+  .tk-up-pick{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .tk-up-prev{ width:96px; height:96px; border-radius:12px; object-fit:cover; border:2px solid var(--green); }
+  .tk-up-note{ font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
 
   /* ==== טאב מפתחות: כרטיסים ==== */
   .key-grid{
@@ -1863,10 +1894,22 @@ button.tk-chip{ cursor:pointer; }
         <label>שנת לימודים<select id="wsYear" onchange="renderWorkSlipTasks()"></select></label>
       </div>
       <div id="wsTaskList" class="ws-task-list"></div>
+      <div id="wsPhotosWrap" class="ws-photos-wrap" style="display:none"></div>
       <div id="wsPreviewWrap" style="display:none;margin-top:12px">
         <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:4px">תצוגה מקדימה של ההודעה (ניתן לערוך לפני השליחה):</div>
         <textarea id="wsPreview" rows="8" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit;font-size:13.5px;box-sizing:border-box"></textarea>
       </div>
+      <details class="ws-tpl" id="wsTpl" ontoggle="if(this.open) wsTplFill()">
+        <summary>עריכת הנוסח הקבוע</summary>
+        <div class="ws-tpl-body">
+          <label>שורת פתיחה <small>({שם} יוחלף בשם איש המקצוע)</small><input type="text" id="wsTplOpen" maxlength="200"></label>
+          <label>שורת בקשת עדכון<input type="text" id="wsTplUpdate" maxlength="200"></label>
+          <label>ברכת סיום<input type="text" id="wsTplBye" maxlength="200"></label>
+          <label class="ws-tpl-days">להציג בלוח הבקרה "לא חזרו אליך" אחרי<input type="number" id="wsTplDays" min="1" max="30" inputmode="numeric">ימים</label>
+          <div class="ws-tpl-acts"><button type="button" class="btn ghost" onclick="wsTplReset()">חזרה לנוסח המקורי</button><button type="button" class="btn" onclick="wsTplSave()">שמירת הנוסח</button></div>
+        </div>
+      </details>
+      <div id="wsSendPanel" class="ws-send-panel" style="display:none" aria-live="polite"></div>
       <div class="toolbar" style="margin-top:12px;flex-wrap:wrap;gap:8px">
         <button class="btn ghost" onclick="closeWorkSlipModal()">סגירה</button>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -2698,7 +2741,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261102; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261103; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -3832,15 +3875,8 @@ function quickContactWhatsAppByName(name){
   sendContactWhatsApp(c.id);
 }
 function buildTaskMessageText(row){
-  const contact = findContactByName(row.assignee);
-  const personName = (contact && contact.name) || row.assignee || "";
-  let msg = `שלום ${personName} 👋\nמה שלומך?\nמצורף לך הפרטים של מה שאני צריך ממך:\n\n`;
-  msg += `📋 *פירוט:*\n`;
-  if(row.category) msg += `🏷️ *תחום:* ${row.category}\n`;
-  msg += `📝 ${row.desc || "—"}\n`;
-  if(row.notes) msg += `💬 *הערות:* ${row.notes}\n`;
-  msg += `\nמתי תוכל לבוא? 🙏`;
-  return msg;
+  // נוסח אחיד עם השליחה המרוכזת (מספר משימה, מקום, בקשת עדכון עם תמונה)
+  return buildProMessage([row], row.assignee || "");
 }
 function sendTaskWhatsApp(taskId){
   const row = data.tasks.find(r => r.id === taskId);
@@ -3855,9 +3891,7 @@ function sendTaskEmail(taskId){
   if(!row) return;
   const contact = findContactByName(row.assignee);
   if(!contact || !contact.email){ alert("לא נמצאה כתובת אימייל לאיש המקצוע שנבחר כאחראי ביצוע."); return; }
-  const subject = encodeURIComponent("משימה: " + (row.desc||""));
-  const body = encodeURIComponent(buildTaskMessageText(row));
-  window.location.href = `mailto:${contact.email}?subject=${subject}&body=${body}`;
+  window.open(tkGmailUrl(contact.email, "משימה: " + (row.desc||""), buildTaskMessageText(row)), "_blank");
 }
 function isInvoiceDocType(t){ return t === "חשבונית" || t === "חשבונית/קבלה" || !t; }
 function isReceiptDocType(t){ return t === "קבלה"; }
@@ -4173,7 +4207,9 @@ function tkNext(t){
       if(!t.sentAt) return { note: "עוד לא יצאה לדרך", act: "send", label: "שליחה ל" + tkFirstName(t.assignee), icon: "whatsapp" };
       return { note: "נשלח ב-" + tkShortDate(t.sentAt), act: "start", label: "העבודה התחילה", icon: "play" };
     }
-    return { note: "בעבודה", act: "done", label: "סימון כבוצע", icon: "check" };
+    return t.sentAt
+      ? { note: "בעבודה", act: "gotupdate", label: "קיבלתי עדכון", icon: "check" }
+      : { note: "בעבודה", act: "done", label: "סימון כבוצע", icon: "check" };
   }
   const j = tkJob(t);
   if(!j) return null;
@@ -4187,7 +4223,7 @@ function tkNextBtn(t, n, extra){
     if(!isJobAdmin()) return "";
     return `<button type="button" class="tk-btn sm ${n.jobAct === "approve" || n.jobAct === "paid" ? "ghost" : "soft"} ${extra || ""}" data-job-act="${n.jobAct}" data-job-key="${n.jobKey}">${tkIcon(n.icon, 15)}${escHtml(n.label)}</button>`;
   }
-  return `<button type="button" class="tk-btn sm ${n.act === "done" ? "" : "soft"} ${extra || ""}" data-tk-act="${n.act}" data-tk-id="${t.id}">${tkIcon(n.icon, 15)}${escHtml(n.label)}</button>`;
+  return `<button type="button" class="tk-btn sm ${n.act === "done" || n.act === "gotupdate" ? "" : "soft"} ${extra || ""}" data-tk-act="${n.act}" data-tk-id="${t.id}">${tkIcon(n.icon, 15)}${escHtml(n.label)}</button>`;
 }
 
 /* ---------- סינון ---------- */
@@ -4631,6 +4667,7 @@ function tkRenderDrawer(){
     <div class="tk-actions">
       <button type="button" class="tk-btn sm soft" data-tk-act="${st === "ממתין" ? "nudge" : "send"}" data-tk-id="${t.id}">${svgIcon("whatsapp", 15)}${st === "ממתין" ? "תזכורת בוואטסאפ" : "וואטסאפ"}</button>
       <button type="button" class="tk-btn sm soft" data-tk-act="mail" data-tk-id="${t.id}">${svgIcon("mail", 15)}מייל (Gmail)</button>
+      ${t.sentAt && st !== "בוצע" ? `<button type="button" class="tk-btn sm" data-tk-act="gotupdate" data-tk-id="${t.id}">${svgIcon("check", 15)}קיבלתי עדכון</button>` : ""}
       <button type="button" class="tk-btn sm soft" data-pro="${escHtml(t.assignee)}">${tkIcon("person", 15)}כל העבודות שלו</button>
     </div>` : `<div class="tk-actions"><button type="button" class="tk-btn sm" data-tk-act="assign" data-tk-id="${t.id}">${tkIcon("person", 15)}שיבוץ איש מקצוע</button></div>`;
   const ck = tkChecklist(t);
@@ -4838,18 +4875,19 @@ function tkAction(act, id){
   if(!t) return;
   if(act === "assign") return tkOpen(id, "assignee");
   if(act === "send"){
+    // פותח את חלון השליחה עם המשימה הזו מסומנת: תצוגה מקדימה, צירוף תמונה, ושליחה
+    if(tkStatus(t) !== "בוצע" && t.assignee && tkOpenSlipForTask(t)) return;
     if(tkWhatsApp(t, buildTaskMessageText(t), `נשלחה הודעת וואטסאפ ל${t.assignee}`)){ t.sentAt = tkToday(); tkSave(); renderTasks(); }
     return;
   }
   if(act === "nudge"){
-    const name = tkFirstName(t.assignee);
-    const text = `שלום ${name} 👋\nרציתי לבדוק לגבי: *${t.desc || ""}*${t.waitFor ? `\n⏳ מחכה ל: ${t.waitFor}` : ""}\nיש עדכון? 🙏`;
-    if(tkWhatsApp(t, text, `נשלחה תזכורת ל${t.assignee}${t.waitFor ? " · " + t.waitFor : ""}`)){ t.lastNudge = tkToday(); tkSave(); renderTasks(); }
+    if(tkWhatsApp(t, proNudgeText(t), `נשלחה תזכורת ל${t.assignee}${t.waitFor ? " · " + t.waitFor : ""}`)){ t.lastNudge = tkToday(); tkSave(); renderTasks(); try{ renderDashboard(); }catch(e){ console.error(e); } }
     return;
   }
+  if(act === "gotupdate") return tkGotUpdate(t);
   if(act === "mail"){
     const c = tkContact(t);
-    window.open(tkGmailUrl(c && c.email ? c.email : "", "משימה: " + (t.desc || ""), buildTaskMessageText(t)), "_blank");
+    window.open(tkGmailUrl(c && c.email ? c.email : "", "משימה: " + (t.desc || ""), buildTaskMessageText(t) + proPhotoLinksText(tkPhotos(t).map(p => p.fileUrl))), "_blank");
     tkLog(t, `נפתח מייל ל${t.assignee || "איש המקצוע"}`);
     tkSave(); if(tkUi.openId === id) tkRenderDrawer();
     return;
@@ -4858,6 +4896,479 @@ function tkAction(act, id){
   if(act === "done") return tkSetStatus(t, "בוצע");
   if(act === "photo") return addCompletionPhoto(id);
   if(act === "delete") return removeTask(id);
+}
+
+/* =====================================================================
+   הודעה לאיש מקצוע (נובמבר 2026)
+   נוסח אחיד לכל ההודעות (משימה בודדת ושליחה מרוכזת), שורת מקום, בקשת עדכון
+   עם תמונה, צירוף תמונות (טלפון: חלון שיתוף; מחשב: העתקה והדבקה), נוסח קבוע
+   שנערך פעם אחת, "קיבלתי עדכון", ומעקב "לא חזרו אליך" בלוח הבקרה.
+   עקרון בטיחות: רק מוסיפים (תמונה חדשה נוספת ל-docs, רישום ב-log). שום שדה קיים
+   לא נמחק ולא נדרס. הנוסח הקבוע נשמר ב-uiPrefs.proMsg בלבד.
+   ===================================================================== */
+const PRO_MSG_DEFAULTS = {
+  open: "שלום {שם} 👋😊",
+  update: "אשמח שתעדכן אותי שבוצע, עדיף עם צירוף תמונה 📸",
+  bye: "🙏 תודה רבה ובהצלחה! 💪",
+  followDays: 3
+};
+function proMsgCfg(){
+  const p = (data.uiPrefs && data.uiPrefs.proMsg && typeof data.uiPrefs.proMsg === "object") ? data.uiPrefs.proMsg : {};
+  const str = (v, d) => typeof v === "string" ? v : d;
+  const fd = Math.round(Number(p.followDays));
+  return {
+    open: str(p.open, PRO_MSG_DEFAULTS.open),
+    update: str(p.update, PRO_MSG_DEFAULTS.update),
+    bye: str(p.bye, PRO_MSG_DEFAULTS.bye),
+    followDays: fd >= 1 && fd <= 30 ? fd : PRO_MSG_DEFAULTS.followDays
+  };
+}
+function proMsgFill(str, name){ return String(str || "").replace(/\{שם\}/g, name || "").trim(); }
+function buildProMessage(list, who){
+  const c = proMsgCfg();
+  const nums = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
+  const line = "━━━━━━━━━━━━━━━";
+  list = (list || []).filter(Boolean);
+  let msg = `🏢 *תיק ניהול בניין*\n${line}\n`;
+  const open = proMsgFill(c.open, who);
+  if(open) msg += open + "\n";
+  msg += list.length === 1 ? `יש לי משימה אחת בשבילך:\n\n` : `יש לי ${list.length} משימות בשבילך:\n\n`;
+  list.forEach((r, i) => {
+    msg += `${nums[i] || "▪️"} 🔧 *משימה ${i + 1}*  ·  🔖 ${taskCodeDisplay(r)}\n`;
+    msg += `📌 *${r.desc || "—"}*\n`;
+    if(r.place && String(r.place).trim()) msg += `📍 ${String(r.place).trim()}\n`;
+    if(r.notes) msg += `📝 ${r.notes}\n`;
+    if(r.category) msg += `🏷️ ${r.category}\n`;
+    if(r.maint) msg += `${MAINT_EMOJI[r.maint] || "🔩"} ${r.maint}\n`;
+    if(r.due) msg += `⏰ לביצוע עד ${dueDateHeb(r.due)}\n`;
+    msg += `\n`;
+  });
+  msg += `${line}\n`;
+  if(list.length){
+    msg += list.length === 1
+      ? `✅ כשמסיימים – פשוט תכתוב לי:\n"בוצע ${taskCodeDisplay(list[0])}"\n`
+      : `✅ כשמסיימים כל משימה – פשוט תכתוב לי "בוצע" עם המספר שלה\n(למשל: "בוצע ${taskCodeDisplay(list[0])}")\n`;
+  }
+  const upd = proMsgFill(c.update, who);
+  if(upd) msg += upd + "\n";
+  const bye = proMsgFill(c.bye, who);
+  if(bye) msg += bye;
+  return msg.replace(/\n+$/, "");
+}
+function proNudgeText(t){
+  const c = proMsgCfg();
+  let m = `שלום ${tkFirstName(t.assignee)} 👋\nרציתי לבדוק לגבי: *${t.desc || ""}*  ·  🔖 ${tkCode(t)}`;
+  if(t.place && String(t.place).trim()) m += `\n📍 ${String(t.place).trim()}`;
+  if(t.waitFor) m += `\n⏳ מחכה ל: ${t.waitFor}`;
+  const upd = proMsgFill(c.update, t.assignee);
+  m += `\n${upd || "יש עדכון? 🙏"}`;
+  return m;
+}
+function proPhotoLinksText(urls){
+  urls = (urls || []).filter(Boolean);
+  if(!urls.length) return "";
+  return `\n\n📷 ${urls.length === 1 ? "תמונה" : "תמונות"}:\n` + urls.join("\n");
+}
+function proIsMobile(){ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); }
+
+/* ---------- הורדת תמונה מהאחסון (ישירות, ואם נחסם - דרך האתר) ---------- */
+async function proFetchImage(url, idx){
+  const attempts = [url].concat(typeof fvProxyUrls === "function" ? fvProxyUrls(url) : []);
+  let last = null;
+  for(const u of attempts){
+    const ctrl = new AbortController();
+    const tm = setTimeout(() => ctrl.abort(), 20000);
+    try{
+      const res = await fetch(u, { signal: ctrl.signal, credentials: "omit" });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const ct = (res.headers.get("content-type") || "").toLowerCase();
+      if(ct.includes("text/html")) throw new Error("html במקום תמונה");
+      const blob = await res.blob();
+      if(!blob.size) throw new Error("קובץ ריק");
+      const type = blob.type && /^image\//.test(blob.type) ? blob.type : "image/jpeg";
+      const ext = (type.split("/")[1] || "jpg").replace("jpeg", "jpg").replace(/[^a-z0-9]/gi, "") || "jpg";
+      return new File([blob], `photo_${Date.now()}_${idx || 1}.${ext}`, { type });
+    }catch(e){ last = e; }
+    finally{ clearTimeout(tm); }
+  }
+  throw last || new Error("ההורדה נכשלה");
+}
+function proToPng(file){
+  return new Promise((resolve, reject) => {
+    const u = URL.createObjectURL(file);
+    const im = new Image();
+    im.onload = () => {
+      try{
+        const max = 1600;
+        let w = im.naturalWidth || 1, h = im.naturalHeight || 1;
+        const k = Math.min(1, max / Math.max(w, h));
+        w = Math.max(1, Math.round(w * k)); h = Math.max(1, Math.round(h * k));
+        const cv = document.createElement("canvas");
+        cv.width = w; cv.height = h;
+        cv.getContext("2d").drawImage(im, 0, 0, w, h);
+        cv.toBlob(b => { URL.revokeObjectURL(u); b ? resolve(b) : reject(new Error("המרה נכשלה")); }, "image/png");
+      }catch(e){ URL.revokeObjectURL(u); reject(e); }
+    };
+    im.onerror = () => { URL.revokeObjectURL(u); reject(new Error("התמונה לא נטענה")); };
+    im.src = u;
+  });
+}
+function proDownloadFile(file){
+  const href = URL.createObjectURL(file);
+  const a = document.createElement("a");
+  a.href = href; a.download = file.name || "photo.jpg";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(href), 8000);
+}
+
+/* ---------- תמונות בחלון השליחה ---------- */
+let wsPhotoSel = new Set();       // url של תמונות שמסומנות לשליחה
+let wsPhotoSeen = new Set();      // משימות שכבר סומנו להן תמונות אוטומטית
+const wsPhotoFiles = new Map();   // url -> File (מוכן לשיתוף)
+const wsPhotoLoad = new Map();    // url -> Promise
+const wsPhotoFail = new Set();    // url שלא הצלחנו להוריד (יישלח כקישור)
+let wsPhotoList = [];
+let wsPhotoUploading = false;
+let wsPhotoTaskId = null;
+let wsSend = null;                // מצב השליחה במחשב (העתקה ← פתיחת וואטסאפ)
+function wsPhotoReset(){ wsPhotoSel = new Set(); wsPhotoSeen = new Set(); wsPhotoList = []; wsPhotoTaskId = null; wsSend = null; }
+function wsPhotoCandidates(){
+  const out = [], seen = new Set();
+  const multi = workSlipSelectedTasks().length > 1;
+  workSlipSelectedTasks().forEach(t => {
+    tkPhotos(t).forEach(p => {
+      if(seen.has(p.fileUrl)) return;
+      seen.add(p.fileUrl);
+      out.push({ url: p.fileUrl, taskId: t.id, label: multi ? tkCode(t) : (p.uploadedAt === tkToday() ? "היום" : fmtDateHe(p.uploadedAt || "")) });
+    });
+  });
+  return out;
+}
+function wsSelectedPhotoUrls(){
+  const valid = new Set(wsPhotoCandidates().map(p => p.url));
+  return [...wsPhotoSel].filter(u => valid.has(u));
+}
+function wsPrefetch(url){
+  if(wsPhotoFiles.has(url)) return Promise.resolve(wsPhotoFiles.get(url));
+  if(wsPhotoLoad.has(url)) return wsPhotoLoad.get(url);
+  wsPhotoFail.delete(url);
+  const p = proFetchImage(url, wsPhotoLoad.size + 1)
+    .then(f => { wsPhotoFiles.set(url, f); return f; })
+    .catch(e => { console.warn("תמונה לא הורדה", e); wsPhotoFail.add(url); return null; })
+    .finally(() => { wsPhotoLoad.delete(url); });
+  wsPhotoLoad.set(url, p);
+  return p;
+}
+function wsRenderPhotos(){
+  const wrap = document.getElementById("wsPhotosWrap");
+  if(!wrap) return;
+  const tasks = workSlipSelectedTasks();
+  if(!tasks.length){ wrap.style.display = "none"; wrap.innerHTML = ""; return; }
+  const list = wsPhotoCandidates();
+  // משימה שנבחרה עכשיו לראשונה: התמונות שכבר שמורות בה מסומנות לשליחה (עד 5)
+  tasks.forEach(t => {
+    if(wsPhotoSeen.has(t.id)) return;
+    wsPhotoSeen.add(t.id);
+    tkPhotos(t).forEach(p => { if(wsPhotoSel.size < 5) wsPhotoSel.add(p.fileUrl); });
+  });
+  wsPhotoList = list;
+  list.forEach(p => { if(wsPhotoSel.has(p.url)) wsPrefetch(p.url); });
+  if(!tasks.some(t => t.id === wsPhotoTaskId)) wsPhotoTaskId = tasks[0].id;
+  const nSel = list.filter(p => wsPhotoSel.has(p.url)).length;
+  const who = (document.getElementById("wsAssignee") || {}).value || "";
+  const hint = proIsMobile()
+    ? `בלחיצה על "שליחה בוואטסאפ" ייפתח חלון שיתוף – בוחרים וואטסאפ ואת ${escHtml(tkFirstName(who) || "איש המקצוע")}`
+    : `במחשב: התמונה מועתקת, ואז מדביקים אותה בצ'אט (Ctrl+V)`;
+  wrap.style.display = "block";
+  wrap.innerHTML = `
+    <div class="ws-ph-h">${svgIcon("camera", 16)}תמונה לצירוף${nSel ? ` · ${nSel} מסומנות` : ""}<small>${hint}</small></div>
+    <div class="ws-ph-grid">
+      ${list.map((p, i) => {
+        const on = wsPhotoSel.has(p.url);
+        return `<button type="button" class="ws-ph ${on ? "on" : ""}" aria-pressed="${on}" onclick="wsTogglePhoto(${i})" title="${on ? "לא לצרף" : "לצרף להודעה"}"><img src="${escHtml(p.url)}" alt="תמונה לצירוף" loading="lazy"><span class="ck">${on ? svgIcon("check", 13) : ""}</span>${p.label ? `<span class="st">${escHtml(p.label)}</span>` : ""}</button>`;
+      }).join("")}
+      <button type="button" class="ws-ph add" onclick="wsAddPhoto()" ${wsPhotoUploading ? "disabled" : ""}>${svgIcon("camera", 20)}${wsPhotoUploading ? "מעלה…" : "צילום / בחירת תמונה"}</button>
+    </div>
+    ${tasks.length > 1 ? `<div class="ws-ph-to">תמונה חדשה תישמר בתיק של:<select onchange="wsPhotoTaskId = Number(this.value)" aria-label="שיוך תמונה חדשה למשימה">${tasks.map(t => `<option value="${t.id}" ${t.id === wsPhotoTaskId ? "selected" : ""}>${escHtml(tkCode(t) + " · " + (t.desc || ""))}</option>`).join("")}</select></div>` : ""}`;
+}
+function wsTogglePhoto(i){
+  const p = wsPhotoList[i];
+  if(!p) return;
+  if(wsPhotoSel.has(p.url)) wsPhotoSel.delete(p.url);
+  else{ wsPhotoSel.add(p.url); wsPrefetch(p.url); }
+  wsPanel(null);
+  wsRenderPhotos();
+}
+async function wsAddPhoto(){
+  if(wsPhotoUploading) return;
+  const tasks = workSlipSelectedTasks();
+  if(!tasks.length){ jobToast("קודם מסמנים משימה"); return; }
+  const target = tasks.find(t => t.id === wsPhotoTaskId) || tasks[0];
+  const file = await lcPickFile("image/*");
+  if(!file) return;
+  if(!/^image\//.test(file.type || "")){ jobToast("יש לבחור קובץ תמונה"); return; }
+  wsPhotoUploading = true;
+  wsRenderPhotos();
+  try{
+    const url = await lcUploadFile(file, "tasks-photos");
+    const live = data.tasks.find(x => x.id === target.id);
+    if(!live) throw new Error("המשימה לא נמצאה");
+    live.docs = Array.isArray(live.docs) ? live.docs : [];
+    live.docs.push({ name: "תמונה לפני (נשלחה לאיש המקצוע)", topic: "", docType: "תמונת ביצוע", fileUrl: url, uploadedAt: tkToday() });
+    tkLog(live, "צורפה תמונה להודעה לאיש המקצוע");
+    tkSave();
+    wsPhotoFiles.set(url, file);
+    wsPhotoSel.add(url);
+    try{ renderTasks(); }catch(e){ console.error(e); }
+    jobToast("התמונה נשמרה בתיק המשימה ומסומנת לשליחה");
+  }catch(e){
+    console.error(e);
+    jobToast("העלאת התמונה נכשלה: " + (e && e.message ? e.message : e), 5000);
+  }finally{
+    wsPhotoUploading = false;
+    wsPanel(null);
+    wsRenderPhotos();
+  }
+}
+function wsPanel(html, warn){
+  const p = document.getElementById("wsSendPanel");
+  if(!p) return;
+  if(!html){ p.style.display = "none"; p.innerHTML = ""; p.classList.remove("warn"); return; }
+  p.innerHTML = html;
+  p.classList.toggle("warn", !!warn);
+  p.style.display = "flex";
+  try{ p.scrollIntoView({ behavior: "smooth", block: "nearest" }); }catch(e){}
+}
+
+/* ---------- שליחה ---------- */
+function sendWorkSlip(channel){
+  const who = document.getElementById("wsAssignee").value;
+  const list = workSlipSelectedTasks();
+  if(!who){ jobToast("יש לבחור איש מקצוע קודם"); return; }
+  if(!list.length){ jobToast("יש לסמן לפחות משימה אחת לשליחה"); return; }
+  const contact = findContactByName(who);
+  const typed = document.getElementById("wsPreview").value;
+  const text = typed && typed.trim() ? typed : buildWorkSlipText(list);
+  const urls = wsSelectedPhotoUrls();
+  if(channel !== "whatsapp"){
+    if(!contact || !contact.email){ jobToast(`לא נמצאה כתובת אימייל ל${who}. אפשר להוסיף אימייל בטאב אנשי קשר וספקים.`, 4500); return; }
+    const subject = list.length === 1 ? `משימה: ${list[0].desc || ""}` : `${list.length} משימות בשבילך`;
+    window.open(tkGmailUrl(contact.email, subject, text + proPhotoLinksText(urls)), "_blank");
+    markWorkSlipSent(list, { channel: "email", photos: urls.length });
+    jobToast("נפתח מייל ב-Gmail · המשימות סומנו כנשלחו");
+    return;
+  }
+  if(!contact || !contact.phone){ jobToast(`לא נמצא מספר טלפון ל${who}. אפשר להוסיף טלפון בטאב אנשי קשר וספקים.`, 4500); return; }
+  const phone = formatPhoneForWhatsApp(contact.phone);
+  if(!urls.length){
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, "_blank");
+    markWorkSlipSent(list, { channel: "whatsapp" });
+    jobToast("נפתח וואטסאפ · המשימות סומנו כנשלחו");
+    return;
+  }
+  const pending = urls.filter(u => !wsPhotoFiles.has(u) && !wsPhotoFail.has(u));
+  if(pending.length){
+    wsPanel(`<b>מכין את התמונות לשליחה…</b><div>עוד רגע זה מוכן.</div>`, true);
+    Promise.all(pending.map(wsPrefetch)).then(() => {
+      wsPanel(`<b>התמונות מוכנות ✓</b><div>לחץ שוב על "שליחה בוואטסאפ".</div>`);
+    });
+    return;
+  }
+  const files = urls.map(u => wsPhotoFiles.get(u)).filter(Boolean);
+  const failed = urls.filter(u => !wsPhotoFiles.has(u));
+  const fullText = text + proPhotoLinksText(failed);
+  // טלפון: חלון השיתוף של המכשיר שולח את התמונות והטקסט יחד
+  if(proIsMobile() && files.length && navigator.share && navigator.canShare && navigator.canShare({ files })){
+    try{ if(navigator.clipboard) navigator.clipboard.writeText(fullText).catch(() => {}); }catch(e){}
+    navigator.share({ files, text: fullText }).then(() => {
+      markWorkSlipSent(list, { channel: "whatsapp", photos: files.length, keepPanel: true });
+      wsPanel(`<b>נשלח ✓</b><div>אם הטקסט לא הופיע ליד התמונה – הוא כבר מועתק, אפשר להדביק אותו בצ'אט.</div>`);
+    }).catch(e => {
+      if(e && e.name === "AbortError") return;
+      if(e && e.name === "NotAllowedError"){ wsPanel(`<b>התמונות מוכנות.</b><div>לחץ שוב על "שליחה בוואטסאפ".</div>`, true); return; }
+      console.warn("share failed", e);
+      wsDesktopFlow(list, phone, fullText, files);
+    });
+    return;
+  }
+  if(!files.length){
+    // לא הצלחנו להוריד אף תמונה: שולחים את ההודעה עם קישור לתמונה
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(fullText)}`, "_blank");
+    markWorkSlipSent(list, { channel: "whatsapp", photos: urls.length });
+    jobToast("התמונה צורפה כקישור בתוך ההודעה", 4200);
+    return;
+  }
+  wsDesktopFlow(list, phone, fullText, files);
+}
+// מחשב: וואטסאפ לא מקבל תמונה דרך קישור, לכן מעתיקים את התמונה ומדביקים בצ'אט
+function wsDesktopFlow(list, phone, text, files){
+  wsSend = { list, phone, text, files, opened: false };
+  const n = files.length;
+  wsPanel(`
+    <b>שלב 1 · העתקת ${n === 1 ? "התמונה" : "תמונה"}</b>
+    <div class="row">${files.map((f, i) => `<button type="button" class="btn ghost" onclick="wsCopyImage(${i})">${svgIcon("copy", 15)}העתקת תמונה${n > 1 ? " " + (i + 1) : ""}</button>`).join("")}</div>
+    <div id="wsCopySt">מעתיק את ${n === 1 ? "התמונה" : "התמונה הראשונה"}…</div>
+    <b>שלב 2 · פתיחת הצ'אט</b>
+    <div class="row"><button type="button" class="btn" onclick="wsOpenWhatsApp()">${svgIcon("whatsapp", 15)}פתיחת וואטסאפ עם ההודעה</button></div>
+    <div>בצ'אט שנפתח לוחצים <b>Ctrl+V</b> כדי להדביק את התמונה, ושולחים. ההודעה כבר כתובה בחלון.${n > 1 ? " לתמונה הבאה: חוזרים לכאן, מעתיקים ומדביקים שוב." : ""}</div>`);
+  wsCopyImage(0);
+}
+function wsCopyMsg(t){ const el = document.getElementById("wsCopySt"); if(el) el.textContent = t; }
+function wsCopyImage(i){
+  const f = wsSend && wsSend.files[i];
+  if(!f) return;
+  const label = wsSend.files.length > 1 ? `תמונה ${i + 1}` : "התמונה";
+  const fallback = err => {
+    if(err) console.warn("העתקת תמונה נכשלה", err);
+    proDownloadFile(f);
+    wsCopyMsg(`הדפדפן לא איפשר להעתיק, אז ${label} ירדה למחשב (תיקיית ההורדות). אפשר לגרור אותה לצ'אט.`);
+  };
+  try{
+    if(!navigator.clipboard || !navigator.clipboard.write || typeof ClipboardItem === "undefined") throw new Error("אין תמיכה בהעתקת תמונה");
+    const item = new ClipboardItem({ "image/png": proToPng(f) });
+    navigator.clipboard.write([item]).then(() => wsCopyMsg(`✓ ${label} הועתקה – עכשיו פותחים את הצ'אט ומדביקים`), fallback);
+  }catch(e){ fallback(e); }
+}
+function wsOpenWhatsApp(){
+  if(!wsSend) return;
+  window.open(`https://wa.me/${wsSend.phone}?text=${encodeURIComponent(wsSend.text)}`, "_blank");
+  if(!wsSend.opened){
+    wsSend.opened = true;
+    markWorkSlipSent(wsSend.list, { channel: "whatsapp", photos: wsSend.files.length, keepPanel: true });
+  }
+}
+
+/* ---------- נוסח קבוע ---------- */
+function wsTplFill(){
+  const c = proMsgCfg();
+  const set = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+  set("wsTplOpen", c.open); set("wsTplUpdate", c.update); set("wsTplBye", c.bye); set("wsTplDays", c.followDays);
+}
+function wsTplStore(cfg){
+  data.uiPrefs = data.uiPrefs || {};
+  data.uiPrefs.proMsg = cfg;
+  saveUiPrefs();
+  updateWorkSlipPreview();
+  try{ renderDashboard(); }catch(e){ console.error(e); }
+}
+function wsTplSave(){
+  const v = id => { const el = document.getElementById(id); return el ? String(el.value || "").trim() : ""; };
+  const d = Math.round(Number(v("wsTplDays")));
+  wsTplStore({ open: v("wsTplOpen"), update: v("wsTplUpdate"), bye: v("wsTplBye"), followDays: d >= 1 && d <= 30 ? d : PRO_MSG_DEFAULTS.followDays });
+  wsTplFill();
+  jobToast("הנוסח נשמר · ישמש בכל ההודעות הבאות");
+}
+function wsTplReset(){
+  wsTplStore(Object.assign({}, PRO_MSG_DEFAULTS));
+  wsTplFill();
+  jobToast("חזרנו לנוסח המקורי");
+}
+
+/* ---------- קיבלתי עדכון ---------- */
+function tkGotUpdate(t){
+  if(!t) return;
+  if(tkStatus(t) === "בוצע"){ jobToast("המשימה כבר מסומנת כבוצעה"); return; }
+  const who = t.assignee || "איש המקצוע";
+  let file = null, busy = false, prevUrl = "";
+  tkModalOpen(`
+    <div class="tk-modal-title">קיבלת עדכון מ${escHtml(tkFirstName(who) || who)}?</div>
+    <div class="tk-modal-sub">${escHtml(t.desc || "משימה")} · ${escHtml(tkCode(t))}</div>
+    <div class="tk-modal-body">
+      <div class="tk-up-pick"><button type="button" class="tk-btn sm soft" id="tkUpPick">${svgIcon("camera", 15)}הוספת תמונת "אחרי"</button><span id="tkUpPrev"></span></div>
+      <div class="tk-up-note">לא חובה. אם קיבלת תמונה בוואטסאפ, שמור אותה במכשיר ובחר אותה כאן. היא תישמר בתיק המשימה, בחלק "תמונות לפני ואחרי".</div>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600">הערה ליומן המשימה (לא חובה)<input type="text" id="tkUpNote" maxlength="200" placeholder="למשל: הוחלף ברז, נבדק ועובד"></label>
+    </div>
+    <div class="tk-modal-foot"><button type="button" class="tk-btn ghost sm" onclick="tkModalClose()">ביטול</button><button type="button" class="tk-btn sm" id="tkUpOk">${svgIcon("check", 15)}סימון כבוצע</button></div>`, box => {
+    const okBtn = box.querySelector("#tkUpOk");
+    const okHtml = okBtn.innerHTML;
+    box.querySelector("#tkUpPick").addEventListener("click", async () => {
+      const f = await lcPickFile("image/*");
+      if(!f) return;
+      if(!/^image\//.test(f.type || "")){ jobToast("יש לבחור קובץ תמונה"); return; }
+      file = f;
+      if(prevUrl) URL.revokeObjectURL(prevUrl);
+      prevUrl = URL.createObjectURL(f);
+      const slot = box.querySelector("#tkUpPrev");
+      if(slot) slot.innerHTML = `<img class="tk-up-prev" src="${prevUrl}" alt="תמונת אחרי">`;
+    });
+    okBtn.addEventListener("click", async () => {
+      if(busy) return;
+      busy = true;
+      okBtn.disabled = true;
+      okBtn.textContent = file ? "מעלה תמונה…" : "שומר…";
+      try{
+        const live = data.tasks.find(x => x.id === t.id);
+        if(!live) throw new Error("המשימה לא נמצאה");
+        if(file){
+          const url = await lcUploadFile(file, "tasks-photos");
+          live.docs = Array.isArray(live.docs) ? live.docs : [];
+          live.docs.push({ name: `תמונת אחרי (${who})`, topic: "", docType: "תמונת ביצוע", fileUrl: url, uploadedAt: tkToday() });
+        }
+        const note = String((box.querySelector("#tkUpNote") || {}).value || "").trim();
+        tkLog(live, `התקבל עדכון מ${who}${file ? " עם תמונה" : ""}${note ? ": " + note : ""}`);
+        if(prevUrl){ URL.revokeObjectURL(prevUrl); prevUrl = ""; }
+        tkModalClose();
+        tkSetStatus(live, "בוצע");
+      }catch(e){
+        console.error(e);
+        busy = false;
+        okBtn.disabled = false;
+        okBtn.innerHTML = okHtml;
+        jobToast("לא נשמר: " + (e && e.message ? e.message : e), 5000);
+      }
+    });
+  });
+}
+
+/* ---------- לא חזרו אליך (לוח בקרה) ---------- */
+function proLastContact(t){
+  let last = t.sentAt || "";
+  if(t.lastNudge && t.lastNudge > last) last = t.lastNudge;
+  (Array.isArray(t.log) ? t.log : []).forEach(l => {
+    if(l && l.d && l.d > last && /הסטטוס עבר|התקבל עדכון/.test(String(l.t || ""))) last = l.d;
+  });
+  return last;
+}
+function proNoReply(list){
+  const N = proMsgCfg().followDays;
+  return (list || []).filter(t => t && t.assignee && t.sentAt && tkStatus(t) !== "בוצע").map(t => {
+    const d = tkDaysTo(proLastContact(t));
+    return { t, n: d === null ? 0 : -d, nudged: !!(t.lastNudge && t.lastNudge >= t.sentAt) };
+  }).filter(x => x.n >= N).sort((a, b) => b.n - a.n);
+}
+function dbNudge(id){
+  const t = data.tasks.find(x => x.id === id);
+  if(!t) return;
+  const c = tkContact(t);
+  if(!c || !c.phone){
+    jobToast(`אין מספר טלפון ל${t.assignee} באנשי קשר. אפשר להוסיף בטאב אנשי קשר וספקים.`, 4200);
+    dbGo("tasks", () => tkOpen(t.id, "assignee"))();
+    return;
+  }
+  tkAction("nudge", id);
+}
+function dbNoReplyHtml(D){
+  if(!dbAllowed("tasks")) return "";
+  const L = proNoReply(D.open);
+  if(!L.length) return "";
+  const N = proMsgCfg().followDays;
+  const max = 5, show = DB.nrAll ? L : L.slice(0, max);
+  return `<section class="db-sec db-in" style="--i:2">
+    <div class="db-sec-h">${svgIcon("clock", 18)}לא חזרו אליך<span class="r">${L.length === 1 ? "משימה אחת" : L.length + " משימות"} · בלי עדכון ${N}+ ימים</span></div>
+    <div class="db-nr-list">${show.map(x => {
+      const t = x.t;
+      const sub = [t.assignee, tkCode(t), t.place, x.nudged ? "תזכורת ב-" + tkShortDate(t.lastNudge) : "נשלח ב-" + tkShortDate(t.sentAt)].filter(Boolean).join(" · ");
+      return `<div class="db-nr-row">
+        <button type="button" class="db-nr-main" ${dbAct(dbGo("tasks", () => tkOpen(t.id)))}><span class="ava" style="background:${tkAvaColor(t.assignee)}">${escHtml(tkInitials(t.assignee))}</span><span class="tx"><b>${escHtml(t.desc || "משימה")}</b><small>${escHtml(sub)}</small></span></button>
+        <span class="db-nr-days ${x.n >= N * 2 ? "hot" : ""}">${x.n} ימים</span>
+        <div class="db-nr-btns">
+          <button type="button" class="db-nr-btn wa" ${dbAct(() => dbNudge(t.id))}>${svgIcon("whatsapp", 14)}תזכורת</button>
+          <button type="button" class="db-nr-btn ok" ${dbAct(() => tkGotUpdate(data.tasks.find(y => y.id === t.id)))}>${svgIcon("check", 14)}קיבלתי עדכון</button>
+        </div>
+      </div>`;
+    }).join("")}</div>
+    ${L.length > max ? `<button type="button" class="db-more" ${dbAct(() => { DB.nrAll = !DB.nrAll; renderDashboard(); })}>${DB.nrAll ? "הצגת פחות" : `הצגת כל ${L.length}`}</button>` : ""}
+  </section>`;
 }
 
 /* ---------- הוספה מהירה ---------- */
@@ -5103,6 +5614,20 @@ function tkOpenSlipFor(name){
   if(ys) ys.value = "";
   wsSelectedIds = workSlipCandidates().map(r => r.id);
   renderWorkSlipTasks();
+}
+// פתיחת חלון השליחה עבור משימה אחת (מהכרטיס או מתיק המשימה)
+function tkOpenSlipForTask(t){
+  const sel = document.getElementById("wsAssignee");
+  if(!sel) return false;
+  openWorkSlipModal();
+  if(![...sel.options].some(o => o.value === t.assignee)){ closeWorkSlipModal(); return false; }
+  sel.value = t.assignee;
+  const ys = document.getElementById("wsYear");
+  if(ys) ys.value = "";
+  if(!workSlipCandidates().some(r => r.id === t.id)){ closeWorkSlipModal(); return false; }
+  wsSelectedIds = [t.id];
+  renderWorkSlipTasks();
+  return true;
 }
 
 /* ---------- משימה מתוך רישוי ובטיחות ---------- */
@@ -6245,10 +6770,13 @@ function openWorkSlipModal(){
   const sel = document.getElementById("wsAssignee");
   fillAssigneeSelect(sel, "— בחר איש מקצוע —", "");
   wsSelectedIds = [];
+  wsPhotoReset();
+  wsPanel(null);
+  const tpl = document.getElementById("wsTpl"); if(tpl) tpl.open = false;
   renderWorkSlipTasks();
   document.getElementById("workSlipModal").style.display = "flex";
 }
-function closeWorkSlipModal(){ document.getElementById("workSlipModal").style.display = "none"; }
+function closeWorkSlipModal(){ document.getElementById("workSlipModal").style.display = "none"; wsPanel(null); }
 function workSlipCandidates(){
   const who = document.getElementById("wsAssignee").value;
   const year = document.getElementById("wsYear").value;
@@ -6261,6 +6789,7 @@ function renderWorkSlipTasks(){
   const wrap = document.getElementById("wsTaskList");
   const validIds = new Set(list.map(r=>r.id));
   wsSelectedIds = wsSelectedIds.filter(id => validIds.has(id));
+  wsPanel(null);
   if(!who){ wrap.innerHTML = `<div class="ws-empty">בחר איש מקצוע כדי לראות את המשימות הפתוחות שלו.</div>`; updateWorkSlipPreview(); return; }
   if(!list.length){ wrap.innerHTML = `<div class="ws-empty">אין משימות פתוחות ל${escHtml(who)} בשנה שנבחרה 🎉</div>`; updateWorkSlipPreview(); return; }
   if(wsSelectedIds.length === 0){
@@ -6277,6 +6806,7 @@ function renderWorkSlipTasks(){
           <span>${escHtml(taskCodeDisplay(r))}</span>
           ${r.due ? `<span>יעד: ${fmtDateHe(r.due)}</span>` : ""}
           ${r.maint ? `<span>${escHtml(r.maint)}</span>` : ""}
+          ${r.place ? `<span>📍 ${escHtml(r.place)}</span>` : ""}
           <span>${escHtml(r.status||"")}</span>
           ${r.sentAt ? `<span class="ws-sent">נשלח ב-${fmtDateHe(r.sentAt)}</span>` : ""}
         </div>
@@ -6291,6 +6821,7 @@ function toggleWorkSlipTask(id, on){
   document.querySelectorAll("#wsTaskList .ws-task").forEach(el => {
     const cb = el.querySelector("input"); el.classList.toggle("selected", cb.checked);
   });
+  wsPanel(null);
   updateWorkSlipPreview();
 }
 function workSlipSelectedTasks(){
@@ -6306,71 +6837,51 @@ function dueDateHeb(iso){
   return `יום ${days[d.getDay()]}, ${m[3]}.${m[2]}.${m[1]}`;
 }
 function buildWorkSlipText(list){
-  const who = document.getElementById("wsAssignee").value;
-  const nums = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
-  const line = "━━━━━━━━━━━━━━━";
-  let msg = `🏢 *תיק ניהול בניין*\n${line}\n`;
-  msg += `שלום ${who} 👋😊\n`;
-  msg += list.length === 1 ? `יש לי משימה אחת בשבילך:\n\n` : `יש לי ${list.length} משימות בשבילך:\n\n`;
-  list.forEach((r,i) => {
-    msg += `${nums[i]||"▪️"} 🔧 *משימה ${i+1}*  ·  🔖 ${taskCodeDisplay(r)}\n`;
-    msg += `📌 *${r.desc || "—"}*\n`;
-    if(r.notes) msg += `📝 ${r.notes}\n`;
-    if(r.category) msg += `🏷️ ${r.category}\n`;
-    if(r.maint) msg += `${MAINT_EMOJI[r.maint]||"🔩"} ${r.maint}\n`;
-    if(r.due) msg += `⏰ לביצוע עד ${dueDateHeb(r.due)}\n`;
-    msg += `\n`;
-  });
-  msg += `${line}\n`;
-  msg += list.length === 1
-    ? `✅ כשמסיימים – פשוט תכתוב לי:\n"בוצע ${taskCodeDisplay(list[0])}"\n`
-    : `✅ כשמסיימים כל משימה – פשוט תכתוב לי "בוצע" עם המספר שלה\n(למשל: "בוצע ${taskCodeDisplay(list[0])}")\n`;
-  msg += `📸 אם יש מה להראות – אפשר לצרף תמונה\n`;
-  msg += `🙏 תודה רבה ובהצלחה! 💪`;
-  return msg;
+  return buildProMessage(list, document.getElementById("wsAssignee").value);
 }
 function updateWorkSlipPreview(){
   const list = workSlipSelectedTasks();
   const wrap = document.getElementById("wsPreviewWrap");
+  wsRenderPhotos();
   if(!list.length){ wrap.style.display = "none"; return; }
   wrap.style.display = "block";
   document.getElementById("wsPreview").value = buildWorkSlipText(list);
 }
-function markWorkSlipSent(list){
-  const today = new Date().toISOString().slice(0,10);
+function markWorkSlipSent(list, opts){
+  opts = opts || {};
+  const today = tkToday();
   const whoSent = (document.getElementById("wsAssignee")||{}).value || "";
-  list.forEach(r => { r.sentAt = today; tkLog(r, `נשלחה לאיש המקצוע${whoSent ? " (" + whoSent + ")" : ""} בשליחה מרוכזת`); });
+  const how = opts.channel === "email" ? "במייל" : "בוואטסאפ";
+  const ph = opts.photos ? (opts.photos === 1 ? " · עם תמונה" : ` · עם ${opts.photos} תמונות`) : "";
+  list.forEach(r => { r.sentAt = today; tkLog(r, `נשלחה לאיש המקצוע${whoSent ? " (" + whoSent + ")" : ""} ${how}${list.length > 1 ? " בשליחה מרוכזת" : ""}${ph}`); });
   scheduleSave("tasks","tasksSaved");
-  renderWorkSlipTasks();
-}
-function sendWorkSlip(channel){
-  const who = document.getElementById("wsAssignee").value;
-  const list = workSlipSelectedTasks();
-  if(!who){ alert("יש לבחור איש מקצוע קודם."); return; }
-  if(!list.length){ alert("יש לסמן לפחות משימה אחת לשליחה."); return; }
-  const contact = findContactByName(who);
-  const text = document.getElementById("wsPreview").value || buildWorkSlipText(list);
-  if(channel === "whatsapp"){
-    if(!contact || !contact.phone){ alert(`לא נמצא מספר טלפון ל${who}. אפשר להוסיף טלפון בטאב אנשי קשר וספקים.`); return; }
-    window.open(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${encodeURIComponent(text)}`, "_blank");
+  try{ renderTasks(); }catch(e){ console.error(e); }
+  try{ renderDashboard(); }catch(e){ console.error(e); }
+  if(opts.keepPanel){
+    // לא מציירים מחדש את רשימת המשימות כדי לא למחוק את חלון ההוראות שמוצג עכשיו
+    document.querySelectorAll("#wsTaskList .ws-task").forEach(el => {
+      const cb = el.querySelector("input");
+      if(cb && cb.checked && !el.querySelector(".ws-sent")){
+        const meta = el.querySelector(".ws-meta");
+        if(meta) meta.insertAdjacentHTML("beforeend", `<span class="ws-sent">נשלח ב-${fmtDateHe(today)}</span>`);
+      }
+    });
   }else{
-    if(!contact || !contact.email){ alert(`לא נמצאה כתובת אימייל ל${who}. אפשר להוסיף אימייל בטאב אנשי קשר וספקים.`); return; }
-    const subject = encodeURIComponent(list.length === 1 ? `משימה: ${list[0].desc||""}` : `${list.length} משימות בשבילך`);
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email)}&su=${subject}&body=${encodeURIComponent(text)}`, "_blank");
+    renderWorkSlipTasks();
   }
-  markWorkSlipSent(list);
 }
+/* sendWorkSlip: ראו בקטע "הודעה לאיש מקצוע" (ליד פעולות המשימות) */
 function printWorkSlip(){
   const who = document.getElementById("wsAssignee").value;
   const list = workSlipSelectedTasks();
-  if(!who){ alert("יש לבחור איש מקצוע קודם."); return; }
-  if(!list.length){ alert("יש לסמן לפחות משימה אחת."); return; }
+  if(!who){ jobToast("יש לבחור איש מקצוע קודם"); return; }
+  if(!list.length){ jobToast("יש לסמן לפחות משימה אחת"); return; }
   const cards = list.map((r,i) => `
     <div class="slip">
       <div class="slip-top"><span class="num">${i+1}</span><span class="code">${escHtml(taskCodeDisplay(r))}</span>${r.maint ? pillHtml(r.maint, MAINT_PRINT[r.maint]) : ""}</div>
       <div class="slip-desc">${escHtml(r.desc||"—")}</div>
       ${r.notes ? `<div class="slip-notes">${escHtml(r.notes)}</div>` : ""}
-      <div class="slip-meta">${r.category ? `<span>תחום: ${escHtml(r.category)}</span>` : ""}${r.due ? `<span>לביצוע עד: <b>${fmtDateHe(r.due)}</b></span>` : ""}</div>
+      <div class="slip-meta">${r.place ? `<span>מקום: <b>${escHtml(r.place)}</b></span>` : ""}${r.category ? `<span>תחום: ${escHtml(r.category)}</span>` : ""}${r.due ? `<span>לביצוע עד: <b>${fmtDateHe(r.due)}</b></span>` : ""}</div>
       <div class="slip-done"><span class="box"></span> בוצע &nbsp;&nbsp; תאריך: ____________ &nbsp;&nbsp; חתימה: ____________</div>
     </div>`).join("");
   const html = `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>כרטיס עבודה – ${escHtml(who)}</title><style>${reportBaseCss()}
@@ -13834,6 +14345,7 @@ function renderDashboard(opts){
   root.innerHTML = [
     dbSafe(() => dbHeroHtml(D, H, alerts), ""),
     D.my ? `<div class="db-row2">${dbSafe(() => dbAlertsHtml(alerts), "")}${dbSafe(() => dbMyHtml(D), "")}</div>` : dbSafe(() => dbAlertsHtml(alerts), ""),
+    dbSafe(() => dbNoReplyHtml(D), ""),
     dbSafe(() => dbKpisHtml(D), ""),
     dbSafe(() => dbWeekHtml(D), ""),
     dbSafe(() => dbChartsHtml(D), ""),
@@ -14980,6 +15492,19 @@ async function autoBackupIfDue(){
 
 /* לוח הבקרה: כרטיס המשימות שלי */
 .db-row2{ display:grid; grid-template-columns:minmax(0,1.45fr) minmax(0,1fr); gap:16px; align-items:start; }
+.db-nr-list{ display:flex; flex-direction:column; gap:8px; }
+.db-nr-row{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:14px; background:var(--bg); flex-wrap:wrap; }
+.db-nr-main{ flex:1 1 220px; min-width:0; display:flex; align-items:center; gap:10px; background:none; border:none; padding:0; cursor:pointer; text-align:right; font-family:inherit; color:var(--ink); }
+.db-nr-main .ava{ width:34px; height:34px; border-radius:50%; color:#fff; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+.db-nr-main .tx{ display:flex; flex-direction:column; min-width:0; }
+.db-nr-main .tx b{ font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.db-nr-main .tx small{ font-size:12px; color:var(--ink-soft); }
+.db-nr-days{ font-size:12px; font-weight:700; padding:3px 9px; border-radius:999px; background:#fff1e0; color:#a3561c; white-space:nowrap; }
+.db-nr-days.hot{ background:#fde2dc; color:#b23a2a; }
+.db-nr-btns{ display:flex; gap:6px; flex-wrap:wrap; }
+.db-nr-btn{ display:inline-flex; align-items:center; gap:5px; min-height:34px; padding:0 11px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--ink); font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer; }
+.db-nr-btn.wa{ border-color:#25a35a; color:#1d8a4b; }
+.db-nr-btn.ok{ background:#5b7a3a; border-color:#5b7a3a; color:#fff; }
 .db-my{ border-top:4px solid #7a5c8f; }
 .db-my .db-sec-h > svg{ color:#7a5c8f; }
 .db-mybar{ height:8px; border-radius:999px; background:#ece3f3; overflow:hidden; }
