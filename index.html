@@ -760,6 +760,35 @@
 .ttd-chk{ display:grid; grid-template-columns:auto 1fr 1fr; gap:4px; align-items:center; font-size:12px; }
 .ttd-tpl{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:13px; padding:8px 10px; border:1px dashed var(--line); border-radius:10px; }
 .ttd-tpl span{ flex:1; min-width:0; }
+.ttd-tpl small{ color:var(--ink-soft); font-size:11.5px; }
+.ttd-tpl .lc-ico{ flex:none; }
+.ttd-inl{ display:inline-flex; align-items:center; gap:5px; margin-top:6px; font-size:12px; cursor:pointer; }
+.ttd-inl input{ accent-color:var(--brand); }
+.ttd-privopt{ align-items:flex-start; border:1px solid var(--line); border-radius:10px; padding:9px 11px; margin-top:0; }
+.ttd-privopt input{ margin-top:3px; flex:none; }
+.ttd-privopt small{ color:var(--ink-soft); font-size:11.5px; }
+.ttd-att{ display:flex; flex-direction:column; gap:6px; border:1.5px dashed var(--line); border-radius:12px; padding:10px; transition:border-color .15s, background .15s; }
+.ttd-att.over{ border-color:var(--brand); background:var(--amber-bg, #fff2eb); }
+.ttd-file{ display:flex; align-items:center; gap:6px 8px; flex-wrap:wrap; border:1px solid var(--line); border-radius:10px; padding:7px 9px; background:var(--card); }
+.ttd-file > .lc-ico{ color:var(--brand); flex:none; }
+.ttd-fname{ appearance:none; border:0; background:none; font:inherit; font-weight:600; color:var(--ink); cursor:pointer; text-align:right; padding:0; flex:1 1 140px; min-width:0; overflow-wrap:anywhere; }
+.ttd-fname:hover{ color:var(--brand); text-decoration:underline; }
+.ttd-file small{ color:var(--ink-soft); font-size:11.5px; }
+.ttd-file small.warn{ color:var(--red, #a53a2a); }
+.ttd-fops{ display:flex; gap:4px; margin-inline-start:auto; }
+.ttd-att-f{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.ttd-drop-hint{ font-size:11.5px; color:var(--ink-soft); }
+.ttd-cnt.ok{ color:var(--green); font-weight:600; }
+.ttd-cnt.miss{ color:var(--red, #a53a2a); font-weight:600; }
+.ttd-lock{ display:inline-flex; align-items:center; gap:3px; color:var(--brand); font-weight:600; }
+.ttd-fmt{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.ttd-fmt label{ cursor:pointer; min-width:0; }
+.ttd-fmt input{ position:absolute; opacity:0; pointer-events:none; }
+.ttd-fmt label > span{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; border:1.5px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--card); transition:border-color .15s, background .15s; }
+.ttd-fmt label > span .lc-ico{ color:var(--brand); }
+.ttd-fmt small{ color:var(--ink-soft); font-size:11.5px; }
+.ttd-fmt input:checked + span{ border-color:var(--brand); background:var(--amber-bg, #fff2eb); box-shadow:0 0 0 1px var(--brand) inset; }
+.ttd-fmt input:focus-visible + span{ outline:2px solid var(--brand); outline-offset:2px; }
 /* ===================== רישוי ובטיחות — עיצוב כרטיסים (2026-10) ===================== */
 #tab-licensing .lc-wrap{ display:flex; flex-direction:column; gap:16px; }
 .lc-ico{ width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex:none; vertical-align:middle; }
@@ -2669,7 +2698,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261029; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261102; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -6518,6 +6547,7 @@ const LC_ICO = {
   bell:'<path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4Z"/><path d="M10 21h4"/>',
   x:'<path d="M6 6l12 12M18 6 6 18"/>',
   info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>',
+  download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
   folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
   trash:'<path d="M4 7h16M10 11v6M14 11v6M5 7l1 13h12l1-13M9 7V4h6v3"/>',
   edit:'<path d="M4 20h4L19 9l-4-4L4 16Z"/><path d="m13.5 6.5 4 4"/>',
@@ -6795,11 +6825,16 @@ const TTD_SCHEMA = [
   { g:"נתונים כלליים", ico:"info", items:[
     { tag:"inst", t:"1.1 פרטי המוסד החינוכי", kind:"kv" },
     { tag:"roles_in", t:"1.2.1 בעלי תפקידים חיוניים במוסד", kind:"rows", num:true, cols:["תפקיד","שם פרטי ומשפחה","כתובת","טל' נייד","טלפון בית","הערות"] },
-    { tag:"roles_out", t:"1.2.2 בעלי תפקידים מחוץ למוסד", kind:"rows", num:true, cols:["תפקיד","שם פרטי ומשפחה","כתובת","טל' נייד","אימייל","הערות"] },
+    { tag:"roles_out", t:"1.2.2 בעלי תפקידים מחוץ למוסד", kind:"attach", appx:"מסמך מצורף לסעיף 1.2.2", desc:"פרטי בעלי התפקידים מחוץ למוסד", cols:["תפקיד","שם פרטי ומשפחה","כתובת","טל' נייד","אימייל","הערות"] },
     { tag:"services", t:"1.2.3 שירותים חיוניים", kind:"rows", num:true, cols:["הגורם","מס' טלפון","בעל תפקיד/גורם","כתובת","הערות"] },
     { tag:"population", t:"1.2.4 אוכלוסיית המוסד", kind:"kv" },
     { tag:"hours", t:"1.2.5 שעות פעילות", kind:"kv" },
     { tag:"classes", t:"1.2.6 התפלגות הכיתות", kind:"rows", cols:["מס\"ד","שכבת הכיתה","מס' כיתות","מס' תלמידים בשכבה","הערות"] } ]},
+  { g:"רשימות תלמידים ועובדים", ico:"user", items:[
+    { tag:"st_all", t:"2.1 רשימת כל תלמידי המוסד החינוכי", kind:"attach", priv:true, appx:"נספח א'1", desc:"קובץ ממוחשב של רשימת כל תלמידי המוסד החינוכי" },
+    { tag:"st_special", t:"2.2 תלמידים עם צרכים מיוחדים / זכאי שירותי חינוך מיוחדים / רגישויות / אלרגיות", kind:"attach", priv:true, appx:"נספח א'2", desc:"קובץ קשיח של רשימת התלמידים עם צרכים מיוחדים, זכאי שירותי חינוך מיוחדים, רגישויות ואלרגיות" },
+    { tag:"staff_all", t:"2.3 רשימת כל עובדי המוסד החינוכי", kind:"attach", priv:true, appx:"נספח ב'", desc:"קובץ ממוחשב של רשימת כל עובדי המוסד, בחלוקה לקבוצות: סגל הוראה, ממלאי מקום, מנהלה" },
+    { tag:"weapons", t:"2.4 נושאי הנשק במוסד החינוכי", kind:"rows", num:true, cols:["שם פרטי ומשפחה","תפקיד","סוג הנשק פרטי/ארגוני","טלפון נייד","הערות"] } ]},
   { g:"המבנה והסביבה", ico:"grid", items:[
     { tag:"routes", t:"3.2 דרכי גישה למוסד", kind:"rows", cols:["נתיב","כתובת / תיאור המיקום"] },
     { tag:"bldg_name", t:"3.3 שם המבנה והאחראי", kind:"kv" },
@@ -6889,7 +6924,8 @@ function ttdCellText(tc){
 function ttdSetCell(tc, text){
   const doc = tc.ownerDocument;
   const ps = ttdEls(tc, "p");
-  const p0 = ps[0];
+  let p0 = ps[0];
+  if(!p0){ p0 = doc.createElementNS(TTD_W, "w:p"); tc.appendChild(p0); }
   const tplRun = tc.getElementsByTagNameNS(TTD_W, "r")[0] || null;
   const runModel = tplRun ? tplRun.cloneNode(true) : null;
   ps.slice(1).forEach(p => tc.removeChild(p));
@@ -6932,6 +6968,7 @@ function ttdParseDoc(doc){
       if(!tbl) missing.push(it.t);
       return;
     }
+    if(it.kind === "attach") return;
     const tbl = ttdTable(doc, it.tag);
     if(!tbl){ missing.push(it.t); return; }
     const rows = ttdRows(tbl).slice(ttdHead(it)).map(tr => ttdCells(tr).map(ttdCellText));
@@ -6966,7 +7003,7 @@ function ttdFillDoc(doc, t, opts){
       if(bm && date){ const runs = bm.parentNode.getElementsByTagNameNS(TTD_W, "t"); if(runs.length) runs[runs.length - 1].textContent = date; }
       return;
     }
-    if(v === undefined) return;
+    if(v === undefined || it.kind === "attach") return;
     const tbl = ttdTable(doc, it.tag);
     if(!tbl){ skipped.push(it.t); return; }
     const h = ttdHead(it);
@@ -7025,64 +7062,539 @@ function ttdFillDoc(doc, t, opts){
 }
 
 /* ---------- קבצים ---------- */
+/* תבנית התיק (לא חובה): נשמרת במכשיר, ואפשר גם בענן כדי שתהיה זמינה בכל המכשירים.
+   בלי תבנית, התיק נבנה כמסמך Word מסודר ישירות מהנתונים. ה-PDF תמיד נבנה מהנתונים. */
 let ttdZipP = null;
 function ttdLoadZip(){
   if(window.JSZip) return Promise.resolve();
-  return ttdZipP = ttdZipP || new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"; s.onload = res; s.onerror = () => { ttdZipP = null; rej(new Error("load")); }; document.head.appendChild(s); });
+  return ttdZipP = ttdZipP || new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"; s.onload = res; s.onerror = () => { ttdZipP = null; s.remove(); rej(new Error("לא הצלחתי לטעון את רכיב בניית הקבצים. בדוק חיבור לאינטרנט ונסה שוב.")); }; document.head.appendChild(s); });
 }
 function ttdIdb(){
   return new Promise((res, rej) => {
     try{ const r = indexedDB.open("ttdTemplateDb", 1); r.onupgradeneeded = () => r.result.createObjectStore("f"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }catch(e){ rej(e); }
   });
 }
-async function ttdTplStore(buf, name){
-  try{ const db = await ttdIdb(); await new Promise((res, rej) => { const tx = db.transaction("f", "readwrite"); tx.objectStore("f").put({ buf, name, at: Date.now() }, "tpl"); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); }
+async function ttdTplStore(buf, name, at){
+  try{ const db = await ttdIdb(); await new Promise((res, rej) => { const tx = db.transaction("f", "readwrite"); tx.objectStore("f").put({ buf, name, at: at || Date.now() }, "tpl"); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); }
   catch(e){ console.warn("שמירת התבנית במכשיר נכשלה", e); }
 }
-async function ttdTplLoad(){
-  if(ttdUi.tpl) return ttdUi.tpl;
+async function ttdTplLocal(){
   try{
     const db = await ttdIdb();
     const v = await new Promise((res, rej) => { const tx = db.transaction("f", "readonly"); const q = tx.objectStore("f").get("tpl"); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
-    if(v && v.buf){ ttdUi.tpl = v.buf; ttdUi.tplName = v.name; ttdUi.tplAt = v.at; }
-  }catch(e){ console.warn("אין גישה לתבנית השמורה במכשיר", e); }
-  return ttdUi.tpl;
+    return v && v.buf ? v : null;
+  }catch(e){ console.warn("אין גישה לתבנית השמורה במכשיר", e); return null; }
+}
+function ttdCloudTpl(){ const c = data.ttd && data.ttd.tpl; return c && typeof c === "object" && c.url ? c : null; }
+async function ttdFetchCloud(c){
+  const urls = [c.url].concat(typeof fvProxyUrls === "function" ? fvProxyUrls(c.url) : []);
+  for(const u of urls){
+    const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), 25000);
+    try{
+      const res = await fetch(u, { signal: ctrl.signal, credentials: "omit" });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      if((res.headers.get("content-type") || "").toLowerCase().includes("text/html")) throw new Error("html");
+      const buf = await res.arrayBuffer();
+      if(buf.byteLength < 500) throw new Error("ריק");
+      return buf;
+    }catch(e){ console.warn("טעינת התבנית מהענן נכשלה", u, e); }
+    finally{ clearTimeout(tm); }
+  }
+  return null;
+}
+/* מחזיר את התבנית הזמינה (מהזיכרון, מהמכשיר או מהענן) או null. לא זורק שגיאות. */
+let ttdTplP = null;
+function ttdTplLoad(){
+  if(ttdUi.tpl) return Promise.resolve(ttdUi.tpl);
+  return ttdTplP = ttdTplP || (async () => {
+    try{
+      const local = await ttdTplLocal();
+      const cloud = ttdCloudTpl();
+      const use = (buf, name, at, src) => { ttdUi.tpl = buf; ttdUi.tplName = name || "קובץ התיק"; ttdUi.tplAt = at || 0; ttdUi.tplSrc = src; return buf; };
+      if(local && (!cloud || (local.at || 0) >= (Number(cloud.at) || 0))) return use(local.buf, local.name, local.at, "device");
+      if(cloud){
+        const buf = await ttdFetchCloud(cloud);
+        if(buf && await ttdTplCount(buf) >= 5){ await ttdTplStore(buf, cloud.name, Number(cloud.at) || Date.now()); return use(buf, cloud.name, Number(cloud.at), "cloud"); }
+      }
+      if(local) return use(local.buf, local.name, local.at, "device");
+      return null;
+    }catch(e){ console.warn(e); return null; }
+    finally{ ttdTplP = null; }
+  })();
 }
 async function ttdOpenDoc(buf){
   await ttdLoadZip();
-  const zip = await JSZip.loadAsync(buf);
+  let zip;
+  try{ zip = await JSZip.loadAsync(buf); }catch(e){ throw new Error("הקובץ שנבחר אינו קובץ Word תקין (docx)."); }
   const f = zip.file("word/document.xml");
-  if(!f) throw new Error("הקובץ שנבחר אינו קובץ Word תקין.");
+  if(!f) throw new Error("הקובץ שנבחר אינו קובץ Word תקין (docx).");
   const xml = await f.async("string");
   const doc = new DOMParser().parseFromString(xml, "application/xml");
   if(doc.getElementsByTagName("parsererror").length) throw new Error("לא הצלחתי לקרוא את תוכן הקובץ.");
   return { zip, doc };
 }
+function ttdDocCount(doc){ return TTD_ITEMS.filter(it => it.kind === "cover" ? ttdTable(doc, "cover_name") : ttdTable(doc, it.tag)).length; }
+async function ttdTplCount(buf){ try{ return ttdDocCount((await ttdOpenDoc(buf)).doc); }catch(e){ return 0; } }
 function ttdPickFile(){
   return new Promise(res => {
+    let done = false; const fin = v => { if(!done){ done = true; res(v); } };
     const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-    inp.onchange = () => res(inp.files && inp.files[0] || null); inp.click();
+    inp.onchange = () => fin(inp.files && inp.files[0] || null);
+    inp.addEventListener("cancel", () => fin(null));
+    inp.click();
   });
 }
-async function ttdChooseTemplate(){
+/* opts.cloud = לשמור עותק בענן של האפליקציה כדי שהתבנית תהיה זמינה בכל המכשירים */
+async function ttdChooseTemplate(opts){
+  opts = opts || {};
   const f = await ttdPickFile(); if(!f) return null;
+  if(!/\.docx$/i.test(f.name || "")) throw new Error("יש לבחור קובץ Word מסוג docx.");
   const buf = await f.arrayBuffer();
   const { doc } = await ttdOpenDoc(buf);
-  const found = TTD_ITEMS.filter(it => it.kind === "cover" ? ttdTable(doc, "cover_name") : ttdTable(doc, it.tag)).length;
-  if(found < 5) throw new Error("בקובץ הזה לא נמצאו הטבלאות המסומנות של התיק. יש לבחור את קובץ ה-Word של התיק שנבנה עבור האפליקציה.");
-  ttdUi.tpl = buf; ttdUi.tplName = f.name; ttdUi.tplAt = Date.now();
-  await ttdTplStore(buf, f.name);
-  return { buf, doc, found };
+  const found = ttdDocCount(doc);
+  if(found < 5) throw new Error("בקובץ הזה לא נמצאו הטבלאות המסומנות של התיק. אפשר להפיק את התיק גם בלי תבנית.");
+  const at = Date.now();
+  ttdUi.tpl = buf; ttdUi.tplName = f.name; ttdUi.tplAt = at; ttdUi.tplSrc = "device";
+  await ttdTplStore(buf, f.name, at);
+  let cloudOk = false;
+  if(opts.cloud){
+    try{
+      const url = await lcUploadFile(new File([buf], f.name, { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }), "ttd");
+      data.ttd.tpl = { url, name: f.name, at };
+      scheduleSave("ttd", "ttdSaved");
+      cloudOk = true;
+    }catch(e){ console.warn("העלאת התבנית לענן נכשלה", e); showToast("התבנית נשמרה במכשיר הזה בלבד (ההעלאה לענן נכשלה)"); }
+  }
+  return { buf, doc, found, cloudOk };
+}
+
+/* ---------- בניית התיק מהנתונים (Word בלי תבנית, ו-PDF) ---------- */
+const TTD_ST_LABEL = Object.fromEntries(TTD_STATUS.map(([k, l]) => [k, k ? l : ""]));
+const TTD_SHELTER_NAMES = ["ממ\"ד 2","ממ\"ד 3","ממ\"ד 4","ממ\"ד 5"];
+function ttdStr(x){ return x == null ? "" : String(x); }
+function ttdNonEmpty(r){ return r.some(x => ttdStr(x).trim()); }
+function ttdWeights(head, rows, numCol){
+  return head.map((h, k) => {
+    if(numCol && k === 0) return 3;
+    const m = Math.max(ttdStr(h).length * 0.8, ...rows.map(r => Math.max(...ttdStr(r[k]).split("\n").map(s => s.length))));
+    return Math.min(Math.max(m, 5), 34);
+  });
+}
+/* טבלה אחת: { head, rows, w (אחוזים), kv, total } או null אם אין מה להציג */
+function ttdItemTable(it, v, opts){
+  const T = it.tag;
+  if(!Array.isArray(v) || !v.length) return null;
+  let head, rows, numCol = true, total = null;
+  if(it.kind === "kv"){
+    rows = v.map(p => [ttdStr(p && p[0]), ttdStr(p && p[1])]).filter(ttdNonEmpty);
+    if(!rows.length) return null;
+    return { kv: true, head: null, rows, w: [36, 64] };
+  }
+  if(T === "components"){
+    head = ["מס'", "מרכיב", "כמות", "מצב"];
+    rows = v.map((r, i) => [String(i + 1), ttdStr(r.item), ttdStr(r.qty), TTD_ST_LABEL[r.st || ""] || ""]);
+  }else if(T === "shelter_check"){
+    head = ["מס'", "פריט"].concat(TTD_SHELTER_NAMES.flatMap(n => [n + " קיים", n + " תקין"]));
+    rows = v.map((r, i) => [String(i + 1), ttdStr(r.item)].concat(Array.from({ length: 8 }, (_, k) => ttdStr((r.v || [])[k]))));
+    return { head, rows, w: [4, 28].concat(Array(8).fill(8.5)) };
+  }else if(it.kind === "teams"){
+    head = ["מס'"].concat(TTD_TEAM_COLS);
+    let prev = null, no = 0;
+    rows = v.filter(r => Array.isArray(r) && ttdNonEmpty(r)).map(r => {
+      const first = r[0] !== prev; if(first) no++; prev = r[0];
+      return [first ? String(no) : "", first ? ttdStr(r[0]) : ""].concat([1, 2, 3, 4, 5].map(k => ttdStr(r[k])));
+    });
+  }else{
+    numCol = !!it.num;
+    head = (it.num ? ["מס'"] : []).concat(it.cols);
+    const src = v.filter(r => Array.isArray(r) && ttdNonEmpty(r));
+    rows = src.map((r, i) => {
+      let vals = it.cols.map((_, k) => ttdStr(r[k]));
+      if(T === "keys" && opts.safeCode) vals = vals.map(x => x.replace(/_{3,}/g, opts.safeCode));
+      if(T === "shelters"){ const a = parseFloat(r[2]); if(!vals[3].trim() && a > 0) vals[3] = String(Math.floor(a / 0.5)); }
+      return it.num ? [String(i + 1)].concat(vals) : vals;
+    });
+    if(T === "shelters" && src.length){
+      const area = src.reduce((s, r) => s + (parseFloat(r[2]) || 0), 0);
+      const cap = src.reduce((s, r) => s + (parseFloat(r[3]) || Math.floor((parseFloat(r[2]) || 0) / 0.5)), 0);
+      total = ["", "סה\"כ", "", String(Math.round(area * 100) / 100), String(cap), "", ""];
+    }
+  }
+  if(!rows.length) return null;
+  const wt = ttdWeights(head, rows, numCol);
+  const sum = wt.reduce((a, b) => a + b, 0);
+  return { head, rows, total, w: wt.map(x => x / sum * 100) };
+}
+function ttdAttFiles(t, tag){ const a = t && t.att && typeof t.att === "object" ? t.att[tag] : null; return Array.isArray(a) ? a.filter(f => f && f.url) : []; }
+function ttdIsPriv(it){ return !!(it && it.priv); }
+function ttdCanSee(it){ return !ttdIsPriv(it) || lcIsAdmin(); }
+function ttdSecNum(it){ const m = /^([\d.]+)\s+(.*)$/.exec(it.t); return m ? { n: m[1], t: m[2] } : { n: "", t: it.t }; }
+function ttdModel(t, opts){
+  opts = opts || {};
+  const c = t.cover || {};
+  const showPriv = opts.withPrivate !== false && lcIsAdmin();
+  const groups = [], appx = [];
+  TTD_SCHEMA.forEach(g => {
+    const items = [];
+    g.items.forEach(it => {
+      if(it.kind === "cover") return;
+      if(it.kind === "attach"){
+        const excluded = ttdIsPriv(it) && !showPriv;
+        const files = excluded ? [] : ttdAttFiles(t, it.tag);
+        if(files.length) appx.push({ it, files });
+        items.push({ it, att: { files, excluded } });
+        return;
+      }
+      const tb = ttdItemTable(it, t[it.tag], opts);
+      if(tb) items.push({ it, tb });
+    });
+    if(items.length) groups.push({ g: g.g, items });
+  });
+  return { cover: { name: ttdStr(c.name).trim(), date: opts.coverDate || ttdStr(c.date) }, groups, appx };
+}
+function ttdAttLine(it, a){
+  if(a.excluded) return "הנספח נשמר בתחום בית הספר בלבד ואינו כלול בעותק זה.";
+  if(!a.files.length) return "טרם צורף מסמך.";
+  return `מצו"ב בנספח בסוף התיק (${it.appx}): ${a.files.map(f => f.name).join(", ")}`;
+}
+function ttdFileKind(f){
+  const n = String(f && f.name || "").toLowerCase(), ty = String(f && f.type || "").toLowerCase();
+  if(ty.includes("pdf") || /\.pdf$/.test(n)) return "pdf";
+  if(/^image\/(jpe?g|png|gif|webp|bmp)/.test(ty) || /\.(jpe?g|png|gif|webp|bmp)$/.test(n)) return "img";
+  return "other";
+}
+async function ttdFetchUrl(url){
+  const urls = [url].concat(typeof fvProxyUrls === "function" ? fvProxyUrls(url) : []);
+  for(const u of urls){
+    const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), 30000);
+    try{
+      const res = await fetch(u, { signal: ctrl.signal, credentials: "omit" });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      if((res.headers.get("content-type") || "").toLowerCase().includes("text/html")) throw new Error("html");
+      const buf = await res.arrayBuffer();
+      if(!buf.byteLength) throw new Error("ריק");
+      return buf;
+    }catch(e){ console.warn("טעינת קובץ נכשלה", u, e); }
+    finally{ clearTimeout(tm); }
+  }
+  return null;
+}
+/* מוריד את קבצי הנספחים פעם אחת לפני הבנייה */
+async function ttdGatherAppx(appx){
+  const list = [], failed = [];
+  for(const a of appx){
+    const files = [];
+    for(const f of a.files){
+      const kind = ttdFileKind(f);
+      let buf = null;
+      if(kind !== "other"){ buf = await ttdFetchUrl(f.url); if(!buf) failed.push(f.name); }
+      files.push({ f, kind, buf });
+    }
+    list.push({ it: a.it, files });
+  }
+  return { list, failed };
+}
+async function ttdImgToJpeg(buf, maxW){
+  const blob = new Blob([buf]);
+  let src;
+  try{ src = await createImageBitmap(blob); }
+  catch(e){
+    src = await new Promise((res, rej) => { const u = URL.createObjectURL(blob); const im = new Image(); im.onload = () => { URL.revokeObjectURL(u); res(im); }; im.onerror = () => { URL.revokeObjectURL(u); rej(new Error("התמונה לא נקראה")); }; im.src = u; });
+  }
+  const w0 = src.width, h0 = src.height;
+  if(!w0 || !h0) throw new Error("התמונה ריקה");
+  const k = Math.min(1, (maxW || 1800) / w0);
+  const cv = document.createElement("canvas"); cv.width = Math.max(1, Math.round(w0 * k)); cv.height = Math.max(1, Math.round(h0 * k));
+  const g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(src, 0, 0, cv.width, cv.height);
+  const out = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.9));
+  return { buf: new Uint8Array(await out.arrayBuffer()), w: cv.width, h: cv.height };
+}
+const TTD_PDF_MAX = 80;
+async function ttdPdfToJpegs(buf){
+  const lib = await loadPdfJs();
+  const B = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/";
+  const pdf = await lib.getDocument({ data: new Uint8Array(buf.slice(0)), cMapUrl: B + "cmaps/", cMapPacked: true, standardFontDataUrl: B + "standard_fonts/" }).promise;
+  const pages = [], n = Math.min(pdf.numPages, TTD_PDF_MAX);
+  for(let i = 1; i <= n; i++){
+    const pg = await pdf.getPage(i);
+    const v0 = pg.getViewport({ scale: 1 });
+    const vp = pg.getViewport({ scale: Math.min(3, 1400 / v0.width) });
+    const cv = document.createElement("canvas"); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+    const g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height);
+    await pg.render({ canvasContext: g, viewport: vp }).promise;
+    const out = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.88));
+    pages.push({ buf: new Uint8Array(await out.arrayBuffer()), w: cv.width, h: cv.height });
+    cv.width = cv.height = 0;
+  }
+  try{ pdf.destroy(); }catch(e){}
+  return { pages, total: pdf.numPages };
+}
+
+/* --- Word (docx) מאפס --- */
+function ttdX(s){ return ttdStr(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g, "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function ttdWRun(text, o){
+  o = o || {};
+  const rPr = `<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>${o.b ? "<w:b/><w:bCs/>" : ""}${o.color ? `<w:color w:val="${o.color}"/>` : ""}<w:sz w:val="${o.sz || 20}"/><w:szCs w:val="${o.sz || 20}"/><w:rtl/></w:rPr>`;
+  return ttdStr(text).split("\n").map((line, i) => `<w:r>${rPr}${i ? "<w:br/>" : ""}<w:t xml:space="preserve">${ttdX(line)}</w:t></w:r>`).join("");
+}
+function ttdWPara(text, o){
+  o = o || {};
+  const pPr = `<w:pPr>${o.keep ? "<w:keepNext/>" : ""}${o.pb ? "<w:pageBreakBefore/>" : ""}${o.border ? `<w:pBdr><w:bottom w:val="single" w:sz="12" w:space="2" w:color="${o.border}"/></w:pBdr>` : ""}<w:bidi/><w:spacing w:before="${o.before || 0}" w:after="${o.after || 0}"/>${o.center ? '<w:jc w:val="center"/>' : ""}</w:pPr>`;
+  return `<w:p>${pPr}${text === "" ? "" : ttdWRun(text, o)}</w:p>`;
+}
+function ttdWTable(tb){
+  const W = 10206; // רוחב שורת טקסט ב-A4 עם שוליים של 1.5 ס"מ
+  const ws = tb.w.map(p => Math.max(320, Math.round(W * p / 100)));
+  const bd = k => `<w:${k} w:val="single" w:sz="4" w:space="0" w:color="C9B79C"/>`;
+  const cell = (text, w, o) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${o.fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${o.fill}"/>` : ""}<w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:before="0" w:after="0"/>${o.center ? '<w:jc w:val="center"/>' : ""}</w:pPr>${ttdWRun(text, { sz: 18, b: o.b, color: o.color })}</w:p></w:tc>`;
+  const row = (cells, o) => `<w:tr><w:trPr><w:cantSplit/>${o.header ? "<w:tblHeader/>" : ""}</w:trPr>${cells.map((x, k) => cell(x, ws[k], Object.assign({}, o, { b: o.b || (tb.kv && k === 0), fill: o.fill || (tb.kv && k === 0 ? "FBF4EA" : ""), center: o.header || (!tb.kv && k === 0 && tb.head && tb.head[0] === "מס'") }))).join("")}</w:tr>`;
+  return `<w:tbl><w:tblPr><w:bidiVisual/><w:tblW w:w="${ws.reduce((a, b) => a + b, 0)}" w:type="dxa"/><w:tblBorders>${["top","left","bottom","right","insideH","insideV"].map(bd).join("")}</w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="45" w:type="dxa"/><w:left w:w="80" w:type="dxa"/><w:bottom w:w="45" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr>`
+    + `<w:tblGrid>${ws.map(w => `<w:gridCol w:w="${w}"/>`).join("")}</w:tblGrid>`
+    + (tb.head ? row(tb.head, { header: true, b: true, fill: "F1E1CC" }) : "")
+    + tb.rows.map(r => row(r, {})).join("")
+    + (tb.total ? row(tb.total, { b: true, fill: "F6EFE4" }) : "")
+    + `</w:tbl>`;
+}
+function ttdDocxXml(model, yearLabel){
+  const BR = "A8592A", INK = "201E1D", SOFT = "645C50";
+  let body = "";
+  body += ttdWPara("", { before: 1800 });
+  body += ttdWPara("תיק נתונים ושטח", { center: true, b: true, sz: 56, color: BR, after: 120 });
+  body += ttdWPara("ביטחון וחירום מוסדי", { center: true, b: true, sz: 36, color: INK, after: 600 });
+  if(model.cover.name) body += ttdWPara(model.cover.name, { center: true, b: true, sz: 32, color: INK, after: 360 });
+  body += ttdWPara("שנת הלימודים " + yearLabel, { center: true, sz: 26, color: SOFT, after: 120 });
+  if(model.cover.date) body += ttdWPara("תאריך עדכון: " + model.cover.date, { center: true, sz: 26, color: SOFT });
+  body += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+  model.groups.forEach((g, gi) => {
+    body += ttdWPara(g.g, { keep: true, b: true, sz: 30, color: BR, border: "D9C2A3", before: gi ? 360 : 0, after: 160 });
+    g.items.forEach(({ it, tb, att }) => {
+      body += ttdWPara(it.t, { keep: true, b: true, sz: 23, color: INK, before: 200, after: 80 });
+      body += att ? ttdWPara(ttdAttLine(it, att), { sz: 20, color: att.files.length ? INK : SOFT, after: 60 }) : ttdWTable(tb);
+    });
+  });
+  body += ttdWPara("", {});
+  const sect = `<w:sectPr><w:footerReference w:type="default" r:id="rIdTtdFtr"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1000" w:right="850" w:bottom="1000" w:left="850" w:header="500" w:footer="450" w:gutter="0"/><w:bidi/></w:sectPr>`;
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:document xmlns:w="${TTD_W}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${body}${sect}</w:body></w:document>`;
+}
+let ttdImgSeq = 0;
+function ttdWImg(rid, w, h){
+  const MAXW = 5486400, MAXH = 7955280; // 6 x 8.7 אינץ'
+  let cx = MAXW, cy = Math.round(MAXW * h / w);
+  if(cy > MAXH){ cy = MAXH; cx = Math.round(MAXH * w / h); }
+  const id = 7000 + (++ttdImgSeq);
+  return `<w:p><w:pPr><w:pageBreakBefore/><w:spacing w:before="0" w:after="0"/><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${id}" name="נספח ${id}"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${id}" name="appx${id}.jpeg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="${rid}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+}
+function ttdAppxHeadLines(it){
+  const sn = ttdSecNum(it);
+  return { big: it.appx, sec: sn.n ? `לסעיף ${sn.n} בתיק` : "", title: sn.t, desc: it.desc || "" };
+}
+/* מוסיף את הנספחים לסוף מסמך Word: עמוד כותרת לכל סעיף ואחריו עמודי הקבצים כתמונות */
+async function ttdDocxAppendix(zip, appxData, onStep){
+  if(!appxData || !appxData.list.length) return { xml: "", notes: [] };
+  const BR = "A8592A", INK = "201E1D", SOFT = "645C50";
+  let xml = "", k = 0; const media = [], notes = [];
+  for(const a of appxData.list){
+    const h = ttdAppxHeadLines(a.it);
+    xml += ttdWPara(h.big, { pb: true, center: true, b: true, sz: 48, color: BR, before: 2600, after: 160 });
+    if(h.sec) xml += ttdWPara(h.sec, { center: true, sz: 24, color: SOFT, after: 200 });
+    xml += ttdWPara(h.title, { center: true, b: true, sz: 30, color: INK, after: 160 });
+    if(h.desc) xml += ttdWPara(h.desc, { center: true, sz: 22, color: SOFT, after: 360 });
+    for(const x of a.files){
+      if(x.kind === "other"){ xml += ttdWPara(`${x.f.name} · מצורף בנפרד (סוג קובץ שלא ניתן לשלב בתוך התיק)`, { center: true, sz: 20, color: SOFT, after: 60 }); notes.push(x.f.name); }
+      else if(!x.buf) xml += ttdWPara(`${x.f.name} · לא נטען, יש לצרף ידנית`, { center: true, sz: 20, color: "A53A2A", after: 60 });
+      else xml += ttdWPara(x.f.name, { center: true, sz: 20, color: INK, after: 60 });
+    }
+    for(const x of a.files){
+      if(x.kind === "other" || !x.buf) continue;
+      if(onStep) onStep(x.f.name);
+      let imgs = [];
+      try{
+        if(x.kind === "img") imgs = [await ttdImgToJpeg(x.buf, 1800)];
+        else{
+          const r = await ttdPdfToJpegs(x.buf); imgs = r.pages;
+          if(r.total > r.pages.length) notes.push(`${x.f.name} (שולבו ${r.pages.length} מתוך ${r.total} עמודים)`);
+        }
+      }catch(e){ console.error("שילוב הקובץ נכשל", x.f.name, e); notes.push(x.f.name); continue; }
+      imgs.forEach(im => { k++; const rid = "rIdTtdAppx" + k; media.push({ path: `media/ttd_appx_${k}.jpeg`, rid, buf: im.buf }); xml += ttdWImg(rid, im.w, im.h); });
+    }
+  }
+  if(media.length){
+    media.forEach(m => zip.file("word/" + m.path, m.buf));
+    const relF = zip.file("word/_rels/document.xml.rels");
+    let rels = relF ? await relF.async("string") : `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`;
+    rels = rels.replace("</Relationships>", media.map(m => `<Relationship Id="${m.rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="${m.path}"/>`).join("") + "</Relationships>");
+    zip.file("word/_rels/document.xml.rels", rels);
+    let ct = await zip.file("[Content_Types].xml").async("string");
+    if(!/Extension="jpeg"/i.test(ct)) ct = ct.replace("</Types>", '<Default Extension="jpeg" ContentType="image/jpeg"/></Types>');
+    zip.file("[Content_Types].xml", ct);
+  }
+  return { xml, notes };
+}
+function ttdInsertBodyEnd(docXml, add){
+  if(!add) return docXml;
+  const end = docXml.lastIndexOf("</w:body>");
+  const sp = docXml.lastIndexOf("<w:sectPr", end);
+  let at = end;
+  if(sp >= 0){ const pc = docXml.indexOf("</w:p>", sp); if(pc < 0 || pc > end) at = sp; }
+  return docXml.slice(0, at) + add + docXml.slice(at);
+}
+async function ttdBuildDocxClean(t, yearLabel, opts, appxData, onStep){
+  await ttdLoadZip();
+  const model = ttdModel(t, opts);
+  const zip = new JSZip();
+  zip.file("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/></Types>`);
+  zip.file("_rels/.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`);
+  zip.file("word/_rels/document.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdTtdSty" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rIdTtdFtr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/></Relationships>`);
+  zip.file("word/styles.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:styles xmlns:w="${TTD_W}"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:eastAsia="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="en-US" w:eastAsia="en-US" w:bidi="he-IL"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="252" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:pPr><w:bidi/></w:pPr><w:rPr><w:rtl/></w:rPr></w:style></w:styles>`);
+  zip.file("word/footer1.xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:ftr xmlns:w="${TTD_W}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:p><w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>${ttdWRun("תיק נתונים ושטח · " + yearLabel + " · עמוד ", { sz: 16, color: "8A8073" })}<w:fldSimple w:instr=" PAGE "><w:r><w:rPr><w:sz w:val="16"/><w:szCs w:val="16"/></w:rPr><w:t>1</w:t></w:r></w:fldSimple></w:p></w:ftr>`);
+  const ap = await ttdDocxAppendix(zip, appxData, onStep);
+  zip.file("word/document.xml", ttdInsertBodyEnd(ttdDocxXml(model, yearLabel), ap.xml));
+  return { blob: await zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", compression: "DEFLATE" }), notes: ap.notes };
+}
+async function ttdBuildDocxFromTpl(buf, t, opts, appxData, onStep){
+  const { zip, doc } = await ttdOpenDoc(buf);
+  const skipped = ttdFillDoc(doc, t, opts);
+  const ap = await ttdDocxAppendix(zip, appxData, onStep);
+  zip.file("word/document.xml", ttdInsertBodyEnd(new XMLSerializer().serializeToString(doc), ap.xml));
+  const blob = await zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", compression: "DEFLATE" });
+  return { blob, skipped, notes: ap.notes };
+}
+
+/* --- PDF --- */
+function ttdPdfHtml(model, yearLabel){
+  const C = { ink:"#201e1d", soft:"#645c50", line:"#d9c9b0", brand:"#a8592a", head:"#f1e1cc", kv:"#fbf4ea", tot:"#f6efe4" };
+  const e = escHtml;
+  const cellHtml = s => e(s).replace(/\n/g, "<br>");
+  const table = tb => `<table class="ttdp-t" style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:10.5px;margin:0 0 4px">
+    <colgroup>${tb.w.map(p => `<col style="width:${p.toFixed(2)}%">`).join("")}</colgroup>
+    ${tb.head ? `<thead><tr>${tb.head.map(h => `<th style="background:${C.head};border:1px solid ${C.line};padding:4px 5px;text-align:center;font-weight:700;word-break:break-word">${e(h)}</th>`).join("")}</tr></thead>` : ""}
+    <tbody>${tb.rows.map(r => `<tr>${r.map((x, k) => `<td style="border:1px solid ${C.line};padding:4px 5px;vertical-align:middle;word-break:break-word;${tb.kv && k === 0 ? `background:${C.kv};font-weight:600;` : ""}${!tb.kv && k === 0 && tb.head && tb.head[0] === "מס'" ? "text-align:center;" : ""}">${cellHtml(x)}</td>`).join("")}</tr>`).join("")}
+    ${tb.total ? `<tr>${tb.total.map(x => `<td style="border:1px solid ${C.line};padding:4px 5px;background:${C.tot};font-weight:700">${e(x)}</td>`).join("")}</tr>` : ""}</tbody></table>`;
+  const cover = `<div style="height:960px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px">
+    <div style="font-size:40px;font-weight:700;color:${C.brand}">תיק נתונים ושטח</div>
+    <div style="font-size:24px;font-weight:700">ביטחון וחירום מוסדי</div>
+    ${model.cover.name ? `<div style="font-size:22px;font-weight:700;margin-top:40px">${cellHtml(model.cover.name)}</div>` : ""}
+    <div style="font-size:16px;color:${C.soft};margin-top:24px">שנת הלימודים ${e(yearLabel)}</div>
+    ${model.cover.date ? `<div style="font-size:16px;color:${C.soft}">תאריך עדכון: ${e(model.cover.date)}</div>` : ""}
+  </div><div class="html2pdf__page-break"></div>`;
+  const body = model.groups.map((g, gi) => `<div class="ttdp-g" style="font-size:19px;font-weight:700;color:${C.brand};border-bottom:2px solid ${C.line};padding-bottom:5px;margin:${gi ? 20 : 0}px 0 8px">${e(g.g)}</div>`
+    + g.items.map(({ it, tb, att }) => `<div class="ttdp-h" style="font-size:13.5px;font-weight:700;margin:12px 0 5px">${e(it.t)}</div>${att
+      ? `<div style="font-size:11px;border:1px dashed ${C.line};border-radius:8px;padding:6px 9px;color:${att.files.length ? C.ink : C.soft}">${e(ttdAttLine(it, att))}</div>`
+      : table(tb)}`).join("")).join("");
+  return `<div dir="rtl" style="width:712px;padding:0 2px;box-sizing:border-box;font-family:Rubik,'Segoe UI',Arial,sans-serif;color:${C.ink};direction:rtl;letter-spacing:.01px;background:#fff">${cover}${body}</div>`;
+}
+let ttdH2P = null;
+function ttdLoadH2P(){
+  if(window.html2pdf) return Promise.resolve();
+  return ttdH2P = ttdH2P || new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"; s.onload = res; s.onerror = () => { ttdH2P = null; s.remove(); rej(new Error("לא הצלחתי לטעון את רכיב ה-PDF. בדוק חיבור לאינטרנט ונסה שוב.")); }; document.head.appendChild(s); });
+}
+function ttdSepHtml(appxData){
+  const C = { ink:"#201e1d", soft:"#645c50", brand:"#a8592a", bad:"#a53a2a" };
+  const e = escHtml;
+  return `<div dir="rtl" style="width:712px;box-sizing:border-box;font-family:Rubik,'Segoe UI',Arial,sans-serif;color:${C.ink};direction:rtl;letter-spacing:.01px;background:#fff">${appxData.list.map((a, i) => {
+    const h = ttdAppxHeadLines(a.it);
+    const fl = a.files.map(x => x.kind === "other" ? `<div style="color:${C.soft}">${e(x.f.name)} · מצורף בנפרד (סוג קובץ שלא ניתן לשלב)</div>`
+      : !x.buf ? `<div style="color:${C.bad}">${e(x.f.name)} · לא נטען, יש לצרף ידנית</div>` : `<div>${e(x.f.name)}</div>`).join("");
+    return `${i ? '<div class="html2pdf__page-break"></div>' : ""}<div style="height:880px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:0 30px">
+      <div style="font-size:36px;font-weight:700;color:${C.brand}">${e(h.big)}</div>
+      ${h.sec ? `<div style="font-size:15px;color:${C.soft}">${e(h.sec)}</div>` : ""}
+      <div style="font-size:21px;font-weight:700;margin-top:10px">${e(h.title)}</div>
+      ${h.desc ? `<div style="font-size:14px;color:${C.soft};max-width:520px">${e(h.desc)}</div>` : ""}
+      <div style="font-size:12px;margin-top:22px;display:flex;flex-direction:column;gap:3px">${fl}</div></div>`;
+  }).join("")}</div>`;
+}
+let ttdPLP = null;
+function ttdLoadPdfLib(){
+  if(window.PDFLib) return Promise.resolve();
+  const srcs = ["https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js", "https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"];
+  return ttdPLP = ttdPLP || (async () => {
+    for(const src of srcs){
+      try{ await new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => { s.remove(); rej(); }; document.head.appendChild(s); }); if(window.PDFLib) return; }catch(e){}
+    }
+    ttdPLP = null; throw new Error("לא הצלחתי לטעון את רכיב צירוף הנספחים. בדוק חיבור לאינטרנט ונסה שוב.");
+  })();
+}
+const TTD_PDF_CFG = () => ({
+  margin: [10, 9, 12, 9], image: { type: "jpeg", quality: 0.95 },
+  html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true },
+  jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+  pagebreak: { mode: ["css", "legacy"], avoid: ["tr", ".ttdp-h", ".ttdp-g"] }
+});
+async function ttdBuildPdf(t, yearLabel, opts, appxData, onStep){
+  await ttdLoadH2P();
+  try{ await document.fonts.ready; }catch(e){}
+  const html = ttdPdfHtml(ttdModel(t, opts), yearLabel);
+  const notes = [];
+  if(!appxData || !appxData.list.length){
+    const blob = await html2pdf().set(TTD_PDF_CFG()).from(html, "string").toPdf().get("pdf").then(pdf => {
+      const n = pdf.internal.getNumberOfPages();
+      for(let i = 2; i <= n; i++){ pdf.setPage(i); pdf.setFontSize(9); pdf.setTextColor(138, 128, 115); pdf.text(`${i} / ${n}`, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 5, { align: "center" }); }
+      return pdf.output("blob");
+    });
+    return { blob, notes };
+  }
+  await ttdLoadPdfLib();
+  const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
+  const mainBuf = await html2pdf().set(TTD_PDF_CFG()).from(html, "string").outputPdf("arraybuffer");
+  const sepBuf = await html2pdf().set(TTD_PDF_CFG()).from(ttdSepHtml(appxData), "string").outputPdf("arraybuffer");
+  const out = await PDFDocument.create();
+  const main = await PDFDocument.load(mainBuf);
+  (await out.copyPages(main, main.getPageIndices())).forEach(pg => out.addPage(pg));
+  const sep = await PDFDocument.load(sepBuf);
+  const sepN = sep.getPageCount();
+  const A4 = [595.28, 841.89], M = 28;
+  for(let i = 0; i < appxData.list.length; i++){
+    const a = appxData.list[i];
+    const [sp] = await out.copyPages(sep, [Math.min(i, sepN - 1)]); out.addPage(sp);
+    for(const x of a.files){
+      if(x.kind === "other" || !x.buf){ if(x.kind === "other") notes.push(x.f.name); continue; }
+      if(onStep) onStep(x.f.name);
+      try{
+        if(x.kind === "pdf"){
+          const src = await PDFDocument.load(x.buf, { ignoreEncryption: true });
+          (await out.copyPages(src, src.getPageIndices())).forEach(pg => out.addPage(pg));
+        }else{
+          const j = await ttdImgToJpeg(x.buf, 2000);
+          const im = await out.embedJpg(j.buf);
+          const pg = out.addPage(A4);
+          const k = Math.min((A4[0] - 2 * M) / j.w, (A4[1] - 2 * M) / j.h);
+          const w = j.w * k, h = j.h * k;
+          pg.drawImage(im, { x: (A4[0] - w) / 2, y: (A4[1] - h) / 2, width: w, height: h });
+        }
+      }catch(e){ console.error("שילוב הקובץ נכשל", x.f.name, e); notes.push(x.f.name); }
+    }
+  }
+  const font = await out.embedFont(StandardFonts.Helvetica);
+  const pages = out.getPages(), n = pages.length;
+  pages.forEach((pg, i) => {
+    if(!i) return;
+    const txt = `${i + 1} / ${n}`, w = font.widthOfTextAtSize(txt, 8), { width } = pg.getSize();
+    pg.drawText(txt, { x: (width - w) / 2, y: 7, size: 8, font, color: rgb(0.54, 0.5, 0.45) });
+  });
+  return { blob: new Blob([await out.save()], { type: "application/pdf" }), notes };
+}
+async function ttdOfferFile(blob, name, type){
+  try{
+    const file = new File([blob], name, { type });
+    if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && navigator.canShare && navigator.canShare({ files: [file] })){
+      await navigator.share({ files: [file], title: name });
+      return "shared";
+    }
+  }catch(e){ if(e && e.name === "AbortError") return "cancel"; }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  return "download";
 }
 
 /* ---------- פעולות ---------- */
 async function ttdImportFromFile(){
   try{
-    const r = await ttdChooseTemplate(); if(!r) return;
+    const r = await ttdChooseTemplate({ cloud: false }); if(!r) return;
     const parsed = ttdParseDoc(r.doc);
     const y = ttdCurYear();
     const apply = () => {
-      const o = ttdYearObj(y, true); o.t = parsed.t; o.updatedAt = Date.now();
+      const o = ttdYearObj(y, true); const keepAtt = o.t && o.t.att; o.t = parsed.t; if(keepAtt) o.t.att = keepAtt; o.updatedAt = Date.now();
       ttdSave(); ttdRerender();
       showToast(`הנתונים יובאו לשנת ${schoolYearLabel(y)}${parsed.missing.length ? " (חסרים: " + parsed.missing.length + ")" : ""}`);
     };
@@ -7098,44 +7610,116 @@ function ttdCopyFrom(fromYear){
   else apply();
 }
 function ttdToday(){ const d = new Date(); return `${d.getDate()}/${d.getMonth() + 1}/${String(d.getFullYear()).slice(2)}`; }
-async function ttdOpenGenerate(){
+function ttdFileBase(y){ return `תיק נתונים ושטח ${schoolYearLabel(y).replace(/"/g, "״")}`.replace(/[\\/:*?<>|]+/g, "-"); }
+function ttdOpenGenerate(){
   const y = ttdCurYear(), o = ttdYearObj(y);
   if(!ttdHasData(o)){ showToast("אין עדיין נתונים לשנה הזו"); return; }
-  await ttdTplLoad();
+  const st = { fmt: (data.uiPrefs && data.uiPrefs.ttdFmt) === "pdf" ? "pdf" : "docx", loading: !ttdUi.tpl, busy: false };
+  const privFiles = lcIsAdmin() && TTD_ITEMS.some(it => ttdIsPriv(it) && ttdAttFiles(o.t, it.tag).length);
   const m = lcModal(`${lcModalHead("doc", "הפקת התיק המעודכן")}
-    <div class="lc-modal-b"><div class="lc-form">
-      <div class="lc-sub">שנת ${escHtml(schoolYearLabel(y))}. הקובץ ייבנה מתבנית התיק, והטבלאות יתמלאו מהנתונים כאן. התמונות, השרטוטים והנוסח הקבוע נשארים כמו בתבנית.</div>
-      <div class="ttd-tpl">${lcIco("doc", 16)}<span id="ttdG_tpl">${ttdUi.tpl ? "תבנית: " + escHtml(ttdUi.tplName || "קובץ התיק") : "עדיין לא נבחרה תבנית במכשיר הזה"}</span>
-        <button type="button" class="lc-btn ghost sm" id="ttdG_pick">${ttdUi.tpl ? "החלפה" : "בחירת קובץ התיק"}</button></div>
-      <label>תאריך עדכון בשער<input type="text" id="ttdG_date" value="${escHtml(ttdToday())}"></label>
-      <label>קוד הכספת להדפסה (לא נשמר באפליקציה)<input type="text" id="ttdG_code" inputmode="numeric" autocomplete="off" placeholder="אם ריק, יישאר ____ למילוי ביד"></label>
-    </div></div>
-    <div class="lc-modal-f"><button type="button" class="lc-btn" id="ttdG_go">${lcIco("upload", 16)}הורדת התיק (Word)</button><button type="button" class="lc-btn ghost" data-lc-close>ביטול</button></div>`);
-  m.querySelector("#ttdG_pick").onclick = async () => {
-    try{ const r = await ttdChooseTemplate(); if(r){ m.querySelector("#ttdG_tpl").textContent = "תבנית: " + (ttdUi.tplName || ""); m.querySelector("#ttdG_pick").textContent = "החלפה"; } }
-    catch(e){ showToast(e.message || "הקובץ לא נקלט"); }
+    <div class="lc-modal-b">
+      <div class="lc-sub">שנת ${escHtml(schoolYearLabel(y))}. הקובץ נבנה מהנתונים שמולאו כאן.</div>
+      <div class="ttd-fmt" role="radiogroup" aria-label="סוג הקובץ">
+        <label><input type="radio" name="ttdG_fmt" value="docx" ${st.fmt === "docx" ? "checked" : ""}><span>${lcIco("doc", 18)}<b>Word</b><small>קובץ שאפשר להמשיך לערוך</small></span></label>
+        <label><input type="radio" name="ttdG_fmt" value="pdf" ${st.fmt === "pdf" ? "checked" : ""}><span>${lcIco("doc", 18)}<b>PDF</b><small>להדפסה ולשליחה</small></span></label>
+      </div>
+      <div class="ttd-tpl" id="ttdG_tplBox"></div>
+      ${privFiles ? `<label class="ttd-inl ttd-privopt"><input type="checkbox" id="ttdG_priv" checked><span><b>לכלול את נספחי רשימות התלמידים והעובדים</b><br><small>לפי ההנחיה, עותק שיוצא מבית הספר יהיה בלי הנספחים האלה. בטלו את הסימון כדי להפיק עותק חיצוני.</small></span></label>` : ""}
+      <div class="lc-form">
+        <label>תאריך עדכון בשער<input type="text" id="ttdG_date" value="${escHtml(ttdToday())}"></label>
+        <label>קוד הכספת להדפסה (לא נשמר באפליקציה)<input type="text" id="ttdG_code" inputmode="numeric" autocomplete="off" placeholder="אם ריק, יישאר ____ למילוי ביד"></label>
+      </div>
+    </div>
+    <div class="lc-modal-f"><button type="button" class="lc-btn" id="ttdG_go"></button><button type="button" class="lc-btn ghost" data-lc-close>ביטול</button></div>`, { noFocus: true });
+  const box = m.querySelector("#ttdG_tplBox"), go = m.querySelector("#ttdG_go");
+  const goLabel = () => `${lcIco("download", 16)}הורדת התיק (${st.fmt === "pdf" ? "PDF" : "Word"})`;
+  const paint = () => {
+    if(!document.body.contains(m)) return;
+    if(!st.busy) go.innerHTML = goLabel();
+    if(st.fmt === "pdf"){
+      box.innerHTML = `${lcIco("info", 16)}<span>ה-PDF מסודר בטבלאות לפי פרקי התיק, עם עמוד שער ומספרי עמודים.</span>`;
+      return;
+    }
+    if(st.loading){ box.innerHTML = `${lcIco("doc", 16)}<span>בודק אם יש תבנית שמורה…</span>`; return; }
+    const cloud = ttdCloudTpl();
+    if(ttdUi.tpl){
+      box.innerHTML = `${lcIco("doc", 16)}<span><b>לפי התבנית:</b> ${escHtml(ttdUi.tplName || "קובץ התיק")}<br><small>התמונות, השרטוטים והנוסח הקבוע נשארים כמו בתבנית${ttdUi.tplSrc === "cloud" || (cloud && Number(cloud.at) === Number(ttdUi.tplAt)) ? " · שמורה בענן לכל המכשירים" : " · שמורה במכשיר הזה"}</small>
+        <label class="ttd-inl"><input type="checkbox" id="ttdG_useTpl" checked>להשתמש בתבנית</label></span>
+        <button type="button" class="lc-btn ghost sm" id="ttdG_pick">החלפה</button>`;
+    }else{
+      box.innerHTML = `${lcIco("doc", 16)}<span>ייבנה מסמך Word מסודר מכל הנתונים.<br><small>לקבלת התיק בדיוק בעיצוב המקורי (עם התמונות והשרטוטים) אפשר לבחור פעם אחת את קובץ התבנית. לא חובה.</small></span>
+        <button type="button" class="lc-btn ghost sm" id="ttdG_pick">בחירת תבנית</button>`;
+    }
+    const pick = box.querySelector("#ttdG_pick");
+    if(pick) pick.onclick = async () => {
+      try{
+        pick.disabled = true;
+        const r = await ttdChooseTemplate({ cloud: true });
+        if(r) showToast(r.cloudOk ? "התבנית נשמרה, והיא תהיה זמינה בכל המכשירים" : "התבנית נשמרה במכשיר הזה");
+      }catch(e){ console.error(e); showToast(e.message || "הקובץ לא נקלט"); }
+      finally{ paint(); }
+    };
   };
-  m.querySelector("#ttdG_go").onclick = async () => {
-    const btn = m.querySelector("#ttdG_go");
+  m.querySelectorAll('input[name="ttdG_fmt"]').forEach(r => r.addEventListener("change", () => {
+    st.fmt = r.value; try{ data.uiPrefs.ttdFmt = st.fmt; saveUiPrefs(); }catch(e){} paint();
+  }));
+  paint();
+  if(st.loading) ttdTplLoad().then(() => { st.loading = false; paint(); });
+  go.onclick = async () => {
+    if(st.busy) return;
+    st.busy = true; go.disabled = true; go.textContent = st.fmt === "pdf" ? "מכין PDF…" : "בונה את הקובץ…";
+    const privCb = m.querySelector("#ttdG_priv");
+    const opts = { coverDate: m.querySelector("#ttdG_date").value.trim(), safeCode: m.querySelector("#ttdG_code").value.trim(), withPrivate: privCb ? privCb.checked : false };
+    const base = ttdFileBase(y) + (privFiles && !opts.withPrivate ? " - עותק ללא נספחי רשימות" : ""), yl = schoolYearLabel(y);
+    const onStep = name => { if(document.body.contains(go)) go.textContent = `משלב את "${String(name).slice(0, 28)}"…`; };
     try{
-      if(!ttdUi.tpl){ const r = await ttdChooseTemplate(); if(!r) return; }
-      btn.disabled = true; btn.textContent = "בונה את הקובץ…";
-      const { zip, doc } = await ttdOpenDoc(ttdUi.tpl);
-      const skipped = ttdFillDoc(doc, o.t, { coverDate: m.querySelector("#ttdG_date").value.trim(), safeCode: m.querySelector("#ttdG_code").value.trim() });
-      zip.file("word/document.xml", new XMLSerializer().serializeToString(doc));
-      const blob = await zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", compression: "DEFLATE" });
-      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-      a.download = `תיק נתונים ושטח ${schoolYearLabel(y).replace(/"/g, "״")}.docx`;
-      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      let msg, appxData = null;
+      const appx = ttdModel(o.t, opts).appx;
+      if(appx.length){ go.textContent = "טוען את הנספחים…"; appxData = await ttdGatherAppx(appx); }
+      const tail = () => {
+        const bad = (appxData ? appxData.failed : []).concat(res && res.notes || []);
+        return bad.length ? ` · לא שולבו בתוך התיק: ${[...new Set(bad)].join(", ")}` : "";
+      };
+      let res = null;
+      if(st.fmt === "pdf"){
+        res = await ttdBuildPdf(o.t, yl, opts, appxData, onStep);
+        const blob = res.blob;
+        const how = await ttdOfferFile(blob, base + ".pdf", "application/pdf");
+        if(how === "cancel"){ return; }
+        msg = (how === "shared" ? "ה-PDF מוכן" : "ה-PDF ירד לתיקיית ההורדות") + tail();
+      }else{
+        if(st.loading){ await ttdTplLoad(); st.loading = false; }
+        const useTpl = !!ttdUi.tpl && !(m.querySelector("#ttdG_useTpl") && !m.querySelector("#ttdG_useTpl").checked);
+        let blob, skipped = [];
+        if(useTpl){
+          try{ res = await ttdBuildDocxFromTpl(ttdUi.tpl, o.t, opts, appxData, onStep); blob = res.blob; skipped = res.skipped; }
+          catch(e){ console.error("מילוי התבנית נכשל, בונה בלי תבנית", e); blob = null; skipped = []; res = null; }
+        }
+        const usedTpl = !!blob;
+        if(!blob){ res = await ttdBuildDocxClean(o.t, yl, opts, appxData, onStep); blob = res.blob; }
+        const how = await ttdOfferFile(blob, base + ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        if(how === "cancel"){ return; }
+        msg = useTpl && !usedTpl ? "לא הצלחתי למלא את התבנית, אז התיק נבנה בלי תבנית"
+          : skipped.length ? `התיק ירד. לא נמצאו בתבנית: ${skipped.join(", ")}`
+          : how === "shared" ? "התיק מוכן" : "התיק המעודכן ירד לתיקיית ההורדות";
+        msg += tail();
+      }
       lcCloseModal();
-      showToast(skipped.length ? `התיק ירד. לא נמצאו בתבנית: ${skipped.join(", ")}` : "התיק המעודכן ירד לתיקיית ההורדות");
-    }catch(e){ console.error(e); btn.disabled = false; btn.textContent = "הורדת התיק (Word)"; showToast(e.message || "הבנייה נכשלה"); }
+      showToast(msg);
+    }catch(e){
+      console.error(e);
+      showToast(e && e.message ? e.message : "הבנייה נכשלה, נסה שוב");
+    }finally{
+      st.busy = false;
+      if(document.body.contains(go)){ go.disabled = false; go.innerHTML = goLabel(); }
+    }
   };
 }
 
 /* ---------- תצוגה ---------- */
 function ttdCount(it, v){
   if(!v) return 0;
+  if(it.kind === "attach") return v.length;
   if(it.kind === "cover") return v.name ? 1 : 0;
   return Array.isArray(v) ? v.length : 0;
 }
@@ -7144,12 +7728,25 @@ function ttdField(label, key, val, extra){
     ? `<textarea class="lc-in" rows="2" data-ttd-k="${key}">${escHtml(val)}</textarea>`
     : `<input class="lc-in" type="text" data-ttd-k="${key}" value="${escHtml(val)}" ${extra && extra.ro ? "readonly" : ""}>`}</label>`;
 }
+function ttdFmtSize(n){ n = Number(n) || 0; return n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB"; }
 function ttdBodyHtml(it, v){
   const T = it.tag;
+  if(it.kind === "attach"){
+    const up = ttdUi.up && ttdUi.up[T];
+    const files = Array.isArray(v) ? v : [];
+    return `<div class="ttd-sub">${ttdIsPriv(it) ? `<span class="ttd-lock">${lcIco("shield", 13)}גלוי רק למנהל</span> · ` : ""}<b>${escHtml(it.appx)}</b> · ${escHtml(it.desc || "")}. בהפקה הקבצים מצורפים בסוף התיק עם עמוד כותרת. מומלץ PDF או תמונה.</div>
+      <div class="ttd-att" data-ttd-drop="${T}">
+        ${files.map((f, i) => `<div class="ttd-file">${lcIco("doc", 16)}<button type="button" class="ttd-fname" data-ttd-op="att-open" data-t="${T}" data-i="${i}">${escHtml(f.name || "קובץ")}</button>
+          <small>${f.size ? `<bdi dir="ltr">${ttdFmtSize(f.size)}</bdi> · ` : ""}${f.at ? new Date(f.at).toLocaleDateString("he-IL") : ""}</small>${ttdFileKind(f) === "other" ? `<small class="warn">יצורף בנפרד, לא בתוך התיק</small>` : ""}
+          <span class="ttd-fops"><button type="button" class="lc-btn ghost sm" title="הזזה למעלה" data-ttd-op="att-up" data-t="${T}" data-i="${i}" ${i ? "" : "disabled"}>▲</button><button type="button" class="lc-btn ghost sm" title="הסרה מהנספח" data-ttd-op="att-del" data-t="${T}" data-i="${i}">${lcIco("trash", 14)}</button></span></div>`).join("")}
+        <div class="ttd-att-f"><button type="button" class="lc-btn ${files.length ? "ghost " : ""}sm" data-ttd-op="att-add" data-t="${T}" ${up ? "disabled" : ""}>${lcIco("upload", 14)}${up ? "מעלה…" : files.length ? "צירוף קובץ נוסף" : "צירוף קובץ"}</button><span class="ttd-drop-hint">או לגרור קבצים לכאן</span></div>
+      </div>`;
+  }
   if(it.kind === "cover"){
     v = v || {};
     return `<div class="ttd-row">${ttdField("שם המוסד (שורה חדשה = Enter)", `${T}|name`, v.name || "", { area: true, wide: true })}${ttdField("תאריך עדכון", `${T}|date`, v.date || "")}</div>`;
   }
+  if(!v && (it.kind === "rows" || it.kind === "teams")) v = [];
   if(!v) return `<div class="lc-sub">אין נתונים לטבלה הזו. אפשר לייבא מהקובץ.</div>`;
   if(it.kind === "kv"){
     return `<div class="ttd-kv">${v.map((p, i) => ttdField(p[0] || "—", `${T}|${i}|1`, p[1] || "")).join("")}</div>`;
@@ -7186,10 +7783,10 @@ function ttdHtml(){
       <div class="lc-actions" style="justify-content:center">${others.map(x => `<button type="button" class="lc-btn" data-ttd-op="copy" data-y="${x.year}">${lcIco("copy", 16)}העתקה מ${escHtml(schoolYearLabel(x.year))}</button>`).join("")}
       <button type="button" class="lc-btn ${others.length ? "ghost" : ""}" data-ttd-op="import">${lcIco("upload", 16)}ייבוא מקובץ התיק</button></div></div>`;
   }else{
-    body = TTD_SCHEMA.map(g => `<div class="ttd-g"><div class="ttd-gh">${lcIco(g.ico, 16)}${escHtml(g.g)}</div>${g.items.map(it => {
-      const v = o.t[it.tag], open = ttdUi.open.has(it.tag), n = ttdCount(it, v);
+    body = TTD_SCHEMA.map(g => ({ g, items: g.items.filter(ttdCanSee) })).filter(x => x.items.length).map(({ g, items }) => `<div class="ttd-g"><div class="ttd-gh">${lcIco(g.ico, 16)}${escHtml(g.g)}</div>${items.map(it => {
+      const v = it.kind === "attach" ? ttdAttFiles(o.t, it.tag) : o.t[it.tag], open = ttdUi.open.has(it.tag), n = ttdCount(it, v);
       return `<div class="lc-card ttd-sec ${open ? "open" : ""}"><button type="button" class="ttd-h" data-ttd-op="toggle" data-t="${it.tag}" aria-expanded="${open}">
-        <span class="ttd-ht">${escHtml(it.t)}</span><span class="ttd-cnt">${it.kind === "kv" || it.kind === "cover" ? "" : n + " שורות"}</span>${lcIco("chev", 16)}</button>
+        <span class="ttd-ht">${escHtml(it.t)}</span><span class="ttd-cnt${it.kind === "attach" ? (n ? " ok" : " miss") : ""}">${it.kind === "kv" || it.kind === "cover" ? "" : it.kind === "attach" ? (n ? (n === 1 ? "קובץ מצורף" : n + " קבצים מצורפים") : "טרם צורף") : n + " שורות"}</span>${lcIco("chev", 16)}</button>
         ${open ? `<div class="ttd-b">${ttdBodyHtml(it, v)}</div>` : ""}</div>`;
     }).join("")}</div>`).join("");
   }
@@ -7218,6 +7815,10 @@ function ttdRender(main){
     main.addEventListener("input", ttdOnInput);
     main.addEventListener("change", ttdOnInput);
     main.addEventListener("click", ttdOnClick);
+    const zone = e => e.target && e.target.closest && licUi.view === "ttd" ? e.target.closest("[data-ttd-drop]") : null;
+    main.addEventListener("dragover", e => { const z = zone(e); if(z){ e.preventDefault(); z.classList.add("over"); } });
+    main.addEventListener("dragleave", e => { const z = zone(e); if(z && !z.contains(e.relatedTarget)) z.classList.remove("over"); });
+    main.addEventListener("drop", e => { const z = zone(e); if(!z) return; e.preventDefault(); z.classList.remove("over"); ttdAttUpload(z.dataset.ttdDrop, e.dataTransfer && e.dataTransfer.files); });
   }
   if(key){ const el = main.querySelector(`[data-ttd-k="${CSS.escape(key)}"]`); if(el){ el.focus({ preventScroll: true }); if(caret && el.setSelectionRange) try{ el.setSelectionRange(caret[0], caret[1]); }catch(e){} } }
   window.scrollTo(0, sy);
@@ -7238,6 +7839,42 @@ function ttdOnInput(e){
   }
   ttdSave();
 }
+function ttdPickMany(){
+  return new Promise(res => {
+    let done = false; const fin = v => { if(!done){ done = true; res(v); } };
+    const inp = document.createElement("input"); inp.type = "file"; inp.multiple = true;
+    inp.accept = ".pdf,image/*,.doc,.docx,.xls,.xlsx";
+    inp.onchange = () => fin(Array.from(inp.files || []));
+    inp.addEventListener("cancel", () => fin([]));
+    inp.click();
+  });
+}
+async function ttdAttUpload(T, files){
+  files = Array.from(files || []).filter(Boolean);
+  const it = TTD_ITEM[T];
+  if(!files.length || !it || it.kind !== "attach" || !ttdCanSee(it)) return;
+  const y = ttdCurYear();
+  if(!ttdYearObj(y)){ showToast("אין עדיין נתונים לשנה הזו"); return; }
+  ttdUi.up = ttdUi.up || {}; ttdUi.up[T] = (ttdUi.up[T] || 0) + 1; ttdRerender();
+  let ok = 0;
+  try{
+    for(const f of files){
+      if(f.size > 25 * 1024 * 1024){ showToast(`"${f.name}" גדול מדי (מעל 25MB)`); continue; }
+      try{
+        const url = await lcUploadFile(f, "ttd/" + T);
+        const o = ttdYearObj(y, true);
+        if(!o.t.att || typeof o.t.att !== "object" || Array.isArray(o.t.att)) o.t.att = {};
+        if(!Array.isArray(o.t.att[T])) o.t.att[T] = [];
+        o.t.att[T].push({ url, name: f.name || "קובץ", type: f.type || "", size: f.size || 0, at: Date.now() });
+        ok++; ttdSave();
+      }catch(e){ console.error(e); showToast(`ההעלאה של "${f.name}" נכשלה. בדוק חיבור לאינטרנט ונסה שוב`); }
+    }
+  }finally{
+    ttdUi.up[T]--; if(ttdUi.up[T] <= 0) delete ttdUi.up[T];
+    ttdRerender();
+  }
+  if(ok) showToast(ok > 1 ? `${ok} קבצים צורפו ל${it.appx}` : `הקובץ צורף ל${it.appx}`);
+}
 function ttdOnClick(e){
   const b = e.target.closest && e.target.closest("[data-ttd-op]"); if(!b) return;
   const op = b.dataset.ttdOp, T = b.dataset.t, i = Number(b.dataset.i);
@@ -7248,6 +7885,14 @@ function ttdOnClick(e){
     case "import": ttdImportFromFile(); break;
     case "copy": ttdCopyFrom(Number(b.dataset.y)); break;
     case "gen": ttdOpenGenerate(); break;
+    case "att-add": ttdPickMany().then(fs => ttdAttUpload(T, fs)); break;
+    case "att-open": case "att-up": case "att-del": {
+      const it = TTD_ITEM[T]; if(!o || !it || !ttdCanSee(it)) return;
+      const list = o.t.att && Array.isArray(o.t.att[T]) ? o.t.att[T] : null; const f = list && list[i]; if(!f) return;
+      if(op === "att-open"){ if(typeof openFileViewer === "function") openFileViewer(f.url, { title: f.name, meta: it.appx }); else window.open(f.url, "_blank", "noopener"); }
+      else if(op === "att-up"){ if(i > 0){ [list[i - 1], list[i]] = [list[i], list[i - 1]]; ttdSave(); ttdRerender(); } }
+      else openConfirmModal(`להסיר את "${f.name}" מ${it.appx}? (הקובץ עצמו נשאר שמור באחסון)`, () => { const k = list.indexOf(f); if(k >= 0){ list.splice(k, 1); ttdSave(); ttdRerender(); } }, { yesLabel: "הסרה", icon: "trash" });
+    } break;
     case "add": {
       const it = TTD_ITEM[T]; if(!o) return; o.t[T] = o.t[T] || [];
       const n = it.kind === "teams" ? TTD_TEAM_COLS.length : it.cols.length;
@@ -8165,7 +8810,7 @@ function lcPdfHtml(rows, title, opts){
   const C = { ink:"#201e1d", soft:"#645c50", line:"#e6dccb", brand:"#c67139", ok:"#5f7a3e", okb:"#e1eecc", warn:"#b7791f", warnb:"#f8e3b6", bad:"#a53a2a", badb:"#ffd3c4" };
   const e = escHtml;
   const toneC = r => { const t = lcTone(r); return t === "bad" ? [C.bad, C.badb, "פג תוקף"] : t === "warn" ? [C.warn, C.warnb, "מתקרב"] : t === "ok" ? [C.ok, C.okb, "בתוקף"] : [C.soft, "#eee", "—"]; };
-  const page = (inner, last) => `<div style="width:760px;padding:24px 26px;box-sizing:border-box;font-family:Rubik,'Segoe UI',Arial,sans-serif;color:${C.ink};direction:rtl;background:#fff">${inner}</div>${last ? "" : '<div class="html2pdf__page-break"></div>'}`;
+  const page = (inner, last) => `<div style="width:728px;padding:22px 22px;box-sizing:border-box;font-family:Rubik,'Segoe UI',Arial,sans-serif;color:${C.ink};direction:rtl;letter-spacing:.01px;background:#fff">${inner}</div>${last ? "" : '<div class="html2pdf__page-break"></div>'}`;
   const live = rows.filter(r => !r.isBundle);
   const ok = live.filter(r => lcTone(r) === "ok").length, bad = live.filter(r => lcTone(r) === "bad").length, warn = live.filter(r => lcTone(r) === "warn").length;
   const miss = live.reduce((s, r) => s + (r.requiredDocs || []).filter(d => d && !d.fileUrl).length, 0);
