@@ -1329,6 +1329,145 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
 /* --- דוח למנהל חשבונות: מקור העבודה --- */
 .acct-src{ display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; font-family:var(--font-body); font-size:12.5px; font-weight:500; color:var(--ink-soft); margin-top:3px; }
 .acct-src-link{ background:none; border:none; padding:0; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:700; color:#8c491a; text-decoration:underline; text-underline-offset:3px; display:inline-flex; align-items:center; gap:4px; }
+
+/* --- דוח למנהל חשבונות v2 --- */
+.acx{ display:flex; flex-direction:column; gap:16px; padding-bottom:10px; }
+.acx-head{ display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px; }
+.acx-head-t{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+.acx-h1{ margin:0; font-family:var(--font-heading, var(--font-display)); font-weight:400; font-size:28px; color:var(--ink); line-height:1.15; }
+.acx-sync{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; font-size:13px; color:var(--ink-soft); }
+.acx-sync svg{ color:var(--green); }
+.acx-head-a{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.acx-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.acx-pill{
+  display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 14px; border-radius:999px;
+  border:1px solid var(--line); background:var(--card); color:var(--ink); font-family:inherit; font-size:13.5px; font-weight:600;
+  cursor:pointer; white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis;
+}
+.acx-pill.active{ background:#2b2723; color:#fbf7f0; border-color:#2b2723; }
+.acx-pill .n{ background:var(--job-warn-bg, #ffe1d0); color:#643312; border-radius:999px; padding:1px 8px; font-size:12px; }
+.acx-pill.active .n{ background:rgba(251,247,240,.2); color:#fbf7f0; }
+.acx-lbl{ font-size:13px; font-weight:600; color:var(--ink-soft); }
+.acx-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:0 16px; border-radius:999px;
+  border:none; background:var(--job-accent, #c67139); color:#fbf7f0; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;
+}
+.acx-btn.ghost{ background:transparent; color:var(--ink); border:1px solid var(--line); }
+.acx-btn.dark{ background:#2b2723; }
+.acx-btn.warn{ background:#8c491a; }
+.acx-btn.ok{ background:#3f4a2c; }
+.acx-btn.soft{ background:var(--job-ok-bg, #e1eecc); color:#3f4a2c; }
+.acx-btn:disabled{ opacity:.5; cursor:not-allowed; }
+.acx-stats{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:10px; }
+.acx-stat{ background:var(--card); border-radius:16px; padding:12px 14px; border-top:4px solid #c67139; box-shadow:0 1px 2px rgba(46,43,37,.10), 0 8px 22px rgba(46,43,37,.07); display:flex; flex-direction:column; gap:2px; min-width:0; }
+.acx-stat.bad{ border-top-color:#8c491a; } .acx-stat.idle{ border-top-color:#82796a; } .acx-stat.ok{ border-top-color:#7a8a5e; }
+.acx-stat .l{ font-size:12px; font-weight:600; color:var(--ink-soft); }
+.acx-stat .v{ font-family:var(--font-heading, var(--font-display)); font-size:24px; color:var(--ink); overflow-wrap:anywhere; }
+.acx-stat.bad .v{ color:#8c491a; } .acx-stat.ok .v{ color:#3f4a2c; }
+.acx-stat .s{ font-size:12px; color:var(--ink-soft); }
+.acx-flow{ background:var(--card); border-radius:18px; padding:14px 16px; box-shadow:0 1px 2px rgba(46,43,37,.08); display:flex; flex-direction:column; gap:10px; }
+.acx-flow-h{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px; font-size:13px; font-weight:600; }
+.acx-flow-h span:last-child{ color:var(--ink-soft); font-weight:500; }
+.acx-bar{ display:flex; height:12px; border-radius:999px; overflow:hidden; gap:3px; background:var(--job-idle-bg, #eee7db); }
+.acx-bar > div{ transition:flex-grow .5s ease; min-width:0; }
+.acx-legend{ display:flex; flex-wrap:wrap; gap:6px 16px; font-size:12.5px; color:var(--ink-soft); }
+.acx-legend span{ display:inline-flex; align-items:center; gap:6px; }
+.acx-legend i{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+.acx-filters{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between; scroll-margin-top:80px; }
+.acx-search{ display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); flex:0 1 280px; min-width:0; color:var(--ink-soft); }
+.acx-search input{ border:none !important; background:transparent !important; box-shadow:none !important; font-family:inherit; font-size:14px; flex:1 1 auto; min-width:0; outline:none; color:var(--ink); padding:8px 0 !important; }
+.acx-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap:14px; }
+.acx-card{ background:var(--job-tint-a, #fff2eb); border-radius:20px; padding:14px 16px; display:flex; flex-direction:column; gap:10px; min-width:0; box-shadow:var(--job-shadow, 0 1px 2px rgba(46,43,37,.10), 0 8px 22px rgba(46,43,37,.09)); transition:transform .18s ease, box-shadow .18s ease; }
+.acx-card.alt{ background:var(--job-tint-b, #f0fae1); }
+.acx-card:hover{ transform:translateY(-2px); box-shadow:0 2px 4px rgba(46,43,37,.10), 0 14px 30px rgba(46,43,37,.14); }
+.acx-card.paid{ background:var(--card); opacity:.88; }
+.acx-card.sel{ outline:2.5px solid #c67139; outline-offset:-2.5px; }
+.acx-card.hl{ outline:2.5px solid #2d6a8a; outline-offset:-2.5px; }
+.acx-top{ display:flex; align-items:flex-start; gap:10px; }
+.acx-chk{ flex:0 0 auto; width:28px; height:28px; margin:8px 0; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0; background:var(--card); border:2px solid rgba(32,30,29,.3); color:#fbf7f0; }
+.acx-chk.on{ background:#c67139; border-color:#c67139; }
+.acx-chk:disabled{ visibility:hidden; }
+.acx-main{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.acx-name{ font-family:var(--font-heading, var(--font-display)); font-size:18px; line-height:1.2; color:#8c491a; overflow-wrap:anywhere; }
+.acx-card.alt .acx-name{ color:#4f5b3a; }
+.acx-title{ font-size:14.5px; font-weight:600; color:var(--ink); overflow-wrap:anywhere; }
+.acx-src{ font-size:12.5px; color:var(--ink-soft); display:inline-flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.acx-side{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex:0 0 auto; }
+.acx-amt{ font-family:var(--font-heading, var(--font-display)); font-size:22px; color:var(--ink); white-space:nowrap; }
+.acx-amt.none{ font-size:14px; color:#8c491a; }
+.acx-chip{ border-radius:999px; padding:3px 10px; font-size:12px; font-weight:600; white-space:nowrap; }
+.acx-chip.pending{ background:#eee7db; color:#645c50; } .acx-chip.ready{ background:#ffe1d0; color:#643312; }
+.acx-chip.missing{ background:#ffc6a5; color:#5a2a0c; } .acx-chip.sent{ background:#e6e1d8; color:#3d3830; }
+.acx-chip.paid{ background:#e1eecc; color:#3f4a2c; } .acx-chip.seen{ background:#dfe7ef; color:#1d4a63; }
+.acx-checks{ display:flex; flex-wrap:wrap; gap:6px; }
+.acx-ck{ display:inline-flex; align-items:center; gap:4px; border-radius:999px; padding:3px 9px; font-size:12px; font-weight:600; background:rgba(122,138,94,.16); color:#3f4a2c; }
+.acx-ck.bad{ background:#ffc6a5; color:#5a2a0c; }
+.acx-ck.soft{ background:var(--job-idle-bg, #eee7db); color:var(--ink-soft); }
+button.acx-ck{ border:none; font-family:inherit; cursor:pointer; }
+.acx-bank{ font-size:12.5px; color:var(--ink-soft); display:flex; align-items:center; gap:6px; flex-wrap:wrap; overflow-wrap:anywhere; }
+.acx-note{ font-size:12.5px; color:#1d4a63; background:#dfe7ef; border-radius:10px; padding:6px 10px; overflow-wrap:anywhere; }
+.acx-acts{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.acx-acts .acx-btn{ flex:1 1 130px; font-size:13.5px; }
+.acx-ico{ width:44px; height:44px; flex:0 0 auto; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--ink); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
+.acx-empty{ grid-column:1 / -1; text-align:center; color:var(--ink-soft); padding:26px 10px; background:var(--card); border-radius:18px; }
+.acx-box{ background:var(--card); border-radius:18px; padding:2px 16px; box-shadow:0 1px 2px rgba(46,43,37,.08); }
+.acx-box > summary{ min-height:50px; display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; font-size:14px; list-style:none; }
+.acx-box > summary::-webkit-details-marker{ display:none; }
+.acx-box > summary svg{ color:#c67139; flex:0 0 auto; }
+.acx-box[open] > summary{ border-bottom:1px solid var(--line); margin-bottom:10px; }
+.acx-box > div{ padding-bottom:14px; }
+.acx-hgrid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap:10px; }
+.acx-hcell{ background:var(--job-tint-a, #fff2eb); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:2px; font-size:12.5px; color:var(--ink-soft); }
+.acx-hcell b{ color:var(--ink); font-size:13.5px; }
+.acx-hcell.warn{ background:#ffe1d0; }
+.acx-log{ display:flex; flex-direction:column; gap:10px; }
+.acx-send{ background:var(--job-tint-a, #fff2eb); border-radius:18px; padding:12px 14px; display:flex; flex-direction:column; gap:8px; scroll-margin-top:80px; }
+.acx-send.alt{ background:var(--job-tint-b, #f0fae1); }
+.acx-send-h{ display:flex; justify-content:space-between; gap:8px; align-items:flex-start; flex-wrap:wrap; }
+.acx-send-t{ font-family:var(--font-heading, var(--font-display)); font-size:17px; color:#8c491a; }
+.acx-send.alt .acx-send-t{ color:#4f5b3a; }
+.acx-send-sub{ font-size:12.5px; color:var(--ink-soft); }
+.acx-line{ display:flex; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:12px; background:rgba(255,255,255,.7); font-size:13px; flex-wrap:wrap; }
+.acx-line .st-paid{ color:#3f4a2c; font-weight:600; } .acx-line .st-open{ color:#8c491a; font-weight:600; }
+.acx-selbar{ position:sticky; bottom:12px; z-index:30; background:#2b2723; color:#fbf7f0; border-radius:20px; padding:10px 12px 10px 16px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; box-shadow:0 10px 30px rgba(0,0,0,.25); }
+.acx-selbar .acx-btn.ghost{ color:#fbf7f0; border-color:rgba(251,247,240,.35); }
+.acx-modal{ display:flex; flex-direction:column; gap:12px; max-height:90vh; overflow:auto; }
+.acx-m-h{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-family:var(--font-heading, var(--font-display)); font-size:20px; }
+.acx-x{ width:40px; height:40px; border-radius:999px; border:none; background:var(--job-idle-bg, #eee7db); color:var(--ink); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; }
+.acx-f{ display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:700; color:var(--ink-soft); min-width:0; }
+.acx-f input, .acx-f select{ width:100%; min-height:42px; font-family:inherit; font-size:15px; }
+.acx-f2{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
+.acx-m-note{ margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
+.acx-m-warn{ display:flex; gap:8px; align-items:flex-start; padding:10px 12px; border-radius:14px; background:#ffe1d0; color:#643312; font-size:12.5px; line-height:1.5; }
+.acx-m-a{ display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; }
+.acx-m-a .acx-btn{ flex:1 1 140px; }
+.acx-m-list{ display:flex; flex-direction:column; gap:6px; }
+.acx-m-item{ display:flex; justify-content:space-between; gap:8px; padding:9px 12px; background:var(--job-tint-a, #fff2eb); border-radius:12px; font-size:13.5px; align-items:center; }
+.acx-m-item:nth-child(even){ background:var(--job-tint-b, #f0fae1); }
+.acx-m-item .rm{ border:none; background:transparent; color:var(--ink-soft); cursor:pointer; width:32px; height:32px; border-radius:999px; flex:0 0 auto; }
+.acx-preview{ background:#e1eecc; border-radius:14px 14px 4px 14px; padding:12px 14px; font-size:13px; line-height:1.6; white-space:pre-wrap; color:var(--ink); overflow-wrap:anywhere; max-height:260px; overflow:auto; }
+.acx-check-row{ display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; color:var(--ink); cursor:pointer; min-height:40px; }
+.acx-check-row input{ width:20px; height:20px; }
+/* תצוגת מנהל החשבונות */
+.acx-inhero{ background:#2b2723; color:#fbf7f0; border-radius:20px; padding:14px 16px; display:flex; flex-direction:column; gap:10px; box-shadow:0 10px 26px rgba(43,39,35,.25); scroll-margin-top:80px; }
+.acx-inhero .t{ font-family:var(--font-heading, var(--font-display)); font-size:20px; }
+.acx-inhero .a{ font-family:var(--font-heading, var(--font-display)); font-size:26px; white-space:nowrap; }
+.acx-inhero .s{ font-size:13px; opacity:.85; }
+.acx-prog{ height:8px; border-radius:999px; background:rgba(251,247,240,.18); overflow:hidden; }
+.acx-prog > div{ height:100%; border-radius:999px; background:#a9c27a; transition:width .35s ease; }
+.acx-bankbox{ background:rgba(255,255,255,.65); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:6px; font-size:13px; }
+.acx-bankbox > div{ display:flex; justify-content:space-between; gap:8px; align-items:center; }
+.acx-bankbox span:first-child{ color:var(--ink-soft); }
+.acx-bankbox b{ overflow-wrap:anywhere; text-align:left; }
+.acx-copy{ width:34px; height:34px; border-radius:8px; border:1px solid var(--line); background:var(--card); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0; color:var(--ink-soft); }
+.acx-paidbox{ display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:14px; background:#e1eecc; color:#3f4a2c; font-size:13px; font-weight:600; }
+.acx-prev{ background:var(--card); border-radius:16px; padding:12px 14px; display:flex; justify-content:space-between; gap:8px; font-size:13.5px; box-shadow:0 1px 2px rgba(46,43,37,.08); border:none; font-family:inherit; color:var(--ink); cursor:pointer; text-align:right; width:100%; min-height:48px; align-items:center; }
+.acx-new{ background:#c67139; color:#fbf7f0; border-radius:999px; padding:2px 9px; font-size:11.5px; font-weight:600; }
+@media (max-width:560px){
+  .acx-h1{ font-size:24px; }
+  .acx-search{ flex:1 1 100%; }
+  .acx-f2{ grid-template-columns:minmax(0,1fr); }
+}
 .job-toast{
   position:fixed; bottom:22px; left:50%; transform:translateX(-50%); z-index:1300;
   background:#2b2723; color:#fbf7f0; padding:11px 18px; border-radius:14px; font-size:14px; font-weight:600;
@@ -2202,113 +2341,59 @@ button.tk-chip{ cursor:pointer; }
   </section>
 
   <section class="tab" id="tab-accountant">
-    <div class="cards" id="accountantCards"></div>
-
-    <div class="card">
-      <div style="font-weight:700;font-size:13px;margin-bottom:8px">פרטי יצירת קשר עם מנהל החשבונות (לשליחת הודעות)</div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <label style="flex:1;min-width:160px">
-          <div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px">טלפון (וואטסאפ)</div>
-          <input type="text" id="accountantPhone" value="" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px">
+    <div id="acxAdmin" class="acx">
+      <div class="acx-head">
+        <div class="acx-head-t">
+          <h2 class="acx-h1">דוח למנהל חשבונות</h2>
+          <div class="acx-sync" id="acxSyncLine"></div>
+        </div>
+        <div class="acx-head-a">
+          <button type="button" class="acx-pill" data-acx="contact" id="acxContactBtn"></button>
+          <button type="button" class="acx-btn" data-acx="new"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>תשלום ידני</button>
+        </div>
+      </div>
+      <div class="acx-row" id="acxPeriods"></div>
+      <div class="acx-stats" id="acxStats"></div>
+      <div class="acx-flow" id="acxFlow"></div>
+      <div class="acx-filters" id="combinedReportAnchor">
+        <div class="acx-row" id="acxCats"></div>
+        <label class="acx-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="sr-only">חיפוש תשלום</span>
+          <input type="search" id="acxSearch" placeholder="חיפוש שם, משימה או סכום" oninput="acxOnSearch(this.value)">
         </label>
-        <label style="flex:1;min-width:160px">
-          <div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px">אימייל</div>
-          <input type="text" id="accountantEmail" value="" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px">
-        </label>
       </div>
-    </div>
-
-    <div class="section-title" id="combinedReportAnchor">דוח מרוכז למנהל חשבונות</div>
-    <p class="hint">סימון סטטוס, פרטי בנק והערה כאן מעדכנים אוטומטית גם את הטבלת המקור. ניתן לשלוח הודעה מנוסחת ישירות מכאן.</p>
-    <div class="toolbar">
-      <div class="acct-subtabs" id="acctSubtabs">
-        <button type="button" class="pill-tab active" data-subtab="all" onclick="setAccountantSubTab('all')">הכל</button>
-        <button type="button" class="pill-tab" data-subtab="staff" onclick="setAccountantSubTab('staff')">צוות ותורנים</button>
-        <button type="button" class="pill-tab" data-subtab="professional" onclick="setAccountantSubTab('professional')">אנשי מקצוע</button>
-        <button type="button" class="pill-tab" data-subtab="vendor" onclick="setAccountantSubTab('vendor')">רכש וספקים</button>
-      </div>
-      <div>תצוגה: <select id="paymentStatusFilter" onchange="renderAccountantReport()" style="width:200px;display:inline-block">
-        <option value="">הכל (חסר פרטים / ממתין קודם)</option>
-        <option value="חסר פרטים">רק חסר פרטים</option>
-        <option value="ממתין">רק ממתין</option>
-        <option value="שולם">רק שולם</option>
-      </select></div>
-    </div>
-
-    <div id="acctSubStaff">
-      <div class="section-title" style="font-size:15px">צוות ותורנים</div>
-      <div class="toolbar">
-        <div></div>
-        <button class="btn ghost" onclick="sendCategorySummary('staff')"><span class="btn-icon-inline" id="sendStaffSlot"></span>שליחת סיכום למנהל חשבונות</button>
-      </div>
-      <div class="card">
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
-            <tbody id="combinedReportBodyStaff"></tbody>
-            <tfoot><tr class="total-row"><td>סה"כ צוות ותורנים</td><td id="combinedTotalStaff"></td></tr></tfoot>
-          </table>
+      <div class="acx-grid" id="acxGrid"></div>
+      <details class="acx-box" id="acxLogBox" open>
+        <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg><span id="acxLogTitle">יומן שליחות למנהל החשבונות</span></summary>
+        <div id="acxLog"></div>
+      </details>
+      <details class="acx-box" id="acxHealthBox">
+        <summary id="acxHealthSum">מצב הסנכרון</summary>
+        <div id="acxHealth"></div>
+      </details>
+      <details class="source-collapse" id="vendorPayAnchor">
+        <summary>טבלת מקור מלאה: תשלומי ספקים ונותני שירות (מתקדם)</summary>
+        <div class="card">
+          <div class="toolbar toolbar-sticky">
+            <div><span class="saved-flag" id="vendorPaySaved">נשמר</span></div>
+            <button class="btn" onclick="addVendorPay()">+ הוספת שורה</button>
+          </div>
+          <p class="hint">עריכה מלאה של כל השדות. בדרך כלל עדיף לעבוד מהכרטיסים למעלה. רק שורות שמסומנות "אושר לתשלום" נכללות בדוח.</p>
+          <div class="table-scroll">
+            <table>
+              <thead><tr>
+                <th>ספק / נותן שירות</th><th>סוג</th><th>תיאור</th><th>סכום</th><th>אושר לתשלום</th><th>סטטוס תשלום</th>
+                <th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל חשבון</th><th>שליחת הודעה</th><th>חשבונית מצורפת</th><th>הערות</th><th></th>
+              </tr></thead>
+              <tbody id="vendorPayBody"></tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </details>
+      <div class="acx-selbar" id="acxSelBar" style="display:none"></div>
     </div>
-
-    <div id="acctSubProfessional">
-      <div class="section-title" style="font-size:15px">אנשי מקצוע</div>
-      <div class="toolbar">
-        <div></div>
-        <button class="btn ghost" onclick="sendCategorySummary('professional')"><span class="btn-icon-inline" id="sendProfessionalSlot"></span>שליחת סיכום למנהל חשבונות</button>
-      </div>
-      <div class="card">
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
-            <tbody id="combinedReportBodyProfessional"></tbody>
-            <tfoot><tr class="total-row"><td>סה"כ אנשי מקצוע</td><td id="combinedTotalProfessional"></td></tr></tfoot>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div id="acctSubVendor">
-      <div class="section-title" style="font-size:15px">רכש וספקים</div>
-      <div class="toolbar">
-        <div></div>
-        <button class="btn ghost" onclick="sendCategorySummary('vendor')"><span class="btn-icon-inline" id="sendVendorSlot"></span>שליחת סיכום למנהל חשבונות</button>
-      </div>
-      <div class="card">
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>שם</th><th>סוג</th><th>סה"כ לתשלום</th><th>סטטוס תשלום</th><th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל חשבון</th><th>הערות</th><th>שליחת הודעה</th></tr></thead>
-            <tbody id="combinedReportBodyVendor"></tbody>
-            <tfoot><tr class="total-row"><td>סה"כ רכש וספקים</td><td id="combinedTotalVendor"></td></tr></tfoot>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <details class="source-collapse" id="vendorPayAnchor">
-      <summary>עריכת מקור: תשלומי ספקים ונותני שירות (הוספה / אישור לתשלום)</summary>
-      <div class="toolbar">
-        <div></div>
-        <button class="btn ghost" onclick="sendCategorySummary('vendor-pay')"><span class="btn-icon-inline" id="sendVendorPaySlot"></span>שליחת סיכום למנהל חשבונות</button>
-      </div>
-      <div class="card">
-        <div class="toolbar toolbar-sticky">
-          <div><span class="saved-flag" id="vendorPaySaved">נשמר</span></div>
-          <button class="btn" onclick="addVendorPay()">+ הוספת תשלום לספק</button>
-        </div>
-        <p class="hint">רק שורות שמסומנות "אושר לתשלום" נכללות בדוח למנהל חשבונות.</p>
-        <div class="table-scroll">
-          <table>
-            <thead><tr>
-              <th>ספק / נותן שירות</th><th>סוג</th><th>תיאור</th><th>סכום</th><th>אושר לתשלום</th><th>סטטוס תשלום</th>
-              <th>הערת מנהל חשבונות</th><th>בנק</th><th>סניף</th><th>מספר חשבון</th><th>שם בעל חשבון</th><th>שליחת הודעה</th><th>חשבונית מצורפת</th><th>הערות</th><th></th>
-            </tr></thead>
-            <tbody id="vendorPayBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </details>
+    <div id="acxInbox" class="acx" style="display:none"></div>
   </section>
 
   <section class="tab" id="tab-finance">
@@ -2686,6 +2771,32 @@ button.tk-chip{ cursor:pointer; }
   </div>
 </div>
 
+<div id="acxContactModal" class="modal-overlay" style="display:none;z-index:1250">
+  <div class="modal-box acx-modal" style="max-width:440px">
+    <div class="acx-m-h"><span>פרטי מנהל החשבונות</span><button type="button" class="acx-x" aria-label="סגירה" onclick="acxCloseModal('acxContactModal')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <label class="acx-f"><span>שם (לתצוגה)</span><input type="text" id="accountantName"></label>
+    <label class="acx-f"><span>טלפון (וואטסאפ)</span><input type="tel" id="accountantPhone" inputmode="tel"></label>
+    <label class="acx-f"><span>אימייל (Gmail)</span><input type="email" id="accountantEmail"></label>
+    <p class="acx-m-note">ההודעות נשלחות לפי הפרטים האלה. כדי שמנהל החשבונות יוכל להיכנס מהקישור, הוא מתחבר עם המשתמש שלו (מוגבל לטאב הזה ולחשבוניות וקבלות).</p>
+    <div class="acx-m-a"><button type="button" class="acx-btn ghost" onclick="acxCloseModal('acxContactModal')">ביטול</button><button type="button" class="acx-btn" onclick="acxSaveContact()">שמירה</button></div>
+  </div>
+</div>
+
+<div id="acxEditModal" class="modal-overlay" style="display:none;z-index:1250">
+  <div class="modal-box acx-modal" style="max-width:480px">
+    <div class="acx-m-h"><span id="acxEditTitle">פרטי התשלום</span><button type="button" class="acx-x" aria-label="סגירה" onclick="acxCloseModal('acxEditModal')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div id="acxEditBody"></div>
+    <div class="acx-m-a"><button type="button" class="acx-btn ghost" onclick="acxCloseModal('acxEditModal')">ביטול</button><button type="button" class="acx-btn" onclick="acxSaveEdit()">שמירה</button></div>
+  </div>
+</div>
+
+<div id="acxSendModal" class="modal-overlay" style="display:none;z-index:1250">
+  <div class="modal-box acx-modal" style="max-width:520px">
+    <div class="acx-m-h"><span>שליחה למנהל החשבונות</span><button type="button" class="acx-x" aria-label="סגירה" onclick="acxCloseModal('acxSendModal')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div id="acxSendBody"></div>
+  </div>
+</div>
+
 <div id="jobAmountModal" class="modal-overlay" style="display:none;z-index:1250">
   <div class="modal-box" style="max-width:400px">
     <div style="font-weight:700;font-size:16px;margin-bottom:4px">עלות העבודה</div>
@@ -2741,7 +2852,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261103; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261104; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -2903,7 +3014,7 @@ const BACKUP_KEY_LABELS = {
   "tasks-data":"משימות", "procurement-data":"רכש ואספקה", "licensing-data":"רישוי ובטיחות",
   "contacts-data":"אנשי קשר וספקים", "vendorPayments-data":"תשלומי ספקים", "recurring-data":"כספים שוטפים",
   "files-data":"קבצים", "projects-data":"פרויקטים", "staff-data":"צוות ותורנים", "keys-data":"מפתחות",
-  "food-data":"רכש אוכל", "accountantContact-data":"פרטי מנהל חשבונות", "uiPrefs-data":"העדפות תצוגה", "loginLog-data":"יומן כניסות",
+  "food-data":"רכש אוכל", "accountantContact-data":"פרטי מנהל חשבונות", "acctSends-data":"משלוחים למנהל החשבונות", "acctInbox-data":"סימונים של מנהל החשבונות", "uiPrefs-data":"העדפות תצוגה", "loginLog-data":"יומן כניסות",
   "supply-data":"רכש ואספקה: מחירונים וספקים", "supplyOrders-data":"רכש ואספקה: הזמנות וחשבוניות", "supplyKitchen-data":"רכש ואספקה: תפריט ומלאי",
   "equipment-data":"ציוד ואחריות", "serviceContracts-data":"חוזי שירות", "maintBudget-data":"תקציב תחזוקה",
   "myTasks-data":"המשימות שלי", "ttd-data":"תיק נתונים ושטח"
@@ -3613,8 +3724,9 @@ const tabQuickLinks = {
     {label:"🏦 פרטי בנק", action: () => openBankModal()}
   ],
   accountant: [
-    {label:"🧾 תשלומי ספקים", action: () => scrollToId("vendorPayAnchor")},
-    {label:"📊 דוח מרוכז", action: () => scrollToId("combinedReportAnchor")}
+    {label:"➕ תשלום ידני", action: () => acxOpenEdit("")},
+    {label:"📨 יומן שליחות", action: () => scrollToId("acxLogBox")},
+    {label:"🧾 טבלת מקור", action: () => scrollToId("vendorPayAnchor")}
   ],
   finance: [
     {label:"➕ הוספת התחייבות", action: () => addRecurring()}
@@ -3689,9 +3801,9 @@ function switchTab(t){
   document.querySelectorAll("#navBar button").forEach(b => {
     b.classList.toggle("active", b.dataset.tab===t);
   });
-  if(t==="dashboard") renderDashboard({enter:true});
+  if(t==="dashboard"){ renderDashboard({enter:true}); if(typeof acxRefreshRemote === "function") acxRefreshRemote(); }
   if(t==="tasks") mtSync();
-  if(t==="accountant") renderAccountantReport();
+  if(t==="accountant"){ renderAccountantReport(); acxRefreshRemote(); }
   if(t==="finance") renderFinance();
   if(t==="procurement" && window.SP) SP.onShow();
   if(t==="equipment") renderEquipment();
@@ -3943,32 +4055,59 @@ function photoDoneAnswer(yes){
   document.getElementById("photoDoneModal").style.display = "none";
   if(cb) cb(yes);
 }
+/* סנכרון חשבונית ממקור (רכש / משימה) לרשומת התשלום — גרסה בטוחה:
+   • מעדכן רק את עותק החשבונית שהסנכרון עצמו יצר; לא נוגע בקבלות ובמסמכים שנוספו ידנית
+   • לא דורס סכום שנערך ידנית, ולא משנה סכום של תשלום ששולם
+   • מקשר לרשומה קיימת עם אותה חשבונית במקום ליצור כפילות */
+const VP_SYNC_NAME = { proc: "מסמך הזמנה", task: "חשבונית ממשימה" };
+function vpSyncedDoc(vp, kind){
+  vp.docs = vp.docs || [];
+  return vp.docs.find(d => d && d.syncFrom === kind)
+      || vp.docs.find(d => d && !d.syncFrom && d.name === VP_SYNC_NAME[kind] && !isReceiptDocType(d.docType)) || null;
+}
+function vpApplyInvoiceSync(vp, kind, invoiceUrl, srcRow){
+  let changed = false;
+  const synced = vpSyncedDoc(vp, kind);
+  if(invoiceUrl){
+    if(synced){
+      if(synced.fileUrl !== invoiceUrl){ synced.fileUrl = invoiceUrl; changed = true; }
+      if(synced.syncFrom !== kind){ synced.syncFrom = kind; changed = true; }
+    }else if(!vp.docs.some(d => d && d.fileUrl === invoiceUrl)){
+      vp.docs.push({ name: VP_SYNC_NAME[kind], docType: "חשבונית", fileUrl: invoiceUrl, syncFrom: kind });
+      changed = true;
+    }
+  }else if(synced && synced.fileUrl){
+    const stillInSource = (srcRow.docs || []).some(d => d && d.fileUrl && d.fileUrl === synced.fileUrl);
+    if(!stillInSource){ vp.docs.splice(vp.docs.indexOf(synced), 1); changed = true; }
+  }
+  return changed;
+}
+function vpFindByInvoiceUrl(url){
+  if(!url) return null;
+  return data.vendorPayments.find(v => v && (v.docs || []).some(d => d && d.fileUrl === url)
+    && !data.tasks.some(t => t.vendorPayId === v.id) && !data.procurement.some(p => p.vendorPayId === v.id)) || null;
+}
 function syncProcInvoiceToVendorPay(procRow){
   const invoiceDoc = (procRow.docs||[]).find(d => d.fileUrl && isInvoiceDocType(d.docType));
   const firstDocUrl = invoiceDoc ? invoiceDoc.fileUrl : "";
   const amount = (parseFloat(procRow.qty)||0) * (parseFloat(procRow.price)||0);
-  if(firstDocUrl){
-    if(procRow.vendorPayId){
-      const vp = data.vendorPayments.find(v=>v.id===procRow.vendorPayId);
-      if(vp){
-        vp.docs = vp.docs || [];
-        if(vp.docs.length===0) vp.docs.push({name:"מסמך הזמנה", fileUrl:firstDocUrl});
-        else vp.docs[0].fileUrl = firstDocUrl;
-        vp.amount = amount;
-        scheduleSave("vendorPayments","vendorPaySaved");
-      }
-    }else{
-      const newId = nextId()+7000;
-      data.vendorPayments.push({id:newId, vendor:procRow.supplier||"", desc:procRow.item||"", amount:amount, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"מסמך הזמנה", fileUrl:firstDocUrl}], notes:"מקור: רכש כללי", sourceType:"רכש/ספק"});
-      procRow.vendorPayId = newId;
-      scheduleSave("vendorPayments","vendorPaySaved");
-      scheduleSave("procurement","procSaved");
+  if(!procRow.vendorPayId && firstDocUrl){
+    const existing = vpFindByInvoiceUrl(firstDocUrl);
+    if(existing){ procRow.vendorPayId = existing.id; scheduleSave("procurement","procSaved"); }
+  }
+  if(procRow.vendorPayId){
+    const vp = data.vendorPayments.find(v=>v.id===procRow.vendorPayId);
+    if(vp){
+      let ch = vpApplyInvoiceSync(vp, "proc", firstDocUrl, procRow);
+      if(firstDocUrl && !vp.amountManual && !vpIsPaid(vp) && (parseFloat(vp.amount)||0) !== amount){ vp.amount = amount; ch = true; }
+      if(ch) scheduleSave("vendorPayments","vendorPaySaved");
     }
-  }else{
-    if(procRow.vendorPayId){
-      const vp = data.vendorPayments.find(v=>v.id===procRow.vendorPayId);
-      if(vp){ vp.docs = []; scheduleSave("vendorPayments","vendorPaySaved"); }
-    }
+  }else if(firstDocUrl){
+    const newId = nextId()+7000;
+    data.vendorPayments.push({id:newId, vendor:procRow.supplier||"", desc:procRow.item||"", amount:amount, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"מסמך הזמנה", docType:"חשבונית", fileUrl:firstDocUrl, syncFrom:"proc"}], notes:"מקור: רכש כללי", sourceType:"רכש/ספק"});
+    procRow.vendorPayId = newId;
+    scheduleSave("vendorPayments","vendorPaySaved");
+    scheduleSave("procurement","procSaved");
   }
   renderVendorPay();
   renderAccountantReport();
@@ -3976,26 +4115,19 @@ function syncProcInvoiceToVendorPay(procRow){
 function syncTaskInvoiceToVendorPay(taskRow){
   const invoiceDoc = (taskRow.docs||[]).find(d => d.fileUrl && isInvoiceDocType(d.docType));
   const firstDocUrl = invoiceDoc ? invoiceDoc.fileUrl : "";
-  if(firstDocUrl){
-    if(taskRow.vendorPayId){
-      const vp = data.vendorPayments.find(v=>v.id===taskRow.vendorPayId);
-      if(vp){
-        vp.docs = vp.docs || [];
-        if(vp.docs.length===0) vp.docs.push({name:"חשבונית ממשימה", fileUrl:firstDocUrl});
-        else vp.docs[0].fileUrl = firstDocUrl;
-        scheduleSave("vendorPayments","vendorPaySaved");
-      }
-    }else{
-      const newId = nextId()+7000;
-      data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", fileUrl:firstDocUrl}], notes:"מקור: משימה", sourceType:"איש מקצוע"});
-      taskRow.vendorPayId = newId;
-      scheduleSave("vendorPayments","vendorPaySaved");
-    }
-  }else{
-    if(taskRow.vendorPayId){
-      const vp = data.vendorPayments.find(v=>v.id===taskRow.vendorPayId);
-      if(vp){ vp.docs = []; scheduleSave("vendorPayments","vendorPaySaved"); }
-    }
+  if(!taskRow.vendorPayId && firstDocUrl){
+    const existing = vpFindByInvoiceUrl(firstDocUrl);
+    if(existing){ taskRow.vendorPayId = existing.id; scheduleSave("tasks","tasksSaved"); }
+  }
+  if(taskRow.vendorPayId){
+    const vp = data.vendorPayments.find(v=>v.id===taskRow.vendorPayId);
+    if(vp && vpApplyInvoiceSync(vp, "task", firstDocUrl, taskRow)) scheduleSave("vendorPayments","vendorPaySaved");
+  }else if(firstDocUrl){
+    const newId = nextId()+7000;
+    data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", docType:"חשבונית", fileUrl:firstDocUrl, syncFrom:"task"}], notes:"מקור: משימה", sourceType:"איש מקצוע"});
+    taskRow.vendorPayId = newId;
+    scheduleSave("vendorPayments","vendorPaySaved");
+    scheduleSave("tasks","tasksSaved");
   }
   renderVendorPay();
   renderAccountantReport();
@@ -10116,11 +10248,11 @@ function renderVendorPay(){
             <option value="שולם" ${(row.paymentStatus||(row.paid?"שולם":"ממתין"))==="שולם"?"selected":""}>שולם</option>
             <option value="חסר פרטים" ${row.paymentStatus==="חסר פרטים"?"selected":""}>חסר פרטים</option>
           </select></td>
-      <td><input type="text" class="accountant-note-input" value="${row.accountantNote||""}" placeholder="הערת מנהל חשבונות" style="min-width:130px"></td>
+      <td><input type="text" class="accountant-note-input" value="${escHtml(row.accountantNote||"")}" placeholder="הערת מנהל חשבונות" style="min-width:130px"></td>
       <td class="bank-line-field"><input type="text" value="${escHtml(row.bank)}" data-f="bank"></td>
       <td class="bank-line-field"><input type="text" value="${escHtml(row.branch)}" data-f="branch"></td>
       <td class="bank-line-field"><input type="text" value="${escHtml(row.account)}" data-f="account"></td>
-      <td class="bank-line-field"><input type="text" value="${row.holder||""}" data-f="holder" placeholder="שם בעל חשבון"></td>
+      <td class="bank-line-field"><input type="text" value="${escHtml(row.holder||"")}" data-f="holder" placeholder="שם בעל חשבון"></td>
       <td class="contact-actions">
         <button class="contact-action-btn ca-whatsapp" title="שליחת הודעה בוואטסאפ" onclick="sendPaymentReminder('vendor',${row.id},'whatsapp')">${svgIcon("whatsapp",15)}</button>
         <button class="contact-action-btn ca-mail" title="שליחת הודעה במייל" onclick="sendPaymentReminder('vendor',${row.id},'email')">${svgIcon("mail",15)}</button>
@@ -10137,8 +10269,9 @@ function renderVendorPay(){
       row.paymentStatus = newStatus;
       row.paid = (newStatus === "שולם");
       if(newStatus === "שולם"){
-        const hasReceipt = (row.docs||[]).some(d=>d.fileUrl);
-        if(!hasReceipt) alert("סומן כשולם. מומלץ לצרף קבלה/חשבונית עבור תשלום זה.");
+        if(!row.paidAt) row.paidAt = new Date().toISOString();
+        const hasReceipt = (row.docs||[]).some(d=>d.fileUrl && isReceiptDocType(d.docType));
+        if(!hasReceipt) jobToast("סומן כשולם · מומלץ לצרף קבלה");
       }
       scheduleSave("vendorPayments","vendorPaySaved");
       withScrollPreserved(() => renderAccountantReport());
@@ -10149,6 +10282,7 @@ function renderVendorPay(){
     tr.querySelectorAll("[data-f]").forEach(inp => {
       inp.addEventListener("input", () => {
         row[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
+        if(inp.dataset.f === "amount") row.amountManual = true;
         scheduleSave("vendorPayments","vendorPaySaved");
       });
       inp.addEventListener("change", () => { withScrollPreserved(() => renderAccountantReport()); });
@@ -10171,9 +10305,13 @@ function paymentStatusPill(row){
 function getAccountantContact(){
   const phoneInput = document.getElementById("accountantPhone");
   const emailInput = document.getElementById("accountantEmail");
+  const nameInput = document.getElementById("accountantName");
+  const saved = data.accountantContact || {};
+  const fromInput = (el, f) => (el && el.dataset.wired) ? el.value.trim() : (saved[f] || "");
   return {
-    phone: phoneInput ? phoneInput.value.trim() : (data.accountantContact.phone||""),
-    email: emailInput ? emailInput.value.trim() : (data.accountantContact.email||"")
+    phone: fromInput(phoneInput, "phone"),
+    email: fromInput(emailInput, "email"),
+    name: fromInput(nameInput, "name")
   };
 }
 function saveAccountantContact(){
@@ -10243,51 +10381,10 @@ function sendPaymentReminder(kind, id, channel){
   sendToAccountant(text, channel);
 }
 function sendCategorySummary(category){
-  let items = [];
-  let label = "";
-  if(category === "staff"){
-    label = "צוות ותורנים";
-    data.installments.forEach((inst, idx) => {
-      inst.forEach(row => {
-        if(row.approved){
-          items.push({
-            name:row.name, desc:(row.role||"—")+" (פעימה "+(idx+1)+")", amount:computeStaffTotal(row),
-            status:row.paymentStatus||(row.paid?"שולם":"ממתין"), docUrl:(row.docs&&row.docs[0])?row.docs[0].fileUrl:"",
-            bankInfo: data.bank.find(b => b.name && b.name === row.name) || null
-          });
-        }
-      });
-    });
-  }else if(category === "professional"){
-    label = "אנשי מקצוע";
-    data.vendorPayments.forEach(row => {
-      if(row.approved && (row.sourceType||"רכש/ספק")==="איש מקצוע"){
-        items.push({
-          name:row.vendor, desc:row.desc||"—", amount:parseFloat(row.amount)||0,
-          status:row.paymentStatus||(row.paid?"שולם":"ממתין"), docUrl:(row.docs&&row.docs[0])?row.docs[0].fileUrl:"",
-          bankInfo:{bank:row.bank, branch:row.branch, account:row.account, holder:row.holder}
-        });
-      }
-    });
-  }else if(category === "vendor" || category === "vendor-pay"){
-    label = "רכש וספקים";
-    data.vendorPayments.forEach(row => {
-      if(category==="vendor-pay" || (row.approved && (row.sourceType||"רכש/ספק")!=="איש מקצוע")){
-        if(category==="vendor-pay" || row.approved) items.push({
-          name:row.vendor, desc:row.desc||"—", amount:parseFloat(row.amount)||0,
-          status:row.paymentStatus||(row.paid?"שולם":"ממתין"), docUrl:(row.docs&&row.docs[0])?row.docs[0].fileUrl:"",
-          bankInfo:{bank:row.bank, branch:row.branch, account:row.account, holder:row.holder}
-        });
-      }
-    });
-  }
-  if(items.length===0){ alert("אין כרגע פריטים לשליחה בקטגוריה זו."); return; }
-  const text = buildCategorySummaryText(label, items);
-  if(confirm(`ישלח סיכום של ${items.length} פריטים למנהל חשבונות. לשלוח בוואטסאפ? (ביטול = שליחה במייל)`)){
-    sendToAccountant(text, "whatsapp");
-  }else{
-    sendToAccountant(text, "email");
-  }
+  const cat = category === "staff" ? "staff" : category === "professional" ? "pro" : "vendor";
+  const keys = acctCollect().filter(it => !it.paid && it.row.approved && (category === "vendor-pay" ? it.k === "v" : it.cat === cat)).map(it => it.key);
+  if(!keys.length){ jobToast("אין כרגע תשלומים מאושרים לשליחה בקטגוריה זו"); return; }
+  acxOpenSend(keys);
 }
 function acctNameCellHtml(r){
   const name = escHtml(r.name || "—");
@@ -10308,162 +10405,986 @@ function acctNameCellHtml(r){
   });
   return `<div style="display:flex;flex-direction:column;min-width:0"><span>${name}</span>${bits.length ? `<div class="acct-src">${bits.join(" · ")}</div>` : ""}</div>`;
 }
+/* =====================================================================
+   דוח למנהל חשבונות v2 — כרטיסים, שליחת מקבץ עם קישור, תצוגת מנהל החשבונות
+   נתונים חדשים (מסמכים נפרדים בענן, כדי שאף צד לא ידרוס את השני):
+   • acctSends-data — המשלוחים שנשלחו (נכתב רק ע"י המנהל)
+   • acctInbox-data — מה שמנהל החשבונות סימן: נצפה / שולם / הערה / קבלה (נכתב רק ע"י מנהל החשבונות)
+   המנהל מעביר את הסימונים של מנהל החשבונות לרשומות התשלום שלו בטעינה. שום דבר לא נמחק.
+   ===================================================================== */
+const ACCT_APP_URL = "https://splendid-rugelach-4f78f5.netlify.app/";
+function acxParseHash(){
+  try{ const m = String(location.hash || "").match(/^#acct\/send\/([a-z0-9]+)/i); return m ? m[1].toLowerCase() : ""; }catch(e){ return ""; }
+}
+const ACCT_DEEP = acxParseHash();
+let acctUi = { cat: "all", period: "open", q: "", sel: new Set(), openSend: ACCT_DEEP, showAllLog: false };
+let acctLink = { ready: false, failed: false, lastRemote: 0 };
+data.acctSends = data.acctSends || [];
+data.acctInbox = data.acctInbox || { seen: {}, marks: {} };
+
+const ACX_I = {
+  check: '<path d="m5 12 5 5 9-10"/>',
+  alert: '<path d="M12 7v6M12 17h.01"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
+  bank: '<path d="M3 10h18M5 10v8M9 10v8M15 10v8M19 10v8M3 21h18M12 3 3 8h18Z"/>',
+  send: '<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+  sync: '<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>',
+  person: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  pen: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  ext: '<path d="M14 3h7v7"/><path d="M10 14 21 3"/><path d="M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/>',
+  copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+  doc: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6"/>',
+  upload: '<path d="M12 16V4"/><path d="m6 10 6-6 6 6"/><path d="M4 20h16"/>',
+  shield: '<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6Z"/><path d="m9 12 2 2 4-4"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>'
+};
+function acxIco(n, s, sw){ return `<svg width="${s||16}" height="${s||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw||2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ACX_I[n]||""}</svg>`; }
+function acxAppBase(){
+  try{ if(/netlify\.app$/i.test(location.hostname)) return location.origin + location.pathname; }catch(e){}
+  return ACCT_APP_URL;
+}
+function acxLinkFor(sendId){ return acxAppBase() + "#acct/send/" + sendId; }
+function acxFmtD(iso){ if(!iso) return ""; const d = new Date(iso); if(isNaN(d)) return ""; return d.getDate() + "." + (d.getMonth() + 1); }
+function acxFmtDT(iso){ if(!iso) return ""; const d = new Date(iso); if(isNaN(d)) return ""; return acxFmtD(iso) + " " + d.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }); }
+function acxDaysSince(iso){ const d = new Date(iso); if(isNaN(d)) return 0; return Math.floor((Date.now() - d.getTime()) / 86400000); }
+function acxSameMonth(iso, offset){
+  if(!iso) return false;
+  const d = new Date(iso); if(isNaN(d)) return false;
+  const n = new Date(); const ref = new Date(n.getFullYear(), n.getMonth() + (offset || 0), 1);
+  return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth();
+}
+function acxIsAcc(){ return typeof currentRole !== "undefined" && currentRole === "accountant"; }
+function acxIsAdmin(){ return typeof currentRole === "undefined" || currentRole === "admin"; }
+
+/* ---------- טעינה מהענן (לא חוסם את האפליקציה אם נכשל) ---------- */
+async function acxFetchDoc(key){
+  const doc = await db.collection(APP_COLLECTION).doc(key).get({ source: "server" });
+  const v = doc.exists ? doc.data().value : null;
+  return v;
+}
+function acxParseSends(v){
+  if(!v) return [];
+  const p = JSON.parse(v);
+  if(!Array.isArray(p)) throw new Error("acctSends: מבנה לא תקין");
+  return p;
+}
+function acxParseInbox(v){
+  if(!v) return { seen: {}, marks: {} };
+  const p = JSON.parse(v);
+  if(!p || typeof p !== "object" || Array.isArray(p)) throw new Error("acctInbox: מבנה לא תקין");
+  return { seen: p.seen || {}, marks: p.marks || {} };
+}
+async function acctLoadLinkData(){
+  if(!(acxIsAdmin() || acxIsAcc())) return;
+  try{
+    const [s, i] = await Promise.all([acxFetchDoc("acctSends-data"), acxFetchDoc("acctInbox-data")]);
+    const sends = acxParseSends(s), inbox = acxParseInbox(i);
+    data.acctSends = sends; data.acctInbox = inbox;
+    originalLoad["acctSends-data"] = s; originalLoad["acctInbox-data"] = i;
+    loadStatus["acctSends-data"] = "ok"; loadStatus["acctInbox-data"] = "ok";
+    acctLink.ready = true; acctLink.failed = false; acctLink.lastRemote = Date.now();
+  }catch(e){
+    console.error("טעינת משלוחי מנהל החשבונות נכשלה — השליחה תעבוד בלי קישור, ולא נשמור כלום על המסמכים האלה", e);
+    acctLink.failed = true;
+    if(!acctLink.ready){ loadStatus["acctSends-data"] = "failed"; loadStatus["acctInbox-data"] = "failed"; }
+  }
+}
+/* רענון: כל צד מושך רק את המסמך שהצד השני כותב, כדי לא לאבד שינוי מקומי שעוד לא נשמר */
+async function acxRefreshRemote(force){
+  if(!acctLink.ready || typeof cloudReady === "undefined" || !cloudReady) return;
+  if(!force && Date.now() - acctLink.lastRemote < 20000) return;
+  acctLink.lastRemote = Date.now();
+  try{
+    if(acxIsAdmin()){
+      const v = await acxFetchDoc("acctInbox-data");
+      data.acctInbox = acxParseInbox(v);
+      originalLoad["acctInbox-data"] = v;
+      const applied = acxApplyInbox();
+      if(applied.length) jobToast(`מנהל החשבונות סימן ${applied.length === 1 ? "תשלום אחד" : applied.length + " תשלומים"} כשולם`, 4000);
+    }else if(acxIsAcc()){
+      const v = await acxFetchDoc("acctSends-data");
+      data.acctSends = acxParseSends(v);
+      originalLoad["acctSends-data"] = v;
+    }
+    const tab = document.getElementById("tab-accountant");
+    if(tab && tab.classList.contains("active")) withScrollPreserved(() => renderAccountantReport());
+  }catch(e){ console.warn("רענון משלוחים נכשל", e); }
+}
+function acxSaveSends(){ if(acctLink.ready && acxIsAdmin()) scheduleSave("acctSends", null); }
+function acxSaveInbox(){ if(acctLink.ready && acxIsAcc()) scheduleSave("acctInbox", null); }
+
+/* ---------- העברת הסימונים של מנהל החשבונות לרשומות (מנהל בלבד) ---------- */
+/* מפתח תשלום: ספק "v<id>", עובד "s<פעימה>-<id>" (מזהי עובדים חוזרים בין פעימות) */
+function acxKeyOf(x){ return x.k === "s" ? "s" + x.i + "-" + x.id : "v" + x.id; }
+function acxParseKey(key){
+  const k = String(key).charAt(0);
+  if(k === "s"){ const m = String(key).slice(1).split("-"); return { k, i: Number(m[0]), id: Number(m[1]) }; }
+  return { k, i: null, id: Number(String(key).slice(1)) };
+}
+function acxFindRow(k, id, i){
+  if(k === "v") return data.vendorPayments.find(r => r && r.id === id) || null;
+  if(k === "s") return ((data.installments || [])[i] || []).find(r => r && r.id === id) || null;
+  return null;
+}
+function acxApplyInbox(){
+  const applied = [];
+  if(!acxIsAdmin() || !acctLink.ready) return applied;
+  const marks = (data.acctInbox && data.acctInbox.marks) || {};
+  let chV = false, chS = false;
+  Object.keys(marks).forEach(key => {
+    const m = marks[key]; if(!m || typeof m !== "object") return;
+    const pk = acxParseKey(key), k = pk.k;
+    const row = acxFindRow(k, pk.id, pk.i); if(!row) return;
+    let ch = false;
+    const isPaid = acctStatusOf(row) === "שולם";
+    if(m.paidAt && !m.undone && !isPaid && row.acctMarkApplied !== m.paidAt){
+      row.paymentStatus = "שולם"; row.paid = true; row.approved = true;
+      row.paidAt = m.paidAt; row.paidBy = "מנהל החשבונות"; row.acctMarkApplied = m.paidAt;
+      if(k === "s") row.paidTotal = computeLiveStaffTotal(row);
+      ch = true; applied.push(row);
+    }
+    if(m.paidAt && m.undone && isPaid && row.paidBy === "מנהל החשבונות" && row.acctMarkApplied === m.paidAt){
+      row.paymentStatus = "ממתין"; row.paid = false;
+      delete row.paidAt; delete row.paidBy; row.acctMarkApplied = "undone:" + m.paidAt;
+      if(k === "s") delete row.paidTotal;
+      ch = true;
+    }
+    if(m.note && row.acctNoteApplied !== m.note){ row.accountantNote = m.note; row.acctNoteApplied = m.note; ch = true; }
+    if(m.receiptUrl && row.acctReceiptApplied !== m.receiptUrl){
+      row.docs = row.docs || [];
+      if(!row.docs.some(d => d && d.fileUrl === m.receiptUrl)){
+        row.docs.push({ name: m.receiptName || "קבלה ממנהל החשבונות", docType: "קבלה", fileUrl: m.receiptUrl, uploadedAt: String(m.receiptAt || new Date().toISOString()).slice(0, 10) });
+      }
+      row.acctReceiptApplied = m.receiptUrl; ch = true;
+    }
+    if(ch){ if(k === "s") chS = true; else chV = true; }
+  });
+  if(chS) saveInstallments();
+  if(chV) scheduleSave("vendorPayments", "vendorPaySaved");
+  if(chS || chV){
+    try{ renderVendorPay(); }catch(e){}
+    if(chS){ try{ renderStaff(); renderPayment(); }catch(e){ console.error(e); } }
+  }
+  return applied;
+}
+
+/* ---------- איסוף כל התשלומים לכרטיסים ---------- */
+function acctStatusOf(row){ return row.paymentStatus || (row.paid ? "שולם" : "ממתין"); }
+function acxDateOfId(id){ return (typeof id === "number" && id > 1e14) ? new Date(Math.floor(id / 1000)) : null; }
+function acxBankFor(k, row){
+  const empty = { bank: "", branch: "", account: "", holder: "", from: "" };
+  if(!row) return empty;
+  if(k === "s"){
+    const b = (data.bank || []).find(x => x && x.name && x.name === row.name);
+    return b ? { bank: b.bank || "", branch: b.branch || "", account: b.account || "", holder: b.holder || "", from: "staff" } : empty;
+  }
+  if(row.bank || row.account) return { bank: row.bank || "", branch: row.branch || "", account: row.account || "", holder: row.holder || "", from: "row" };
+  const prev = data.vendorPayments.filter(v => v && v !== row && v.vendor && v.vendor === row.vendor && v.account)
+    .sort((a, b) => (b.id || 0) - (a.id || 0))[0];
+  if(prev) return { bank: prev.bank || "", branch: prev.branch || "", account: prev.account || "", holder: prev.holder || "", from: "prev" };
+  return empty;
+}
+function acxMakeItem(k, row, o){
+  const status = acctStatusOf(row);
+  const paid = status === "שולם";
+  const bank = acxBankFor(k, row);
+  const hasBank = !!String(bank.account || "").trim();
+  const docs = k === "v" ? (o.job ? o.job.docs : finDocs(row.docs)) : finDocs(row.docs);
+  const inv = docs.find(d => isInvoiceDocType(d.docType)) || null;
+  const rec = docs.find(d => isReceiptDocType(d.docType)) || null;
+  const hasAmount = o.amount > 0;
+  let stage;
+  if(paid) stage = "paid";
+  else if(!row.approved) stage = "pending";
+  else if(!hasAmount || !hasBank || status === "חסר פרטים") stage = "missing";
+  else if(row.sentAt) stage = "sent";
+  else stage = "ready";
+  const idDate = acxDateOfId(row.id);
+  const date = row.paidAt || row.sentAt || (idDate ? idDate.toISOString() : "");
+  const send = row.sentId ? (data.acctSends || []).find(s => s.id === row.sentId) || null : null;
+  return Object.assign({ key: acxKeyOf({ k, id: row.id, i: o.instIdx }), k, row, status, stage, paid, bank, hasBank, hasAmount, inv, rec, docs, date, send }, o);
+}
+function acxSourceLabel(it){
+  if(it.k === "s") return "מצוות ותורנים";
+  const j = it.job;
+  if(j && j.task) return "ממשימה " + (j.code || "");
+  if(j && j.proc) return "מרכש ואספקה";
+  if(/חשבוניות וקבלות/.test(it.row.notes || "")) return "מחשבוניות וקבלות";
+  return "תשלום ידני";
+}
+function acctCollect(){
+  const out = [];
+  (data.vendorPayments || []).forEach(row => {
+    if(!row) return;
+    const amount = parseFloat(row.amount) || 0;
+    const cat = (row.sourceType || "רכש/ספק") === "איש מקצוע" ? "pro" : "vendor";
+    let job = null; try{ job = jobForVendorPayment(row); }catch(e){}
+    out.push(acxMakeItem("v", row, { cat, amount, name: row.vendor || "ללא שם", title: row.desc || (job && job.title) || "תשלום", job, instIdx: null }));
+  });
+  (data.installments || []).forEach((inst, idx) => {
+    const anyApproved = (inst || []).some(r => r && r.approved);
+    (inst || []).forEach(row => {
+      if(!row || !String(row.name || "").trim()) return;
+      const paid = acctStatusOf(row) === "שולם";
+      let amount = 0; try{ amount = computeStaffTotal(row); }catch(e){}
+      if(!row.approved && !paid && !(anyApproved && amount > 0)) return;
+      out.push(acxMakeItem("s", row, { cat: "staff", amount, name: row.name, title: (row.role || "צוות") + " · פעימה " + (idx + 1), job: null, instIdx: idx }));
+    });
+  });
+  return out;
+}
+const ACX_STAGE = {
+  missing: { label: "חסר פרטים", rank: 0 }, pending: { label: "ממתין לאישור", rank: 1 },
+  ready: { label: "מוכן לשליחה", rank: 2 }, sent: { label: "נשלח", rank: 3 }, paid: { label: "שולם", rank: 4 }
+};
+function acxStageLabel(it){
+  if(it.stage === "sent") return "נשלח · " + acxFmtD(it.row.sentAt);
+  if(it.stage === "paid") return "שולם" + (it.row.paidAt ? " · " + acxFmtD(it.row.paidAt) : "");
+  return ACX_STAGE[it.stage].label;
+}
+
+/* ---------- תצוגת המנהל ---------- */
+function acxOnSearch(v){ acctUi.q = String(v || "").trim(); acxRenderGrid(acctCollect()); }
+function acxFilterItems(all){
+  const q = acctUi.q.toLowerCase();
+  return all.filter(it => {
+    if(acctUi.cat !== "all" && it.cat !== acctUi.cat) return false;
+    const p = acctUi.period;
+    if(p === "open" && it.paid) return false;
+    if(p === "paidThis" && !(it.paid && acxSameMonth(it.row.paidAt, 0))) return false;
+    if(p === "paidPrev" && !(it.paid && acxSameMonth(it.row.paidAt, -1))) return false;
+    if(q){
+      const hay = [it.name, it.title, String(Math.round(it.amount)), it.job && it.job.code, it.row.notes, it.row.accountantNote].filter(Boolean).join(" ").toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort((a, b) => (ACX_STAGE[a.stage].rank - ACX_STAGE[b.stage].rank) || String(b.date).localeCompare(String(a.date)));
+}
+function acxRenderAdmin(){
+  acxWireContact();
+  const all = acctCollect();
+  const sum = list => list.reduce((s, it) => s + (it.amount || 0), 0);
+  const by = st => all.filter(it => it.stage === st);
+  const ready = by("ready"), missing = by("missing"), sent = by("sent"), pending = by("pending");
+  const paidThis = all.filter(it => it.paid && acxSameMonth(it.row.paidAt, 0));
+  // שורת סנכרון + כפתור איש קשר
+  const c = data.accountantContact || {};
+  const cBtn = document.getElementById("acxContactBtn");
+  if(cBtn) cBtn.innerHTML = `${acxIco("person")}<span>${escHtml(c.name || "מנהל החשבונות")}${c.phone ? " · " + escHtml(c.phone) : " · להזנת טלפון"}</span>${acxIco("pen", 14)}`;
+  const sync = document.getElementById("acxSyncLine");
+  if(sync) sync.innerHTML = `${acxIco("sync", 15)}<span>מסונכרן ממשימות, רכש, חשבוניות וקבלות וצוות${acctLink.failed && !acctLink.ready ? " · <b style=\"color:#8c491a\">יומן השליחות לא נטען — שליחה תעבוד בלי קישור</b>" : ""}</span>`;
+  // תקופה
+  const periods = [["open", "פתוחים"], ["paidThis", "שולמו החודש"], ["paidPrev", "שולמו בחודש שעבר"], ["all", "הכל"]];
+  document.getElementById("acxPeriods").innerHTML = `<span class="acx-lbl">תצוגה:</span>` + periods.map(([k, l]) =>
+    `<button type="button" class="acx-pill ${acctUi.period === k ? "active" : ""}" data-acx="period" data-v="${k}" aria-pressed="${acctUi.period === k}">${l}</button>`).join("");
+  // סיכומים
+  const missAmt = missing.filter(it => !it.hasAmount).length, missBank = missing.filter(it => !it.hasBank).length;
+  const oldestSent = sent.reduce((m, it) => (!m || it.row.sentAt < m) ? it.row.sentAt : m, "");
+  document.getElementById("acxStats").innerHTML = `
+    <div class="acx-stat"><span class="l">מוכן לשליחה עכשיו</span><span class="v">${fmtMoney(sum(ready))}</span><span class="s">${ready.length ? ready.length + " תשלומים · הכל תקין" : "אין כרגע"}</span></div>
+    <div class="acx-stat bad"><span class="l">חסר פרטים</span><span class="v">${missing.length}</span><span class="s">${missing.length ? [missAmt ? missAmt + " בלי סכום" : "", missBank ? missBank + " בלי פרטי בנק" : ""].filter(Boolean).join(" · ") || "מסומן ידנית" : "הכל מלא"}</span></div>
+    <div class="acx-stat idle"><span class="l">נשלח · ממתין לתשלום</span><span class="v">${fmtMoney(sum(sent))}</span><span class="s">${sent.length ? sent.length + " תשלומים · הישן נשלח ב־" + acxFmtD(oldestSent) : "אין כרגע"}</span></div>
+    <div class="acx-stat ok"><span class="l">שולם החודש</span><span class="v">${fmtMoney(sum(paidThis))}</span><span class="s">${paidThis.length} תשלומים</span></div>`;
+  // מסלול
+  const segs = [[sum(pending), "#d8cfc1", "ממתין לאישור שלך"], [sum(ready) + sum(missing), "#c67139", "מאושר · לפני שליחה"], [sum(sent), "#82796a", "נשלח למנהל החשבונות"], [sum(paidThis), "#7a8a5e", "שולם החודש"]];
+  const tot = segs.reduce((s, x) => s + x[0], 0);
+  document.getElementById("acxFlow").innerHTML = `
+    <div class="acx-flow-h"><span>מסלול התשלומים</span><span>${fmtMoney(tot)} בסך הכל</span></div>
+    <div class="acx-bar" role="img" aria-label="${segs.map(s => s[2] + " " + fmtMoney(s[0])).join(", ")}">${tot > 0 ? segs.filter(s => s[0] > 0).map(s => `<div style="flex:${s[0]} 1 0;background:${s[1]}"></div>`).join("") : ""}</div>
+    <div class="acx-legend">${segs.map(s => `<span><i style="background:${s[1]}"></i>${s[2]} · ${fmtMoney(s[0])}</span>`).join("")}</div>`;
+  // קטגוריות
+  const cats = [["all", "הכל"], ["staff", "צוות ותורנים"], ["pro", "אנשי מקצוע"], ["vendor", "רכש וספקים"]];
+  document.getElementById("acxCats").innerHTML = cats.map(([k, l]) => {
+    const n = all.filter(it => (k === "all" || it.cat === k) && !it.paid).length;
+    return `<button type="button" class="acx-pill ${acctUi.cat === k ? "active" : ""}" data-acx="cat" data-v="${k}" aria-pressed="${acctUi.cat === k}">${l}${n ? `<span class="n">${n}</span>` : ""}</button>`;
+  }).join("");
+  const sIn = document.getElementById("acxSearch");
+  if(sIn && sIn.value !== acctUi.q && document.activeElement !== sIn) sIn.value = acctUi.q;
+  acxRenderGrid(all);
+  acxRenderLog(all);
+  acxRenderHealth(all);
+}
+function acxCardHtml(it, i, opts){
+  opts = opts || {};
+  const r = it.row;
+  const sel = acctUi.sel.has(it.key);
+  const canSel = !it.paid;
+  const checks = [];
+  checks.push(`<span class="acx-ck ${it.hasAmount ? "" : "bad"}">${acxIco(it.hasAmount ? "check" : "alert", 13, 3)}סכום</span>`);
+  if(it.k === "v") checks.push(it.inv ? `<button type="button" class="acx-ck" data-fv-url="${escHtml(it.inv.fileUrl)}" data-fv-title="חשבונית · ${escHtml(it.name)}" data-fv-kind="invoice">${acxIco("check", 13, 3)}חשבונית</button>`
+                                    : `<span class="acx-ck soft">${acxIco("alert", 13, 3)}בלי חשבונית</span>`);
+  checks.push(`<span class="acx-ck ${it.hasBank ? "" : "bad"}">${acxIco(it.hasBank ? "check" : "alert", 13, 3)}פרטי בנק</span>`);
+  if(it.k === "s") checks.push(`<span class="acx-ck ${r.approved ? "" : "bad"}">${acxIco(r.approved ? "check" : "alert", 13, 3)}אושר</span>`);
+  if(it.paid) checks.push(it.rec ? `<button type="button" class="acx-ck" data-fv-url="${escHtml(it.rec.fileUrl)}" data-fv-title="קבלה · ${escHtml(it.name)}" data-fv-kind="receipt">${acxIco("check", 13, 3)}קבלה</button>`
+                                 : (it.k === "v" ? `<span class="acx-ck soft">${acxIco("alert", 13, 3)}בלי קבלה</span>` : ""));
+  const b = it.bank;
+  const bankTxt = it.hasBank
+    ? `${b.from === "staff" ? "מכרטיס העובד" : b.from === "prev" ? "מתשלום קודם לאותו ספק" : "פרטי בנק"} · ${escHtml(b.bank || "—")} · סניף ${escHtml(b.branch || "—")} · ${escHtml(String(b.account).length > 4 ? "…" + String(b.account).slice(-4) : b.account)}`
+    : (it.k === "s" ? "אין פרטי בנק לעובד — הזנה פעם אחת ותישמר לכל הפעימות" : "אין פרטי בנק — הזנה פעם אחת ותשמש גם לתשלומים הבאים לאותו ספק");
+  let main = "";
+  if(it.stage === "pending") main = `<button type="button" class="acx-btn dark" data-acx="approve" data-key="${it.key}">${acxIco("check", 16, 2.4)}אישור לתשלום</button>`;
+  else if(it.stage === "missing") main = `<button type="button" class="acx-btn warn" data-acx="edit" data-key="${it.key}">${acxIco("pen", 16)}השלמת פרטים</button>`;
+  else if(it.stage === "ready") main = `<button type="button" class="acx-btn" data-acx="sendOne" data-key="${it.key}">${acxIco("send", 16)}שליחה למנה״ח</button>`;
+  else if(it.stage === "sent") main = `<button type="button" class="acx-btn dark" data-acx="paid" data-key="${it.key}">${acxIco("check", 16, 2.4)}סמן כשולם</button>`;
+  else if(it.stage === "paid"){
+    if(it.rec) main = `<button type="button" class="acx-btn soft" data-fv-url="${escHtml(it.rec.fileUrl)}" data-fv-title="קבלה · ${escHtml(it.name)}" data-fv-kind="receipt">${acxIco("doc", 16)}צפייה בקבלה</button>`;
+    else if(it.k === "v") main = `<button type="button" class="acx-btn soft" data-acx="receipt" data-key="${it.key}">${acxIco("upload", 16)}צירוף קבלה</button>`;
+  }
+  const quick = (!it.paid && it.stage !== "pending") ? `
+      <button type="button" class="acx-ico" title="שליחה בודדת בוואטסאפ עם פירוט מלא" aria-label="שליחה בודדת בוואטסאפ" data-acx="quick" data-ch="whatsapp" data-key="${it.key}">${svgIcon("whatsapp", 17)}</button>
+      <button type="button" class="acx-ico" title="שליחה בודדת ב־Gmail עם פירוט מלא" aria-label="שליחה בודדת במייל" data-acx="quick" data-ch="email" data-key="${it.key}">${svgIcon("mail", 17)}</button>` : "";
+  const note = r.accountantNote ? `<div class="acx-note">הערת מנהל החשבונות: ${escHtml(r.accountantNote)}</div>` : "";
+  return `<div class="acx-card ${i % 2 ? "alt" : ""} ${it.paid ? "paid" : ""} ${sel ? "sel" : ""}" data-card="${it.key}">
+    <div class="acx-top">
+      <button type="button" class="acx-chk ${sel ? "on" : ""}" data-acx="sel" data-key="${it.key}" aria-pressed="${sel}" aria-label="בחירה לשליחה: ${escHtml(it.name)}" ${canSel ? "" : "disabled"}>${sel ? acxIco("check", 16, 3) : ""}</button>
+      <div class="acx-main">
+        <span class="acx-name">${escHtml(it.name)}</span>
+        <span class="acx-title">${escHtml(it.title)}</span>
+        <span class="acx-src">${acxIco("link", 13)}${escHtml(acxSourceLabel(it))}</span>
+      </div>
+      <div class="acx-side">
+        ${it.hasAmount ? `<span class="acx-amt">${fmtMoney(it.amount)}</span>` : `<span class="acx-amt none">חסר סכום</span>`}
+        <span class="acx-chip ${it.stage}">${escHtml(acxStageLabel(it))}</span>
+      </div>
+    </div>
+    <div class="acx-checks">${checks.join("")}</div>
+    <div class="acx-bank">${acxIco("bank", 14)}<span>${bankTxt}</span></div>
+    ${note}
+    <div class="acx-acts">
+      ${main}
+      <button type="button" class="acx-ico" title="עריכת פרטי התשלום" aria-label="עריכת פרטי התשלום" data-acx="edit" data-key="${it.key}">${acxIco("pen", 16)}</button>
+      <button type="button" class="acx-ico" title="פתיחת המקור" aria-label="פתיחת המקור" data-acx="src" data-key="${it.key}">${acxIco("ext", 16)}</button>
+      ${quick}
+    </div>
+  </div>`;
+}
+function acxRenderGrid(all){
+  const grid = document.getElementById("acxGrid");
+  if(!grid) return;
+  // ניקוי בחירה של פריטים שכבר שולמו / נמחקו
+  const live = new Set(all.filter(it => !it.paid).map(it => it.key));
+  [...acctUi.sel].forEach(k => { if(!live.has(k)) acctUi.sel.delete(k); });
+  const list = acxFilterItems(all);
+  if(!list.length){
+    const msg = acctUi.q ? "לא נמצאו תשלומים לחיפוש הזה." : acctUi.period === "open" ? "אין תשלומים פתוחים. הכל שולם." : "אין תשלומים בתצוגה הזו.";
+    grid.innerHTML = `<div class="acx-empty">${msg}</div>`;
+  }else{
+    grid.innerHTML = list.map((it, i) => acxCardHtml(it, i)).join("");
+  }
+  acxRenderSelBar(all);
+}
+function acxRenderSelBar(all){
+  const bar = document.getElementById("acxSelBar");
+  if(!bar) return;
+  const items = (all || acctCollect()).filter(it => acctUi.sel.has(it.key));
+  if(!items.length){ bar.style.display = "none"; bar.innerHTML = ""; return; }
+  const tot = items.reduce((s, it) => s + (it.amount || 0), 0);
+  bar.style.display = "flex";
+  bar.innerHTML = `<span style="font-size:14px;font-weight:600">נבחרו ${items.length} · ${fmtMoney(tot)}</span>
+    <div class="acx-row">
+      <button type="button" class="acx-btn" data-acx="sendSel">${acxIco("send", 16)}שליחה למנהל החשבונות</button>
+      <button type="button" class="acx-btn ghost" data-acx="clearSel">ניקוי</button>
+    </div>`;
+}
+function acxSendStats(s){
+  const rows = (s.items || []).map(x => ({ x, row: acxFindRow(x.k, x.id, x.i) }));
+  const paid = rows.filter(o => o.row && acctStatusOf(o.row) === "שולם").length;
+  return { rows, paid, total: rows.length };
+}
+function acxRenderLog(){
+  const box = document.getElementById("acxLog");
+  if(!box) return;
+  const sends = (data.acctSends || []).slice().sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  const title = document.getElementById("acxLogTitle");
+  if(title) title.textContent = "יומן שליחות למנהל החשבונות" + (sends.length ? ` · ${sends.length}` : "");
+  if(!acctLink.ready){ box.innerHTML = `<div class="acx-m-note">יומן השליחות לא נטען מהענן. אפשר לשלוח כרגיל, ההודעה תצא עם פירוט מלא בלי קישור. רענון הדף ינסה שוב.</div>`; return; }
+  if(!sends.length){ box.innerHTML = `<div class="acx-m-note">עוד לא נשלח שום משלוח. סמן כרטיסים למעלה ולחץ "שליחה למנהל החשבונות".</div>`; return; }
+  const seen = (data.acctInbox && data.acctInbox.seen) || {};
+  const marks = (data.acctInbox && data.acctInbox.marks) || {};
+  const list = acctUi.showAllLog ? sends : sends.slice(0, 6);
+  box.innerHTML = `<div class="acx-log">${list.map((s, i) => {
+    const st = acxSendStats(s);
+    const seenAt = seen[s.id];
+    const days = acxDaysSince(s.at);
+    const chips = [`<span class="acx-chip sent">${acxIco("send", 12)} נשלח ${escHtml(acxFmtDT(s.at))}</span>`];
+    chips.push(seenAt ? `<span class="acx-chip seen">${acxIco("eye", 12)} נצפה ${escHtml(acxFmtDT(seenAt))}</span>`
+                      : `<span class="acx-chip ${days >= 2 ? "missing" : "pending"}">עדיין לא נצפה${days >= 1 ? " · " + days + " ימים" : ""}</span>`);
+    chips.push(`<span class="acx-chip ${st.paid === st.total ? "paid" : "ready"}">${st.paid === st.total ? "הכל שולם" : st.paid + " מתוך " + st.total + " שולמו"}</span>`);
+    const lines = st.rows.map(o => {
+      const m = marks[acxKeyOf(o.x)];
+      if(!o.row) return `<div class="acx-line"><span>${escHtml(o.x.name)} · <span class="st-open">הרשומה נמחקה</span></span><span>${fmtMoney(o.x.amount)}</span></div>`;
+      const isPaid = acctStatusOf(o.row) === "שולם";
+      const noteTxt = (m && m.note) || "";
+      return `<div class="acx-line" style="flex-direction:column;gap:3px">
+        <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>${escHtml(o.x.name)} · ${isPaid ? `<span class="st-paid">שולם${o.row.paidAt ? " " + escHtml(acxFmtD(o.row.paidAt)) : ""}${o.row.paidBy === "מנהל החשבונות" ? " (סומן ע״י מנה״ח)" : ""}</span>` : `<span class="st-open">ממתין</span>`}</span><span style="font-weight:600">${fmtMoney(o.x.amount)}</span></div>
+        ${noteTxt ? `<span style="font-size:12px;color:var(--ink-soft)">הערה ממנהל החשבונות: "${escHtml(noteTxt)}"</span>` : ""}
+      </div>`;
+    }).join("");
+    const allPaid = st.paid === st.total;
+    return `<div class="acx-send ${i % 2 ? "alt" : ""}" id="acxSend-${escHtml(s.id)}" ${acctUi.openSend === s.id ? 'style="outline:2.5px solid #2d6a8a"' : ""}>
+      <div class="acx-send-h"><div style="display:flex;flex-direction:column;gap:2px"><span class="acx-send-t">${escHtml(acxFmtD(s.at))} · ${st.total === 1 ? "תשלום אחד" : st.total + " תשלומים"}</span>
+        <span class="acx-send-sub">${s.channel === "email" ? "Gmail" : s.channel === "copy" ? "הועתק" : "וואטסאפ"} · ${s.mode === "full" ? "פירוט מלא + קישור" : "הודעה קצרה + קישור"}</span></div>
+        <span class="acx-amt" style="font-size:20px">${fmtMoney(s.total || 0)}</span></div>
+      <div class="acx-checks">${chips.join("")}</div>
+      <div style="display:flex;flex-direction:column;gap:6px">${lines}</div>
+      ${allPaid ? "" : `<div class="acx-acts">
+        <button type="button" class="acx-btn dark" data-acx="remind" data-id="${escHtml(s.id)}">${svgIcon("whatsapp", 15)}תזכורת עם אותו קישור</button>
+        <button type="button" class="acx-btn ghost" data-acx="copyLink" data-id="${escHtml(s.id)}">${acxIco("copy", 15)}העתקת הקישור</button>
+      </div>`}
+    </div>`;
+  }).join("")}
+  ${sends.length > 6 ? `<button type="button" class="acx-btn ghost" data-acx="moreLog">${acctUi.showAllLog ? "הצגת פחות" : "הצגת כל " + sends.length + " המשלוחים"}</button>` : ""}</div>`;
+}
+function acxRenderHealth(all){
+  const sumEl = document.getElementById("acxHealthSum"), box = document.getElementById("acxHealth");
+  if(!sumEl || !box) return;
+  const v = all.filter(it => it.k === "v");
+  const fromTask = v.filter(it => it.job && it.job.task).length;
+  const fromProc = v.filter(it => it.job && it.job.proc).length;
+  const fromFiles = v.filter(it => acxSourceLabel(it) === "מחשבוניות וקבלות").length;
+  const manual = v.length - fromTask - fromProc - fromFiles;
+  const staff = all.filter(it => it.k === "s").length;
+  // כפילויות אפשריות: אותו ספק + תיאור + סכום, לא שולמו, לא מקושרים לאותו מקור. רק מציגים — לא מוחקים
+  const groups = {};
+  v.filter(it => !it.paid && it.hasAmount).forEach(it => {
+    const k = [it.name, it.title, Math.round(it.amount * 100)].join("|");
+    (groups[k] = groups[k] || []).push(it);
+  });
+  const dups = Object.values(groups).filter(g => g.length > 1);
+  const noBankVendors = [...new Set(v.filter(it => !it.paid && it.row.approved && !it.hasBank).map(it => it.name))];
+  sumEl.innerHTML = `${acxIco("shield", 16)}<span>מצב הסנכרון · 5 מקורות · ${dups.length ? `<b style="color:#8c491a">${dups.length} כפילויות אפשריות</b>` : "אין כפילויות"}</span>`;
+  box.innerHTML = `<div class="acx-hgrid">
+    <div class="acx-hcell"><b>משימות ← תיק עבודה</b>${fromTask} תשלומים · רשומה אחת לכל משימה</div>
+    <div class="acx-hcell"><b>רכש ואספקה</b>${fromProc} תשלומים · סכום מכמות × מחיר, עריכה ידנית לא נדרסת</div>
+    <div class="acx-hcell"><b>חשבוניות וקבלות</b>${fromFiles} תשלומים · מחיקת חשבונית במקור לא מוחקת קבלות</div>
+    <div class="acx-hcell"><b>צוות ותורנים</b>${staff} תשלומים · סכום ננעל ברגע התשלום</div>
+    <div class="acx-hcell"><b>תשלומים ידניים</b>${manual} תשלומים</div>
+    ${noBankVendors.length ? `<div class="acx-hcell warn"><b>חסרים פרטי בנק</b>${noBankVendors.map(escHtml).join(", ")}</div>` : ""}
+    ${dups.map(g => `<div class="acx-hcell warn"><b>כפילות אפשרית: ${escHtml(g[0].name)}</b>${g.length} רשומות של ${fmtMoney(g[0].amount)} · "${escHtml(g[0].title)}". כדאי לבדוק בטבלת המקור ולמחוק ידנית את המיותרת.</div>`).join("")}
+  </div>`;
+}
+
+/* ---------- פעולות המנהל ---------- */
+function acxItem(key){ return acctCollect().find(it => it.key === key) || null; }
+function acxAfterChange(k){
+  withScrollPreserved(() => {
+    if(k === "s" || k === "both"){ try{ renderStaff(); renderPayment(); }catch(e){ console.error(e); } }
+    if(k === "v" || k === "both"){ try{ refreshJobViews(); return; }catch(e){ console.error(e); } }
+    renderAccountantReport();
+    try{ renderDashboard(); }catch(e){}
+  });
+}
+function acxSaveRow(k){ if(k === "s") saveInstallments(); else scheduleSave("vendorPayments", "vendorPaySaved"); }
+function acxApprove(key){
+  const it = acxItem(key); if(!it) return;
+  if(it.k === "v" && !it.hasAmount){ acxOpenEdit(key, { thenApprove: true }); return; }
+  it.row.approved = true;
+  acxSaveRow(it.k); acxAfterChange(it.k);
+  jobToast("אושר לתשלום");
+}
+function acxMarkPaid(key){
+  const it = acxItem(key); if(!it || it.paid) return;
+  const r = it.row;
+  r.paymentStatus = "שולם"; r.paid = true; r.approved = true;
+  r.paidAt = new Date().toISOString(); r.paidBy = "מנהל";
+  if(it.k === "s") r.paidTotal = computeLiveStaffTotal(r);
+  acxSaveRow(it.k); acxAfterChange(it.k);
+  jobToast(it.k === "v" ? "סומן כשולם · אפשר לצרף קבלה מהכרטיס" : "סומן כשולם · הסכום ננעל");
+}
+function acxOpenSource(key){
+  const it = acxItem(key); if(!it) return;
+  if(it.k === "s"){
+    if(!canOpenTab("staff")) return;
+    switchTab("staff");
+    try{ if(typeof it.instIdx === "number" && it.instIdx !== activeInstallment) selectInstallment(it.instIdx); openStaffCardFromTable(it.row.id); }catch(e){ console.error(e); }
+    return;
+  }
+  if(it.job && (it.job.task || it.job.proc)) return openJobSource(it.job.key);
+  scrollToId("vendorPayAnchor");
+  setTimeout(() => {
+    const tr = [...document.querySelectorAll("#vendorPayBody tr")][data.vendorPayments.indexOf(it.row)];
+    if(tr){ tr.scrollIntoView({ behavior: "smooth", block: "center" }); tr.style.outline = "2px solid #c67139"; setTimeout(() => { tr.style.outline = ""; }, 2500); }
+  }, 150);
+}
+function acxAttachReceipt(key){
+  const it = acxItem(key); if(!it || it.k !== "v") return;
+  if(it.job && (it.job.task || it.job.proc)) return attachJobDoc(it.job.key, "קבלה");
+  const input = document.createElement("input");
+  input.type = "file"; input.accept = "image/*,application/pdf";
+  input.onchange = async () => {
+    if(!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    jobToast("מעלה את הקבלה…", 60000);
+    try{
+      const ref = storage.ref().child(`uploads/vendor-invoices/${Date.now()}_${file.name}`);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      const row = data.vendorPayments.find(x => x.id === it.row.id);
+      if(!row){ jobToast("הרשומה לא נמצאה, הקובץ לא שויך"); return; }
+      row.docs = row.docs || [];
+      row.docs.push({ name: "קבלה", docType: "קבלה", fileUrl: url, uploadedAt: new Date().toISOString().slice(0, 10) });
+      acxSaveRow("v"); acxAfterChange("v");
+      jobToast("הקבלה נשמרה ✓");
+    }catch(e){ console.error(e); jobToast("שגיאת העלאה: " + e.message, 5000); }
+  };
+  input.click();
+}
+
+/* ---------- חלון עריכה / תשלום ידני ---------- */
+let acxEditCtx = null;
+function acxCloseModal(id){ const m = document.getElementById(id); if(m) m.style.display = "none"; if(id === "acxEditModal") acxEditCtx = null; }
+function acxOpenEdit(key, opts){
+  opts = opts || {};
+  const it = key ? acxItem(key) : null;
+  if(key && !it) return;
+  acxEditCtx = { key: key || "", k: it ? it.k : "v", thenApprove: !!opts.thenApprove };
+  const r = it ? it.row : {};
+  const isStaff = it && it.k === "s";
+  const b = it ? it.bank : { bank: "", branch: "", account: "", holder: "", from: "" };
+  const procLinked = it && it.job && it.job.proc && !it.job.task;
+  document.getElementById("acxEditTitle").textContent = it ? (isStaff ? "פרטי תשלום · " + it.name : "פרטי התשלום") : "תשלום ידני חדש";
+  const names = (typeof getContactNames === "function") ? getContactNames() : [];
+  const f = (id, label, val, extra) => `<label class="acx-f"><span>${label}</span><input id="${id}" value="${escHtml(val == null ? "" : val)}" ${extra || ""}></label>`;
+  let html = "";
+  if(!isStaff){
+    html += `<datalist id="acxVendorList">${names.map(n => `<option value="${escHtml(n)}">`).join("")}</datalist>`;
+    html += f("acxEVendor", "ספק / נותן שירות", r.vendor || "", 'list="acxVendorList" type="text"');
+    html += `<label class="acx-f"><span>סוג</span><select id="acxEType"><option value="רכש/ספק" ${(r.sourceType || "רכש/ספק") === "רכש/ספק" ? "selected" : ""}>רכש וספקים</option><option value="איש מקצוע" ${r.sourceType === "איש מקצוע" ? "selected" : ""}>איש מקצוע</option></select></label>`;
+    html += f("acxEDesc", "תיאור", r.desc || "", 'type="text"');
+    html += f("acxEAmount", "סכום (₪)", (parseFloat(r.amount) || 0) > 0 ? r.amount : "", 'type="number" inputmode="decimal" min="0" step="any"');
+    if(procLinked) html += `<p class="acx-m-note">הסכום מגיע מרכש (כמות × מחיר). שינוי כאן יישמר כעריכה ידנית, והסנכרון לא ידרוס אותו.</p>`;
+    if(it && it.paid) html += `<p class="acx-m-note">התשלום כבר סומן כשולם — שינוי סכום ישנה את הרישום.</p>`;
+  }else{
+    html += `<p class="acx-m-note">${escHtml(it.title)} · ${fmtMoney(it.amount)}. הסכום מחושב בטאב צוות ותורנים. פרטי הבנק נשמרים בכרטיס העובד ומשמשים לכל הפעימות.</p>`;
+  }
+  html += `<div class="acx-f2">${f("acxEBank", "בנק", b.bank, 'type="text"')}${f("acxEBranch", "סניף", b.branch, 'type="text" inputmode="numeric"')}</div>`;
+  html += `<div class="acx-f2">${f("acxEAccount", "מספר חשבון", b.account, 'type="text" inputmode="numeric"')}${f("acxEHolder", "שם בעל החשבון", b.holder, 'type="text"')}</div>`;
+  if(b.from === "prev") html += `<p class="acx-m-note">פרטי הבנק מולאו מתשלום קודם לאותו ספק. בשמירה הם יישמרו גם בתשלום הזה.</p>`;
+  if(!it || !it.paid) html += `<label class="acx-check-row"><input type="checkbox" id="acxEApproved" ${(r.approved || opts.thenApprove || !it) ? "checked" : ""}>אושר לתשלום</label>`;
+  html += f("acxENote", "הערה (פנימית)", r.notes || "", 'type="text"');
+  document.getElementById("acxEditBody").innerHTML = html;
+  document.getElementById("acxEditModal").style.display = "flex";
+  setTimeout(() => {
+    const modal = document.getElementById("acxEditModal");
+    if(modal && modal.contains(document.activeElement) && document.activeElement.tagName === "INPUT") return;   // לא מזיזים פוקוס באמצע הקלדה
+    const first = document.querySelector(!isStaff && !(parseFloat(r.amount) > 0) ? "#acxEAmount" : (b.account ? "#acxENote" : "#acxEBank"));
+    if(first) first.focus();
+  }, 60);
+}
+function acxSaveEdit(){
+  const ctx = acxEditCtx; if(!ctx) return;
+  const val = id => { const el = document.getElementById(id); return el ? String(el.value || "").trim() : ""; };
+  const bank = { bank: val("acxEBank"), branch: val("acxEBranch"), account: val("acxEAccount"), holder: val("acxEHolder") };
+  const apprEl = document.getElementById("acxEApproved");
+  const approved = apprEl ? apprEl.checked : null;
+  if(ctx.k === "s"){
+    const it = acxItem(ctx.key); if(!it) return acxCloseModal("acxEditModal");
+    const r = it.row;
+    let bankRow = (data.bank || []).find(x => x && x.name && x.name === r.name);
+    if(!bankRow && (bank.bank || bank.account || bank.branch || bank.holder)){
+      bankRow = { id: nextId() + 8000, name: r.name, bank: "", branch: "", account: "", holder: "" };
+      data.bank.push(bankRow);
+    }
+    if(bankRow) Object.assign(bankRow, bank);
+    if(approved !== null) r.approved = approved;
+    r.notes = val("acxENote");
+    if(r.paymentStatus === "חסר פרטים" && bank.account) r.paymentStatus = "ממתין";
+    saveInstallments();
+    acxCloseModal("acxEditModal");
+    try{ renderBank(); }catch(e){}
+    acxAfterChange("s");
+    jobToast("נשמר");
+    return;
+  }
+  const vendor = val("acxEVendor");
+  const amountRaw = val("acxEAmount");
+  const amount = Math.max(0, Math.round((parseFloat(amountRaw.replace(/[^\d.]/g, "")) || 0) * 100) / 100);
+  if(!vendor){ jobToast("יש להזין שם ספק"); return; }
+  if(ctx.thenApprove && !(amount > 0)){ jobToast("יש להזין סכום כדי לאשר"); return; }
+  let row;
+  if(ctx.key){
+    const it = acxItem(ctx.key); if(!it) return acxCloseModal("acxEditModal");
+    row = it.row;
+  }else{
+    row = { id: nextId() + 7000, vendor: "", desc: "", amount: 0, approved: false, paid: false, bank: "", branch: "", account: "", holder: "", docs: [], notes: "", sourceType: "רכש/ספק", amountManual: true };
+    data.vendorPayments.push(row);
+  }
+  row.vendor = vendor;
+  row.sourceType = val("acxEType") || "רכש/ספק";
+  row.desc = val("acxEDesc");
+  if((parseFloat(row.amount) || 0) !== amount){ row.amount = amount; row.amountManual = true; }
+  Object.assign(row, bank);
+  if(approved !== null) row.approved = approved;
+  if(ctx.thenApprove && amount > 0) row.approved = true;
+  row.notes = val("acxENote");
+  if(row.paymentStatus === "חסר פרטים" && amount > 0 && bank.account) row.paymentStatus = "ממתין";
+  scheduleSave("vendorPayments", "vendorPaySaved");
+  acxCloseModal("acxEditModal");
+  acxAfterChange("v");
+  jobToast(ctx.key ? "נשמר" : "התשלום נוסף");
+}
+
+/* ---------- פרטי מנהל החשבונות ---------- */
+function acxWireContact(){
+  const c = data.accountantContact || {};
+  [["accountantPhone", "phone"], ["accountantEmail", "email"], ["accountantName", "name"]].forEach(([id, f]) => {
+    const el = document.getElementById(id);
+    if(el && !el.dataset.wired){ el.dataset.wired = "1"; el.value = c[f] || ""; }
+  });
+}
+function acxOpenContact(){
+  const c = data.accountantContact || {};
+  [["accountantPhone", "phone"], ["accountantEmail", "email"], ["accountantName", "name"]].forEach(([id, f]) => {
+    const el = document.getElementById(id); if(el){ el.dataset.wired = "1"; el.value = c[f] || ""; }
+  });
+  document.getElementById("acxContactModal").style.display = "flex";
+}
+function acxSaveContact(){
+  saveAccountantContact();
+  acxCloseModal("acxContactModal");
+  renderAccountantReport();
+  jobToast("פרטי מנהל החשבונות נשמרו");
+  if(acxPendingSend){ const p = acxPendingSend; acxPendingSend = null; acxOpenSend(p); }
+}
+
+/* ---------- שליחה ---------- */
+let acxSendState = null;
+let acxPendingSend = null;
+function acxOpenSend(keys){
+  const all = acctCollect();
+  const items = keys.map(k => all.find(it => it.key === k)).filter(it => it && !it.paid);
+  if(!items.length){ jobToast("אין תשלומים פתוחים לשליחה"); return; }
+  acxSendState = { keys: items.map(it => it.key), mode: acctLink.ready ? "short" : "full", inv: true, rec: false, bank: true };
+  acxRenderSend();
+  document.getElementById("acxSendModal").style.display = "flex";
+}
+function acxSendItems(){
+  if(!acxSendState) return [];
+  const all = acctCollect();
+  return acxSendState.keys.map(k => all.find(it => it.key === k)).filter(it => it && !it.paid);
+}
+function acxBuildText(items, sendId, o){
+  const total = items.reduce((s, it) => s + (it.amount || 0), 0);
+  const n = items.length;
+  const link = sendId ? acxLinkFor(sendId) : "";
+  if(o.mode === "short" && link){
+    return `שלום, מה שלומך?\nשלחתי לך ${n === 1 ? "תשלום אחד" : n + " תשלומים"} לטיפול, סה״כ ${fmtMoney(total)}.\nכל הפרטים, החשבוניות ופרטי הבנק מחכים לך כאן:\n${link}\n\nאחרי ההעברה אפשר לסמן שם "שולם" ולצרף קבלה.\nתודה רבה!`;
+  }
+  let t = `שלום, מה שלומך?\nאשמח שתטפל ${n === 1 ? "בתשלום הבא" : "בתשלומים הבאים"}:\n`;
+  items.forEach((it, i) => {
+    t += `\n${i + 1}. *${it.name}* · ${it.title}\n   💰 ${it.hasAmount ? fmtMoney(it.amount) : "סכום יעודכן"}`;
+    if(o.bank && it.hasBank) t += `\n   🏦 ${it.bank.bank || "—"} | סניף ${it.bank.branch || "—"} | חשבון ${it.bank.account} | ע״ש ${it.bank.holder || "—"}`;
+    if(o.inv && it.inv) t += `\n   📎 חשבונית: ${it.inv.fileUrl}`;
+    if(o.rec && it.rec) t += `\n   🧾 קבלה: ${it.rec.fileUrl}`;
+    t += "\n";
+  });
+  t += `\nסה״כ: ${fmtMoney(total)}`;
+  if(link) t += `\nלצפייה וסימון "שולם":\n${link}`;
+  t += `\nתודה רבה! 🙏`;
+  return t;
+}
+function acxRenderSend(){
+  const body = document.getElementById("acxSendBody");
+  const st = acxSendState; if(!body || !st) return;
+  const items = acxSendItems();
+  const total = items.reduce((s, it) => s + (it.amount || 0), 0);
+  const pend = items.filter(it => it.stage === "pending");
+  const miss = items.filter(it => it.stage === "missing");
+  const again = items.filter(it => it.stage === "sent");
+  const linkOk = acctLink.ready;
+  const opt = (k, label) => `<button type="button" class="acx-pill ${st[k] ? "active" : ""}" data-acx="sOpt" data-v="${k}" aria-pressed="${!!st[k]}" ${st.mode === "short" && k !== "inv" && k !== "rec" ? "" : ""}>${label}</button>`;
+  const modeBtn = (k, label) => `<button type="button" class="acx-pill ${st.mode === k ? "active" : ""}" data-acx="sMode" data-v="${k}" aria-pressed="${st.mode === k}" ${!linkOk && k === "short" ? "disabled" : ""} style="flex:1 1 0;justify-content:center">${label}</button>`;
+  const preview = acxBuildText(items, linkOk ? "xxxxxx" : "", st).replace(acxLinkFor("xxxxxx"), acxLinkFor("…"));
+  body.innerHTML = `
+    <div class="acx-m-list">${items.map(it => `<div class="acx-m-item"><span style="min-width:0;overflow-wrap:anywhere"><b>${escHtml(it.name)}</b> · ${escHtml(it.title)}</span>
+      <span style="display:flex;align-items:center;gap:4px;flex:0 0 auto"><b>${it.hasAmount ? fmtMoney(it.amount) : "—"}</b>${items.length > 1 ? `<button type="button" class="rm" data-acx="sRemove" data-key="${it.key}" aria-label="הסרה מהמשלוח">${acxIco("x", 15)}</button>` : ""}</span></div>`).join("")}
+      <div class="acx-m-item" style="background:transparent;font-weight:700"><span>סה״כ ${items.length === 1 ? "תשלום אחד" : items.length + " תשלומים"}</span><span>${fmtMoney(total)}</span></div>
+    </div>
+    ${pend.length ? `<div class="acx-m-warn">${acxIco("alert", 16)}<span>${pend.map(it => "\"" + escHtml(it.name) + "\"").join(", ")} עוד לא ${pend.length === 1 ? "אושר" : "אושרו"} לתשלום — השליחה ${pend.length === 1 ? "תסמן אותו" : "תסמן אותם"} כמאושר.</span></div>` : ""}
+    ${miss.length ? `<div class="acx-m-warn">${acxIco("alert", 16)}<span>חסרים פרטים (סכום או בנק) ב: ${miss.map(it => escHtml(it.name)).join(", ")}. אפשר לשלוח בכל זאת, אבל מומלץ להשלים קודם.</span></div>` : ""}
+    ${again.length ? `<div class="acx-m-note">${again.length === 1 ? "תשלום אחד כבר נשלח" : again.length + " תשלומים כבר נשלחו"} בעבר — הם יישלחו שוב במשלוח חדש.</div>` : ""}
+    ${linkOk ? "" : `<div class="acx-m-warn">${acxIco("alert", 16)}<span>יומן השליחות לא נטען, ולכן ההודעה תצא בלי קישור (עם פירוט מלא).</span></div>`}
+    <div style="display:flex;flex-direction:column;gap:6px"><span class="acx-lbl">סוג ההודעה</span><div class="acx-row">${modeBtn("short", "קצרה + קישור (מומלץ)")}${modeBtn("full", "פירוט מלא + קישור")}</div></div>
+    ${st.mode === "full" ? `<div style="display:flex;flex-direction:column;gap:6px"><span class="acx-lbl">מה לצרף להודעה</span><div class="acx-row">${opt("inv", "קישורי חשבוניות")}${opt("rec", "קישורי קבלות")}${opt("bank", "פרטי בנק")}</div></div>` : ""}
+    <div style="display:flex;flex-direction:column;gap:6px"><span class="acx-lbl">תצוגה מקדימה</span><div class="acx-preview">${escHtml(preview)}</div></div>
+    <div class="acx-m-a">
+      <button type="button" class="acx-btn ok" data-acx="doSend" data-ch="whatsapp">${svgIcon("whatsapp", 17)}וואטסאפ</button>
+      <button type="button" class="acx-btn dark" data-acx="doSend" data-ch="email">${svgIcon("mail", 17)}Gmail</button>
+    </div>
+    <button type="button" class="acx-btn ghost" data-acx="doSend" data-ch="copy">${acxIco("copy", 16)}העתקת ההודעה בלבד</button>
+    <p class="acx-m-note" style="text-align:center">אחרי השליחה התשלומים מסומנים "נשלח", נרשמים ביומן, ומנהל החשבונות רואה אותם בכניסה שלו.</p>`;
+}
+async function acxDoSend(channel, overrideState){
+  const st = overrideState || acxSendState; if(!st) return;
+  const prevState = acxSendState; acxSendState = st;
+  const items = acxSendItems();
+  acxSendState = prevState;
+  if(!items.length){ jobToast("אין תשלומים לשליחה"); return; }
+  const contact = getAccountantContact();
+  if(channel === "whatsapp" && !contact.phone){ acxPendingSend = st.keys.slice(); acxCloseModal("acxSendModal"); jobToast("קודם צריך להזין טלפון של מנהל החשבונות"); acxOpenContact(); return; }
+  if(channel === "email" && !contact.email){ acxPendingSend = st.keys.slice(); acxCloseModal("acxSendModal"); jobToast("קודם צריך להזין אימייל של מנהל החשבונות"); acxOpenContact(); return; }
+  const now = new Date().toISOString();
+  const linkOk = acctLink.ready;
+  const sendId = linkOk ? (Date.now().toString(36) + Math.floor(Math.random() * 36 * 36).toString(36)).toLowerCase() : "";
+  const text = acxBuildText(items, sendId, linkOk ? st : Object.assign({}, st, { mode: "full" }));
+  // פתיחת וואטסאפ/מייל קודם (חלון חדש חייב להיפתח מיד מהלחיצה)
+  if(channel === "copy"){
+    try{ await navigator.clipboard.writeText(text); }
+    catch(e){ jobToast("ההעתקה נכשלה בדפדפן הזה — נסה וואטסאפ או Gmail"); return; }
+  }else{
+    sendToAccountant(text, channel);
+  }
+  if(linkOk){
+    data.acctSends.unshift({
+      id: sendId, at: now, channel, mode: st.mode,
+      items: items.map(it => ({ k: it.k, id: it.row.id, i: it.k === "s" ? it.instIdx : null, name: it.name, desc: it.title, amount: it.amount || 0 })),
+      total: items.reduce((s, it) => s + (it.amount || 0), 0)
+    });
+    acxSaveSends();
+  }
+  let chV = false, chS = false;
+  items.forEach(it => {
+    const r = it.row;
+    if(!r.approved) r.approved = true;
+    r.sentAt = now; if(sendId) r.sentId = sendId;
+    if(it.k === "s") chS = true; else chV = true;
+  });
+  if(chS) saveInstallments();
+  if(chV) scheduleSave("vendorPayments", "vendorPaySaved");
+  items.forEach(it => acctUi.sel.delete(it.key));
+  if(!overrideState){ acxCloseModal("acxSendModal"); acxSendState = null; }
+  acxAfterChange(chS && chV ? "both" : chS ? "s" : "v");
+  jobToast(channel === "copy" ? "ההודעה הועתקה · התשלומים סומנו כנשלחו" : "נשלח · מופיע ביומן השליחות", 3200);
+}
+function acxQuickSend(key, channel){
+  acxDoSend(channel, { keys: [key], mode: "full", inv: true, rec: false, bank: true });
+}
+function acxRemind(sendId, channel){
+  const s = (data.acctSends || []).find(x => x.id === sendId); if(!s) return;
+  const contact = getAccountantContact();
+  if(!contact.phone && channel !== "copy"){ jobToast("קודם צריך להזין טלפון של מנהל החשבונות"); acxOpenContact(); return; }
+  const st = acxSendStats(s);
+  const open = st.rows.filter(o => o.row && acctStatusOf(o.row) !== "שולם");
+  const sumOpen = open.reduce((t, o) => t + (o.x.amount || 0), 0);
+  const text = `שלום, תזכורת קטנה 🙂\nבמשלוח מ־${acxFmtD(s.at)} ${open.length === 1 ? "נשאר תשלום אחד" : "נשארו " + open.length + " תשלומים"} לטיפול (${fmtMoney(sumOpen)}).\nהפרטים כאן:\n${acxLinkFor(s.id)}\nתודה רבה!`;
+  sendToAccountant(text, "whatsapp");
+}
+
+/* ---------- תצוגת מנהל החשבונות (משתמש מוגבל) ---------- */
+function acxInboxItem(x){
+  const key = acxKeyOf(x);
+  const row = acxFindRow(x.k, x.id, x.i);
+  const mark = ((data.acctInbox && data.acctInbox.marks) || {})[key] || null;
+  const paidRow = !!row && acctStatusOf(row) === "שולם";
+  const paidMark = !!(mark && mark.paidAt && !mark.undone);
+  const bank = row ? acxBankFor(x.k, row) : { bank: "", branch: "", account: "", holder: "" };
+  let amount = x.amount || 0;
+  if(row){ try{ amount = x.k === "s" ? computeStaffTotal(row) : (parseFloat(row.amount) || amount); }catch(e){} }
+  let docs = [];
+  if(row){ try{ docs = x.k === "v" ? jobForVendorPayment(row).docs : finDocs(row.docs); }catch(e){ docs = finDocs(row.docs); } }
+  const inv = docs.find(d => isInvoiceDocType(d.docType)) || null;
+  const rec = (mark && mark.receiptUrl) ? { fileUrl: mark.receiptUrl } : (docs.find(d => isReceiptDocType(d.docType)) || null);
+  const canUndo = paidMark && (!paidRow || (row && row.paidBy === "מנהל החשבונות"));
+  return { key, k: x.k, x, row, mark, paid: paidRow || paidMark, paidAt: (paidMark && mark.paidAt) || (row && row.paidAt) || "", bank, amount, inv, rec, canUndo,
+           name: (row && (x.k === "s" ? row.name : row.vendor)) || x.name, title: x.desc || (row && row.desc) || "" };
+}
+function acxInboxCard(it, i){
+  const b = it.bank;
+  const noteVal = (it.mark && it.mark.note) || (it.row && it.row.accountantNote) || "";
+  return `<div class="acx-card ${i % 2 ? "alt" : ""}">
+    <div class="acx-top"><div class="acx-main"><span class="acx-name">${escHtml(it.name)}</span><span class="acx-title">${escHtml(it.title)}</span></div>
+      <div class="acx-side"><span class="acx-amt">${fmtMoney(it.amount)}</span><span class="acx-chip ${it.paid ? "paid" : "ready"}">${it.paid ? "שולם" : "לטיפול"}</span></div></div>
+    ${!it.row ? `<div class="acx-m-note">הרשומה הוסרה במערכת. כדאי לבדוק עם נפתלי.</div>` : ""}
+    <div class="acx-bankbox">
+      <div><span>בנק</span><b>${escHtml(b.bank || "—")}</b></div>
+      <div><span>סניף</span><b>${escHtml(b.branch || "—")}</b></div>
+      <div><span>חשבון</span><span style="display:inline-flex;align-items:center;gap:6px"><b>${escHtml(b.account || "—")}</b>${b.account ? `<button type="button" class="acx-copy" data-acx-in="copy" data-v="${escHtml(b.account)}" aria-label="העתקת מספר החשבון">${acxIco("copy", 14)}</button>` : ""}</span></div>
+      <div><span>ע״ש</span><b>${escHtml(b.holder || "—")}</b></div>
+    </div>
+    <div class="acx-row">
+      ${it.inv ? `<button type="button" class="acx-pill" data-fv-url="${escHtml(it.inv.fileUrl)}" data-fv-title="חשבונית · ${escHtml(it.name)}" data-fv-kind="invoice">${acxIco("doc", 15)}חשבונית</button>` : (it.k === "s" ? "" : `<span class="acx-ck soft">אין חשבונית מצורפת</span>`)}
+      ${it.rec ? `<button type="button" class="acx-pill" data-fv-url="${escHtml(it.rec.fileUrl)}" data-fv-title="קבלה · ${escHtml(it.name)}" data-fv-kind="receipt">${acxIco("doc", 15)}קבלה</button>` : ""}
+    </div>
+    ${it.paid ? `
+      <div class="acx-paidbox">${acxIco("check", 16, 2.6)}${it.mark && it.mark.paidAt && !it.mark.undone ? "סימנת ששולם · " + escHtml(acxFmtDT(it.mark.paidAt)) + " · נפתלי מקבל עדכון" : "שולם" + (it.paidAt ? " · " + escHtml(acxFmtD(it.paidAt)) : "")}</div>
+      ${it.mark && it.mark.receiptUrl ? "" : `<button type="button" class="acx-btn ghost" data-acx-in="receipt" data-key="${it.key}">${acxIco("upload", 16)}צירוף קבלה / אסמכתת העברה</button>`}
+      ${it.canUndo ? `<button type="button" class="acx-btn ghost" style="min-height:36px;border:none;text-decoration:underline;color:var(--ink-soft)" data-acx-in="undo" data-key="${it.key}">ביטול הסימון</button>` : ""}`
+    : `
+      <label class="acx-f"><span>הערה לנפתלי (רשות)</span><input type="text" data-acx-in-note="${it.key}" value="${escHtml(noteVal)}" placeholder="למשל: יועבר ביום חמישי"></label>
+      <button type="button" class="acx-btn ok" data-acx-in="paid" data-key="${it.key}" ${it.row ? "" : "disabled"}>${acxIco("check", 17, 2.6)}שולם</button>`}
+  </div>`;
+}
+function acxRenderInbox(root){
+  if(!acctLink.ready){
+    root.innerHTML = `<div class="acx-head"><div class="acx-head-t"><h2 class="acx-h1">מה שנשלח אליי</h2></div></div>
+      <div class="acx-empty">לא הצלחנו לטעון את המשלוחים. בדוק את החיבור לאינטרנט ורענן את הדף.</div>`;
+    return;
+  }
+  const sends = (data.acctSends || []).slice().sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  const seen = data.acctInbox.seen || {};
+  const unseen = sends.filter(s => !seen[s.id]);
+  let openId = acctUi.openSend && sends.some(s => s.id === acctUi.openSend) ? acctUi.openSend : (unseen[0] || sends[0] || {}).id || "";
+  const open = sends.find(s => s.id === openId) || null;
+  if(open && !seen[open.id]){ data.acctInbox.seen[open.id] = new Date().toISOString(); acxSaveInbox(); }
+  const inSends = new Set(); sends.forEach(s => (s.items || []).forEach(x => inSends.add(acxKeyOf(x))));
+  const extra = acctCollect().filter(it => it.row.approved && !it.paid && !inSends.has(it.key))
+    .map(it => acxInboxItem({ k: it.k, id: it.row.id, i: it.instIdx, name: it.name, desc: it.title, amount: it.amount }));
+  let html = `<div class="acx-head"><div class="acx-head-t"><span class="acx-sync">מחובר כ: מנהל חשבונות</span><h2 class="acx-h1">מה שנשלח אליי</h2></div>
+    ${unseen.length ? `<span class="acx-new" style="font-size:12.5px;padding:4px 11px">${unseen.length} חדש</span>` : ""}</div>`;
+  if(!sends.length && !extra.length){
+    html += `<div class="acx-empty">עוד לא נשלחו אליך תשלומים דרך המערכת.</div>`;
+  }
+  if(open){
+    const its = (open.items || []).map(acxInboxItem);
+    const n = its.filter(x => x.paid).length;
+    const tot = its.reduce((s, x) => s + x.amount, 0);
+    html += `<div class="acx-inhero" id="acxSend-${escHtml(open.id)}">
+      ${acctUi.openSend === open.id && ACCT_DEEP === open.id ? `<div class="acx-sync" style="color:#fbf7f0;opacity:.85">${acxIco("link", 15)}נפתח מהקישור שקיבלת</div>` : ""}
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:2px"><span class="t">נשלח אליך ב־${escHtml(acxFmtD(open.at))}</span><span class="s">${its.length === 1 ? "תשלום אחד" : its.length + " תשלומים"} · ${escHtml(new Date(open.at).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }))}</span></div>
+        <span class="a">${fmtMoney(tot)}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px"><div class="acx-prog"><div style="width:${its.length ? Math.round(n / its.length * 100) : 0}%"></div></div>
+        <span class="s">${n === its.length ? "הכל שולם — תודה!" : n + " מתוך " + its.length + " סומנו כשולמו"}</span></div>
+    </div>
+    <div class="acx-grid">${its.map(acxInboxCard).join("")}</div>`;
+  }
+  const others = sends.filter(s => !open || s.id !== open.id);
+  if(others.length){
+    html += `<div style="display:flex;flex-direction:column;gap:8px"><span class="acx-lbl">משלוחים ${open ? "נוספים" : ""}</span>${others.map(s => {
+      const its = (s.items || []).map(acxInboxItem);
+      const n = its.filter(x => x.paid).length;
+      return `<button type="button" class="acx-prev" data-acx-in="open" data-id="${escHtml(s.id)}"><span><b>${escHtml(acxFmtD(s.at))}</b> · ${its.length === 1 ? "תשלום אחד" : its.length + " תשלומים"} · ${n === its.length ? '<span style="color:#3f4a2c;font-weight:600">הכל שולם</span>' : '<span style="color:#8c491a;font-weight:600">' + (its.length - n) + " לטיפול</span>"}${!seen[s.id] ? ' <span class="acx-new">חדש</span>' : ""}</span><b>${fmtMoney(s.total || 0)}</b></button>`;
+    }).join("")}</div>`;
+  }
+  if(extra.length){
+    html += `<div style="display:flex;flex-direction:column;gap:8px"><span class="acx-lbl">תשלומים מאושרים נוספים (לא נשלחו בקישור)</span><div class="acx-grid">${extra.map(acxInboxCard).join("")}</div></div>`;
+  }
+  html += `<p class="acx-m-note" style="text-align:center">במסך הזה אפשר לסמן "שולם", לכתוב הערה ולצרף קבלה. לא ניתן לשנות סכומים או למחוק.</p>`;
+  root.innerHTML = html;
+}
+function acxInMark(key){ data.acctInbox.marks = data.acctInbox.marks || {}; return data.acctInbox.marks[key] = data.acctInbox.marks[key] || {}; }
+function acxInboxAction(act, el){
+  const key = el.dataset.key;
+  if(act === "open"){ acctUi.openSend = el.dataset.id; renderAccountantReport(); const t = document.getElementById("acxSend-" + el.dataset.id); if(t) t.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+  if(act === "copy"){
+    const v = el.dataset.v || "";
+    (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => jobToast("מספר החשבון הועתק")).catch(() => jobToast("לא הצלחנו להעתיק — אפשר לסמן ולהעתיק ידנית"));
+    return;
+  }
+  if(!acctLink.ready){ jobToast("המשלוחים לא נטענו, רענן את הדף"); return; }
+  if(act === "paid"){
+    const m = acxInMark(key);
+    const inp = document.querySelector(`[data-acx-in-note="${key}"]`);
+    if(inp && inp.value.trim()) m.note = inp.value.trim();
+    m.paidAt = new Date().toISOString(); delete m.undone;
+    acxSaveInbox();
+    withScrollPreserved(() => renderAccountantReport());
+    jobToast("סומן כשולם · נפתלי יקבל עדכון");
+    return;
+  }
+  if(act === "undo"){
+    const m = acxInMark(key); m.undone = true;
+    acxSaveInbox(); withScrollPreserved(() => renderAccountantReport());
+    jobToast("הסימון בוטל");
+    return;
+  }
+  if(act === "receipt"){
+    const input = document.createElement("input");
+    input.type = "file"; input.accept = "image/*,application/pdf";
+    input.onchange = async () => {
+      if(!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      jobToast("מעלה את הקבלה…", 60000);
+      try{
+        const ref = storage.ref().child(`uploads/accountant-receipts/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
+        const m = acxInMark(key);
+        m.receiptUrl = url; m.receiptName = "קבלה ממנהל החשבונות"; m.receiptAt = new Date().toISOString();
+        acxSaveInbox(); withScrollPreserved(() => renderAccountantReport());
+        jobToast("הקבלה צורפה ✓");
+      }catch(e){ console.error(e); jobToast("שגיאת העלאה: " + e.message, 5000); }
+    };
+    input.click();
+  }
+}
+
+/* ---------- קישור ישיר מההודעה ---------- */
+function acxHandleDeepLink(id){
+  id = id || ACCT_DEEP;
+  if(!id || !canOpenTab("accountant")) return;
+  acctUi.openSend = id;
+  switchTab("accountant");
+  try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
+  setTimeout(() => { const el = document.getElementById("acxSend-" + id); if(el){ if(el.tagName !== "DIV" || !el.classList.contains("acx-inhero")){ const lb = document.getElementById("acxLogBox"); if(lb) lb.open = true; } el.scrollIntoView({ behavior: "smooth", block: "start" }); } }, 150);
+}
+window.addEventListener("hashchange", () => {
+  const id = acxParseHash();
+  if(id && typeof cloudReady !== "undefined" && cloudReady) acxHandleDeepLink(id);
+});
+
+/* ---------- האזנה ללחיצות בטאב ---------- */
+document.addEventListener("click", e => {
+  const t = e.target; if(!t || !t.closest) return;
+  const inb = t.closest("[data-acx-in]");
+  if(inb){ e.preventDefault(); acxInboxAction(inb.dataset.acxIn, inb); return; }
+  const el = t.closest("[data-acx]");
+  if(!el || el.disabled) return;
+  const a = el.dataset.acx, key = el.dataset.key;
+  if(a === "contact") return acxOpenContact();
+  if(acxIsAcc()) return;   // פעולות מנהל בלבד מכאן
+  if(a === "new") return acxOpenEdit("");
+  if(a === "period"){ acctUi.period = el.dataset.v; return renderAccountantReport(); }
+  if(a === "cat"){ acctUi.cat = el.dataset.v; return renderAccountantReport(); }
+  if(a === "sel"){ if(acctUi.sel.has(key)) acctUi.sel.delete(key); else acctUi.sel.add(key);
+    const card = el.closest(".acx-card"); const on = acctUi.sel.has(key);
+    if(card) card.classList.toggle("sel", on); el.classList.toggle("on", on); el.setAttribute("aria-pressed", on); el.innerHTML = on ? acxIco("check", 16, 3) : "";
+    return acxRenderSelBar(); }
+  if(a === "clearSel"){ acctUi.sel.clear(); return renderAccountantReport(); }
+  if(a === "sendSel") return acxOpenSend([...acctUi.sel]);
+  if(a === "sendOne") return acxOpenSend([key]);
+  if(a === "approve") return acxApprove(key);
+  if(a === "paid") return acxMarkPaid(key);
+  if(a === "edit") return acxOpenEdit(key);
+  if(a === "src") return acxOpenSource(key);
+  if(a === "receipt") return acxAttachReceipt(key);
+  if(a === "quick") return acxQuickSend(key, el.dataset.ch);
+  if(a === "moreLog"){ acctUi.showAllLog = !acctUi.showAllLog; return acxRenderLog(); }
+  if(a === "remind") return acxRemind(el.dataset.id, "whatsapp");
+  if(a === "copyLink"){
+    const link = acxLinkFor(el.dataset.id);
+    (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => jobToast("הקישור הועתק")).catch(() => jobToast(link, 6000));
+    return;
+  }
+  if(a === "sMode"){ if(acxSendState){ acxSendState.mode = el.dataset.v; acxRenderSend(); } return; }
+  if(a === "sOpt"){ if(acxSendState){ acxSendState[el.dataset.v] = !acxSendState[el.dataset.v]; acxRenderSend(); } return; }
+  if(a === "sRemove"){ if(acxSendState){ acxSendState.keys = acxSendState.keys.filter(k => k !== key); acxRenderSend(); } return; }
+  if(a === "doSend") return acxDoSend(el.dataset.ch);
+});
+document.addEventListener("change", e => {
+  const t = e.target; if(!t || !t.dataset || !t.dataset.acxInNote) return;
+  if(!acctLink.ready || !acxIsAcc()) return;
+  const m = acxInMark(t.dataset.acxInNote);
+  const v = t.value.trim();
+  if((m.note || "") === v) return;
+  m.note = v;
+  acxSaveInbox();
+  jobToast("ההערה נשמרה");
+});
+
 function renderAccountantReport(){
-  const acctPhoneEl = document.getElementById("accountantPhone");
-  const acctEmailEl = document.getElementById("accountantEmail");
-  if(acctPhoneEl && !acctPhoneEl.dataset.wired){
-    acctPhoneEl.dataset.wired = "1";
-    acctPhoneEl.value = data.accountantContact.phone || "";
-    acctPhoneEl.addEventListener("change", saveAccountantContact);
-  }
-  if(acctEmailEl && !acctEmailEl.dataset.wired){
-    acctEmailEl.dataset.wired = "1";
-    acctEmailEl.value = data.accountantContact.email || "";
-    acctEmailEl.addEventListener("change", saveAccountantContact);
-  }
-  let total = 0;
-  let count = 0;
-  const combinedRows = [];
-  data.installments.forEach((inst, idx) => {
-    inst.forEach(row => {
-      if(!row.approved) return;
-      count++;
-      const rowTotal = computeStaffTotal(row);
-      total += rowTotal;
-      const bankRow = data.bank.find(b => b.name && b.name === row.name) || {};
-      combinedRows.push({ref:row, kind:"staff", saveFn:saveInstallments, name:row.name, type:"צוות (פעימה "+(idx+1)+")", total:rowTotal, bank:bankRow.bank, branch:bankRow.branch, account:bankRow.account, holder:bankRow.holder, notes:row.notes});
-    });
-  });
-  const cards = document.getElementById("accountantCards");
-
-  let vendorTotal = 0;
-  data.vendorPayments.forEach(row => {
-    if(!row.approved) return;
-    vendorTotal += (parseFloat(row.amount)||0);
-    combinedRows.push({ref:row, kind:"vendor", saveFn:()=>scheduleSave("vendorPayments","vendorPaySaved"), name:row.vendor, type:row.sourceType||"רכש/ספק", total:parseFloat(row.amount)||0, bank:row.bank, branch:row.branch, account:row.account, holder:row.holder, notes:row.notes});
-  });
-
-  const staffBody = document.getElementById("combinedReportBodyStaff");
-  const professionalBody = document.getElementById("combinedReportBodyProfessional");
-  const vendorBody = document.getElementById("combinedReportBodyVendor");
-  const STATUS_SORT_ORDER = {"חסר פרטים":0, "ממתין":1, "שולם":2};
-  function applyStatusFilterSort(rows){
-    const filterSel = document.getElementById("paymentStatusFilter");
-    const filterVal = filterSel ? filterSel.value : "";
-    const statusOf = r => r.ref.paymentStatus || (r.ref.paid ? "שולם" : "ממתין");
-    if(filterVal){
-      return rows.filter(r => statusOf(r) === filterVal);
-    }
-    return rows.slice().sort((a,b) => (STATUS_SORT_ORDER[statusOf(a)] ?? 1) - (STATUS_SORT_ORDER[statusOf(b)] ?? 1));
-  }
-  function buildCombinedRow(r){
-    const tr = document.createElement("tr");
-    const curStatus = r.ref.paymentStatus || (r.ref.paid ? "שולם" : "ממתין");
-    tr.innerHTML = `
-      <td class="primary-field">${acctNameCellHtml(r)}</td><td>${r.type}</td><td style="font-weight:600">${r.kind==="vendor" && !(r.total>0) ? '<span class="job-status bad">חסר סכום</span>' : fmtMoney(r.total)}</td>
-      <td><select class="payment-status-select" data-status-style="paymentStatus">
-            <option value="ממתין" ${curStatus==="ממתין"?"selected":""}>ממתין</option>
-            <option value="שולם" ${curStatus==="שולם"?"selected":""}>שולם</option>
-            <option value="חסר פרטים" ${curStatus==="חסר פרטים"?"selected":""}>חסר פרטים</option>
-          </select></td>
-      <td><input type="text" class="accountant-note-input" value="${r.ref.accountantNote||""}" placeholder="הערת מנהל חשבונות" style="min-width:140px"></td>
-      <td><input type="text" class="acct-bank-input" data-bf="bank" value="${r.bank||""}" style="width:75px"></td>
-      <td><input type="text" class="acct-bank-input" data-bf="branch" value="${r.branch||""}" style="width:55px"></td>
-      <td><input type="text" class="acct-bank-input" data-bf="account" value="${r.account||""}" style="width:95px"></td>
-      <td><input type="text" class="acct-bank-input" data-bf="holder" value="${r.holder||""}" style="min-width:100px" placeholder="שם בעל חשבון"></td>
-      <td>${r.notes||""}</td>
-      <td class="contact-actions">
-        <button class="contact-action-btn ca-whatsapp" title="שליחת הודעה בוואטסאפ" onclick="sendPaymentReminder('${r.kind}',${r.ref.id},'whatsapp')">${svgIcon("whatsapp",15)}</button>
-        <button class="contact-action-btn ca-mail" title="שליחת הודעה במייל" onclick="sendPaymentReminder('${r.kind}',${r.ref.id},'email')">${svgIcon("mail",15)}</button>
-      </td>
-    `;
-    tr.querySelector(".payment-status-select").addEventListener("change", (e) => {
-      const newStatus = e.target.value;
-      r.ref.paymentStatus = newStatus;
-      r.ref.paid = (newStatus === "שולם");
-      if(r.kind === "staff"){
-        if(r.ref.paid) r.ref.paidTotal = computeLiveStaffTotal(r.ref);
-        else delete r.ref.paidTotal;
-      }
-      if(newStatus === "שולם"){
-        const hasReceipt = (r.ref.docs||[]).some(d=>d.fileUrl);
-        if(!hasReceipt) alert("סומן כשולם. מומלץ לצרף קבלה/חשבונית עבור תשלום זה.");
-      }
-      r.saveFn();
-      withScrollPreserved(() => { renderStaff(); renderVendorPay(); renderAccountantReport(); });
-    });
-    const noteInput = tr.querySelector(".accountant-note-input");
-    noteInput.addEventListener("input", () => { r.ref.accountantNote = noteInput.value; });
-    noteInput.addEventListener("change", () => { r.saveFn(); });
-    tr.querySelectorAll(".acct-bank-input").forEach(inp => {
-      inp.addEventListener("input", () => {
-        const f = inp.dataset.bf;
-        if(r.kind === "staff"){
-          let bankRow = data.bank.find(b => b.name && b.name === r.ref.name);
-          if(!bankRow){ bankRow = {id: nextId()+8000, name:r.ref.name, bank:"", branch:"", account:"", holder:""}; data.bank.push(bankRow); }
-          bankRow[f] = inp.value;
-        }else{
-          r.ref[f] = inp.value;
-        }
-      });
-      inp.addEventListener("change", () => {
-        r.saveFn();
-        withScrollPreserved(() => { renderStaff(); renderVendorPay(); renderAccountantReport(); });
-      });
-    });
-    return tr;
-  }
-  if(staffBody){
-    staffBody.innerHTML = "";
-    const staffRows = applyStatusFilterSort(combinedRows.filter(r => r.kind === "staff"));
-    if(staffRows.length === 0){
-      staffBody.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומי צוות מאושרים.</td></tr>`;
-    }else{
-      staffRows.forEach(r => staffBody.appendChild(buildCombinedRow(r)));
-    }
-    document.getElementById("combinedTotalStaff").textContent = fmtMoney(total);
-  }
-  if(professionalBody){
-    professionalBody.innerHTML = "";
-    const proRows = applyStatusFilterSort(combinedRows.filter(r => r.kind === "vendor" && r.type === "איש מקצוע"));
-    let proTotal = 0;
-    if(proRows.length === 0){
-      professionalBody.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומים מאושרים לאנשי מקצוע.</td></tr>`;
-    }else{
-      proRows.forEach(r => { proTotal += r.total; professionalBody.appendChild(buildCombinedRow(r)); });
-    }
-    document.getElementById("combinedTotalProfessional").textContent = fmtMoney(proTotal);
-  }
-  if(vendorBody){
-    vendorBody.innerHTML = "";
-    const vendorRows = applyStatusFilterSort(combinedRows.filter(r => r.kind === "vendor" && r.type !== "איש מקצוע"));
-    let vTotal = 0;
-    if(vendorRows.length === 0){
-      vendorBody.innerHTML = `<tr><td style="flex:1 1 100%;color:var(--ink-soft);text-align:center;padding:16px 0">אין עדיין תשלומי ספקים/רכש מאושרים.</td></tr>`;
-    }else{
-      vendorRows.forEach(r => { vTotal += r.total; vendorBody.appendChild(buildCombinedRow(r)); });
-    }
-    document.getElementById("combinedTotalVendor").textContent = fmtMoney(vTotal);
-  }
-
-  if(cards){
-    cards.innerHTML = `
-      <div class="stat good"><div class="label">תשלומי צוות מאושרים</div><div class="value">${count}</div></div>
-      <div class="stat good"><div class="label">תשלומי ספקים מאושרים</div><div class="value">${data.vendorPayments.filter(r=>r.approved).length}</div></div>
-      <div class="stat"><div class="label">סה"כ כולל להעברה</div><div class="value">${fmtMoney(total+vendorTotal)}</div></div>
-    `;
-  }
-  const activeSub = data.uiPrefs.accountantSubTab || "all";
-  document.querySelectorAll("#acctSubtabs .pill-tab").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.subtab === activeSub);
-  });
-  const subSections = {staff:"acctSubStaff", professional:"acctSubProfessional", vendor:"acctSubVendor"};
-  Object.keys(subSections).forEach(key => {
-    const el = document.getElementById(subSections[key]);
-    if(el) el.style.display = (activeSub === "all" || activeSub === key) ? "" : "none";
-  });
+  const adminView = document.getElementById("acxAdmin"), inboxView = document.getElementById("acxInbox");
+  if(!adminView || !inboxView) return;
+  const isAcc = acxIsAcc();
+  adminView.style.display = isAcc ? "none" : "";
+  inboxView.style.display = isAcc ? "" : "none";
+  if(isAcc){ acxRenderInbox(inboxView); return; }
+  acxRenderAdmin();
   renderVendorPay();
 }
+
 function setAccountantSubTab(key){
   data.uiPrefs.accountantSubTab = key;
   saveUiPrefs();
@@ -12830,6 +13751,7 @@ function markJobPaid(key){
   if(!vp) return;
   vp.paymentStatus = "שולם";
   vp.paid = true;
+  if(!vp.paidAt) vp.paidAt = new Date().toISOString();
   if(!vp.approved) vp.approved = true;
   saveJobRecords(j);
   refreshJobViews();
@@ -14041,6 +14963,18 @@ function dbAlerts(D){
   D.cSoon.forEach(x => add(3, "report", `לחדש חוזה: ${x.c.name || x.c.supplier || "חוזה"}`, x.c.supplier || "", x.n, dbGo("equipment", () => { eqUi.view = "contracts"; renderEquipment(); eqOpen("contract", x.c.id); }), "equipment"));
   D.warrSoon.forEach(x => add(3, "wrench", `אחריות נגמרת: ${x.e.name || "ציוד"}`, x.e.place || x.e.category || "", tkDaysTo(x.e.warrantyEnd), dbGo("equipment", () => { eqUi.view = "equip"; renderEquipment(); eqOpen("equip", x.e.id); }), "equipment"));
   D.recSoon.filter(x => x.n <= 3).forEach(x => add(3, "repeat", `תשלום שוטף קרוב: ${x.r.name || "—"}`, [x.r.vendor, x.r.amount ? fmtMoney(parseFloat(x.r.amount) || 0) : ""].filter(Boolean).join(" · "), x.n, dbGo("finance"), "finance"));
+  try{
+    (data.vendorPayments || []).concat(...(data.installments || [])).forEach(r => {
+      if(r && r.paidBy === "מנהל החשבונות" && r.paidAt && acxDaysSince(r.paidAt) <= 3 && acctStatusOf(r) === "שולם")
+        add(3, "wallet", `מנהל החשבונות סימן ששולם: ${r.vendor || r.name || "—"}`, fmtMoney(r.vendor !== undefined ? (parseFloat(r.amount) || 0) : computeStaffTotal(r)), null, dbGo("accountant"), "accountant");
+    });
+    const seenMap = (data.acctInbox && data.acctInbox.seen) || {};
+    (data.acctSends || []).forEach(s => {
+      const st = acxSendStats(s);
+      if(!seenMap[s.id] && st.paid < st.total && acxDaysSince(s.at) >= 2)
+        add(3, "wallet", "משלוח למנהל החשבונות עוד לא נצפה", `נשלח לפני ${acxDaysSince(s.at)} ימים · ${fmtMoney(s.total || 0)}`, null, dbGo("accountant", () => acxHandleDeepLink(s.id)), "accountant");
+    });
+  }catch(e){ console.error(e); }
   if(D.noAmount.length) add(3, "receipt", `${D.noAmount.length} חשבוניות בלי סכום`, "צריך להשלים סכום כדי שייכנסו לדוח", null, dbGo("accountant"), "accountant");
   if(D.sp && D.sp.soon.length) add(3, "box", `${D.sp.soon.length} מוצרים יפוגו השבוע`, D.sp.soon.slice(0, 3).map(s => s.name).join(", "), null, dbGo("procurement"), "procurement");
   if(D.sp && D.sp.below) add(3, "box", `${D.sp.below} מוצרים מתחת למינימום במלאי`, "רכש ואספקה", null, dbGo("procurement"), "procurement");
@@ -15081,6 +16015,11 @@ async function initAppData(){
   backfillProcInvoiceSync();
   backfillKeysImport();
   backfillCodeMasterKeys();
+  await acctLoadLinkData();
+  try{
+    const appliedMarks = acxApplyInbox();
+    if(appliedMarks.length) setTimeout(() => jobToast(`מנהל החשבונות סימן ${appliedMarks.length === 1 ? "תשלום אחד" : appliedMarks.length + " תשלומים"} כשולם`, 4500), 900);
+  }catch(e){ console.error(e); }
   buildNav();
   buildInstallmentTabs();
   renderTasks();
@@ -15102,6 +16041,7 @@ async function initAppData(){
   renderProjects();
   if(window.SP) SP.init();
   switchTab(allowedTabs()[0]);
+  try{ acxHandleDeepLink(); }catch(e){ console.error(e); }
   if(currentRole === "admin") autoBackupIfDue();
 }
 
@@ -15115,6 +16055,7 @@ function buildFullExportObject(){
     "ttd-data":"ttd"
   };
   if(currentRole === "admin" && !mtBlocked) map["myTasks-data"] = "myTasks";
+  if(acctLink.ready){ map["acctSends-data"] = "acctSends"; map["acctInbox-data"] = "acctInbox"; }
   const out = {};
   for(const sk in map) out[sk] = JSON.stringify(data[map[sk]]);
   out["staff-data"] = JSON.stringify({ installments: data.installments, bank: data.bank, installmentMeta: data.installmentMeta || [], roleCatalog: data.roleCatalog || [] });
