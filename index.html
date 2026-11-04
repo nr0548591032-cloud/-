@@ -762,7 +762,7 @@
   }
 
 /* ===================== תיק נתונים ושטח (2026-10) ===================== */
-#licRoot.lc-ttd-mode #lcKpis, #licRoot.lc-ttd-mode .lc-bar{ display:none; }
+
 .ttd-wrap{ display:flex; flex-direction:column; gap:12px; }
 .ttd-top{ padding:12px 14px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; border-inline-start-color:var(--brand); overflow:visible; }
 .ttd-top-r{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
@@ -1051,6 +1051,104 @@
 .lc-stlist{ display:flex; flex-direction:column; gap:6px; }
 .lc-stlist button{ border:1px solid var(--line); background:var(--card); border-radius:10px; padding:9px 11px; text-align:right; font:inherit; cursor:pointer; display:flex; gap:8px; align-items:center; color:var(--ink); }
 .lc-stlist button.cur{ border-color:var(--brand); background:var(--amber-bg); font-weight:600; }
+/* ---- רישוי ובטיחות: עיצוב נקי (2026-11) ---- */
+.lc-tag.ok{ color:#3f4a2c; } .lc-tag.warn{ color:#7a3f15; } .lc-tag.bad{ color:#6e3010; } .lc-tag.vio{ color:#4f4a40; } .lc-tag.info{ color:#3f4a2c; }
+a.lc-btn, a.lc-iconbtn{ text-decoration:none; }
+.lc-filters{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.lc-fchip{ border:0; border-radius:99px; padding:7px 13px; font:inherit; font-size:13px; font-weight:600; display:inline-flex; gap:6px; align-items:center; cursor:pointer; background:var(--violet-bg); color:var(--ink); transition:transform .15s; }
+.lc-fchip:hover{ transform:translateY(-1px); }
+.lc-fchip:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
+.lc-fchip i{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+.lc-fchip b{ font-variant-numeric:tabular-nums; }
+.lc-fchip.on{ background:var(--brand-dark, #2b2723); color:#f9f4ed; }
+.lc-overall{ margin-inline-start:auto; display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft); }
+.lc-overall .lc-prog{ width:120px; flex:none; }
+@media (max-width:600px){ .lc-overall{ margin-inline-start:0; width:100%; } }
+.lc-focus{ background:var(--brand-dark, #2b2723); color:#f9f4ed; border-radius:16px; padding:12px 16px; display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; }
+.lc-focus h4{ margin:0; font-family:var(--font-heading, var(--font-display)); font-weight:400; font-size:16px; }
+.lc-focus button{ border:0; border-radius:99px; padding:6px 12px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; background:rgba(255,255,255,.13); color:#fbeee3; text-align:right; }
+.lc-focus button.bad{ background:rgba(255,198,165,.24); color:#ffe3d3; }
+.lc-focus button:hover{ background:rgba(255,255,255,.24); }
+.lc-focus button:focus-visible{ outline:2px solid #f9f4ed; outline-offset:2px; }
+#licRoot.lc-ttd-mode .lc-bar > :not(.lc-views), #licRoot.lc-ttd-mode .lc-filters, #licRoot.lc-ttd-mode #lcFocus{ display:none; }
+.lc-bar .lc-views{ margin-inline-start:auto; }
+
+button.lc-track-h{ border:0; background:transparent; font:inherit; color:inherit; cursor:pointer; text-align:right; padding:2px; width:100%; border-radius:10px; }
+button.lc-track-h:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
+.lc-track-h .ln{ flex:1 1 30px; height:1px; background:var(--line); }
+.lc-track-h .lc-chev{ transition:transform .2s; display:inline-flex; }
+.lc-track.closed .lc-track-h .lc-chev{ transform:rotate(90deg); }
+
+.lc-card{ border-inline-start:0; }
+.lc-h{ grid-template-columns:auto minmax(0,1fr) auto auto auto; padding:11px 15px; }
+.lc-h .lc-name{ display:flex; }
+.lc-next{ display:block; color:var(--ink-soft); font-size:12.5px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lc-date{ font-size:12.5px; color:var(--ink-soft); white-space:nowrap; font-variant-numeric:tabular-nums; }
+@media (max-width:640px){ .lc-h{ grid-template-columns:auto minmax(0,1fr) auto; gap:10px; } .lc-h .lc-date, .lc-h .lc-chev{ display:none; } .lc-next{ white-space:normal; } }
+.lc-dot2{ width:44px; height:44px; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; flex:none; font-variant-numeric:tabular-nums; }
+.lc-dot2 b{ font-family:var(--font-heading, var(--font-display)); font-weight:400; font-size:15px; display:flex; }
+.lc-dot2 small{ font-size:9px; margin-top:2px; }
+.lc-dot2.ok{ background:var(--green-bg); color:#3f4a2c; }
+.lc-dot2.warn{ background:var(--amber-bg); color:#7a3f15; }
+.lc-dot2.bad{ background:var(--red-bg); color:#6e3010; }
+.lc-dot2.mute, .lc-dot2.vio{ background:var(--violet-bg); color:#4f4a40; }
+.lc-card.open .lc-steps{ padding-top:2px; }
+.lc-body{ grid-template-columns:minmax(0,1fr) !important; gap:12px; }
+.lc-inb{ box-shadow:none !important; background:transparent !important; overflow:visible; }
+.lc-inb .lc-body{ border-top:1px solid var(--line); padding:12px 0 0; }
+.lc-nextbar{ display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; background:var(--amber-bg); color:#5a2d0f; border-radius:12px; padding:10px 14px; font-size:13.5px; }
+.lc-nextbar.ok{ background:var(--green-bg); color:#2f3a20; }
+.lc-nextbar.bad{ background:var(--red-bg); color:#5a230a; }
+.lc-nextbar.soft{ background:var(--violet-bg); color:var(--ink); }
+.lc-nextbar .t{ flex:1 1 220px; min-width:0; }
+.lc-grid2{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap:12px; }
+.lc-panel{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:9px; min-width:0; }
+.lc-tiles{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:10px; }
+.lc-tile{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; display:flex; flex-direction:column; gap:3px; min-width:0; align-items:flex-start; }
+.lc-tile .k{ font-size:11.5px; color:var(--ink-soft); display:inline-flex; gap:5px; align-items:center; }
+.lc-tile .k .lc-ico{ width:14px; height:14px; }
+.lc-tile .v{ font-weight:600; font-size:14px; }
+.lc-tile .v.soft{ color:var(--ink-soft); font-weight:500; }
+.lc-tile .acts{ display:flex; gap:6px; flex-wrap:wrap; margin-top:5px; align-items:center; }
+.lc-tile .lk{ border:0; background:none; padding:0; font:inherit; font-weight:600; font-size:14px; color:var(--ink); cursor:pointer; text-align:right; display:inline-flex; gap:4px; align-items:center; max-width:100%; }
+.lc-tile .lk.sm{ font-size:12px; font-weight:500; color:var(--ink-soft); }
+.lc-tile .lk .lc-ico{ width:13px; height:13px; color:var(--brand); }
+.lc-tile .lk:hover{ color:var(--brand); }
+.lc-histbtn{ border:0; background:none; font:inherit; font-size:12.5px; color:var(--ink-soft); cursor:pointer; display:inline-flex; gap:6px; align-items:center; padding:2px 0; text-align:right; min-width:0; }
+.lc-histbtn > span:first-of-type{ overflow:hidden; text-overflow:ellipsis; }
+.lc-histbtn .lc-chev{ display:inline-flex; transition:transform .2s; }
+.lc-doc-main{ background:var(--green) !important; color:#fff !important; }
+.lc-pay-steps{ display:flex; gap:6px; }
+.lc-pay-steps div{ flex:1; font-size:11.5px; text-align:center; color:var(--ink-soft); }
+.lc-pay-steps i{ display:block; height:6px; border-radius:9px; background:var(--line); margin-bottom:4px; }
+.lc-pay-steps .d{ color:#3f4a2c; } .lc-pay-steps .d i{ background:var(--green); }
+.lc-pay-steps .c{ color:var(--ink); font-weight:600; } .lc-pay-steps .c i{ background:var(--brand); }
+.lc-pay-f{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; }
+.lc-pay-f label{ display:flex; flex-direction:column; gap:3px; font-size:11.5px; color:var(--ink-soft); min-width:0; }
+@media (max-width:520px){ .lc-pay-f{ grid-template-columns:minmax(0,1fr); } }
+.lc-bundle-top .lc-bh .txt{ display:block; }
+.lc-bundle-top .lc-name{ font-size:15.5px; }
+.lc-bchev .lc-ico{ transition:transform .2s; }
+.lc-bundle.open .lc-bchev .lc-ico{ transform:rotate(180deg); }
+.lc-segs{ display:flex; gap:4px; flex:0 1 280px; min-width:160px; }
+.lc-segs button{ flex:1; border:0; background:none; padding:0; font:inherit; cursor:pointer; text-align:center; min-width:0; }
+.lc-segs i{ display:block; height:8px; border-radius:5px; background:var(--line); }
+.lc-segs .ok i{ background:var(--green); } .lc-segs .bad i{ background:var(--red); } .lc-segs .wait i{ background:#e6a37a; }
+.lc-segs span{ display:block; font-size:10.5px; color:var(--ink-soft); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lc-segs button:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; border-radius:4px; }
+@media (max-width:640px){ .lc-segs{ flex:1 1 100%; } }
+.lc-pick{ display:flex; flex-direction:column; gap:6px; max-height:52vh; overflow:auto; }
+.lc-pick button{ display:flex; gap:10px; align-items:center; border:1px solid var(--line); background:var(--card); border-radius:12px; padding:9px 11px; font:inherit; color:var(--ink); cursor:pointer; text-align:right; }
+.lc-pick button:hover, .lc-pick button:focus-visible{ border-color:var(--brand); }
+.lc-pick small{ display:block; color:var(--ink-soft); font-size:11.5px; }
+.lc-seg2{ display:flex; background:var(--violet-bg); border-radius:12px; padding:4px; gap:4px; }
+.lc-seg2 label{ flex:1; display:flex; align-items:center; justify-content:center; gap:6px; border-radius:9px; padding:9px; font-size:13px; color:var(--ink); cursor:pointer; text-align:center; }
+.lc-seg2 label:has(input:checked){ background:var(--card); font-weight:600; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.lc-seg2 input{ accent-color:var(--brand); }
+.lc-warnbox{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:var(--amber-bg); color:#5a2d0f; border-radius:12px; padding:10px 12px; font-size:13px; }
+.lc-files2{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.lc-bdl-row{ display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.lc-bdl-row:last-child{ border-bottom:0; }
 @media (prefers-reduced-motion:reduce){ #tab-licensing *, .lc-mask *{ animation:none !important; transition:none !important; } }
 
 </style>
@@ -2235,7 +2333,7 @@ button.tk-chip{ cursor:pointer; }
         <div style="font-weight:700;font-size:15px" id="confirmModalMessage">האם למחוק?</div>
       </div>
       <div class="toolbar">
-        <button class="btn ghost" onclick="closeConfirmModal()">ביטול</button>
+        <button class="btn ghost" id="confirmModalNoBtn" onclick="closeConfirmModal()">ביטול</button>
         <button class="btn" id="confirmModalYesBtn" style="background:var(--red)" onclick="confirmModalYes()">מחיקה</button>
       </div>
     </div>
@@ -4123,11 +4221,28 @@ function syncTaskInvoiceToVendorPay(taskRow){
     const vp = data.vendorPayments.find(v=>v.id===taskRow.vendorPayId);
     if(vp && vpApplyInvoiceSync(vp, "task", firstDocUrl, taskRow)) scheduleSave("vendorPayments","vendorPaySaved");
   }else if(firstDocUrl){
-    const newId = nextId()+7000;
-    data.vendorPayments.push({id:newId, vendor:taskRow.assignee||"", desc:taskRow.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", docType:"חשבונית", fileUrl:firstDocUrl, syncFrom:"task"}], notes:"מקור: משימה", sourceType:"איש מקצוע"});
-    taskRow.vendorPayId = newId;
-    scheduleSave("vendorPayments","vendorPaySaved");
-    scheduleSave("tasks","tasksSaved");
+    const make = () => {
+      const t = data.tasks.find(x => x.id === taskRow.id) || taskRow;
+      if(t.vendorPayId) return;
+      const newId = nextId()+7000;
+      data.vendorPayments.push({id:newId, vendor:t.assignee||"", desc:t.desc||"", amount:0, approved:false, paid:false, bank:"", branch:"", account:"", docs:[{name:"חשבונית ממשימה", docType:"חשבונית", fileUrl:firstDocUrl, syncFrom:"task"}], notes:"מקור: משימה", sourceType:"איש מקצוע"});
+      t.vendorPayId = newId;
+      scheduleSave("vendorPayments","vendorPaySaved");
+      scheduleSave("tasks","tasksSaved");
+      try{ renderVendorPay(); renderAccountantReport(); }catch(e){ console.error(e); }
+    };
+    const cands = vpOpenCandidates(taskRow.assignee, taskRow.licId);
+    if(cands.length){
+      const c = cands[0];
+      openConfirmModal(`בדוח מנה״ח כבר יש תשלום פתוח ל${c.vendor || ""}${(parseFloat(c.amount) || 0) > 0 ? " על " + fmtMoney(parseFloat(c.amount)) : ""}${c.desc ? ` ("${c.desc}")` : ""}. לקשר את המשימה לתשלום הזה, כדי שהעלות לא תירשם פעמיים?`, () => {
+        const t = data.tasks.find(x => x.id === taskRow.id) || taskRow;
+        if(t.vendorPayId || !data.vendorPayments.includes(c) || vpIsPaid(c)) return;
+        t.vendorPayId = c.id;
+        scheduleSave("tasks","tasksSaved");
+        try{ refreshJobViews(); renderVendorPay(); }catch(e){ console.error(e); }
+        jobToast("המשימה קושרה לתשלום הקיים · בלי רישום כפול");
+      }, { icon: "receipt", yesLabel: "כן, לקשר", noLabel: "לא, תשלום חדש", onCancel: make });
+    }else make();
   }
   renderVendorPay();
   renderAccountantReport();
@@ -7238,6 +7353,12 @@ function lcRenewed(row){ return !!(row.renewedToId && lcRow(row.renewedToId)); }
 function lcStepIdx(row){ return LIC_STATUS_ORDER.indexOf(row.processStatus || "לא התחיל"); }
 function lcTone(row){
   if(lcRenewed(row)) return "mute";
+  if(row.isPayment && !row.isBundle && !row.expiry){
+    if(lcPayPaid(row)) return "ok";
+    const pd = lcPayDays(row);
+    if(pd === null) return "";
+    return pd < 0 ? "bad" : pd <= 14 ? "warn" : "";
+  }
   const d = lcDays(row);
   if(d !== null){ if(d < 0) return "bad"; if(d <= 60) return "warn"; return "ok"; }
   return row.processStatus === LIC_FINAL ? "ok" : "";
@@ -7265,7 +7386,7 @@ function lcDefState(d){
 }
 function lcKids(parent){ return data.licensing.filter(r => r !== parent && Number(r.parentId) === parent.id); }
 function lcParent(row){ if(!row.parentId) return null; const p = lcRow(row.parentId); return p && p.isBundle && p !== row ? p : null; }
-function lcKidReady(k){ return lcStepIdx(k) >= 4 && lcStepIdx(k) <= 5 && !licHasMissingDocs(k) && lcTone(k) !== "bad"; }
+function lcKidReady(k){ if(k.isPayment && !k.isBundle) return lcPayDone(k); return lcStepIdx(k) >= 4 && lcStepIdx(k) <= 5 && !licHasMissingDocs(k) && lcTone(k) !== "bad"; }
 function lcLog(row, note, auto){
   row.statusLog = Array.isArray(row.statusLog) ? row.statusLog : [];
   row.statusLog.unshift(Object.assign({ date: lcToday(), status: row.processStatus || "", note }, auto ? { auto:true } : {}));
@@ -7301,7 +7422,7 @@ function lcMatches(row, f){
   if(f === "warn") return tone === "warn";
   if(f === "docs") return licHasMissingDocs(row);
   if(f === "proc") return licIsInProcess(row) && !lcRenewed(row);
-  if(f === "done") return row.processStatus === LIC_FINAL;
+  if(f === "done") return row.isPayment && !row.isBundle ? lcPayDone(row) : row.processStatus === LIC_FINAL;
   return true;
 }
 function lcSearchHit(row, q){
@@ -7354,27 +7475,26 @@ function lcBuildShell(root){
         <div><h2>רישוי ובטיחות</h2><div class="lc-sub" id="lcSub"></div></div></div>
       <div class="lc-actions">
         <span class="saved-flag" id="licSaved">נשמר</span>
-        <button type="button" class="lc-btn ghost" data-lc-act="view" data-v="ttd">${lcIco("doc", 16)}תיק נתונים ושטח</button>
         <button type="button" class="lc-btn ghost" data-lc-act="pack">${lcIco("folder", 16)}תיק רישוי להורדה</button>
-        <button type="button" class="lc-btn ghost" data-lc-act="view" data-v="visit">${lcIco("phone", 16)}מצב ביקור בודק</button>
         <button type="button" class="lc-btn" data-lc-act="new">${lcIco("plus", 16)}אישור חדש</button>
       </div>
     </div>
-    <div class="lc-kpis" id="lcKpis"></div>
     <div class="lc-bar">
-      <div class="lc-pills" id="lcPills"></div>
-      <div class="lc-search">${lcIco("search", 16)}<input type="text" id="licSearchInput" autocomplete="off" enterkeyhint="search" placeholder="חיפוש אישור, בודק, מסמך…"></div>
+      <div class="lc-search">${lcIco("search", 16)}<input type="text" id="licSearchInput" autocomplete="off" enterkeyhint="search" placeholder="חיפוש אישור, בודק, מסמך…" aria-label="חיפוש אישור"></div>
       <select class="lc-sel" id="licYearFilter" aria-label="שנת לימודים"></select>
       <select class="lc-sel" id="licSortBy" aria-label="מיון">
         <option value="expiry">מיון: תאריך תפוגה</option><option value="status">מיון: סטטוס טיפול</option>
         <option value="priority">מיון: עדיפות</option><option value="name">מיון: שם</option>
       </select>
-      <div class="lc-views" id="lcViews">
+      <div class="lc-views" id="lcViews" role="group" aria-label="תצוגה">
         <button type="button" data-lc-act="view" data-v="cards">${lcIco("grid")}כרטיסים</button>
         <button type="button" data-lc-act="view" data-v="year">${lcIco("cal")}ציר שנתי</button>
-        <button type="button" data-lc-act="view" data-v="visit">${lcIco("phone")}ביקור</button>
+        <button type="button" data-lc-act="view" data-v="visit">${lcIco("phone")}ביקור בודק</button>
+        <button type="button" data-lc-act="view" data-v="ttd">${lcIco("doc")}תיק נתונים ושטח</button>
       </div>
     </div>
+    <div class="lc-filters" id="lcPills"></div>
+    <div id="lcFocus"></div>
     <div id="lcMain"></div>
   </div>`;
   const yearSel = root.querySelector("#licYearFilter");
@@ -7424,20 +7544,13 @@ function renderLic(){
   const warnN = live.filter(r => lcTone(r) === "warn").length;
   const missDocs = live.reduce((s, r) => s + (r.requiredDocs || []).filter(d => d && !d.fileUrl).length, 0);
   const yearSel = document.getElementById("licYearFilter");
-  document.getElementById("lcSub").textContent = `${yearSel && yearSel.value ? "שנת " + schoolYearLabel(Number(yearSel.value)) : "כל השנים"} · ${live.length} אישורים`;
+  document.getElementById("lcSub").textContent = `${yearSel && yearSel.value ? "שנת " + schoolYearLabel(Number(yearSel.value)) : "כל השנים"} · ${live.length} אישורים${missDocs ? ` · ${missDocs} מסמכים חסרים` : ""}`;
 
-  const kp = document.getElementById("lcKpis");
-  const r = 17, L = +(2 * Math.PI * r).toFixed(2);
-  kp.innerHTML = `
-    <button type="button" class="lc-kpi ok ${licUi.f === "all" ? "on" : ""}" data-lc-act="filter" data-f="all">
-      <div style="width:40px;height:40px;flex:none"><svg viewBox="0 0 40 40" style="width:40px;height:40px;transform:rotate(-90deg)"><circle cx="20" cy="20" r="${r}" fill="none" stroke="var(--line)" stroke-width="5"/><circle cx="20" cy="20" r="${r}" fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L}" data-lc-off="${(L * (1 - (pct || 0) / 100)).toFixed(2)}" style="transition:stroke-dashoffset 1.1s"/></svg></div>
-      <div><div class="v" ${pct === null ? "" : `data-lc-count="${pct}" data-lc-suf="%"`}>${pct === null ? "—" : pct + "%"}</div><div class="l">אישורים בתוקף</div></div></button>
-    <button type="button" class="lc-kpi bad ${licUi.f === "bad" ? "on" : ""}" data-lc-act="filter" data-f="bad"><div class="ic">${lcIco("alert")}</div><div><div class="v" data-lc-count="${badN}">${badN}</div><div class="l">פג תוקף</div></div></button>
-    <button type="button" class="lc-kpi warn ${licUi.f === "warn" ? "on" : ""}" data-lc-act="filter" data-f="warn"><div class="ic">${lcIco("clock")}</div><div><div class="v" data-lc-count="${warnN}">${warnN}</div><div class="l">מתקרבים · 60 יום</div></div></button>
-    <button type="button" class="lc-kpi vio ${licUi.f === "docs" ? "on" : ""}" data-lc-act="filter" data-f="docs"><div class="ic">${lcIco("doc")}</div><div><div class="v" data-lc-count="${missDocs}">${missDocs}</div><div class="l">מסמכים חסרים</div></div></button>`;
-
-  const pills = [["all","הכל"],["bad","פג תוקף"],["warn","מתקרב"],["docs","חסרים מסמכים"],["proc","בתהליך"],["done","סגור"]];
-  document.getElementById("lcPills").innerHTML = pills.map(([k, l]) => `<button type="button" class="lc-pill ${licUi.f === k ? "on" : ""}" data-lc-act="filter" data-f="${k}">${l} <b>${all.filter(r => lcMatches(r, k)).length}</b></button>`).join("");
+  const pills = [["all","הכל",""],["bad","פג תוקף","var(--red)"],["warn","מתקרב","var(--amber)"],["docs","חסרים מסמכים","var(--violet)"],["proc","בתהליך",""],["done","סגור","var(--green)"]];
+  document.getElementById("lcPills").innerHTML = pills.map(([k, l, c]) => `<button type="button" class="lc-fchip ${licUi.f === k ? "on" : ""}" data-lc-act="filter" data-f="${k}" aria-pressed="${licUi.f === k}">${c ? `<i style="background:${c}"></i>` : ""}${l} <b>${all.filter(r => lcMatches(r, k)).length}</b></button>`).join("")
+    + (pct === null ? "" : `<div class="lc-overall"><span class="lc-prog"><i style="width:${pct}%;background:var(--green)"></i></span><span><b style="color:var(--ink)">${pct}%</b> בתוקף</span></div>`);
+  const fo = document.getElementById("lcFocus");
+  if(fo) fo.innerHTML = licUi.view === "cards" ? lcFocusHtml(all) : "";
   document.querySelectorAll("#lcViews button").forEach(b => b.classList.toggle("on", b.dataset.v === licUi.view));
 
   const main = document.getElementById("lcMain");
@@ -8552,7 +8665,139 @@ function ttdOnClick(e){
   }
 }
 
+/* ---------- מצב כרטיס: נקודה, תגית אחת, "הצעד הבא" (עיצוב נקי 2026-11) ---------- */
+function lcBundleParts(p){
+  const kids = lcKids(p).filter(k => !lcRenewed(k));
+  const parts = lcSortRows(kids).map(k => ({ id: k.id, l: k.type || "ללא שם", ok: lcKidReady(k), bad: lcTone(k) === "bad", pay: false }));
+  if(p.isPayment) parts.push({ id: p.id, l: "תשלום", ok: lcPayDone(p), bad: lcPayLate(p), pay: true });
+  return parts;
+}
+function lcBundleState(p){
+  const parts = lcBundleParts(p);
+  const ready = parts.filter(x => x.ok).length;
+  const all = parts.length > 0 && ready === parts.length;
+  const idx = lcStepIdx(p);
+  let label, tone;
+  if(lcRenewed(p)){ label = lcToneLabel(p); tone = "mute"; }
+  else if(p.processStatus === LIC_REJECTED){ label = "נדחה"; tone = "bad"; }
+  else if(lcTone(p) === "bad"){ label = "פג תוקף"; tone = "bad"; }
+  else if(idx >= 4){ label = LIC_STEP_LABELS[idx]; tone = "ok"; }
+  else if(!parts.length){ label = "אין אישורי משנה"; tone = "mute"; }
+  else if(!all){ label = `איסוף אישורים ${ready}/${parts.length}`; tone = "warn"; }
+  else if(idx >= 1){ label = LIC_STEP_LABELS[idx]; tone = "vio"; }
+  else{ label = "מוכן להגשה"; tone = "ok"; }
+  return { parts, ready, total: parts.length, all, label, tone };
+}
+function lcNext(row){
+  if(lcRenewed(row)) return { t: lcToneLabel(row), tone: "mute" };
+  if(row.processStatus === LIC_REJECTED) return { t: "האישור נדחה · כדאי לבדוק את הסיבה ולהגיש מחדש", tone: "bad" };
+  if(row.isBundle){
+    const s = lcBundleState(row);
+    if(lcTone(row) === "bad") return { t: "פג תוקף · צריך לחדש את האישור", tone: "bad" };
+    if(lcStepIdx(row) < 4){
+      if(!s.total) return { t: "עדיין אין אישורי משנה", tone: "" };
+      if(!s.all){
+        const miss = s.parts.filter(x => !x.ok);
+        if(miss.length === 1 && miss[0].pay) return Object.assign(lcPayNext(row), {});
+        return { t: "להשלים: " + miss.map(x => x.l).join(", "), tone: "warn" };
+      }
+      if(lcStepIdx(row) <= 0) return { t: "כל אישורי המשנה מוכנים · אפשר להגיש", tone: "ok", act: "bundle" };
+      if(lcStepIdx(row) === 1) return { t: "הוגש · ממתין לבדיקה או לתשובה", tone: "" };
+    }
+  }
+  if(row.isPayment && !row.isBundle) return lcPayNext(row);
+  const tone = lcTone(row);
+  const defs = lcDefects(row);
+  const openD = defs.filter(d => lcDefState(d) === "open").length;
+  const taskD = defs.filter(d => lcDefState(d) === "task").length;
+  const miss = (row.requiredDocs || []).filter(d => d && !d.fileUrl);
+  if(tone === "bad") return { t: "פג תוקף · לתאם בדיקה", tone: "bad", act: "coord" };
+  if(openD) return { t: `${openD === 1 ? "ליקוי פתוח אחד" : openD + " ליקויים פתוחים"}${taskD ? ` · ${taskD} בטיפול במשימות` : ""}`, tone: "warn", act: "deftask" };
+  if(taskD) return { t: `${taskD === 1 ? "ליקוי אחד בטיפול" : taskD + " ליקויים בטיפול"} במשימות`, tone: "" };
+  if(miss.length) return { t: miss.length === 1 ? `חסר מסמך: ${miss[0].name || "מסמך"}` : `חסרים ${miss.length} מסמכים`, tone: "warn", act: "docup" };
+  if(tone === "warn") return { t: "מתקרב לתפוגה · לתאם בדיקה", tone: "warn", act: "coord" };
+  const idx = lcStepIdx(row);
+  if(idx === 1) return { t: "ממתין לביקור הבודק", tone: "" };
+  if(idx === 2) return { t: "דוח ליקויים התקבל · להזין את הליקויים", tone: "warn" };
+  if(idx === 3) return { t: "תיקונים בוצעו · ממתין לאישור", tone: "" };
+  if(idx === 4) return { t: "אישור זמני בתוקף · ממתין לאישור סופי", tone: "" };
+  if(idx <= 0 && !row.expiry) return { t: "לא התחיל · להזמין בודק", tone: "", act: "coord" };
+  const nm = lcInspectorName(row);
+  return { t: ["בתוקף", nm ? "בודק: " + nm : "", row.freq || ""].filter(Boolean).join(" · "), tone: "ok" };
+}
+function lcChip(row){
+  if(lcRenewed(row)) return ["mute", lcToneLabel(row)];
+  if(row.isBundle){ const s = lcBundleState(row); return [s.tone, s.label]; }
+  if(row.processStatus === LIC_REJECTED) return ["bad", "נדחה"];
+  if(row.isPayment){
+    const st = lcPayStage(row);
+    if(st === 3) return ["ok", "שולם"];
+    if(st === 2) return ["warn", "שולם · חסרה אסמכתא"];
+    if(st === 1) return lcPayLate(row) ? ["bad", "עבר מועד התשלום"] : ["warn", "ממתין לתשלום"];
+    return ["mute", "ממתין לשובר"];
+  }
+  const tone = lcTone(row);
+  if(tone === "bad") return ["bad", "פג תוקף"];
+  if(tone === "warn") return ["warn", "מתקרב לתפוגה"];
+  const idx = lcStepIdx(row);
+  if(idx < 0) return ["vio", row.processStatus || ""];
+  if(idx === 5) return ["ok", "אישור סופי"];
+  return [idx === 4 ? "ok" : idx === 0 ? "mute" : "vio", LIC_STEP_LABELS[idx]];
+}
+function lcDateTxt(row){
+  if(row.isPayment && !row.isBundle){ const p = row.pay || {}; return p.due ? fmtDateHe(p.due) : "—"; }
+  if(row.expiry) return (lcDays(row) < 0 ? "פג " : "עד ") + fmtDateHe(row.expiry);
+  if(row.last) return "נבדק " + fmtDateHe(row.last);
+  return "—";
+}
+function lcDotHtml(row){
+  if(row.isBundle && lcStepIdx(row) < 4 && !lcRenewed(row) && lcTone(row) !== "bad"){
+    const s = lcBundleState(row);
+    if(s.total) return `<div class="lc-dot2 ${s.tone === "ok" ? "ok" : "warn"}"><b>${s.ready}/${s.total}</b><small>מוכנים</small></div>`;
+  }
+  const tone = lcTone(row) || "mute";
+  if(row.isPayment && !row.isBundle){
+    const st = lcPayStage(row);
+    return `<div class="lc-dot2 ${st === 3 ? "ok" : tone === "bad" ? "bad" : st === 0 ? "mute" : "warn"}" aria-hidden="true">${lcIco(st === 3 ? "check" : "coin", 20)}</div>`;
+  }
+  const d = lcDays(row);
+  if(d === null) return `<div class="lc-dot2 ${tone}"><b>${row.processStatus === LIC_FINAL ? lcIco("check", 18) : "—"}</b><small>${lcRenewed(row) ? "חודש" : row.processStatus === LIC_FINAL ? "סופי" : "אין תאריך"}</small></div>`;
+  return `<div class="lc-dot2 ${tone}"><b>${Math.abs(d) > 999 ? "999+" : Math.abs(d)}</b><small>${d < 0 ? "באיחור" : "ימים"}</small></div>`;
+}
+function lcStepsHtml(row){
+  const stepIdx = lcStepIdx(row);
+  return LIC_STEP_LABELS.map((l, i) => {
+    const cls = row.processStatus === LIC_REJECTED ? "rej" : stepIdx < 0 ? "" : i < stepIdx ? "done" : i === stepIdx ? (i === 5 ? "done" : "cur") : "";
+    return `<button type="button" class="lc-step ${cls}" data-lc-act="step" data-id="${row.id}" data-s="${i}" title="עדכון סטטוס ל: ${escHtml(LIC_STATUS_ORDER[i])}"><i></i><span>${l}</span></button>`;
+  }).join("");
+}
+function lcFocusHtml(all){
+  const live = all.filter(r => !lcRenewed(r));
+  const items = [];
+  live.forEach(r => {
+    const tone = lcTone(r);
+    if(r.processStatus === LIC_REJECTED){ items.push({ r, w: 0, t: `${r.type || ""} · נדחה`, cls: "bad" }); return; }
+    if(r.isBundle){
+      if(tone === "bad") items.push({ r, w: 0, t: `${r.type || ""} · פג תוקף`, cls: "bad" });
+      else if(lcStepIdx(r) <= 0){ const s = lcBundleState(r); if(s.all) items.push({ r, w: 3, t: `${r.type || ""} · מוכן להגשה`, cls: "" }); }
+      if(!r.isPayment) return;
+    }
+    if(r.isPayment){
+      if(lcPayStage(r) < 2){ const d = lcPayDays(r); if(d !== null && d <= 14) items.push({ r, w: d < 0 ? 0 : 1, t: `${r.isBundle ? "תשלום · " : ""}${r.type || ""} · ${d < 0 ? "עבר מועד התשלום" : "לשלם עד " + fmtDateHe(r.pay.due)}`, cls: d < 0 ? "bad" : "" }); }
+      if(!r.isBundle) return;
+      return;
+    }
+    if(tone === "bad") items.push({ r, w: 0, t: `${r.type || ""} · ${lcDays(r) === 0 ? "פג היום" : "פג לפני " + Math.abs(lcDays(r)) + " ימים"}`, cls: "bad" });
+    else if(tone === "warn" && lcDays(r) <= 30) items.push({ r, w: 2, t: `${r.type || ""} · עוד ${lcDays(r)} ימים`, cls: "" });
+  });
+  if(!items.length) return "";
+  items.sort((a, b) => a.w - b.w);
+  const shown = items.slice(0, 5);
+  return `<div class="lc-focus"><h4>לטיפול עכשיו</h4>${shown.map(x => `<button type="button" class="${x.cls}" data-lc-act="goto" data-id="${x.r.id}">${escHtml(x.t)}</button>`).join("")}${items.length > 5 ? `<span style="font-size:12px;color:#e9dccb">ועוד ${items.length - 5}</span>` : ""}</div>`;
+}
+
 function lcCardsHtml(all){
+  if(!licUi.closedTr) licUi.closedTr = new Set();
   const shown = all.filter(r => lcMatches(r, licUi.f) && lcSearchHit(r, licUi.q));
   if(!all.length){
     return `<div class="lc-empty">${lcIco("shield", 34)}<b>עדיין אין אישורים בשנה הזו</b><span>אפשר להתחיל מתבנית מוכנה, או לבחור "כל השנים" כדי לראות אישורים קודמים.</span><button type="button" class="lc-btn" data-lc-act="new">${lcIco("plus", 16)}אישור חדש מתבנית</button></div>`;
@@ -8571,88 +8816,91 @@ function lcCardsHtml(all){
     placed.add(p); kids.forEach(k => placed.add(k));
   });
   lcSortRows(shown).forEach(r => { if(!placed.has(r)) byKey(lcTrackKey(r)).items.push({ row: r }); });
+  const searching = !!licUi.q || licUi.f !== "all";
   return groups.filter(g => g.items.length).map(g => {
     const rows = all.filter(r => lcTrackKey(lcParent(r) || r) === g.t.k && !lcRenewed(r) && !r.isBundle);
     const okN = rows.filter(r => lcTone(r) === "ok").length;
     const pc = rows.length ? Math.round(okN / rows.length * 100) : 0;
-    return `<section class="lc-track">
-      <div class="lc-track-h"><div class="lc-dot" style="background:${g.t.bg};color:${g.t.c}">${lcIco(g.t.ico)}</div><h3>${g.t.l}</h3>
-        <span class="lc-sub">${rows.length} אישורים · ${okN} בתוקף</span><div class="lc-prog"><i style="width:${pc}%;background:${g.t.c}"></i></div></div>
-      ${g.items.map(it => it.bundle ? lcBundleHtml(it.bundle, it.kids) : lcCardHtml(it.row)).join("")}
+    const closed = licUi.closedTr.has(g.t.k) && !searching;
+    return `<section class="lc-track ${closed ? "closed" : ""}">
+      <button type="button" class="lc-track-h" data-lc-act="trk" data-k="${g.t.k}" aria-expanded="${!closed}">
+        <span class="lc-dot" style="background:${g.t.bg};color:${g.t.c}">${lcIco(g.t.ico)}</span><h3>${g.t.l}</h3>
+        <span class="lc-sub">${rows.length} אישורים · ${okN} בתוקף</span><span class="lc-prog"><i style="width:${pc}%;background:${g.t.c}"></i></span>
+        <span class="ln"></span><span class="lc-chev">${lcIco("chev", 16)}</span></button>
+      ${closed ? "" : g.items.map(it => it.bundle ? lcBundleHtml(it.bundle, it.kids) : lcCardHtml(it.row)).join("")}
     </section>`;
   }).join("");
 }
 
 function lcBundleHtml(p, kids){
-  const all = lcKids(p).filter(k => !lcRenewed(k));
-  const ready = all.filter(lcKidReady).length;
-  const tone = all.length && ready === all.length ? "ok" : "warn";
-  const kidChip = k => {
-    const ok = lcKidReady(k), bad = lcTone(k) === "bad";
-    const sub = ok ? (k.expiry ? "בתוקף עד " + fmtDateHe(k.expiry) : "מוכן") : bad ? "פג תוקף" : licHasMissingDocs(k) ? "חסרים מסמכים" : (k.processStatus || "לא התחיל");
-    return `<button type="button" class="lc-kid" data-lc-act="goto" data-id="${k.id}"><div class="st ${ok ? "ok" : bad ? "bad" : "wait"}">${lcIco(ok ? "check" : bad ? "alert" : "clock")}</div><div>${escHtml(k.type || "ללא שם")}<small>${escHtml(sub)}</small></div></button>`;
-  };
-  return `<div class="lc-bundle">
+  const s = lcBundleState(p);
+  const open = licUi.open.has(p.id);
+  const nx = lcNext(p);
+  const segs = s.parts.map(x => `<button type="button" class="${x.ok ? "ok" : x.bad ? "bad" : "wait"}" data-lc-act="${x.pay ? "openbody" : "goto"}" data-id="${x.id}" title="${escHtml(x.l + (x.ok ? " · מוכן" : " · עוד לא מוכן"))}"><i></i><span>${escHtml(x.l)}</span></button>`).join("");
+  return `<div class="lc-bundle ${open ? "open" : ""}" id="lc-card-${p.id}">
     <div class="lc-bundle-top">
-      <button type="button" class="lc-bh" data-lc-act="toggle" data-id="${p.id}" aria-expanded="${licUi.open.has(p.id)}">
-        ${lcRingHtml(p)}
-        <div class="txt"><h4>${escHtml(p.type || "אישור מרוכז")}</h4>
-          <div class="lc-sub">תיק הגשה · נאסף אוטומטית מ־${all.length} אישורי משנה${p.expiry ? " · יעד " + fmtDateHe(p.expiry) : ""}${p.processStatus ? " · " + escHtml(p.processStatus) : ""}</div></div>
+      <button type="button" class="lc-bh" data-lc-act="toggle" data-id="${p.id}" aria-expanded="${open}">
+        ${lcDotHtml(p)}
+        <span class="txt"><span class="lc-name">${escHtml(p.type || "אישור מרוכז")} <span class="lc-tag info">תיק הגשה</span>${p.isPayment ? ` <span class="lc-tag mute">${lcIco("coin", 12)}תשלום</span>` : ""}</span><span class="lc-next">${escHtml(nx.t)}</span></span>
       </button>
-      <span class="lc-tag ${tone}">${ready} מתוך ${all.length} מוכנים להגשה</span>
-      <button type="button" class="lc-btn sm" data-lc-act="bundle" data-id="${p.id}">${lcIco("folder", 15)}פתיחת תיק הגשה</button>
-      <button type="button" class="lc-btn sm ghost" data-lc-act="toggle" data-id="${p.id}">${licUi.open.has(p.id) ? "סגירה" : "פרטים"}</button>
+      ${s.total ? `<div class="lc-segs" aria-label="אישורי המשנה: ${s.ready} מתוך ${s.total} מוכנים">${segs}</div>` : ""}
+      <span class="lc-tag ${s.tone}">${escHtml(s.label)}</span>
+      <button type="button" class="lc-btn sm ghost" data-lc-act="bundle" data-id="${p.id}">${lcIco("folder", 15)}תיק הגשה</button>
+      <button type="button" class="lc-iconbtn lc-bchev" data-lc-act="toggle" data-id="${p.id}" aria-expanded="${open}" aria-label="${open ? "סגירת הפרטים" : "פתיחת הפרטים"}">${lcIco("chev", 16)}</button>
     </div>
-    ${all.length ? `<div class="lc-kids">${all.map(kidChip).join("")}</div>` : `<div class="lc-sub">אין עדיין אישורי משנה. בעריכת אישור אחר בוחרים "שייך לאישור מרוכז".</div>`}
-    ${licUi.open.has(p.id) ? lcCardHtml(p, true) : ""}
-    ${kids.length ? `<div class="lc-kids-cards">${kids.map(k => lcCardHtml(k)).join("")}</div>` : ""}
+    ${open ? `<div class="lc-card open lc-inb">${lcBodyHtml(p, true)}</div>` : ""}
+    ${kids.length ? `<div class="lc-kids-cards">${kids.map(k => lcCardHtml(k)).join("")}</div>` : (s.total ? "" : `<div class="lc-sub">אין עדיין אישורי משנה. בעריכת אישור אחר בוחרים "שייך לאישור מרוכז".</div>`)}
   </div>`;
 }
 
-function lcCardHtml(row, inBundle){
+function lcCardHtml(row){
   const tone = lcTone(row);
-  const open = licUi.open.has(row.id) || inBundle;
-  const parent = lcParent(row);
-  const stepIdx = lcStepIdx(row);
-  const toneLbl = lcToneLabel(row);
-  const tags = [];
-  if(parent) tags.push(`<span class="lc-tag vio">חלק מ${escHtml(parent.type || "אישור מרוכז")}</span>`);
-  if(row.priority === "גבוהה" && tone !== "mute") tags.push(`<span class="lc-tag bad">עדיפות גבוהה</span>`);
-  if(toneLbl) tags.push(`<span class="lc-tag ${tone === "mute" ? "mute" : tone}">${escHtml(toneLbl)}</span>`);
-  if(row.processStatus === LIC_FINAL && tone !== "bad") tags.push(`<span class="lc-tag ok">אישור סופי</span>`);
-  if(row.processStatus === LIC_REJECTED) tags.push(`<span class="lc-tag bad">נדחה</span>`);
-  if(stepIdx < 0 && row.processStatus) tags.push(`<span class="lc-tag vio">${escHtml(row.processStatus)}</span>`);
-  const missN = (row.requiredDocs || []).filter(d => d && !d.fileUrl).length;
-  if(missN) tags.push(`<span class="lc-tag vio">${missN} מסמכים חסרים</span>`);
+  const open = licUi.open.has(row.id);
+  const [ct, cl] = lcChip(row);
+  const nx = lcNext(row);
   const mt = row.mtRemindId && typeof mtGet === "function" ? mtGet(row.mtRemindId) : null;
-  if(mt && !mt.done) tags.push(`<span class="lc-tag info">${lcIco("bell", 12)}תזכורת ב"המשימות שלי"</span>`);
-  const freq = row.freq || (lcFreqMonths(row) ? (LIC_FREQS.find(f => f[1] === lcFreqMonths(row)) || [""])[0] : "");
-  const who = [
-    lcInspectorName(row) ? `<span>${lcIco("user")}${escHtml(lcInspectorName(row))}</span>` : "",
-    freq ? `<span>${lcIco("refresh")}${escHtml(freq)}</span>` : "",
-    row.expiry ? `<span>${lcIco("cal")}${lcDays(row) < 0 ? "פג ב-" : "בדיקה הבאה "}${fmtDateHe(row.expiry)}</span>` : (row.last ? `<span>${lcIco("cal")}בדיקה אחרונה ${fmtDateHe(row.last)}</span>` : ""),
-    row.schoolYear ? `<span class="lc-sub">${schoolYearLabel(Number(row.schoolYear))}</span>` : ""
-  ].join("");
-  const steps = LIC_STEP_LABELS.map((l, i) => {
-    const cls = row.processStatus === LIC_REJECTED ? "rej" : stepIdx < 0 ? "" : i < stepIdx ? "done" : i === stepIdx ? (i === 5 ? "done" : "cur") : "";
-    return `<button type="button" class="lc-step ${cls}" data-lc-act="step" data-id="${row.id}" data-s="${i}" title="עדכון סטטוס ל: ${escHtml(LIC_STATUS_ORDER[i])}"><i></i><span>${l}</span></button>`;
-  }).join("");
-  const head = inBundle ? "" : `<button type="button" class="lc-h" data-lc-act="toggle" data-id="${row.id}" aria-expanded="${open}">
-      ${lcRingHtml(row)}
-      <div style="min-width:0"><div class="lc-name">${escHtml(row.type || "אישור ללא שם")} ${tags.join(" ")}</div><div class="lc-who">${who}</div></div>
+  const extra = [];
+  if(row.isPayment) extra.push(`<span class="lc-tag mute">${lcIco("coin", 12)}תשלום</span>`);
+  if(row.priority === "גבוהה" && tone !== "mute" && tone !== "ok") extra.push(`<span class="lc-tag bad">עדיפות גבוהה</span>`);
+  if(mt && !mt.done) extra.push(`<span class="lc-tag info" title="יש תזכורת ב&quot;המשימות שלי&quot;">${lcIco("bell", 12)}</span>`);
+  return `<article class="lc-card ${tone} ${open ? "open" : ""}" id="lc-card-${row.id}">
+    <button type="button" class="lc-h" data-lc-act="toggle" data-id="${row.id}" aria-expanded="${open}">
+      ${lcDotHtml(row)}
+      <span style="min-width:0"><span class="lc-name">${escHtml(row.type || "אישור ללא שם")} ${extra.join(" ")}</span><span class="lc-next">${escHtml(nx.t)}</span></span>
+      <span class="lc-tag ${ct}">${escHtml(cl)}</span>
+      <span class="lc-date">${escHtml(lcDateTxt(row))}</span>
       <span class="lc-chev">${lcIco("chev")}</span>
-    </button>`;
-  return `<article class="lc-card ${tone} ${open ? "open" : ""}" id="lc-card-${row.id}" ${inBundle ? 'style="box-shadow:none;border-inline-start:0;background:transparent"' : ""}>
-    ${head}
-    <div class="lc-steps" ${inBundle ? 'style="padding:4px 0 10px"' : ""}>${steps}</div>
-    ${open ? lcBodyHtml(row, inBundle) : ""}
+    </button>
+    ${open && !row.isPayment ? `<div class="lc-steps">${lcStepsHtml(row)}</div>` : ""}
+    ${open ? lcBodyHtml(row, false) : ""}
   </article>`;
+}
+
+function lcNextBtn(row, nx, canTasks){
+  const isAdmin = lcIsAdmin();
+  switch(nx.act){
+    case "deftask": return canTasks ? `<button type="button" class="lc-btn sm" data-lc-act="deftask" data-id="${row.id}">${lcIco("task", 14)}הפיכת הליקויים למשימות</button>` : "";
+    case "docup": { const i = (row.requiredDocs || []).findIndex(d => d && !d.fileUrl); return i >= 0 ? `<button type="button" class="lc-btn sm" data-lc-act="docup" data-id="${row.id}" data-i="${i}">${lcIco("upload", 14)}העלאת המסמך</button>` : ""; }
+    case "coord": {
+      const c = lcContact(row), nm = lcInspectorName(row);
+      if(c && c.phone) return `<a class="lc-btn sm" href="${escHtml(lcWaUrl(c.phone, lcMsgCoordinate(row, nm)))}" target="_blank" rel="noopener">${lcIco("chat", 14)}תיאום ביקור</a>`;
+      return `<button type="button" class="lc-btn sm" data-lc-act="pickcontact" data-id="${row.id}">${lcIco("user", 14)}${nm ? "קישור לאיש קשר" : "בחירת גורם בודק"}</button>`;
+    }
+    case "bundle": return `<button type="button" class="lc-btn sm" data-lc-act="bundle" data-id="${row.id}">${lcIco("folder", 14)}פתיחת תיק הגשה</button>`;
+    case "payvoucher": return `<button type="button" class="lc-btn sm" data-lc-act="payup" data-id="${row.id}" data-w="voucher">${lcIco("upload", 14)}העלאת השובר</button>`;
+    case "paypaid": return isAdmin ? `<button type="button" class="lc-btn sm" data-lc-act="paypaid" data-id="${row.id}">${lcIco("check", 14)}סימון כשולם</button>` : "";
+    case "payreceipt": return `<button type="button" class="lc-btn sm" data-lc-act="payup" data-id="${row.id}" data-w="receipt">${lcIco("upload", 14)}העלאת אסמכתא</button>`;
+  }
+  return "";
 }
 
 function lcBodyHtml(row, inBundle){
   const docs = row.requiredDocs || [];
   const isAdmin = lcIsAdmin();
   const canTasks = canOpenTab("tasks");
+  const canEq = canOpenTab("equipment");
+  const nx = lcNext(row);
+  const nextBar = `<div class="lc-nextbar ${nx.tone === "ok" ? "ok" : nx.tone === "bad" ? "bad" : nx.tone === "mute" || !nx.tone ? "soft" : ""}">${lcIco(nx.tone === "ok" ? "check" : "flag", 16)}<span class="t"><b>${nx.tone === "ok" ? "מצב:" : "הצעד הבא:"}</b> ${escHtml(nx.t)}</span>${lcNextBtn(row, nx, canTasks)}</div>`;
   // --- ליקויים
   const defs = lcDefects(row);
   const defRows = defs.map((d, i) => {
@@ -8663,82 +8911,95 @@ function lcBodyHtml(row, inBundle){
     const acts = [
       d.photoUrl ? `<button type="button" class="lc-thumb" data-fv-url="${escHtml(d.photoUrl)}" data-fv-title="תמונת ליקוי"><img class="lc-thumb" src="${escHtml(d.photoUrl)}" alt="תמונת ליקוי" loading="lazy"></button>` : "",
       st === "open" && canTasks ? `<button type="button" class="lc-btn sm ghost" data-lc-act="deftask" data-id="${row.id}" data-i="${i}">${lcIco("task", 14)}למשימה</button>` : "",
-      st === "task" && canTasks ? `<button type="button" class="lc-iconbtn" title="פתיחת המשימה" data-lc-act="gototask" data-tid="${t.id}">${lcIco("task")}</button>` : "",
-      st === "open" ? `<button type="button" class="lc-iconbtn" title="סימון כתוקן" data-lc-act="deffix" data-id="${row.id}" data-i="${i}">${lcIco("check")}</button>` : "",
-      st === "fixed" && d.fixed && !t ? `<button type="button" class="lc-iconbtn" title="ביטול סימון תוקן" data-lc-act="defunfix" data-id="${row.id}" data-i="${i}">${lcIco("refresh")}</button>` : "",
-      st !== "task" ? `<button type="button" class="lc-iconbtn" title="מחיקת הליקוי" data-lc-act="defdel" data-id="${row.id}" data-i="${i}">${lcIco("trash")}</button>` : ""
+      st === "task" && canTasks ? `<button type="button" class="lc-iconbtn" title="פתיחת המשימה" aria-label="פתיחת המשימה" data-lc-act="gototask" data-tid="${t.id}">${lcIco("task")}</button>` : "",
+      st === "open" ? `<button type="button" class="lc-iconbtn" title="סימון כתוקן" aria-label="סימון כתוקן" data-lc-act="deffix" data-id="${row.id}" data-i="${i}">${lcIco("check")}</button>` : "",
+      st === "fixed" && d.fixed && !t ? `<button type="button" class="lc-iconbtn" title="ביטול סימון תוקן" aria-label="ביטול סימון תוקן" data-lc-act="defunfix" data-id="${row.id}" data-i="${i}">${lcIco("refresh")}</button>` : "",
+      st !== "task" ? `<button type="button" class="lc-iconbtn" title="מחיקת הליקוי" aria-label="מחיקת הליקוי" data-lc-act="defdel" data-id="${row.id}" data-i="${i}">${lcIco("trash")}</button>` : ""
     ].join("");
     return `<div class="lc-def ${st}"><div class="num">${i + 1}</div><div style="min-width:0"><div class="t">${escHtml(d.text)}</div><div class="m">${meta}</div></div><div class="acts">${acts}</div></div>`;
   }).join("");
-  const openDefs = defs.filter(d => lcDefState(d) === "open").length;
-  const defSec = `<div class="lc-sec">
-    <div class="lc-sec-h">${lcIco("alert")}דוח ליקויים${defs.length ? ` · ${defs.length} ליקויים` : ""}
+  const defSec = `<div class="lc-panel">
+    <div class="lc-sec-h">${lcIco("alert")}דוח ליקויים${defs.length ? ` · ${defs.length}` : ""}
       <span class="r">${row.defectReport && row.defectReport.url ? `<button type="button" class="lc-btn sm ghost" data-fv-url="${escHtml(row.defectReport.url)}" data-fv-title="דוח ליקויים">${lcIco("doc", 14)}הדוח המלא · ${fmtDateHe(row.defectReport.date)}</button>` : ""}</span></div>
-    ${defs.length ? `<div class="lc-box">${defRows}</div>` : ""}
-    <div class="lc-addrow"><input type="text" class="lc-in" data-lc-defin="${row.id}" placeholder="הוספת ליקוי מהדוח (Enter)"><button type="button" class="lc-btn sm ghost" data-lc-act="defadd" data-id="${row.id}">${lcIco("plus", 14)}ליקוי</button></div>
+    ${defs.length ? `<div>${defRows}</div>` : ""}
+    <div class="lc-addrow"><input type="text" class="lc-in" data-lc-defin="${row.id}" placeholder="הוספת ליקוי מהדוח (Enter)" aria-label="הוספת ליקוי"><button type="button" class="lc-btn sm ghost" data-lc-act="defadd" data-id="${row.id}">${lcIco("plus", 14)}ליקוי</button></div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-      ${openDefs && canTasks ? `<button type="button" class="lc-btn sm" data-lc-act="deftask" data-id="${row.id}">${lcIco("task", 14)}הפיכת ${openDefs} ליקויים למשימות</button>` : ""}
       <button type="button" class="lc-btn sm ghost" data-lc-act="defreport" data-id="${row.id}">${lcIco("upload", 14)}${row.defectReport && row.defectReport.url ? "החלפת דוח ליקויים" : "העלאת דוח ליקויים"}</button>
       ${defs.length ? `<span class="lc-sub">כשכל הליקויים מתוקנים, הסטטוס עובר לבד ל"תיקונים בוצעו"</span>` : ""}
     </div>
   </div>`;
   // --- מסמכים
   const docChips = docs.map((d, i) => d.fileUrl
-    ? `<span class="lc-doc have"><button type="button" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(d.name || "מסמך")}">${lcIco("check")}${escHtml(d.name || "מסמך")}</button><button type="button" class="x" title="הסרת המסמך" data-lc-act="docdel" data-id="${row.id}" data-i="${i}">${lcIco("x", 12)}</button></span>`
-    : `<span class="lc-doc miss"><button type="button" title="העלאה" data-lc-act="docup" data-id="${row.id}" data-i="${i}">${lcIco("upload")}${escHtml(d.name || "מסמך")}</button><button type="button" class="x" title="הסרה מהרשימה" data-lc-act="docdel" data-id="${row.id}" data-i="${i}">${lcIco("x", 12)}</button></span>`).join("");
+    ? `<span class="lc-doc have"><button type="button" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(d.name || "מסמך")}">${lcIco("check")}${escHtml(d.name || "מסמך")}</button><button type="button" class="x" title="הסרת המסמך" aria-label="הסרת המסמך" data-lc-act="docdel" data-id="${row.id}" data-i="${i}">${lcIco("x", 12)}</button></span>`
+    : `<span class="lc-doc miss"><button type="button" title="העלאה" data-lc-act="docup" data-id="${row.id}" data-i="${i}">${lcIco("upload")}${escHtml(d.name || "מסמך")}</button><button type="button" class="x" title="הסרה מהרשימה" aria-label="הסרה מהרשימה" data-lc-act="docdel" data-id="${row.id}" data-i="${i}">${lcIco("x", 12)}</button></span>`).join("");
   const have = docs.filter(d => d.fileUrl).length;
-  const approval = row.link
-    ? `<span class="lc-doc have" style="background:var(--green);color:#fff"><button type="button" data-fv-url="${escHtml(row.link)}" data-fv-title="${escHtml((row.type || "אישור") + " · אישור")}">${lcIco("shield")}האישור עצמו</button><button type="button" class="x" title="הסרת קובץ האישור" data-lc-act="approvaldel" data-id="${row.id}">${lcIco("x", 12)}</button></span>`
+  const approval = row.isPayment && !row.isBundle && !row.link ? "" : row.link
+    ? `<span class="lc-doc have lc-doc-main"><button type="button" data-fv-url="${escHtml(row.link)}" data-fv-title="${escHtml((row.type || "אישור") + " · אישור")}">${lcIco("shield")}האישור עצמו</button><button type="button" class="x" title="הסרת קובץ האישור" aria-label="הסרת קובץ האישור" data-lc-act="approvaldel" data-id="${row.id}">${lcIco("x", 12)}</button></span>`
     : `<span class="lc-doc miss"><button type="button" data-lc-act="approvalup" data-id="${row.id}">${lcIco("shield")}העלאת האישור עצמו</button></span>`;
-  const docSec = `<div class="lc-sec">
+  const docSec = `<div class="lc-panel">
     <div class="lc-sec-h">${lcIco("doc")}מסמכים<span class="r">${docs.length ? `${have} מתוך ${docs.length} נדרשים` : ""}</span></div>
     <div class="lc-docs">${approval}${docChips}<button type="button" class="lc-btn sm ghost" data-lc-act="docadd" data-id="${row.id}">${lcIco("plus", 14)}מסמך נדרש</button></div>
     <div class="lc-drop" data-lc-drop="${row.id}" data-lc-act="dropclick" data-id="${row.id}" role="button" tabindex="0">${lcIco("upload")}<span>גוררים קובץ לכאן או מצלמים מהטלפון${docs.some(d => !d.fileUrl) ? " · ישויך למסמך החסר הראשון" : " · יתווסף כמסמך חדש"}</span></div>
   </div>`;
-  // --- גורם בודק
+  const panels = [];
+  if(row.isPayment) panels.push(lcPaySecHtml(row));
+  if(row.isBundle) panels.push(lcBundleDocsHtml(row));
+  else if(!row.isPayment) panels.push(defSec);
+  panels.push(docSec);
+  // --- משבצות: בודק, עלויות, משימות, ציוד
+  const tiles = [];
   const c = lcContact(row);
   const nm = lcInspectorName(row);
-  const phone = c && c.phone ? c.phone : "";
-  const email = c && c.email ? c.email : "";
-  const inspSec = `<div class="lc-sec">
-    <div class="lc-sec-h">${lcIco("user")}גורם בודק<span class="r">${c ? "מאנשי קשר וספקים" : nm ? "לא מקושר לאיש קשר" : ""}</span></div>
-    ${nm ? `<div class="lc-box lc-person"><div class="lc-av">${escHtml(tkInitials(nm))}</div><div style="min-width:0"><b>${escHtml(nm)}</b><div class="lc-sub">${escHtml([c && c.specialty, phone].filter(Boolean).join(" · ")) || "אין טלפון שמור"}</div></div></div>
-      <div class="lc-qa">
-        ${phone ? `<a href="${escHtml(lcWaUrl(phone, lcMsgCoordinate(row, nm)))}" target="_blank" rel="noopener">${lcIco("chat")}תיאום ביקור</a>` : ""}
-        ${email ? `<a href="${escHtml(lcGmailUrl(email, "בקשת מסמכים – " + (row.type || ""), lcMsgDocs(row, nm)))}" target="_blank" rel="noopener">${lcIco("mail")}בקשת מסמך</a>` : ""}
-        ${phone ? `<a href="tel:${escHtml(phone.replace(/[^\d+]/g, ""))}">${lcIco("call")}חיוג</a><button type="button" data-lc-act="copy" data-t="${escHtml(phone)}">${lcIco("copy")}העתקה</button>` : ""}
-        ${!c ? `<button type="button" data-lc-act="edit" data-id="${row.id}">${lcIco("link")}קישור לאיש קשר</button>` : ""}
-      </div>` : `<button type="button" class="lc-btn sm ghost" data-lc-act="edit" data-id="${row.id}">${lcIco("plus", 14)}בחירת גורם בודק</button>`}
-  </div>`;
-  // --- קישורים לטאבים אחרים
+  if(!row.isPayment || nm){
+    const phone = c && c.phone ? c.phone : "";
+    const email = c && c.email ? c.email : "";
+    tiles.push(`<div class="lc-tile"><span class="k">${lcIco("user", 14)}גורם בודק</span>
+      ${c ? `<button type="button" class="lk" data-lc-act="gotocontact" data-cid="${c.id}" title="פתיחה באנשי קשר">${escHtml(nm)}${lcIco("link", 13)}</button>` : `<span class="v ${nm ? "" : "soft"}">${escHtml(nm || "לא נבחר")}</span>`}
+      <span class="lc-sub">${c ? escHtml([c.specialty, phone].filter(Boolean).join(" · ") || "אין טלפון שמור") : nm ? "לא מקושר לאיש קשר" : ""}</span>
+      <span class="acts">
+        ${phone ? `<a class="lc-iconbtn" href="${escHtml(lcWaUrl(phone, lcMsgCoordinate(row, nm)))}" target="_blank" rel="noopener" title="תיאום ביקור בוואטסאפ" aria-label="תיאום ביקור בוואטסאפ">${lcIco("chat")}</a><a class="lc-iconbtn" href="tel:${escHtml(phone.replace(/[^\d+]/g, ""))}" title="חיוג" aria-label="חיוג">${lcIco("call")}</a>` : ""}
+        ${email ? `<a class="lc-iconbtn" href="${escHtml(lcGmailUrl(email, "בקשת מסמכים – " + (row.type || ""), lcMsgDocs(row, nm)))}" target="_blank" rel="noopener" title="בקשת מסמך במייל" aria-label="בקשת מסמך במייל">${lcIco("mail")}</a>` : ""}
+        <button type="button" class="lc-btn sm ghost" data-lc-act="pickcontact" data-id="${row.id}">${c ? "החלפה" : nm ? "קישור לאיש קשר" : "בחירה"}</button>
+      </span></div>`);
+  }
+  if(isAdmin){
+    const cs = lcCostsFor(row);
+    const first = cs.list.find(v => !vpIsPaid(v)) || cs.list[0];
+    tiles.push(`<div class="lc-tile"><span class="k">${lcIco("coin", 14)}עלויות</span>
+      <span class="v ${cs.list.length ? "" : "soft"}">${cs.list.length ? fmtMoney(cs.total) : "אין עלויות"}</span>
+      <span class="lc-sub">${cs.list.length ? `${cs.list.length === 1 ? "תשלום אחד" : cs.list.length + " תשלומים"} · ${cs.paid === cs.list.length ? "הכל שולם" : cs.paid + " שולמו"}` : "נרשם ישר בדוח מנה״ח"}</span>
+      <span class="acts">${first ? `<button type="button" class="lc-btn sm ghost" data-lc-act="gotoacct" data-vp="${first.id}">${lcIco("link", 13)}פתיחה במנה״ח</button>` : ""}<button type="button" class="lc-btn sm ghost" data-lc-act="cost" data-id="${row.id}">${lcIco("plus", 13)}עלות</button></span></div>`);
+  }
+  if(canTasks){
+    const tasks = data.tasks.filter(t => Number(t.licId) === row.id);
+    const openT = tasks.filter(t => tkStatus(t) !== "בוצע");
+    tiles.push(`<div class="lc-tile"><span class="k">${lcIco("task", 14)}משימות</span>
+      <span class="v ${tasks.length ? "" : "soft"}">${tasks.length ? (openT.length ? `${openT.length} פתוחות` : "הכל בוצע") : "אין משימות"}</span>
+      <span class="lc-sub">${tasks.length ? `${tasks.length} משימות קשורות` : ""}</span>
+      <span class="acts">${openT.slice(0, 3).map(t => `<button type="button" class="lc-btn sm ghost" data-lc-act="gototask" data-tid="${t.id}">${escHtml(tkCode(t))}</button>`).join("")}<button type="button" class="lc-btn sm ghost" data-lc-act="newtask" data-id="${row.id}">${lcIco("plus", 13)}משימה</button></span></div>`);
+  }
   const eqs = (Array.isArray(row.equipIds) ? row.equipIds : []).map(id => (data.equipment || []).find(e => e.id === Number(id))).filter(Boolean);
-  const contracts = [];
-  if(typeof eqContractsFor === "function") eqs.forEach(e => eqContractsFor(e).forEach(k => { if(!contracts.includes(k)) contracts.push(k); }));
-  const tasks = data.tasks.filter(t => Number(t.licId) === row.id);
-  const openT = tasks.filter(t => tkStatus(t) !== "בוצע").length;
-  const cost = tasks.reduce((s, t) => { const vp = taskVP(t); return s + (vp ? (parseFloat(vp.amount) || 0) : 0); }, 0);
-  const canEq = canOpenTab("equipment");
-  const links = [
-    eqs.length ? `<button type="button" class="lc-lnk" data-lc-act="${canEq ? "gotoeq" : ""}" data-eid="${eqs[0].id}">${lcIco("wrench")}ציוד: ${escHtml(eqs.slice(0, 3).map(e => e.name || "ללא שם").join(", "))}${eqs.length > 3 ? ` ועוד ${eqs.length - 3}` : ""}<span class="r">ציוד ותחזוקה</span></button>` : "",
-    contracts.map(k => { const st = typeof eqContractState === "function" ? eqContractState(k) : null; return `<button type="button" class="lc-lnk" data-lc-act="${canEq ? "gotocontract" : ""}" data-cid="${k.id}">${lcIco("doc")}חוזה: ${escHtml(k.name || k.supplier || "חוזה שירות")}${k.end ? " · עד " + fmtDateHe(k.end) : ""}<span class="r">${escHtml(st ? st.label.split(" · ")[0] : "חוזה שירות")}</span></button>`; }).join(""),
-    isAdmin ? `<div class="lc-lnk" style="cursor:default">${lcIco("coin")}עלויות קשורות (מהמשימות)<span class="r">${cost ? fmtMoney(cost) : "—"}</span></div>` : "",
-    canTasks ? `<div class="lc-lnk" style="cursor:default;flex-wrap:wrap">${lcIco("task")}${tasks.length ? `${tasks.length} משימות קשורות · ${openT} פתוחות` : "אין משימות קשורות"}<span class="r" style="display:flex;gap:4px;flex-wrap:wrap">${tkLicTasksHtml(row.id)}</span></div>` : ""
-  ].join("");
-  const linkSec = `<div class="lc-sec">
-    <div class="lc-sec-h">${lcIco("pkg")}מקושר בטאבים אחרים<span class="r">${canEq && !eqs.length ? `<button type="button" class="lc-btn sm ghost" data-lc-act="edit" data-id="${row.id}">${lcIco("link", 13)}קישור ציוד</button>` : ""}</span></div>
-    <div class="lc-links">${links || `<span class="lc-sub">אין קישורים עדיין</span>`}</div>
-    ${isAdmin && canTasks ? `<div><button type="button" class="lc-btn sm ghost" data-lc-act="cost" data-id="${row.id}">${lcIco("coin", 14)}רישום עלות בדיקה</button></div>` : ""}
-  </div>`;
-  // --- היסטוריה
+  if(canEq || eqs.length){
+    const contracts = [];
+    if(typeof eqContractsFor === "function") eqs.forEach(e => eqContractsFor(e).forEach(k => { if(!contracts.includes(k)) contracts.push(k); }));
+    tiles.push(`<div class="lc-tile"><span class="k">${lcIco("wrench", 14)}ציוד</span>
+      ${eqs.length ? eqs.slice(0, 3).map(e => `<button type="button" class="lk" data-lc-act="${canEq ? "gotoeq" : ""}" data-eid="${e.id}">${escHtml(e.name || "ללא שם")}${canEq ? lcIco("link", 13) : ""}</button>`).join("") + (eqs.length > 3 ? `<span class="lc-sub">ועוד ${eqs.length - 3}</span>` : "") : `<span class="v soft">לא מקושר</span>`}
+      ${contracts.map(k => `<button type="button" class="lk sm" data-lc-act="${canEq ? "gotocontract" : ""}" data-cid="${k.id}">${lcIco("doc", 13)}חוזה: ${escHtml(k.name || k.supplier || "חוזה שירות")}${k.end ? " · עד " + fmtDateHe(k.end) : ""}</button>`).join("")}
+      ${canEq ? `<span class="acts"><button type="button" class="lc-btn sm ghost" data-lc-act="pickeq" data-id="${row.id}">${lcIco("plus", 13)}ציוד</button></span>` : ""}</div>`);
+  }
+  // --- היסטוריה (מקופלת)
   const log = Array.isArray(row.statusLog) ? row.statusLog : [];
-  const showAll = licUi.hist.has(row.id);
-  const logShown = showAll ? log : log.slice(0, 5);
+  const histOpen = licUi.hist.has(row.id);
+  const last = log[0];
+  const lastTxt = last ? String(last.note || last.status || "") : "";
   const histSec = `<div class="lc-sec">
-    <div class="lc-sec-h">${lcIco("clock")}היסטוריה<span class="r"><button type="button" class="lc-btn sm ghost" data-lc-act="note" data-id="${row.id}">${lcIco("plus", 13)}עדכון</button></span></div>
-    ${log.length ? `<div class="lc-tl">${logShown.map((l, k) => { const prev = log[k + 1]; const showSt = l.status && (!prev || prev.status !== l.status); return `<div class="e ${lcIsAutoLog(l) ? "auto" : ""}"><span class="d">${escHtml(fmtDateHe(l.date))}</span>${showSt ? ` · <b>${escHtml(l.status)}</b>` : ""}<br>${escHtml(l.note || "")}</div>`; }).join("")}</div>
-      ${log.length > 5 ? `<button type="button" class="lc-btn sm ghost" data-lc-act="hist" data-id="${row.id}">${showAll ? "הצגת פחות" : `הצגת כל ${log.length} העדכונים`}</button>` : ""}
-      <div class="lc-legend"><span><i style="background:var(--brand)"></i>עדכון ידני</span><span><i style="background:var(--violet)"></i>נרשם אוטומטית</span></div>`
-      : `<span class="lc-sub">אין עדכונים עדיין. כל שינוי סטטוס יירשם כאן לבד.</span>`}
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button type="button" class="lc-histbtn" data-lc-act="hist" data-id="${row.id}" aria-expanded="${histOpen}">${lcIco("clock", 15)}<span>היסטוריה · ${log.length} עדכונים${last ? ` · אחרון: ${escHtml(lastTxt.length > 46 ? lastTxt.slice(0, 45) + "…" : lastTxt)}, ${escHtml(fmtDateHe(last.date))}` : ""}</span><span class="lc-chev" ${histOpen ? 'style="transform:rotate(180deg)"' : ""}>${lcIco("chev", 14)}</span></button>
+      <span style="flex:1"></span>
+      <button type="button" class="lc-btn sm ghost" data-lc-act="note" data-id="${row.id}">${lcIco("plus", 13)}עדכון</button>
+    </div>
+    ${histOpen && log.length ? `<div class="lc-tl">${log.map((l, k) => { const prev = log[k + 1]; const showSt = l.status && (!prev || prev.status !== l.status); return `<div class="e ${lcIsAutoLog(l) ? "auto" : ""}"><span class="d">${escHtml(fmtDateHe(l.date))}</span>${showSt ? ` · <b>${escHtml(l.status)}</b>` : ""}<br>${escHtml(l.note || "")}</div>`; }).join("")}</div>
+      <div class="lc-legend"><span><i style="background:var(--brand)"></i>עדכון ידני</span><span><i style="background:var(--violet)"></i>נרשם אוטומטית</span></div>` : ""}
     ${row.notes ? `<div class="lc-box" style="font-size:12.5px">${lcIco("note", 14)} ${escHtml(row.notes)}</div>` : ""}
   </div>`;
   // --- תחתית
@@ -8749,18 +9010,21 @@ function lcBodyHtml(row, inBundle){
     <label class="lc-cal" title="${row.synced ? "מסונכרן ליומן" : "סנכרון ליומן גוגל"}"><input type="checkbox" data-lc-sync="${row.id}" ${row.synced ? "checked" : ""} ${row.syncing ? "disabled" : ""}>${lcIco("cal", 15)}יומן</label>
     <span class="sync-status lc-sub" id="sync-lic-${row.id}">${row.syncing ? "מסנכרן…" : (row.synced ? "✓ סונכרן" : "")}</span>
     <span class="sp"></span>
-    <button type="button" class="lc-iconbtn" title="מחיקת האישור" data-lc-act="delete" data-id="${row.id}">${lcIco("trash")}</button>
+    <button type="button" class="lc-iconbtn" title="מחיקת האישור" aria-label="מחיקת האישור" data-lc-act="delete" data-id="${row.id}">${lcIco("trash")}</button>
   </div>`;
-  return `<div class="lc-body" ${inBundle ? 'style="padding:12px 0 0"' : ""}>
-    <div class="lc-col">${row.isBundle ? lcBundleDocsHtml(row) : defSec}${docSec}</div>
-    <div class="lc-col">${inspSec}${linkSec}${histSec}</div>
+  return `<div class="lc-body">
+    ${inBundle ? `<div class="lc-steps" style="padding:0">${lcStepsHtml(row)}</div>` : ""}
+    ${nextBar}
+    <div class="lc-grid2">${panels.join("")}</div>
+    ${tiles.length ? `<div class="lc-tiles">${tiles.join("")}</div>` : ""}
+    ${histSec}
     ${foot}
   </div>`;
 }
 function lcBundleDocsHtml(p){
   const kids = lcKids(p).filter(k => !lcRenewed(k));
-  return `<div class="lc-sec"><div class="lc-sec-h">${lcIco("folder")}מסמכים מאישורי המשנה</div>
-    <div class="lc-box">${kids.length ? kids.map(k => `<div style="padding:4px 0"><b style="font-size:12.5px">${escHtml(k.type || "")}</b><div class="lc-docs" style="margin-top:4px">${[k.link ? { name: "האישור", fileUrl: k.link } : null].concat(k.requiredDocs || []).filter(Boolean).map(d => d.fileUrl ? `<span class="lc-doc have"><button type="button" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(d.name || "")}">${lcIco("check")}${escHtml(d.name || "מסמך")}</button></span>` : `<span class="lc-doc miss" style="padding-inline-end:10px">${lcIco("upload")}${escHtml(d.name || "מסמך")}</span>`).join("") || `<span class="lc-sub">אין מסמכים</span>`}</div></div>`).join("") : `<span class="lc-sub">אין אישורי משנה</span>`}</div></div>`;
+  return `<div class="lc-panel"><div class="lc-sec-h">${lcIco("folder")}מסמכים מאישורי המשנה</div>
+    <div>${kids.length ? kids.map(k => `<div style="padding:4px 0"><b style="font-size:12.5px">${escHtml(k.type || "")}</b><div class="lc-docs" style="margin-top:4px">${lcRowDocList(k).map(d => d.fileUrl ? `<span class="lc-doc have"><button type="button" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(d.name || "")}">${lcIco("check")}${escHtml(d.name || "מסמך")}</button></span>` : `<span class="lc-doc miss" style="padding-inline-end:10px">${lcIco("upload")}${escHtml(d.name || "מסמך")}</span>`).join("") || `<span class="lc-sub">אין מסמכים</span>`}</div></div>`).join("") : `<span class="lc-sub">אין אישורי משנה</span>`}</div></div>`;
 }
 function lcWaUrl(phone, text){ return `https://wa.me/${formatPhoneForWhatsApp(phone)}?text=${encodeURIComponent(text)}`; }
 function lcGmailUrl(to, subject, body){ return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to || "")}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; }
@@ -8787,6 +9051,17 @@ function lcWireMain(main){
 function lcOnChange(e){
   const t = e.target;
   if(t && t.matches && t.matches("[data-lc-visitsel]")){ licUi.visitId = Number(t.value) || null; renderLic(); }
+  if(t && t.matches && t.matches("[data-lc-pay]")){
+    const r = lcRow(Number(t.dataset.id)); if(!r) return;
+    const p = lcPay(r), f = t.dataset.lcPay;
+    let v = String(t.value || "").trim();
+    if(f === "amount"){ const a = Math.max(0, Math.round((parseFloat(v.replace(/[^\d.]/g, "")) || 0) * 100) / 100); v = a ? String(a) : ""; }
+    if(String(p[f] == null ? "" : p[f]) === v) return;
+    p[f] = v;
+    if(p.vpId) lcPaySync(r, false);
+    lcSave();
+    setTimeout(() => { const a = document.activeElement; if(!(a && a.matches && a.matches("[data-lc-pay]"))) renderLic(); }, 0);
+  }
 }
 function lcOnClick(e){
   const b = e.target.closest && e.target.closest("[data-lc-act]");
@@ -8828,6 +9103,18 @@ function lcOnClick(e){
     case "gotoeq": if(canOpenTab("equipment")){ const eid = Number(b.dataset.eid); switchTab("equipment"); try{ eqUi.view = "equip"; renderEquipment(); eqOpen("equip", eid); }catch(err){ console.error(err); } } break;
     case "gotocontract": if(canOpenTab("equipment")){ const cid = Number(b.dataset.cid); switchTab("equipment"); try{ eqUi.view = "contracts"; renderEquipment(); eqOpen("contract", cid); }catch(err){ console.error(err); } } break;
     case "cost": if(row) lcCost(row); break;
+    case "trk": { if(!licUi.closedTr) licUi.closedTr = new Set(); const k = b.dataset.k; if(licUi.closedTr.has(k)) licUi.closedTr.delete(k); else licUi.closedTr.add(k); renderLic(); break; }
+    case "openbody": { licUi.open.add(id); renderLic(); const el = document.getElementById("lc-card-" + id); if(el) el.scrollIntoView({ behavior: "smooth", block: "start" }); break; }
+    case "gotocontact": lcGotoContact(Number(b.dataset.cid)); break;
+    case "pickcontact": if(row) lcPickContact(row); break;
+    case "pickeq": if(row) lcPickEquip(row); break;
+    case "gotoacct": lcGotoAcct(Number(b.dataset.vp)); break;
+    case "newtask": if(row) tkCreateFromLic(row.id); break;
+    case "payup": if(row) lcPayUpload(row, b.dataset.w); break;
+    case "paydel": if(row){ const w = b.dataset.w; openConfirmModal(w === "receipt" ? "להסיר את אסמכתת התשלום מהכרטיס?" : "להסיר את השובר מהכרטיס?", () => { const r = lcRow(row.id); if(!r) return; const p = lcPay(r); if(w === "receipt") p.receiptUrl = ""; else p.voucherUrl = ""; lcLog(r, w === "receipt" ? "אסמכתת התשלום הוסרה" : "השובר הוסר", true); if(p.vpId) lcPaySync(r, false); lcSave(); renderLic(); }, { icon: "trash", yesLabel: "הסרה" }); } break;
+    case "paypaid": if(row) lcPayMarkPaid(row, true); break;
+    case "payunpaid": if(row) lcPayMarkPaid(row, false); break;
+    case "payacct": if(row){ const vp = lcPaySync(row, true); lcSave(); renderLic(); if(vp) lcGotoAcct(vp.id); } break;
     case "visitck": lcVisitToggle(i); break;
     case "visitdel": lcVisitDel(i); break;
     case "visitadd": lcVisitAdd(); break;
@@ -8947,14 +9234,454 @@ async function lcUploadApproval(row){
     lcSave(); renderLic(); lcToast("האישור נשמר");
   }catch(e){ console.error(e); lcToast("ההעלאה נכשלה: " + e.message); }
 }
+/* ---------- כרטיס מסוג תשלום (שובר / אגרה) — 2026-11 ----------
+   row.isPayment = true, row.pay = { payee, amount, due, voucherUrl, receiptUrl, paid, paidAt, vpId }
+   אפשר לסמן גם אישור מרוכז (אב) ככרטיס תשלום: הוא נשאר אב, ומקבל בנוסף אזור תשלום. */
+function lcPay(row){ if(!row.pay || typeof row.pay !== "object") row.pay = {}; return row.pay; }
+function lcPayVP(row){ const p = row.pay; if(!p || !p.vpId) return null; return (data.vendorPayments || []).find(v => v && v.id === p.vpId) || null; }
+function lcPayPaid(row){ const p = row.pay || {}; return !!p.paid || vpIsPaid(lcPayVP(row)); }
+function lcPayStage(row){ const p = row.pay || {}; if(lcPayPaid(row)) return p.receiptUrl ? 3 : 2; return p.voucherUrl ? 1 : 0; }
+function lcPayDone(row){ return lcPayStage(row) === 3; }
+function lcPayDays(row){ const p = row.pay || {}; return p.due ? tkDaysTo(p.due) : null; }
+function lcPayLate(row){ if(lcPayPaid(row)) return false; const d = lcPayDays(row); return d !== null && d < 0; }
+function lcPayNext(row){
+  const st = lcPayStage(row), p = row.pay || {};
+  if(st === 0) return { t: "להעלות את השובר לתשלום", tone: "warn", act: "payvoucher" };
+  if(st === 1){ const late = lcPayLate(row); return { t: `לשלם${(parseFloat(p.amount) || 0) > 0 ? " " + fmtMoney(parseFloat(p.amount)) : ""}${p.due ? (late ? " · המועד עבר ב-" : " עד ") + fmtDateHe(p.due) : ""}`, tone: late ? "bad" : "warn", act: "paypaid" }; }
+  if(st === 2) return { t: "שולם · להעלות אסמכתת תשלום", tone: "warn", act: "payreceipt" };
+  return { t: `שולם${p.paidAt ? " ב-" + fmtDateHe(String(p.paidAt).slice(0, 10)) : ""} · יש אסמכתא`, tone: "ok" };
+}
+function lcPaySecHtml(row){
+  const p = row.pay || {};
+  const st = lcPayStage(row);
+  const vp = lcPayVP(row);
+  const isAdmin = lcIsAdmin();
+  const steps = ["שובר התקבל", "שולם", "אסמכתא הועלתה"].map((l, i) => `<div class="${st > i ? "d" : st === i ? "c" : ""}"><i></i>${l}</div>`).join("");
+  const file = (w, label, url) => url
+    ? `<span class="lc-doc have"><button type="button" data-fv-url="${escHtml(url)}" data-fv-title="${escHtml(label + " · " + (row.type || ""))}">${lcIco("check")}${label}</button><button type="button" class="x" title="הסרה" aria-label="הסרת ${label}" data-lc-act="paydel" data-id="${row.id}" data-w="${w}">${lcIco("x", 12)}</button></span>`
+    : `<span class="lc-doc miss"><button type="button" data-lc-act="payup" data-id="${row.id}" data-w="${w}">${lcIco("upload")}${label}</button></span>`;
+  const paid = lcPayPaid(row);
+  return `<div class="lc-panel">
+    <div class="lc-sec-h">${lcIco("coin")}תשלום<span class="r">${vp ? "מקושר לדוח מנה״ח" : ""}</span></div>
+    <div class="lc-pay-steps">${steps}</div>
+    <div class="lc-pay-f">
+      <label>למי משלמים<input class="lc-in" data-lc-pay="payee" data-id="${row.id}" value="${escHtml(p.payee || "")}" placeholder="למשל: כבאות והצלה"></label>
+      <label>סכום (₪)<input class="lc-in" data-lc-pay="amount" data-id="${row.id}" inputmode="decimal" value="${escHtml(p.amount == null ? "" : String(p.amount))}" placeholder="0" ${vp && vpIsPaid(vp) ? "disabled" : ""}></label>
+      <label>לשלם עד<input type="date" class="lc-in" data-lc-pay="due" data-id="${row.id}" value="${escHtml(p.due || "")}"></label>
+    </div>
+    <div class="lc-docs">${file("voucher", "שובר", p.voucherUrl)}${file("receipt", "אסמכתת תשלום", p.receiptUrl)}</div>
+    ${isAdmin ? `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      ${paid ? (p.paid && !vpIsPaid(vp) ? `<span class="lc-sub">${lcIco("check", 14)} שולם${p.paidAt ? " ב-" + fmtDateHe(String(p.paidAt).slice(0, 10)) : ""}</span><button type="button" class="lc-btn sm ghost" data-lc-act="payunpaid" data-id="${row.id}">ביטול סימון שולם</button>` : `<span class="lc-sub">${lcIco("check", 14)} שולם (מסומן בדוח מנה״ח)</span>`)
+        : `<button type="button" class="lc-btn sm" data-lc-act="paypaid" data-id="${row.id}">${lcIco("check", 14)}סימון כשולם</button>`}
+      <button type="button" class="lc-btn sm ghost" data-lc-act="payacct" data-id="${row.id}">${lcIco("link", 14)}${vp ? "פתיחה בדוח מנה״ח" : "העברה לדוח מנה״ח"}</button>
+    </div>` : ""}
+  </div>`;
+}
+/* מסנכרן את כרטיס התשלום לרשומת תשלום אחת בדוח מנה"ח (בלי כפילויות) */
+function lcPaySync(row, create){
+  const p = lcPay(row);
+  let vp = lcPayVP(row);
+  if(!vp && !create) return null;
+  if(!vp){
+    vp = { id: nextId() + 7000, vendor: p.payee || "כבאות והצלה", desc: row.type || "תשלום", amount: parseFloat(p.amount) || 0,
+      approved: false, paid: false, bank: "", branch: "", account: "", holder: "", docs: [], notes: "מקור: רישוי ובטיחות", sourceType: "רכש/ספק", licId: row.id };
+    data.vendorPayments.push(vp);
+    p.vpId = vp.id;
+    lcLog(row, "התשלום הועבר לדוח מנהל החשבונות", true);
+    lcSave();
+  }
+  if(!vpIsPaid(vp)){
+    const a = parseFloat(p.amount) || 0;
+    if(!vp.amountManual && a !== (parseFloat(vp.amount) || 0)) vp.amount = a;
+    if(p.payee) vp.vendor = p.payee;
+  }
+  vp.docs = Array.isArray(vp.docs) ? vp.docs : [];
+  const want = [[p.voucherUrl, "שובר", "חשבונית"], [p.receiptUrl, "אסמכתת תשלום", "קבלה"]];
+  vp.docs = vp.docs.filter(d => !(d && d.syncFrom === "lic" && !want.some(w => w[0] && w[0] === d.fileUrl)));
+  want.forEach(([u, n, t]) => { if(u && !vp.docs.some(d => d && d.fileUrl === u)) vp.docs.push({ name: n, docType: t, fileUrl: u, syncFrom: "lic", uploadedAt: lcToday() }); });
+  if(p.paid && !vpIsPaid(vp)){ vp.paymentStatus = "שולם"; vp.paid = true; vp.approved = true; vp.paidAt = new Date().toISOString(); vp.paidBy = "מנהל"; }
+  scheduleSave("vendorPayments", "vendorPaySaved");
+  try{ renderAccountantReport(); }catch(e){}
+  return vp;
+}
+async function lcPayUpload(row, w){
+  const f = await lcPickFile("image/*,application/pdf", false);
+  if(!f) return;
+  lcToast("מעלה…");
+  try{
+    const url = await lcUploadFile(f, "licensing-payments");
+    const r = lcRow(row.id); if(!r) return;
+    const p = lcPay(r);
+    if(w === "receipt"){
+      p.receiptUrl = url;
+      if(!lcPayPaid(r)){ p.paid = true; p.paidAt = lcToday(); lcLog(r, "הועלתה אסמכתת תשלום · סומן כשולם", true); }
+      else lcLog(r, "הועלתה אסמכתת תשלום", true);
+    }else{ p.voucherUrl = url; lcLog(r, "הועלה שובר לתשלום", true); }
+    if(p.vpId || p.paid) lcPaySync(r, !!p.paid);
+    lcSave(); renderLic(); lcToast(w === "receipt" ? "האסמכתא נשמרה" : "השובר נשמר");
+  }catch(e){ console.error(e); lcToast("ההעלאה נכשלה: " + e.message); }
+}
+function lcPayMarkPaid(row, on){
+  const r = lcRow(row.id); if(!r) return;
+  const p = lcPay(r);
+  if(on){
+    p.paid = true; p.paidAt = lcToday();
+    lcLog(r, "התשלום סומן כשולם", true);
+    lcPaySync(r, true);
+    lcToast(p.receiptUrl ? "סומן כשולם" : "סומן כשולם · אפשר להעלות אסמכתא");
+  }else{
+    const vp = lcPayVP(r);
+    if(vpIsPaid(vp)){ lcToast("התשלום מסומן כשולם בדוח מנה״ח"); return; }
+    p.paid = false; p.paidAt = "";
+    lcLog(r, "בוטל סימון שולם", true);
+  }
+  lcSave(); renderLic();
+  try{ renderDashboard(); }catch(e){}
+}
+
+/* ---------- עלויות של אישור ---------- */
+function lcCostsFor(row){
+  const seen = new Set(), list = [];
+  const add = v => { if(v && !seen.has(v.id)){ seen.add(v.id); list.push(v); } };
+  (data.vendorPayments || []).forEach(v => { if(v && Number(v.licId) === row.id) add(v); });
+  data.tasks.forEach(t => { if(Number(t.licId) === row.id) add(taskVP(t)); });
+  const total = list.reduce((s, v) => s + (parseFloat(v.amount) || 0), 0);
+  return { list, total, paid: list.filter(vpIsPaid).length };
+}
+function lcGotoAcct(vpId){
+  if(!canOpenTab("accountant")){ lcToast("אין הרשאה לטאב דוח מנהל חשבונות"); return; }
+  const vp = vpId ? (data.vendorPayments || []).find(v => v.id === vpId) : null;
+  acctUi.cat = "all"; acctUi.q = ""; acctUi.period = "all";
+  const si = document.querySelector('#tab-accountant input[oninput*="acxOnSearch"]'); if(si) si.value = "";
+  switchTab("accountant");
+  if(!vp) return;
+  setTimeout(() => {
+    const el = document.querySelector(`[data-card="v${vp.id}"]`);
+    if(el){ el.scrollIntoView({ behavior: "smooth", block: "center" }); el.style.outline = "3px solid var(--brand)"; el.style.outlineOffset = "2px"; setTimeout(() => { el.style.outline = ""; }, 2600); }
+  }, 220);
+}
+
+/* ---------- חלון רישום עלות: תשלום בלבד, או תשלום + משימה ---------- */
 function lcCost(row){
   const nm = lcInspectorName(row);
-  const t = tkNewTask({ desc: `תשלום בדיקה: ${row.type || "רישוי"}`, category: "בטיחות", licId: row.id, assignee: nm,
-    schoolYear: Number(row.schoolYear) || currentSchoolYearStart(), prio: 2, due: lcToday() });
-  t.log = [{ d: lcToday(), t: `נפתחה מרישוי ובטיחות לרישום עלות: ${row.type || ""}` }];
-  tkSave();
-  try{ jobCostOpen.add(t.id); }catch(e){}
-  goToTask(t.id);
+  const names = typeof getContactNames === "function" ? getContactNames() : [];
+  const canT = canOpenTab("tasks");
+  const files = { inv: null, rec: null };
+  const m = lcModal(`${lcModalHead("coin", "רישום עלות · " + escHtml(row.type || ""))}
+    <div class="lc-modal-b">
+      <div class="lc-seg2" role="radiogroup" aria-label="סוג העלות">
+        <label><input type="radio" name="lcCK" value="pay" checked>תשלום בלבד</label>
+        ${canT ? `<label><input type="radio" name="lcCK" value="task">תשלום + משימת עבודה</label>` : ""}
+      </div>
+      <datalist id="lcCVList">${names.map(n => `<option value="${escHtml(n)}">`).join("")}</datalist>
+      <div class="lc-form">
+        <label>למי משלמים<input id="lcC_v" list="lcCVList" value="${escHtml(nm)}" autocomplete="off"></label>
+        <label>סכום (₪)<input id="lcC_a" inputmode="decimal" placeholder="0"></label>
+        <label class="full">תיאור<input id="lcC_d" value="${escHtml("בדיקה: " + (row.type || "רישוי"))}"></label>
+      </div>
+      <div class="lc-files2">
+        <button type="button" class="lc-btn sm ghost" id="lcC_inv">${lcIco("upload", 14)}צירוף חשבונית</button>
+        <button type="button" class="lc-btn sm ghost" id="lcC_rec">${lcIco("upload", 14)}צירוף קבלה</button>
+        <label class="lc-cal" style="color:var(--ink)"><input type="checkbox" id="lcC_paid">כבר שולם</label>
+      </div>
+      <div id="lcC_dup"></div>
+      <div class="lc-note">${lcIco("info")}<div>העלות נרשמת ישר בדוח מנהל החשבונות ומקושרת לאישור הזה. "תשלום + משימת עבודה" פותח גם משימה מקושרת לאותו תשלום, בלי רישום כפול.</div></div>
+    </div>
+    <div class="lc-modal-f"><button type="button" class="lc-btn" id="lcC_ok">${lcIco("check", 15)}שמירה</button><button type="button" class="lc-btn ghost" data-lc-close>ביטול</button></div>`, { noFocus: true });
+  const $ = s => m.querySelector(s);
+  let linkTo = null;
+  const dupCheck = () => {
+    const box = $("#lcC_dup");
+    linkTo = null;
+    const cands = vpOpenCandidates($("#lcC_v").value, row.id);
+    if(!cands.length){ box.innerHTML = ""; return; }
+    const c = cands[0];
+    box.innerHTML = `<div class="lc-warnbox">${lcIco("alert", 16)}<span style="flex:1 1 220px">בדוח מנה״ח כבר יש תשלום פתוח ל${escHtml(c.vendor)}${(parseFloat(c.amount) || 0) > 0 ? " על " + fmtMoney(parseFloat(c.amount)) : ""}${c.desc ? ` ("${escHtml(c.desc)}")` : ""}. לקשר אליו במקום ליצור תשלום חדש?</span><button type="button" class="lc-btn sm" id="lcC_link">כן, לקשר</button></div>`;
+    $("#lcC_link").onclick = () => {
+      linkTo = c;
+      box.innerHTML = `<div class="lc-note">${lcIco("check")}<div>בשמירה האישור יקושר לתשלום הקיים של ${escHtml(c.vendor)}, ולא ייווצר תשלום חדש. קבצים שצירפת יתווספו אליו.</div></div>`;
+    };
+  };
+  $("#lcC_v").addEventListener("change", dupCheck);
+  dupCheck();
+  const pick = (k, id, label) => { $(id).onclick = async () => { const f = await lcPickFile("image/*,application/pdf", false); if(f){ files[k] = f; $(id).innerHTML = `${lcIco("check", 14)}${escHtml(label)}: ${escHtml(f.name.length > 22 ? f.name.slice(0, 21) + "…" : f.name)}`; } }; };
+  pick("inv", "#lcC_inv", "חשבונית"); pick("rec", "#lcC_rec", "קבלה");
+  let busy = false;
+  $("#lcC_ok").onclick = async () => {
+    if(busy) return;
+    const vendor = $("#lcC_v").value.trim();
+    const amount = Math.max(0, Math.round((parseFloat(String($("#lcC_a").value).replace(/[^\d.]/g, "")) || 0) * 100) / 100);
+    const desc = $("#lcC_d").value.trim() || ("בדיקה: " + (row.type || ""));
+    const kindEl = m.querySelector('input[name="lcCK"]:checked');
+    const kind = kindEl ? kindEl.value : "pay";
+    const paid = $("#lcC_paid").checked;
+    if(!vendor && !linkTo){ $("#lcC_v").focus(); $("#lcC_v").style.borderColor = "var(--red)"; return; }
+    busy = true;
+    const okBtn = $("#lcC_ok"); okBtn.disabled = true; okBtn.textContent = "שומר…";
+    const docs = [];
+    try{
+      if(files.inv){ const u = await lcUploadFile(files.inv, "vendor-invoices"); docs.push({ name: "חשבונית", docType: "חשבונית", fileUrl: u, uploadedAt: lcToday() }); }
+      if(files.rec){ const u = await lcUploadFile(files.rec, "vendor-invoices"); docs.push({ name: "קבלה", docType: "קבלה", fileUrl: u, uploadedAt: lcToday() }); }
+    }catch(e){
+      console.error(e);
+      lcToast("העלאת הקובץ נכשלה, שום דבר לא נשמר: " + e.message);
+      busy = false; okBtn.disabled = false; okBtn.innerHTML = `${lcIco("check", 15)}שמירה`;
+      return;
+    }
+    const r = lcRow(row.id); if(!r){ lcCloseModal(); return; }
+    let vp;
+    if(linkTo && data.vendorPayments.includes(linkTo) && !vpIsPaid(linkTo)){
+      vp = linkTo; vp.licId = r.id;
+      if(amount > 0 && !((parseFloat(vp.amount) || 0) > 0)) vp.amount = amount;
+    }else{
+      vp = { id: nextId() + 7000, vendor, desc, amount, approved: false, paid: false, bank: "", branch: "", account: "", holder: "", docs: [], notes: "מקור: רישוי ובטיחות", sourceType: "איש מקצוע", licId: r.id };
+      data.vendorPayments.push(vp);
+    }
+    vp.docs = (Array.isArray(vp.docs) ? vp.docs : []).concat(docs);
+    if(paid && !vpIsPaid(vp)){ vp.paymentStatus = "שולם"; vp.paid = true; vp.approved = true; vp.paidAt = new Date().toISOString(); vp.paidBy = "מנהל"; }
+    scheduleSave("vendorPayments", "vendorPaySaved");
+    let t = null;
+    if(kind === "task" && canT && !data.tasks.some(x => x.vendorPayId === vp.id)){
+      t = tkNewTask({ desc, category: "בטיחות", licId: r.id, assignee: vendor || vp.vendor || "",
+        schoolYear: Number(r.schoolYear) || currentSchoolYearStart(), prio: 2, due: lcToday() });
+      t.vendorPayId = vp.id;
+      t.log = [{ d: lcToday(), t: `נפתחה מרישוי ובטיחות עם רישום עלות: ${r.type || ""}` }];
+      tkSave();
+    }
+    lcLog(r, `נרשמה עלות: ${vp.vendor || ""}${(parseFloat(vp.amount) || 0) > 0 ? " · " + fmtMoney(parseFloat(vp.amount)) : ""}${t ? " · נפתחה משימה" : ""}`, true);
+    lcSave(); lcCloseModal(); renderLic();
+    try{ renderAccountantReport(); }catch(e){}
+    if(t){ try{ renderTasks(); }catch(e){} }
+    lcToast(linkTo && vp === linkTo ? "קושר לתשלום הקיים בדוח מנה״ח" : t ? "העלות נרשמה בדוח מנה״ח ונפתחה משימה" : "העלות נרשמה בדוח מנה״ח");
+  };
+}
+
+/* ---------- בחירה מהירה מרשימה (איש קשר, ציוד, משימה) ---------- */
+function lcPicker(title, items, onPick, opts){
+  opts = opts || {};
+  const m = lcModal(`${lcModalHead(opts.ico || "search", escHtml(title))}
+    <div class="lc-modal-b">
+      <input class="lc-in" id="lcPkQ" placeholder="${escHtml(opts.ph || "חיפוש")}" autocomplete="off" aria-label="${escHtml(opts.ph || "חיפוש")}">
+      <div class="lc-pick" id="lcPkL"></div>
+      ${opts.note ? `<div class="lc-sub">${opts.note}</div>` : ""}
+    </div>`);
+  const draw = () => {
+    const q = vpNorm(m.querySelector("#lcPkQ").value);
+    const list = items.filter(it => !q || vpNorm(it.title + " " + (it.sub || "")).includes(q)).slice(0, 80);
+    m.querySelector("#lcPkL").innerHTML = list.length ? list.map(it => `<button type="button" data-pk="${escHtml(String(it.id))}"><span class="lc-av" style="width:34px;height:34px;font-size:12px">${escHtml(it.ini || "")}</span><span style="flex:1;min-width:0"><b>${escHtml(it.title)}</b>${it.sub ? `<small>${escHtml(it.sub)}</small>` : ""}</span>${it.cur ? `<span class="lc-tag ok">${escHtml(opts.curLabel || "נבחר")}</span>` : ""}</button>`).join("") : `<div class="lc-sub" style="padding:8px 2px">לא נמצאו תוצאות</div>`;
+  };
+  m.querySelector("#lcPkQ").addEventListener("input", draw);
+  m.querySelector("#lcPkL").addEventListener("click", e => {
+    const b = e.target.closest && e.target.closest("[data-pk]"); if(!b) return;
+    const it = items.find(x => String(x.id) === b.dataset.pk);
+    if(it){ lcCloseModal(); onPick(it); }
+  });
+  draw();
+  if(opts.q){
+    const qi = m.querySelector("#lcPkQ");
+    const hit = items.some(it => vpNorm(it.title + " " + (it.sub || "")).includes(vpNorm(opts.q)));
+    if(hit){ qi.value = opts.q; draw(); }
+  }
+  setTimeout(() => { const qi = m.querySelector("#lcPkQ"); if(qi) qi.focus(); }, 40);
+  return m;
+}
+function lcPickContact(row){
+  const c0 = lcContact(row);
+  const items = data.contacts.filter(c => c && c.name).slice().sort((a, b) => String(a.name).localeCompare(String(b.name), "he"))
+    .map(c => ({ id: c.id, title: c.name, sub: [c.specialty, c.phone].filter(Boolean).join(" · "), ini: tkInitials(c.name), cur: !!(c0 && c0.id === c.id) }));
+  if(!items.length){ lcToast("אין עדיין אנשי קשר. מוסיפים אותם בטאב אנשי קשר"); return; }
+  const free = !c0 && row.inspector ? row.inspector : "";
+  lcPicker(free ? `קישור "${free}" לאיש קשר` : "בחירת גורם בודק", items, it => {
+    const r = lcRow(row.id); if(!r) return;
+    const c = data.contacts.find(x => x.id === it.id); if(!c) return;
+    r.inspectorId = c.id; r.inspector = c.name;
+    lcLog(r, `גורם בודק: ${c.name}`, true);
+    lcSave(); renderLic(); lcToast(`${c.name} נבחר כגורם בודק`);
+  }, { ico: "user", ph: "חיפוש שם, תחום או טלפון", q: free, note: "לא מופיע ברשימה? מוסיפים אותו בטאב אנשי קשר, והוא יופיע כאן." });
+}
+function lcPickEquip(row){
+  const have = new Set((row.equipIds || []).map(Number));
+  const items = (data.equipment || []).filter(e => e && !have.has(e.id))
+    .slice().sort((a, b) => String(a.category || "").localeCompare(String(b.category || ""), "he") || String(a.name || "").localeCompare(String(b.name || ""), "he"))
+    .map(e => ({ id: e.id, title: e.name || "ללא שם", sub: [e.category, e.place].filter(Boolean).join(" · "), ini: tkInitials(e.name || "צ") }));
+  if(!items.length){ lcToast((data.equipment || []).length ? "כל הציוד כבר מקושר" : "אין עדיין ציוד בטאב ציוד ותחזוקה"); return; }
+  lcPicker("קישור ציוד לאישור", items, it => {
+    const r = lcRow(row.id); if(!r) return;
+    r.equipIds = Array.isArray(r.equipIds) ? r.equipIds.map(Number) : [];
+    if(!r.equipIds.includes(it.id)) r.equipIds.push(it.id);
+    lcLog(r, `קושר ציוד: ${it.title}`, true);
+    lcSave(); renderLic(); lcToast(`${it.title} קושר`);
+  }, { ico: "wrench", ph: "חיפוש ציוד" });
+}
+function lcGotoContact(cid){
+  if(!canOpenTab("contacts")){ lcToast("אין הרשאה לטאב אנשי קשר"); return; }
+  const c = data.contacts.find(x => x.id === cid); if(!c) return;
+  switchTab("contacts");
+  const si = document.getElementById("contactsSearchInput");
+  if(si && si.value){ si.value = ""; try{ filterRows("contactsBody", ""); }catch(e){} }
+  setTimeout(() => {
+    const rows = [...document.querySelectorAll("#contactsBody > tr")];
+    const tr = rows[data.contacts.indexOf(c)] && (rows[data.contacts.indexOf(c)].querySelector('input[data-f="name"]') || {}).value === c.name
+      ? rows[data.contacts.indexOf(c)]
+      : rows.find(r => { const i = r.querySelector('input[data-f="name"]'); return i && i.value === c.name; });
+    if(!tr) return;
+    tr.classList.add("mob-open");
+    tr.scrollIntoView({ behavior: "smooth", block: "center" });
+    tr.style.outline = "3px solid var(--brand)"; tr.style.outlineOffset = "-2px";
+    setTimeout(() => { tr.style.outline = ""; }, 2600);
+  }, 160);
+}
+
+/* ---------- תיק הגשה: PDF עם כל המסמכים מצורפים, או כל אישור בנפרד ---------- */
+function lcRowDocList(r){
+  const out = [];
+  out.push({ name: "האישור", fileUrl: r.link || "" });
+  (r.requiredDocs || []).forEach(d => d && out.push({ name: d.name || "מסמך", fileUrl: d.fileUrl || "" }));
+  if(r.isPayment){ const p = r.pay || {}; out.push({ name: "שובר", fileUrl: p.voucherUrl || "" }); out.push({ name: "אסמכתת תשלום", fileUrl: p.receiptUrl || "" }); }
+  return out.filter((d, i) => i > 0 || d.fileUrl || !(r.isBundle || r.isPayment));
+}
+function lcSniff(buf){
+  const b = new Uint8Array(buf.slice(0, 1024));
+  let s = ""; for(let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+  if(s.indexOf("%PDF") >= 0) return "pdf";
+  if(b[0] === 0xFF && b[1] === 0xD8) return "img";
+  if(b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E) return "img";
+  if(s.startsWith("GIF8") || s.startsWith("BM")) return "img";
+  if(s.startsWith("RIFF") && s.slice(8, 12) === "WEBP") return "img";
+  if(s.slice(4, 8) === "ftyp") return "img";
+  return "other";
+}
+function lcSepHtml(list){
+  return list.map((x, i) => `<div style="width:728px;padding:46px 30px;box-sizing:border-box;font-family:Rubik,'Segoe UI',Arial,sans-serif;direction:rtl;color:#201e1d;background:#fff">
+    <div style="font-size:13px;color:#c67139;font-weight:700;letter-spacing:.04em">נספח ${i + 1}</div>
+    <div style="font-size:27px;font-weight:700;margin-top:6px;border-bottom:3px solid #c67139;padding-bottom:12px">${escHtml(x.r.type || "")}</div>
+    <div style="margin-top:14px;font-size:13.5px;color:#645c50">${escHtml([x.r.processStatus || "", x.r.expiry ? "בתוקף עד " + fmtDateHe(x.r.expiry) : "", lcInspectorName(x.r) ? "בודק: " + lcInspectorName(x.r) : ""].filter(Boolean).join(" · "))}</div>
+    <div style="margin-top:20px;font-size:14px"><b>המסמכים המצורפים בעמודים הבאים:</b><ol style="margin:8px 0 0;padding-inline-start:22px">${x.docs.map(d => `<li style="margin:5px 0">${escHtml(d.name || "מסמך")}</li>`).join("")}</ol></div>
+  </div>${i < list.length - 1 ? '<div class="html2pdf__page-break"></div>' : ""}`).join("");
+}
+async function lcBuildPack(rows, title, onStep){
+  await lcLoadH2P();
+  try{ await document.fonts.ready; }catch(e){}
+  await ttdLoadPdfLib();
+  const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
+  const cfg = () => ({ margin: [8, 8, 8, 8], image: { type: "jpeg", quality: 0.95 }, html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"] } });
+  const mainBuf = await html2pdf().set(cfg()).from(lcPdfHtml(rows, title, { history: false, phones: true }), "string").outputPdf("arraybuffer");
+  const out = await PDFDocument.create();
+  const main = await PDFDocument.load(mainBuf);
+  (await out.copyPages(main, main.getPageIndices())).forEach(pg => out.addPage(pg));
+  const notes = [];
+  const withFiles = rows.map(r => ({ r, docs: lcRowDocList(r).filter(d => d.fileUrl) })).filter(x => x.docs.length);
+  if(withFiles.length){
+    const sepBuf = await html2pdf().set(cfg()).from(lcSepHtml(withFiles), "string").outputPdf("arraybuffer");
+    const sep = await PDFDocument.load(sepBuf);
+    const sepN = sep.getPageCount();
+    const A4 = [595.28, 841.89], M = 28;
+    const tot = withFiles.reduce((s, x) => s + x.docs.length, 0);
+    let n = 0;
+    for(let i = 0; i < withFiles.length; i++){
+      const x = withFiles[i];
+      const [sp] = await out.copyPages(sep, [Math.min(i, sepN - 1)]); out.addPage(sp);
+      for(const d of x.docs){
+        n++; if(onStep) onStep(n, tot);
+        const label = `${x.r.type || ""} · ${d.name || "מסמך"}`;
+        const buf = await ttdFetchUrl(d.fileUrl);
+        if(!buf){ notes.push(label); continue; }
+        try{
+          const kind = lcSniff(buf);
+          if(kind === "pdf"){
+            const src = await PDFDocument.load(buf, { ignoreEncryption: true });
+            (await out.copyPages(src, src.getPageIndices())).forEach(pg => out.addPage(pg));
+          }else if(kind === "img"){
+            const j = await ttdImgToJpeg(buf, 2000);
+            const im = await out.embedJpg(j.buf);
+            const pg = out.addPage(A4);
+            const k = Math.min((A4[0] - 2 * M) / j.w, (A4[1] - 2 * M) / j.h);
+            const w = j.w * k, h = j.h * k;
+            pg.drawImage(im, { x: (A4[0] - w) / 2, y: (A4[1] - h) / 2, width: w, height: h });
+          }else notes.push(label);
+        }catch(e){ console.error("שילוב הקובץ נכשל", label, e); notes.push(label); }
+      }
+    }
+  }
+  const font = await out.embedFont(StandardFonts.Helvetica);
+  const pages = out.getPages(), total = pages.length;
+  pages.forEach((pg, i) => {
+    if(!i) return;
+    const txt = `${i + 1} / ${total}`, w = font.widthOfTextAtSize(txt, 8), { width } = pg.getSize();
+    pg.drawText(txt, { x: (width - w) / 2, y: 7, size: 8, font, color: rgb(0.54, 0.5, 0.45) });
+  });
+  return { blob: new Blob([await out.save()], { type: "application/pdf" }), notes };
+}
+function lcSafeName(s){ return String(s || "מסמך").replace(/[\\/:*?"<>|]+/g, "-").trim().slice(0, 80) || "מסמך"; }
+function lcPackNotes(notes){
+  if(!notes.length) return;
+  lcToast(notes.length === 1 ? `קובץ אחד לא נכנס לתיק (${notes[0]}) · אפשר לפתוח אותו מהכרטיס` : `${notes.length} קבצים לא נכנסו לתיק (למשל ${notes[0]}) · אפשר לפתוח אותם מהכרטיסים`);
+}
+async function lcPackRun(btn, job){
+  if(!btn || btn.disabled) return;
+  const lbl = btn.innerHTML;
+  const all = document.querySelectorAll("#lcModal [data-lc-pk]");
+  all.forEach(b => { b.disabled = true; });
+  btn.textContent = "מכין…";
+  try{ await job(t => { if(document.body.contains(btn)) btn.textContent = t; }); }
+  catch(e){ console.error(e); lcToast("לא הצלחתי להכין את הקובץ. בדוק חיבור לאינטרנט ונסה שוב"); }
+  finally{ if(document.body.contains(btn)){ btn.innerHTML = lbl; } all.forEach(b => { if(document.body.contains(b)) b.disabled = false; }); }
+}
+function lcOpenBundle(p){
+  const kids = lcSortRows(lcKids(p).filter(k => !lcRenewed(k)));
+  const rows = [p].concat(kids);
+  const s = lcBundleState(p);
+  const allDocs = rows.flatMap(r => lcRowDocList(r));
+  const have = allDocs.filter(d => d.fileUrl).length;
+  const m = lcModal(`${lcModalHead("folder", escHtml(p.type || "תיק הגשה"))}
+    <div class="lc-modal-b">
+      <div class="lc-note">${lcIco("info")}<div>${have} מתוך ${allDocs.length} מסמכים קיימים · ${s.ready} מתוך ${s.total} חלקים מוכנים. ב־PDF כל המסמכים מצורפים בפועל אחרי עמוד הסיכום, כל אישור עם עמוד כותרת משלו.</div></div>
+      ${rows.map(r => { const ds = lcRowDocList(r); const n = ds.filter(d => d.fileUrl).length; return `<div class="lc-bdl-row">
+        <div style="flex:1;min-width:0"><b style="font-size:13.5px">${escHtml(r.type || "")}</b> <span class="lc-sub">${escHtml(lcChip(r)[1])}${r.expiry ? " · עד " + fmtDateHe(r.expiry) : ""}</span>
+          <div class="lc-docs" style="margin-top:5px">${ds.map(d => d.fileUrl ? `<span class="lc-doc have"><button type="button" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(d.name)}">${lcIco("check")}${escHtml(d.name)}</button></span>` : `<span class="lc-doc miss" style="padding-inline-end:10px">${lcIco("upload")}${escHtml(d.name)}</span>`).join("") || `<span class="lc-sub">אין מסמכים</span>`}</div></div>
+        <button type="button" class="lc-btn sm ghost" data-lc-pk="one" data-rid="${r.id}" title="PDF של האישור הזה בלבד, עם המסמכים שלו">${lcIco("download", 14)}הורדה${n ? ` · ${n}` : ""}</button>
+      </div>`; }).join("")}
+    </div>
+    <div class="lc-modal-f">
+      <button type="button" class="lc-btn" data-lc-pk="full">${lcIco("doc", 15)}PDF מלא עם כל המסמכים</button>
+      <button type="button" class="lc-btn ghost" data-lc-pk="zip">${lcIco("download", 15)}כל אישור בקובץ נפרד (ZIP)</button>
+      <button type="button" class="lc-btn ghost" data-lc-close>סגירה</button>
+    </div>`, { noFocus: true, wide: true });
+  const fname = r => lcSafeName(r.type) + ".pdf";
+  m.addEventListener("click", e => {
+    const b = e.target.closest && e.target.closest("[data-lc-pk]"); if(!b) return;
+    const kind = b.dataset.lcPk;
+    if(kind === "one"){
+      const r = lcRow(Number(b.dataset.rid)); if(!r) return;
+      lcPackRun(b, async set => {
+        const res = await lcBuildPack([r], r.type || "אישור", (n, t) => set(`מצרף ${n}/${t}…`));
+        await lcOfferFile(res.blob, fname(r)); lcPackNotes(res.notes);
+      });
+    }else if(kind === "full"){
+      lcPackRun(b, async set => {
+        const live = [lcRow(p.id) || p].concat(kids.map(k => lcRow(k.id)).filter(Boolean));
+        const res = await lcBuildPack(live, `תיק הגשה — ${p.type || ""}`, (n, t) => set(`מצרף ${n}/${t}…`));
+        await lcOfferFile(res.blob, lcSafeName(`תיק הגשה — ${p.type || ""}`) + ".pdf"); lcPackNotes(res.notes);
+      });
+    }else if(kind === "zip"){
+      lcPackRun(b, async set => {
+        await ttdLoadZip();
+        const zip = new JSZip();
+        const live = [lcRow(p.id) || p].concat(kids.map(k => lcRow(k.id)).filter(Boolean));
+        const notes = [];
+        for(let i = 0; i < live.length; i++){
+          set(`מכין ${i + 1}/${live.length}…`);
+          const res = await lcBuildPack([live[i]], live[i].type || "אישור");
+          zip.file(`${i + 1}. ${fname(live[i])}`, res.blob);
+          notes.push(...res.notes);
+        }
+        const blob = await zip.generateAsync({ type: "blob", mimeType: "application/zip" });
+        await ttdOfferFile(blob, lcSafeName(`תיק הגשה — ${p.type || ""}`) + ".zip", "application/zip");
+        lcPackNotes(notes);
+      });
+    }
+  });
 }
 
 /* ---------- מודאלים ---------- */
@@ -9029,6 +9756,8 @@ function lcOpenEdit(row, isNew){
       <label>שנת לימודים<select id="lcE_year">${schoolYearOptions().map(y => `<option value="${y}" ${Number(r.schoolYear || currentSchoolYearStart()) === y ? "selected" : ""}>${schoolYearLabel(y)}</option>`).join("")}</select></label>
       <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);align-self:end;padding-bottom:8px"><input type="checkbox" id="lcE_bundle" ${r.isBundle ? "checked" : ""} style="width:auto;accent-color:var(--brand)">זהו אישור מרוכז (תיק הגשה)</label>
       <div class="full lc-note" id="lcE_bundleNote" hidden></div>
+      <label class="full" style="flex-direction:row;align-items:center;gap:6px;color:var(--ink)"><input type="checkbox" id="lcE_pay" ${r.isPayment ? "checked" : ""} style="width:auto;accent-color:var(--brand)">כרטיס תשלום (שובר / אגרה)</label>
+      <div class="full lc-sub" style="margin-top:-6px">בכרטיס תשלום יש שובר, סכום, מועד תשלום ואסמכתא במקום דוח ליקויים, והוא נכנס לדוח מנהל החשבונות. אפשר לסמן יחד עם "אישור מרוכז", והכרטיס יישאר אישור אב.</div>
       ${eqs.length ? `<div class="full"><div class="lc-sub" style="margin-bottom:4px">ציוד קשור (מטאב ציוד ותחזוקה)</div><div class="lc-chkgrid">${eqs.map(e => `<label><input type="checkbox" value="${e.id}" data-lc-eq ${eqSet.has(e.id) ? "checked" : ""}>${escHtml((e.name || "ללא שם") + (e.place ? " · " + e.place : ""))}</label>`).join("")}</div></div>` : ""}
       <label class="full">הערות<textarea id="lcE_notes" rows="2">${escHtml(r.notes || "")}</textarea></label>
     </div></div>
@@ -9101,6 +9830,16 @@ function lcOpenEdit(row, isNew){
     target.schoolYear = Number($("#lcE_year").value) || currentSchoolYearStart();
     target.equipIds = [...m.querySelectorAll("[data-lc-eq]:checked")].map(x => Number(x.value));
     target.notes = $("#lcE_notes").value.trim();
+    const wantPay = $("#lcE_pay").checked;
+    if(wantPay && !target.isPayment){
+      target.isPayment = true;
+      const pp = lcPay(target);
+      if(!pp.payee) pp.payee = lcTrackKey(target) === "fire" ? "כבאות והצלה" : (target.inspector || "");
+      if(!isNew) lcLog(target, "הוגדר ככרטיס תשלום", true);
+    }else if(!wantPay && target.isPayment){
+      target.isPayment = false;
+      if(!isNew) lcLog(target, "בוטל סימון כרטיס תשלום (פרטי התשלום נשמרים)", true);
+    }
     if(isNew){
       target.statusLog = [{ date: lcToday(), status: target.processStatus || "לא התחיל", note: "האישור נוצר", auto: true }];
       data.licensing.push(target);
@@ -9134,6 +9873,7 @@ const LIC_TEMPLATES = [
   { k:"gas", l:"מתקן גז", s:"שנתי · אישור בודק", track:"safety", freq:12, docs:["אישור בודק גז מוסמך"] },
   { k:"elec", l:"מתקן חשמל", s:"5 שנים · דוח בודק", track:"safety", freq:60, docs:["דוח בודק חשמל"] },
   { k:"kitchen", l:"רישיון עסק — מטבח", s:"שנתי · משרד הבריאות", track:"kitchen", freq:12, docs:["רישיון עסק","אישור משרד הבריאות"] },
+  { k:"voucher", l:"תשלום שובר / אגרה", s:"שובר · תשלום · אסמכתא", track:"fire", freq:0, docs:[], payment:true },
   { k:"blank", l:"אישור ריק", s:"מילוי חופשי", track:"", freq:0, docs:[] }
 ];
 function lcBlankRow(fields){
@@ -9151,6 +9891,7 @@ function lcOpenTemplates(){
   m.querySelectorAll(".lc-tpl button").forEach(b => b.onclick = () => {
     const t = LIC_TEMPLATES.find(x => x.k === b.dataset.k);
     const row = lcBlankRow({ type: t.k === "blank" ? "" : t.l, track: t.track || "", freqMonths: t.freq, requiredDocs: lcDocList(t.docs), isBundle: !!t.bundle });
+    if(t.payment){ row.isPayment = true; row.pay = { payee: "כבאות והצלה" }; }
     if(t.bundle){ row.type = "אישור כבאות למוסד — הגשה מרוכזת"; row._kids = t.kids.map(k => { const kr = lcBlankRow({ type: k.type, track: t.track, freqMonths: k.freq, requiredDocs: lcDocList(k.docs) }); kr.statusLog = [{ date: lcToday(), status: "לא התחיל", note: "נוצר מתבנית אישור כבאות", auto: true }]; return kr; }); }
     // מזהים ייחודיים לילדים
     if(row._kids) row._kids.forEach((k, i) => { k.id = row.id + i + 1; });
@@ -9168,9 +9909,12 @@ function lcCloneForRenew(o, year, parentId){
     requiredDocs: (o.requiredDocs || []).filter(d => d && d.name).map(d => ({ name: d.name, topic: d.topic || "", docType: d.docType || "", fileUrl: "" })),
     visitChecklist: Array.isArray(o.visitChecklist) ? o.visitChecklist.map(v => ({ t: v.t, done: false })) : undefined,
     defects: [], renewedFromId: o.id,
+    isPayment: !!o.isPayment, pay: o.isPayment ? { payee: (o.pay && o.pay.payee) || "", amount: (o.pay && o.pay.amount) || "", due: "" } : undefined,
     statusLog: [{ date: lcToday(), status: "לא התחיל", note: `נפתח כחידוש מ${schoolYearLabel(Number(o.schoolYear) || currentSchoolYearStart())}`, auto: true }]
   };
   if(!n.visitChecklist) delete n.visitChecklist;
+  if(!n.pay) delete n.pay;
+  if(!n.isPayment) delete n.isPayment;
   return n;
 }
 function lcOpenRenew(row){
@@ -9269,26 +10013,6 @@ function lcOpenDefTasks(row, onlyIdx){
     renderLic();
     lcToast(`${made === 1 ? "נוצרה משימה" : "נוצרו " + made + " משימות"} בטאב משימות${photoFail ? ` · ${photoFail} תמונות לא עלו, אפשר לצרף מהמשימה` : ""}`);
   };
-}
-
-/* ---------- תיק הגשה (אישור מרוכז) ---------- */
-function lcOpenBundle(p){
-  const kids = lcKids(p).filter(k => !lcRenewed(k));
-  const rows = [p].concat(kids);
-  const allDocs = [];
-  rows.forEach(r => {
-    if(r.link) allDocs.push({ from: r.type, name: "האישור", fileUrl: r.link });
-    (r.requiredDocs || []).forEach(d => d && allDocs.push({ from: r.type, name: d.name, fileUrl: d.fileUrl }));
-  });
-  const have = allDocs.filter(d => d.fileUrl).length;
-  lcModal(`${lcModalHead("folder", escHtml(p.type || "תיק הגשה"))}
-    <div class="lc-modal-b">
-      <div class="lc-note">${lcIco("info")}<div>${have} מתוך ${allDocs.length} מסמכים מוכנים · ${kids.filter(lcKidReady).length} מתוך ${kids.length} אישורי משנה בתוקף ובאישור. המסמכים נאספים מכל אישורי המשנה, אין צורך להעתיק קישורים.</div></div>
-      ${rows.map(r => `<div><b style="font-size:13px">${escHtml(r.type || "")}</b> <span class="lc-sub">${escHtml(r.processStatus || "")}${r.expiry ? " · עד " + fmtDateHe(r.expiry) : ""}</span>
-        <div class="lc-docs" style="margin-top:5px">${allDocs.filter(d => d.from === r.type).map(d => d.fileUrl ? `<span class="lc-doc have"><button type="button" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(d.name)}">${lcIco("check")}${escHtml(d.name)}</button></span>` : `<span class="lc-doc miss" style="padding-inline-end:10px">${lcIco("upload")}${escHtml(d.name)}</span>`).join("") || `<span class="lc-sub">אין מסמכים</span>`}</div></div>`).join("")}
-    </div>
-    <div class="lc-modal-f"><button type="button" class="lc-btn" id="lcBPdf">${lcIco("doc", 15)}PDF של תיק ההגשה</button><button type="button" class="lc-btn ghost" data-lc-close>סגירה</button></div>`, { noFocus: true, wide: true });
-  document.getElementById("lcBPdf").onclick = () => lcMakePdf(rows, `תיק הגשה — ${p.type || ""}`, { history: true, phones: true }, document.getElementById("lcBPdf"));
 }
 
 /* ---------- ציר שנתי ---------- */
@@ -10437,7 +11161,8 @@ const ACX_I = {
   doc: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6"/>',
   upload: '<path d="M12 16V4"/><path d="m6 10 6-6 6 6"/><path d="M4 20h16"/>',
   shield: '<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6Z"/><path d="m9 12 2 2 4-4"/>',
-  x: '<path d="M6 6l12 12M18 6 6 18"/>'
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M5 7l1 13h12l1-13M9 7V4h6v3"/>'
 };
 function acxIco(n, s, sw){ return `<svg width="${s||16}" height="${s||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw||2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ACX_I[n]||""}</svg>`; }
 function acxAppBase(){
@@ -10610,6 +11335,7 @@ function acxSourceLabel(it){
   const j = it.job;
   if(j && j.task) return "ממשימה " + (j.code || "");
   if(j && j.proc) return "מרכש ואספקה";
+  if(it.row.licId && typeof lcRow === "function" && lcRow(Number(it.row.licId))) return "מרישוי ובטיחות";
   if(/חשבוניות וקבלות/.test(it.row.notes || "")) return "מחשבוניות וקבלות";
   return "תשלום ידני";
 }
@@ -10756,8 +11482,14 @@ function acxCardHtml(it, i, opts){
       <button type="button" class="acx-ico" title="עריכת פרטי התשלום" aria-label="עריכת פרטי התשלום" data-acx="edit" data-key="${it.key}">${acxIco("pen", 16)}</button>
       <button type="button" class="acx-ico" title="פתיחת המקור" aria-label="פתיחת המקור" data-acx="src" data-key="${it.key}">${acxIco("ext", 16)}</button>
       ${quick}
+      ${acxExtraActs(it)}
     </div>
   </div>`;
+}
+function acxExtraActs(it){
+  if(it.k !== "v") return "";
+  const linked = it.job && (it.job.task || it.job.proc);
+  return `${!linked && canOpenTab("tasks") ? `<button type="button" class="acx-ico" title="קישור למשימה קיימת" aria-label="קישור למשימה קיימת" data-acx="linkTask" data-key="${it.key}">${acxIco("link", 16)}</button>` : ""}${!it.paid ? `<button type="button" class="acx-ico" title="מחיקת התשלום" aria-label="מחיקת התשלום" data-acx="del" data-key="${it.key}">${acxIco("trash", 16)}</button>` : ""}`;
 }
 function acxRenderGrid(all){
   const grid = document.getElementById("acxGrid");
@@ -10848,7 +11580,7 @@ function acxRenderHealth(all){
   // כפילויות אפשריות: אותו ספק + תיאור + סכום, לא שולמו, לא מקושרים לאותו מקור. רק מציגים — לא מוחקים
   const groups = {};
   v.filter(it => !it.paid && it.hasAmount).forEach(it => {
-    const k = [it.name, it.title, Math.round(it.amount * 100)].join("|");
+    const k = [vpNorm(it.name), Math.round(it.amount * 100)].join("|");
     (groups[k] = groups[k] || []).push(it);
   });
   const dups = Object.values(groups).filter(g => g.length > 1);
@@ -10861,7 +11593,7 @@ function acxRenderHealth(all){
     <div class="acx-hcell"><b>צוות ותורנים</b>${staff} תשלומים · סכום ננעל ברגע התשלום</div>
     <div class="acx-hcell"><b>תשלומים ידניים</b>${manual} תשלומים</div>
     ${noBankVendors.length ? `<div class="acx-hcell warn"><b>חסרים פרטי בנק</b>${noBankVendors.map(escHtml).join(", ")}</div>` : ""}
-    ${dups.map(g => `<div class="acx-hcell warn"><b>כפילות אפשרית: ${escHtml(g[0].name)}</b>${g.length} רשומות של ${fmtMoney(g[0].amount)} · "${escHtml(g[0].title)}". כדאי לבדוק בטבלת המקור ולמחוק ידנית את המיותרת.</div>`).join("")}
+    ${dups.map(g => `<div class="acx-hcell warn"><b>כפילות אפשרית: ${escHtml(g[0].name)}</b>${g.length} רשומות של ${fmtMoney(g[0].amount)} · "${escHtml(g[0].title)}". אם זה אותו תשלום, אפשר למחוק את המיותר עם אייקון הפח בכרטיס שלו.</div>`).join("")}
   </div>`;
 }
 
@@ -10901,6 +11633,7 @@ function acxOpenSource(key){
     return;
   }
   if(it.job && (it.job.task || it.job.proc)) return openJobSource(it.job.key);
+  if(it.row.licId && canOpenTab("licensing") && typeof lcRow === "function" && lcRow(Number(it.row.licId))){ switchTab("licensing"); try{ lcGoto(Number(it.row.licId)); }catch(e){ console.error(e); } return; }
   scrollToId("vendorPayAnchor");
   setTimeout(() => {
     const tr = [...document.querySelectorAll("#vendorPayBody tr")][data.vendorPayments.indexOf(it.row)];
@@ -10929,6 +11662,53 @@ function acxAttachReceipt(key){
     }catch(e){ console.error(e); jobToast("שגיאת העלאה: " + e.message, 5000); }
   };
   input.click();
+}
+
+/* ---------- מחיקת תשלום וקישור למשימה (2026-11) ---------- */
+function acxDelete(key){
+  const it = acxItem(key); if(!it || it.k !== "v") return;
+  if(it.paid){ jobToast("תשלום שסומן כשולם לא נמחק"); return; }
+  const r = it.row;
+  const t = data.tasks.find(x => x.vendorPayId === r.id);
+  const p = data.procurement.find(x => x.vendorPayId === r.id);
+  const lic = r.licId && typeof lcRow === "function" ? lcRow(Number(r.licId)) : null;
+  const src = t ? `למשימה "${t.desc || ""}"` : p ? `לפריט רכש "${p.item || ""}"` : lic ? `לאישור "${lic.type || ""}"` : "";
+  const msg = `למחוק את התשלום "${it.name}${it.hasAmount ? " · " + fmtMoney(it.amount) : ""}"?` + (src ? ` הוא מקושר ${src}. רק רישום התשלום יימחק, ${t ? "המשימה" : p ? "הפריט" : "האישור"} והקבצים נשארים.` : "");
+  openConfirmModal(msg, () => {
+    const i = data.vendorPayments.indexOf(r);
+    if(i < 0 || vpIsPaid(r)) return;
+    data.vendorPayments.splice(i, 1);
+    let tCh = false, pCh = false, lCh = false;
+    data.tasks.forEach(x => { if(x.vendorPayId === r.id){ x.vendorPayId = null; x.vpRemoved = true; tCh = true; } });
+    data.procurement.forEach(x => { if(x.vendorPayId === r.id){ x.vendorPayId = null; x.vpRemoved = true; pCh = true; } });
+    (data.licensing || []).forEach(x => { if(x.pay && x.pay.vpId === r.id){ x.pay.vpId = null; lCh = true; } });
+    acctUi.sel.delete(key);
+    scheduleSave("vendorPayments", "vendorPaySaved");
+    if(tCh) scheduleSave("tasks", "tasksSaved");
+    if(pCh) scheduleSave("procurement", "procSaved");
+    if(lCh) scheduleSave("licensing", "licSaved");
+    acxAfterChange("v");
+    try{ refreshJobViews(); }catch(e){}
+    try{ renderLic(); }catch(e){}
+    jobToast("התשלום נמחק");
+  });
+}
+function acxLinkTask(key){
+  const it = acxItem(key); if(!it || it.k !== "v") return;
+  const r = it.row, vn = vpNorm(r.vendor);
+  const list = data.tasks.filter(t => t && !taskVP(t)).slice().sort((a, b) =>
+    ((vpNorm(b.assignee) === vn) - (vpNorm(a.assignee) === vn)) || ((tkStatus(a) === "בוצע") - (tkStatus(b) === "בוצע")) || (b.id - a.id));
+  if(!list.length){ jobToast("אין משימות בלי תשלום שאפשר לקשר"); return; }
+  lcPicker("קישור התשלום למשימה", list.slice(0, 300).map(t => ({ id: t.id, title: t.desc || "משימה", sub: [tkCode(t), t.assignee, tkStatus(t)].filter(Boolean).join(" · "), ini: tkInitials(t.assignee || t.desc || "מ"), cur: !!vn && vpNorm(t.assignee) === vn })), x => {
+    const t = data.tasks.find(y => y.id === x.id);
+    const row = data.vendorPayments.find(v => v.id === r.id);
+    if(!t || !row || taskVP(t)) return;
+    t.vendorPayId = row.id;
+    scheduleSave("tasks", "tasksSaved");
+    acxAfterChange("v");
+    try{ refreshJobViews(); }catch(e){}
+    jobToast(`התשלום קושר למשימה ${tkCode(t)}`);
+  }, { ico: "task", ph: "חיפוש משימה", curLabel: "אותו ספק", note: "מוצגות רק משימות שעוד אין להן תשלום, כדי שלא תיווצר עלות כפולה." });
 }
 
 /* ---------- חלון עריכה / תשלום ידני ---------- */
@@ -11350,6 +12130,8 @@ document.addEventListener("click", e => {
   if(a === "edit") return acxOpenEdit(key);
   if(a === "src") return acxOpenSource(key);
   if(a === "receipt") return acxAttachReceipt(key);
+  if(a === "del") return acxDelete(key);
+  if(a === "linkTask") return acxLinkTask(key);
   if(a === "quick") return acxQuickSend(key, el.dataset.ch);
   if(a === "moreLog"){ acctUi.showAllLog = !acctUi.showAllLog; return acxRenderLog(); }
   if(a === "remind") return acxRemind(el.dataset.id, "whatsapp");
@@ -13376,8 +14158,12 @@ function confirmCreateVendorPay(){
 }
 let confirmModalCallback = null;
 /* opts (רשות): {yesLabel, icon} — לאישור עדכון במקום מחיקה. בלי opts ההתנהגות כמו קודם (מחיקה, אדום) */
+let confirmModalCancelCb = null;
 function openConfirmModal(message, onConfirm, opts){
   opts = opts || {};
+  confirmModalCancelCb = typeof opts.onCancel === "function" ? opts.onCancel : null;
+  const noBtn = document.getElementById("confirmModalNoBtn");
+  if(noBtn) noBtn.textContent = opts.noLabel || "ביטול";
   document.getElementById("confirmModalMessage").textContent = message;
   const iconSlot = document.getElementById("confirmModalIconSlot");
   if(iconSlot) iconSlot.innerHTML = svgIcon(opts.icon || "trash", 18);
@@ -13390,11 +14176,15 @@ function openConfirmModal(message, onConfirm, opts){
   document.getElementById("confirmModal").style.display = "flex";
 }
 function closeConfirmModal(){
+  const cancel = confirmModalCancelCb;
+  confirmModalCancelCb = null;
   document.getElementById("confirmModal").style.display = "none";
   confirmModalCallback = null;
+  if(cancel){ try{ cancel(); }catch(e){ console.error(e); } }
 }
 function confirmModalYes(){
   const cb = confirmModalCallback;
+  confirmModalCancelCb = null;
   closeConfirmModal();
   if(cb) cb();
 }
@@ -13566,6 +14356,15 @@ function procVP(p){
 function vpIsPaid(vp){
   return !!vp && (vp.paymentStatus || (vp.paid ? "שולם" : "ממתין")) === "שולם";
 }
+/* תשלום פתוח לאותו ספק שעוד לא מקושר למשימה או לרכש — כדי לקשר במקום ליצור כפילות */
+function vpNorm(s){ return String(s || "").replace(/\s+/g, " ").trim().toLowerCase(); }
+function vpOpenCandidates(vendor, licId){
+  const v = vpNorm(vendor); if(!v) return [];
+  return (data.vendorPayments || []).filter(x => x && !vpIsPaid(x) && vpNorm(x.vendor) === v
+    && (!x.licId || (licId && Number(x.licId) === Number(licId)))
+    && !data.tasks.some(t => t.vendorPayId === x.id) && !data.procurement.some(p => p.vendorPayId === x.id))
+    .sort((a, b) => b.id - a.id);
+}
 function finDocs(list){
   const seen = new Set();
   const out = [];
@@ -13723,6 +14522,14 @@ function setJobAmount(key, value){
   if(!vp){
     if(!amount) return;
     if(!j.task) return;
+    const same = vpOpenCandidates(j.task.assignee, j.task.licId).filter(v => Math.abs((parseFloat(v.amount) || 0) - amount) < 0.01);
+    if(same.length){
+      j.task.vendorPayId = same[0].id;
+      saveJobRecords(j);
+      refreshJobViews();
+      jobToast(`קושר לתשלום הקיים בדוח מנה״ח (${same[0].vendor || ""} · ${fmtMoney(amount)}) · בלי רישום כפול`, 4200);
+      return;
+    }
     vp = ensureTaskVendorPay(j.task);
   }
   if((parseFloat(vp.amount) || 0) === amount) return;
@@ -15958,7 +16765,7 @@ function repairDuplicateIds(){
 function backfillTaskInvoiceSync(){
   let changed = false;
   data.tasks.forEach(taskRow => {
-    if(taskRow.link && !taskRow.vendorPayId){
+    if(taskRow.link && !taskRow.vendorPayId && !taskRow.vpRemoved){
       const alreadyLinked = data.vendorPayments.some(v => (v.docs||[]).some(d=>d.fileUrl===taskRow.link));
       if(!alreadyLinked){
         const newId = nextId()+7000;
@@ -15977,7 +16784,7 @@ function backfillProcInvoiceSync(){
   let changed = false;
   data.procurement.forEach(procRow => {
     const firstDocUrl = (procRow.docs && procRow.docs[0]) ? procRow.docs[0].fileUrl : (procRow.link || "");
-    if(firstDocUrl && !procRow.vendorPayId){
+    if(firstDocUrl && !procRow.vendorPayId && !procRow.vpRemoved){
       const alreadyLinked = data.vendorPayments.some(v => (v.docs||[]).some(d=>d.fileUrl===firstDocUrl));
       if(!alreadyLinked){
         const newId = nextId()+7000;
