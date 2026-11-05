@@ -1338,6 +1338,10 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
 .je-doc{ display:flex; align-items:center; gap:8px; padding:6px 8px; border:1px solid var(--line); border-radius:10px; background:var(--card); min-width:0; }
 .je-doc .nm{ flex:1 1 auto; min-width:0; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .je-doc select{ width:auto !important; flex:0 0 auto; font-size:13px; }
+.je-paid{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
+.je-undo{ display:inline-flex; align-items:center; gap:5px; min-height:36px; padding:0 12px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:#8c491a; font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; }
+.je-undo:hover{ border-color:#c67139; }
+.ja-check.is-off{ opacity:.5; cursor:default; }
 .je-box{ border:1px solid var(--line); border-radius:12px; padding:12px; background:var(--job-idle-bg, #f5efe6); }
 .job-topic-row{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
 .job-edit{ display:inline-flex; align-items:center; gap:4px; border:1px solid var(--line); background:var(--card); color:var(--ink-soft); font:inherit; font-size:12px; font-weight:600; cursor:pointer; padding:3px 9px; border-radius:999px; }
@@ -3199,7 +3203,7 @@ button.tk-chip{ cursor:pointer; }
         <label class="ja-f" style="margin-bottom:0"><span>סיבה</span><select id="jeNcReason"></select></label>
         <div class="ja-hint" style="margin:8px 0 0">לא יופיע כחסר סכום או ממתין לתשלום, ולא יישלח למנהל החשבונות. החשבונית נשמרת בתיק כתיעוד.</div>
       </div>
-      <div id="jeNcPaid" class="ja-hint" style="display:none;margin:8px 0 0"></div>
+      <div id="jeNcPaid" class="je-paid" style="display:none"></div>
     </div>
     <div class="toolbar" style="margin-top:16px">
       <button class="btn ghost" onclick="closeJobEditModal()">ביטול</button>
@@ -12210,6 +12214,7 @@ function acxDrMoreHtml(it){
     b.push(`<button type="button" class="acx-btn ghost sm" data-acx="quick" data-ch="email" data-key="${it.key}">${svgIcon("mail", 15)}שליחה בודדת ב־Gmail</button>`);
   }
   if(it.k === "v" && !it.paid) b.push(`<button type="button" class="acx-btn ghost sm" style="color:#8c491a" data-acx="del" data-key="${it.key}">${acxIco("trash", 15)}מחיקת התשלום</button>`);
+  if(it.k === "v" && it.paid && acxIsAdmin()) b.push(`<button type="button" class="acx-btn ghost sm" data-acx="unpay" data-key="${it.key}">${acxIco("sync", 15)}ביטול סימון שולם</button>`);
   if(!b.length) return "";
   return `<div class="tk-sec-h">${acxIco("send", 16)}פעולות נוספות</div><div class="acx-row">${b.join("")}</div>`;
 }
@@ -12932,6 +12937,7 @@ document.addEventListener("click", e => {
   if(a === "drClose") return acxDrClose();
   if(a === "drSave") return acxSaveEdit();
   if(a === "drAct") return acxDrAct();
+  if(a === "unpay"){ const it = acxItem(key); if(it && it.k === "v") vpUndoPaid(it.row); return; }
   if(a === "upInv") return acxAttachDoc(key, "חשבונית");
   if(a === "new") return acxDrOpen("");
   if(a === "period"){ acctUi.period = el.dataset.v; return renderAccountantReport(); }
@@ -16010,6 +16016,37 @@ function confirmJobAssignModal(){
   if(!noCharge && !paid && !(amount > 0) && isInvoiceDocType(docType)) openJobAmountModal("v" + vp.id);
 }
 
+/* ---------- ביטול סימון "שולם" שסומן בטעות ----------
+   משנה רק סטטוס. שום דבר לא נמחק: התשלום הקודם נשמר ב-unpaidLog. */
+function vpUndoPaid(vp, onDone){
+  if(!vp || !isJobAdmin() || !vpIsPaid(vp)) return;
+  const byAcc = vp.paidBy === "מנהל החשבונות";
+  const when = vp.paidAt ? fmtDateHe(String(vp.paidAt).slice(0, 10)) : "";
+  const note = byAcc ? " הסימון הגיע ממנהל החשבונות, כדאי לעדכן אותו."
+    : vp.sentAt ? " התשלום נשלח בעבר למנהל החשבונות, כדאי לעדכן אותו." : "";
+  openConfirmModal(`לבטל את סימון "שולם" של ${vp.vendor || "התשלום"}${when ? " (סומן ב-" + when + ")" : ""}? התשלום יחזור לסטטוס ממתין. שום מסמך לא נמחק.${note}`, () => {
+    const row = data.vendorPayments.find(v => v.id === vp.id);
+    if(!row || !vpIsPaid(row)) return;
+    row.unpaidLog = (row.unpaidLog || []).concat([{ paidAt: row.paidAt || "", paidBy: row.paidBy || "", at: new Date().toISOString() }]).slice(-10);
+    row.paymentStatus = "ממתין";
+    row.paid = false;
+    delete row.paidAt;
+    delete row.paidBy;
+    delete row.paidTotal;
+    scheduleSave("vendorPayments", "vendorPaySaved");
+    refreshJobViews();
+    try{ renderVendorPay(); }catch(e){}
+    jobToast("סימון \"שולם\" בוטל · התשלום חזר לממתין");
+    if(onDone) onDone();
+  }, { yesLabel: "ביטול סימון שולם", noLabel: "השארה כך", icon: "cash" });
+}
+function jobUndoPaid(key){
+  const j = findJob(key);
+  if(!j || !j.vp) return;
+  closeJobEditModal();
+  vpUndoPaid(j.vp, () => openJobEditModal(key, { check: true }));
+}
+
 /* ---------- עריכת כרטיס: נושא + ללא תשלום ---------- */
 let jobEditKey = null;
 function jobNcReasons(j){
@@ -16064,7 +16101,10 @@ function openJobEditModal(key, opts){
   const paidNote = document.getElementById("jeNcPaid");
   const sentNote = !j.paid && j.vp && j.vp.sentAt ? "שים לב: התשלום הזה כבר נשלח למנהל החשבונות. אם תסמן ללא תשלום, כדאי לעדכן אותו שאין צורך לשלם." : "";
   paidNote.style.display = j.paid || sentNote ? "" : "none";
-  paidNote.textContent = j.paid ? "העבודה כבר סומנה כשולמה, לכן אי אפשר לסמן אותה ללא תשלום." : sentNote;
+  paidNote.innerHTML = j.paid
+    ? `<span>מסומן כשולם${j.vp && j.vp.paidAt ? " · " + escHtml(fmtDateHe(String(j.vp.paidAt).slice(0, 10))) : ""}</span>${j.vp ? `<button type="button" class="je-undo" data-job-unpay="${escHtml(key)}">${jobIcon("sync", 14)}ביטול סימון שולם</button>` : ""}`
+    : `<span>${escHtml(sentNote)}</span>`;
+  document.querySelector("#jobEditModal .je-box > label.ja-check").classList.toggle("is-off", j.paid);
   document.getElementById("jeNcWrap").style.display = cb.checked ? "" : "none";
   document.getElementById("jobEditModal").style.display = "flex";
 }
@@ -16519,6 +16559,8 @@ document.addEventListener("click", e => {
   const filt = t.closest("[data-jobs-filter]");
   if(filt){ setJobsFilter(filt.dataset.jobsFilter); return; }
   if(t.closest("[data-jobs-clear]")){ clearJobsFilters(); return; }
+  const jUnpay = t.closest("[data-job-unpay]");
+  if(jUnpay){ e.preventDefault(); jobUndoPaid(jUnpay.dataset.jobUnpay); return; }
   const jEdit = t.closest("[data-job-edit]");
   if(jEdit){ e.preventDefault(); openJobEditModal(jEdit.dataset.jobEdit); return; }
   const jaMode = t.closest("[data-ja-mode]");
