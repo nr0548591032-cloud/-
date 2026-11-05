@@ -14914,7 +14914,14 @@ function removeGenericDoc(tableKey, id, field, idx){
   const t = DOC_TABLES[tableKey];
   const row = t.find(id);
   if(!row || !row[field]) return;
-  row[field].splice(idx, 1);
+  const removed = row[field].splice(idx, 1)[0];
+  /* רשומות ישנות שמרו את הקובץ גם בשדה יחיד (link / invoiceLink). בלי זה המסמך האחרון
+     "חוזר" בכל רענון. השדה הישן לא נמחק לגמרי — עובר לשדה גיבוי. */
+  const legacy = field === "docs" ? ({ tasks: "link", procurement: "link", staff: "link", vendorPayments: "invoiceLink" })[tableKey] : "";
+  if(legacy && removed && removed.fileUrl && row[legacy] === removed.fileUrl){
+    row[legacy + "Removed"] = row[legacy];
+    delete row[legacy];
+  }
   t.save();
   if(tableKey==="tasks" && field==="docs") syncTaskInvoiceToVendorPay(row);
   if(tableKey==="procurement" && field==="docs") syncProcInvoiceToVendorPay(row);
