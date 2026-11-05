@@ -1334,6 +1334,10 @@ button.job-title{ background:none; border:none; padding:0; font-family:inherit; 
 .ja-check{ display:flex; align-items:center; gap:8px; font-size:13.5px; margin:6px 0; cursor:pointer; }
 .ja-check input{ width:18px; height:18px; flex:0 0 auto; margin:0; }
 .ja-n{ color:var(--ink-soft); font-size:12px; }
+.je-docs{ display:flex; flex-direction:column; gap:6px; }
+.je-doc{ display:flex; align-items:center; gap:8px; padding:6px 8px; border:1px solid var(--line); border-radius:10px; background:var(--card); min-width:0; }
+.je-doc .nm{ flex:1 1 auto; min-width:0; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.je-doc select{ width:auto !important; flex:0 0 auto; font-size:13px; }
 .je-box{ border:1px solid var(--line); border-radius:12px; padding:12px; background:var(--job-idle-bg, #f5efe6); }
 .job-topic-row{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
 .job-edit{ display:inline-flex; align-items:center; gap:4px; border:1px solid var(--line); background:var(--card); color:var(--ink-soft); font:inherit; font-size:12px; font-weight:600; cursor:pointer; padding:3px 9px; border-radius:999px; }
@@ -3187,6 +3191,8 @@ button.tk-chip{ cursor:pointer; }
     <div style="font-weight:700;font-size:16px;margin-bottom:4px">עריכת הכרטיס</div>
     <div id="jobEditSub" style="font-size:13px;color:var(--ink-soft);margin-bottom:14px"></div>
     <label class="ja-f"><span>נושא</span><select id="jeTopic"></select></label>
+    <div id="jeDocsWrap" class="ja-f" style="display:none"><span>המסמכים בכרטיס</span><div id="jeDocs" class="je-docs"></div>
+      <div class="ja-hint" style="margin:4px 0 0">"אישור / מסמך אחר" נשמר בתיק, אבל לא נחשב חשבונית ולא דורש תשלום.</div></div>
     <div class="je-box">
       <label class="ja-check" style="margin:0"><input type="checkbox" id="jeNoCharge"> <span><b>ללא תשלום</b> · כלול בחוזה או באחריות</span></label>
       <div id="jeNcWrap" style="display:none;margin-top:10px">
@@ -15205,6 +15211,10 @@ function finDocs(list){
 function buildJob(task, proc, vp){
   const allDocs = [].concat(task ? (task.docs || []) : [], proc ? (proc.docs || []) : [], vp ? (vp.docs || []) : []);
   const docs = finDocs(allDocs);
+  /* מסמכים שאינם כספיים (אישור ביצוע וכד׳) — מוצגים בכרטיס אבל לא נחשבים חשבונית */
+  const finUrls = new Set(docs.map(d => d.fileUrl));
+  const otherDocs = [];
+  allDocs.forEach(d => { if(d && d.fileUrl && d.docType === "אחר" && !finUrls.has(d.fileUrl) && !otherDocs.some(x => x.fileUrl === d.fileUrl)) otherDocs.push(d); });
   const hasInvoice = docs.some(d => isInvoiceDocType(d.docType));
   const hasReceipt = docs.some(d => isReceiptDocType(d.docType));
   const amount = vp ? (parseFloat(vp.amount) || 0)
@@ -15227,7 +15237,8 @@ function buildJob(task, proc, vp){
   const key = task ? "t" + task.id : proc ? "p" + proc.id : "v" + vp.id;
   return {
     key, task, proc, vp, docs, hasInvoice, hasReceipt, amount: noCharge ? 0 : amount, approved, paid, done,
-    steps: noCharge ? [done, hasInvoice || hasReceipt, true] : [done, hasInvoice, approved, paid, hasReceipt],
+    steps: noCharge ? [done, hasInvoice || hasReceipt || otherDocs.length > 0, true] : [done, hasInvoice, approved, paid, hasReceipt],
+    otherDocs,
     topic, title, pro, date, noCharge, noChargeNote, topicSet,
     year: task ? String(task.schoolYear || currentSchoolYearStart()) : "",
     code: task ? taskCodeDisplay(task) : "",
@@ -15242,7 +15253,7 @@ function collectJobs(){
   const usedVp = new Set();
   data.tasks.forEach(t => {
     const vp = taskVP(t);
-    if(!vp && finDocs(t.docs).length === 0) return;
+    if(!vp && finDocs(t.docs).length === 0 && !t.noCharge) return;
     if(vp) usedVp.add(vp.id);
     jobs.push(buildJob(t, null, vp));
   });
@@ -15484,6 +15495,7 @@ function jobDocChipsHtml(j, opts){
     const label = isRec ? "קבלה" : (j.noCharge ? "חשבונית (תיעוד)" : "חשבונית");
     return `<button type="button" class="job-chip ${isRec ? "receipt" : ""}" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(label + " · " + j.title)}" data-fv-meta="${escHtml((j.pro || "") + (j.amount > 0 ? " · " + fmtMoney(j.amount) : ""))}" data-fv-job="${j.key}" data-fv-kind="${isRec ? "receipt" : "invoice"}" aria-label="פתיחת ${label}${escHtml(name)}">${jobIcon("check", 15)}${label}</button>`;
   }).join("");
+  html += (j.otherDocs || []).map(d => `<button type="button" class="job-chip plain" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml((d.name || "אישור") + " · " + j.title)}" data-fv-job="${j.key}">${jobIcon("doc", 15)}${escHtml(d.name && d.name.length < 26 ? d.name : "אישור / מסמך")}</button>`).join("");
   if(opts.withMissing && isJobAdmin() && !j.noCharge){
     if(!j.hasInvoice && !j.paid) html += `<button type="button" class="job-chip missing" data-job-act="addInvoice" data-job-key="${j.key}">${jobIcon("upload", 15)}חשבונית</button>`;
     if(j.hasInvoice && !j.hasReceipt) html += `<button type="button" class="job-chip missing" data-job-act="addReceipt" data-job-key="${j.key}">${jobIcon("upload", 15)}קבלה${j.paid ? " חסרה" : ""}</button>`;
@@ -15518,7 +15530,7 @@ function renderTaskJobCell(row){
         ${next && adm ? `<button type="button" class="job-btn ${next.act === "paid" || next.act === "approve" ? "ghost" : ""}" data-job-act="${next.act}" data-job-key="${j.key}">${jobIcon(next.icon, 16)}${next.label}</button>` : ""}
         ${!next ? `<span class="job-closed">${jobIcon("check", 15)}התיק סגור</span>` : ""}
         ${j.pro ? `<button type="button" class="job-btn soft" data-pro="${escHtml(j.pro)}">${jobIcon("person", 16)}כל העבודות של ${escHtml(j.pro)}</button>` : ""}
-        ${adm && !j.paid ? `<button type="button" class="job-btn soft" data-job-edit="${j.key}">${jobIcon("edit", 16)}${j.noCharge ? "ללא תשלום · שינוי" : "נושא / ללא תשלום"}</button>` : ""}
+        ${adm ? `<button type="button" class="job-btn soft" data-job-edit="${j.key}">${jobIcon("edit", 16)}${j.noCharge ? "ללא תשלום · שינוי" : "עריכה: נושא, מסמכים, ללא תשלום"}</button>` : ""}
       </div>
     </div>
     <div class="job-mini">${j.amount > 0 ? fmtMoney(j.amount) : (j.noCharge ? "ללא תשלום" : "ללא סכום")} <span class="job-status ${st.tone}">${st.text}</span></div>`;
@@ -15877,7 +15889,8 @@ function confirmJobAmountModal(){
 let jobAssignFileId = null;
 let jobAssignMode = "buy";
 function jobTopicOptionsHtml(cur){
-  const list = [...new Set(DOC_TOPICS.concat(cur && cur !== "כללי" ? [cur] : []))];
+  /* הנושא הנוכחי תמיד ברשימה ונבחר, כדי ששמירה בלי נגיעה לא תשנה נושא בטעות */
+  const list = [...new Set((cur ? [cur] : []).concat(DOC_TOPICS))];
   return list.map(t => `<option value="${escHtml(t)}" ${t === cur ? "selected" : ""}>${escHtml(t)}</option>`).join("");
 }
 function jaSetMode(m){
@@ -16012,10 +16025,33 @@ function jobNcGuess(j, reasons){
   const hit = reasons.find(r => r.startsWith("כלול ב") && r !== "כלול בחוזה אחזקה" && vpNorm(r.slice(6)).split(" ").some(w => w.length > 2 && hay.includes(w.replace(/^ה/, ""))));
   return hit || "כלול בחוזה אחזקה";
 }
-function openJobEditModal(key){
+/* כל המסמכים של הכרטיס (בלי תמונות), פעם אחת לכל קובץ */
+function jobEditDocs(j){
+  const out = [];
+  [j.task, j.proc, j.vp].filter(Boolean).forEach(r => (r.docs || []).forEach(d => {
+    if(!d || !d.fileUrl || isPhotoDocType(d.docType) || out.some(x => x.fileUrl === d.fileUrl)) return;
+    out.push(d);
+  }));
+  return out;
+}
+function jobDocTypeValue(t){ return isReceiptDocType(t) ? "קבלה" : t === "אחר" ? "אחר" : "חשבונית"; }
+function openJobEditModal(key, opts){
+  opts = opts || {};
   const j = findJob(key);
   if(!j || !isJobAdmin()) return;
   jobEditKey = key;
+  const docs = jobEditDocs(j);
+  document.getElementById("jeDocsWrap").style.display = docs.length ? "" : "none";
+  document.getElementById("jeDocs").innerHTML = docs.map((d, i) => {
+    const v = jobDocTypeValue(d.docType);
+    const nm = String(d.name || "").trim() || "מסמך";
+    return `<div class="je-doc"><button type="button" class="job-chip plain" style="min-height:30px;padding:0 9px" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(nm)}" aria-label="פתיחת ${escHtml(nm)}">${jobIcon("doc", 14)}</button><span class="nm">${escHtml(nm)}</span>
+      <select data-je-doc="${i}" data-url="${escHtml(d.fileUrl)}" data-orig="${v}" aria-label="סוג המסמך ${escHtml(nm)}">
+        <option value="חשבונית" ${v === "חשבונית" ? "selected" : ""}>חשבונית</option>
+        <option value="קבלה" ${v === "קבלה" ? "selected" : ""}>קבלה</option>
+        <option value="אחר" ${v === "אחר" ? "selected" : ""}>אישור / מסמך אחר</option>
+      </select></div>`;
+  }).join("");
   document.getElementById("jobEditSub").textContent = [j.title, j.pro, j.code ? "משימה " + j.code : ""].filter(Boolean).join(" · ");
   document.getElementById("jeTopic").innerHTML = jobTopicOptionsHtml(j.topic);
   const reasons = jobNcReasons(j);
@@ -16023,7 +16059,7 @@ function openJobEditModal(key){
   const pick = jobNcGuess(j, reasons);
   sel.innerHTML = reasons.map(r => `<option value="${escHtml(r)}" ${r === pick ? "selected" : ""}>${escHtml(r)}</option>`).join("");
   const cb = document.getElementById("jeNoCharge");
-  cb.checked = j.noCharge;
+  cb.checked = j.noCharge || (!!opts.check && !j.paid);
   cb.disabled = j.paid;
   const paidNote = document.getElementById("jeNcPaid");
   const sentNote = !j.paid && j.vp && j.vp.sentAt ? "שים לב: התשלום הזה כבר נשלח למנהל החשבונות. אם תסמן ללא תשלום, כדאי לעדכן אותו שאין צורך לשלם." : "";
@@ -16043,9 +16079,23 @@ function confirmJobEditModal(){
   const topic = document.getElementById("jeTopic").value;
   const nc = document.getElementById("jeNoCharge").checked && !j.paid;
   const reason = document.getElementById("jeNcReason").value || "ללא חיוב";
-  const urls = new Set(j.docs.map(d => d.fileUrl));
+  const urls = new Set(j.docs.map(d => d.fileUrl).concat((j.otherDocs || []).map(d => d.fileUrl)));
   let filesCh = false;
   const msgs = [];
+  /* שינוי סוג מסמך: מעדכנים את כל העותקים של אותו קובץ (משימה, רכש, תשלום, העלאות ישירות) */
+  const typeCh = [];
+  document.querySelectorAll("#jeDocs select[data-je-doc]").forEach(sel => {
+    if(sel.value !== sel.dataset.orig) typeCh.push({ url: sel.dataset.url, type: sel.value });
+  });
+  typeCh.forEach(c => {
+    recs.forEach(r => (r.docs || []).forEach(d => { if(d && d.fileUrl === c.url && !isPhotoDocType(d.docType)) d.docType = c.type; }));
+    data.files.forEach(fl => { if(fl && fl.url === c.url && fl.docType !== c.type){ fl.docType = c.type; filesCh = true; } });
+  });
+  if(typeCh.length){
+    if(j.task) try{ syncTaskInvoiceToVendorPay(j.task); }catch(e){ console.error(e); }
+    if(j.proc) try{ syncProcInvoiceToVendorPay(j.proc); }catch(e){ console.error(e); }
+    msgs.push(typeCh.length === 1 ? "סוג המסמך עודכן" : "סוגי המסמכים עודכנו");
+  }
   if(topic && topic !== j.topic){
     recs.forEach(r => {
       r.jobTopic = topic;
