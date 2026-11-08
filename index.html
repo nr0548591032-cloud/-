@@ -2084,6 +2084,214 @@ button.tk-chip{ cursor:pointer; }
 @media (prefers-reduced-motion:reduce){ .acx-peek{ animation:none; } }
 </style>
 
+<style id="ct-style">
+/* ===== אנשי קשר וספקים — עיצוב חדש ===== */
+.ct{display:flex;flex-direction:column;gap:20px;color:#201e1d}
+.ct *,#ctDrawer *,#ctModal *,#ctMini *{box-sizing:border-box}
+.ct button,#ctDrawer button,#ctModal button,#ctMini button{font-family:inherit;cursor:pointer}
+.ct-h1{font-family:var(--font-heading,"Suez One",serif);font-weight:400;font-size:28px;margin:0;color:#201e1d;letter-spacing:-.01em}
+.ct-h2{font-family:var(--font-heading,"Suez One",serif);font-weight:400;font-size:19px;margin:0;color:#201e1d}
+.ct-h2.big{font-size:22px;overflow-wrap:anywhere}
+.ct-sub{font-size:14px;color:#645c50}
+.ct-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.ct-head-t{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ct-head-a{display:flex;flex-wrap:wrap;gap:8px}
+.ct-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid rgba(32,30,29,.16);background:#fbf7f0;color:#201e1d !important;font-size:14px;font-weight:600;text-decoration:none;transition:background .15s}
+.ct-btn:hover{background:#fff2eb}
+.ct-btn.pri{background:#c67139;border-color:#c67139;color:#fff9f2 !important}
+.ct-btn.pri:hover{background:#b2622d}
+.ct-btn:disabled{opacity:.6;cursor:wait}
+.ct-flex{flex:1}
+.ct-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:12px}
+.ct-kpi{background:#fbf7f0;border-radius:18px;padding:13px 15px;border-top:4px solid #c67139;box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.07);display:flex;flex-direction:column;gap:2px;min-width:0;animation:ctIn .35s ease both}
+.ct-kpi .l{font-size:12px;font-weight:600;color:#645c50}
+.ct-kpi .v{font-family:var(--font-heading,"Suez One",serif);font-size:25px;color:#201e1d;overflow-wrap:anywhere}
+.ct-kpi .v.sm{font-size:19px}
+.ct-kpi .s{font-size:12px;color:#645c50}
+.ct-kpi.ok{border-top-color:#7a8a5e}.ct-kpi.idle{border-top-color:#82796a}.ct-kpi.bad{border-top-color:#8c491a}.ct-kpi.bad .v{color:#8c491a}
+.ct-kpi:nth-child(2){animation-delay:.05s}.ct-kpi:nth-child(3){animation-delay:.1s}.ct-kpi:nth-child(4){animation-delay:.15s}
+@keyframes ctIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ct-sec{display:flex;flex-direction:column;gap:10px}
+.ct-sec-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
+.ct-sec-h span{font-size:12.5px;color:#645c50}
+.ct-alerts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:10px}
+.ct-alert{display:flex;align-items:center;gap:12px;background:#fbf7f0;border-radius:16px;padding:11px 13px;border:1px solid rgba(32,30,29,.10)}
+.ct-alert .ic{flex:0 0 36px;height:36px;border-radius:12px;display:grid;place-items:center}
+.ct-alert .ic.w{background:#ffe1d0;color:#8c491a}.ct-alert .ic.d{background:#ffc6a5;color:#643312}.ct-alert .ic.i{background:#eee7db;color:#4d463c}
+.ct-alert .tx{flex:1;min-width:0;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.ct-alert .tx small{display:block;color:#645c50;font-size:12px}
+.ct-alert-a{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:0 0 auto}
+.ct-act{min-height:36px;padding:0 12px;border-radius:999px;border:1px solid #c67139;background:transparent;color:#8c491a;font-size:13px;font-weight:600;white-space:nowrap}
+.ct-act:hover{background:#fff2eb}
+.ct-lnk{border:0;background:transparent;color:#645c50;font-size:12.5px;text-decoration:underline;min-height:32px;padding:0 6px}
+.ct-lnk.red{color:#8c491a}
+.ct-more{align-self:flex-start;border:0;background:transparent;color:#8c491a;font-weight:600;font-size:13px;min-height:36px}
+.ct-dial{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.ct-dia{display:flex;flex-direction:column;align-items:center;gap:6px;background:#fbf7f0;border:1px solid rgba(32,30,29,.10);border-radius:18px;padding:12px 8px;position:relative;transition:transform .15s,box-shadow .15s}
+.ct-dia:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(46,43,37,.10)}
+.ct-dia-open{display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:transparent;padding:0;text-align:center;width:100%}
+.ct-dia .nm{font-size:13px;font-weight:600;color:#201e1d;line-height:1.2;overflow-wrap:anywhere}
+.ct-dia .sp{font-size:11.5px;color:#645c50;min-height:14px}
+.ct-dia .call{width:48px;height:36px;border-radius:999px;background:#7a8a5e;color:#fff;display:grid;place-items:center;text-decoration:none}
+.ct-dia .call.off{background:#eee7db;color:#8c491a}
+.ct-dia .sos{position:absolute;top:7px;inset-inline-start:7px;font-size:10px;font-weight:700;background:#8c491a;color:#fff9f2;border-radius:999px;padding:2px 7px}
+.ct-av{border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff9f2;flex:0 0 auto;letter-spacing:.02em}
+.ct-av.pro{background:#c67139}.ct-av.sup{background:#5f6e45}.ct-av.both{background:#6b6253}
+.ct-ic{flex:0 0 44px;height:44px;border-radius:14px;background:#ffe1d0;color:#8c491a;display:grid;place-items:center}
+.ct-bar{display:flex;flex-direction:column;gap:10px;background:#fbf7f0;border-radius:20px;padding:12px;box-shadow:0 1px 2px rgba(46,43,37,.10);position:sticky;top:0;z-index:5}
+.ct-bar-r{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ct-srch{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(32,30,29,.16);border-radius:999px;padding:0 14px;min-height:44px;flex:1 1 240px;max-width:380px;color:#645c50}
+.ct-srch input{border:0 !important;background:transparent !important;outline:none;font:inherit;font-size:14px;flex:1;min-width:0;color:#201e1d;padding:0 !important;box-shadow:none !important;min-height:0}
+.ct-seg{display:inline-flex;flex-wrap:wrap;background:#eee7db;border-radius:999px;padding:4px;gap:2px}
+.ct-seg button{border:0;background:transparent;min-height:36px;padding:0 13px;border-radius:999px;font-size:13.5px;font-weight:600;color:#4d463c;display:inline-flex;align-items:center;gap:4px}
+.ct-seg button.on{background:#fff;color:#201e1d;box-shadow:0 1px 3px rgba(46,43,37,.18)}
+.ct-seg .cnt{font-size:11px;color:#645c50}
+.ct-sort{display:flex;align-items:center;gap:6px;font-size:13px;color:#645c50}
+.ct-sort select{min-height:40px;border-radius:999px;border:1px solid rgba(32,30,29,.16);background:#fff;padding:0 12px;font:inherit;font-size:13.5px;width:auto}
+.ct-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ct-chip{border:1px solid rgba(32,30,29,.16);background:transparent;min-height:34px;padding:0 13px;border-radius:999px;font-size:13px;color:#4d463c}
+.ct-chip.sm{min-height:32px;padding:0 11px;font-size:12.5px}
+.ct-chip.on{background:#201e1d;border-color:#201e1d;color:#f9f4ed}
+.ct-chip.sos.on{background:#8c491a;border-color:#8c491a}
+.ct-chip.dash{border-style:dashed;border-color:#c67139;color:#8c491a}
+.ct-count{font-size:13px;color:#645c50;margin-bottom:10px}
+.ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:14px}
+.ct-card{background:#fbf7f0;border-radius:20px;padding:15px;box-shadow:0 1px 2px rgba(46,43,37,.10),0 10px 26px rgba(46,43,37,.07);display:flex;flex-direction:column;gap:11px;position:relative;transition:transform .18s,box-shadow .18s;animation:ctIn .3s ease both;min-width:0}
+.ct-card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(46,43,37,.12),0 16px 34px rgba(46,43,37,.12)}
+.ct-card.avoid{opacity:.72}
+.ct-hit{position:absolute;inset:0;border:0;background:transparent;border-radius:inherit;z-index:1}
+.ct-hit:focus-visible{outline:3px solid #c67139;outline-offset:2px}
+.ct-card-top{display:flex;gap:12px;align-items:center}
+.ct-card-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ct-card-t .nm{font-size:16px;font-weight:700;color:#201e1d;overflow-wrap:anywhere;display:flex;align-items:center;gap:5px}
+.ct-card-t .nm .pin{color:#c67139;display:inline-flex}
+.ct-card-t .sp{font-size:13px;color:#645c50}
+.ct-stars{color:#c67139;font-size:14px;letter-spacing:1px;white-space:nowrap}.ct-stars .off{color:#d7cbb8}
+.ct-stars.none{font-size:11.5px;color:#82796a;letter-spacing:0}
+.ct-tags{display:flex;flex-wrap:wrap;gap:6px}
+.ct-tag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;border-radius:999px;padding:3px 9px;line-height:1.3}
+.ct-tag.pro{background:#ffe1d0;color:#643312}.ct-tag.sup,.ct-tag.ok{background:#e1eecc;color:#3f4a2c}.ct-tag.both{background:#eee7db;color:#4d463c}
+.ct-tag.sos{background:#8c491a;color:#fff9f2}.ct-tag.warn{background:#ffc6a5;color:#643312}.ct-tag.miss{background:transparent;border:1px dashed #8c491a;color:#8c491a}
+.ct-mets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border-top:1px solid rgba(32,30,29,.10);padding-top:10px}
+.ct-mets div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.ct-mets b{font-size:14.5px;color:#201e1d;overflow-wrap:anywhere}
+.ct-mets span{font-size:11.5px;color:#645c50}
+.ct-acts{display:flex;gap:8px;position:relative;z-index:2}
+.ct-acts .ab,.ct-person .ab{flex:1;min-height:40px;border-radius:12px;border:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;font-size:13.5px;font-weight:600}
+.ab.c{background:#e1eecc;color:#3f4a2c}.ab.w{background:#dff3e4;color:#1f6a3a}.ab.m{background:#fff2eb;color:#8c491a}.ab.x{background:#eee7db;color:#4d463c;flex:0 0 44px}.ab.off{background:#f3ece1;color:#a08f7a;cursor:default}
+.ct-acts .ab:hover:not(.off){filter:brightness(.96)}
+.ct-acts.sm .ab{flex:0 0 40px}
+.ct-acts.wide{flex-wrap:wrap}
+.ct-rows{background:#fbf7f0;border-radius:20px;box-shadow:0 1px 2px rgba(46,43,37,.10);overflow:hidden}
+.ct-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(32,30,29,.08);position:relative;flex-wrap:wrap}
+.ct-row:last-child{border-bottom:0}
+.ct-row:hover{background:#fff6ee}
+.ct-row.avoid{opacity:.72}
+.ct-row-t{flex:1 1 180px;min-width:0;display:flex;flex-direction:column}
+.ct-row-t b{font-size:14.5px}.ct-row-t span{font-size:12.5px;color:#645c50;overflow-wrap:anywhere}
+.ct-row-last{font-size:12.5px;color:#645c50;min-width:80px}
+.ct-empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:40px 16px;color:#645c50;background:#fbf7f0;border-radius:20px}
+.ct-empty b{color:#201e1d;font-size:16px}
+.ct-saved{display:flex;justify-content:flex-end;min-height:0}
+/* מגירה */
+body.ct-lock{overflow:hidden}
+#ctDrawer{display:none}
+#ctDrawer.show{display:block}
+.ct-ov{position:fixed;inset:0;background:rgba(32,30,29,.34);z-index:600;border:0;animation:ctFade .2s ease both}
+.ct-dr{position:fixed;top:0;bottom:0;left:0;width:min(470px,100%);background:#fbf7f0;z-index:601;box-shadow:12px 0 40px rgba(32,30,29,.22);display:flex;flex-direction:column;animation:ctSlide .25s ease both;direction:rtl}
+@keyframes ctSlide{from{transform:translateX(-24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes ctFade{from{opacity:0}to{opacity:1}}
+.ct-dr-h{padding:16px 18px 14px;display:flex;flex-direction:column;gap:12px;background:#fff2eb}
+.ct-dr-top{display:flex;gap:12px;align-items:flex-start}
+.ct-dr-top .t{flex:1;min-width:0;font-size:13.5px;color:#645c50}
+.ct-x{width:38px;height:38px;border-radius:12px;border:0;background:transparent;color:#4d463c;display:inline-grid;place-items:center;flex:0 0 auto}
+.ct-x:hover{background:#eee7db}
+.ct-x.big{width:44px;height:44px}
+.ct-tabs{display:flex;gap:2px;border-bottom:1px solid rgba(32,30,29,.12);padding:0 12px;overflow-x:auto;scrollbar-width:none;flex:0 0 auto}
+.ct-tabs button{border:0;background:transparent;min-height:46px;padding:0 12px;font-size:14px;font-weight:600;color:#645c50;border-bottom:3px solid transparent;white-space:nowrap}
+.ct-tabs button.on{color:#201e1d;border-bottom-color:#c67139}
+.ct-dr-b{flex:1;overflow-y:auto;padding:16px 18px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.ct-box{background:#fff;border-radius:16px;padding:14px;border:1px solid rgba(32,30,29,.08);display:flex;flex-direction:column;gap:10px}
+.ct-box h4{margin:0;font-size:13px;font-weight:700;color:#645c50;display:flex;align-items:center;gap:7px}
+.ct-box h4::before{content:"";width:4px;height:14px;border-radius:999px;background:#c67139}
+.ct-kv{display:flex;justify-content:space-between;gap:12px;font-size:14px;align-items:baseline}
+.ct-kv span{color:#645c50;flex:0 0 auto}.ct-kv b{color:#201e1d;font-weight:600;text-align:left;overflow-wrap:anywhere;min-width:0}
+.ct-kv .soft{color:#a08f7a;font-style:normal}
+.ct-note-fixed{background:#fbf7f0;border-radius:10px;padding:8px 10px;font-size:13.5px;white-space:pre-line}
+.ct-soft{font-size:13px;color:#645c50;line-height:1.5}
+.ct-person{display:flex;align-items:center;gap:8px}
+.ct-person .t{flex:1;min-width:0;font-size:14px}.ct-person .t div{font-size:12.5px;color:#645c50;direction:ltr;text-align:right}
+.ct-person .ab{flex:0 0 40px;min-height:36px}
+.ct-pill{font-size:11.5px;font-weight:600;border-radius:999px;padding:2px 8px;background:#eee7db;color:#4d463c}
+.ct-rate{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.ct-rate button{border:0;background:transparent;font-size:25px;color:#d7cbb8;min-width:38px;min-height:42px;padding:0;line-height:1}
+.ct-rate button.on{color:#c67139}
+.ct-rate span{font-size:13px;color:#645c50;margin-inline-start:6px}
+.ct-lognote{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;line-height:1.45;border-bottom:1px solid rgba(32,30,29,.06);padding-bottom:6px}
+.ct-lognote div{flex:1;min-width:0;overflow-wrap:anywhere}
+.ct-lognote span{display:block;color:#645c50;font-size:11.5px}
+.ct-addnote{display:flex;gap:8px}
+.ct-addnote input,.ct-f input,.ct-f select,.ct-box textarea,.ct-prow input,#ctMini input{min-height:42px;border-radius:12px;border:1px solid rgba(32,30,29,.18);background:#fbf7f0;padding:0 12px;font:inherit;font-size:14px;color:#201e1d;width:100%;min-width:0}
+.ct-box textarea{padding:10px 12px;resize:vertical}
+.ct-addnote input{flex:1}
+.ct-minis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ct-minis .ct-kpi{padding:10px 11px}
+.ct-tl{display:flex;gap:11px;align-items:flex-start;text-align:right;border:0;background:transparent;padding:6px 4px;border-radius:12px;width:100%;color:inherit}
+button.ct-tl:hover{background:#fbf7f0}
+.ct-tl .dot,.ct-doc .dot{flex:0 0 32px;height:32px;border-radius:10px;display:grid;place-items:center}
+.dot.t{background:#ffe1d0;color:#8c491a}.dot.f{background:#e1eecc;color:#3f4a2c}.dot.l{background:#eee7db;color:#4d463c}.dot.m{background:#dff3e4;color:#1f6a3a}
+.ct-tl .tx{flex:1;font-size:13.5px;line-height:1.4;min-width:0;overflow-wrap:anywhere}
+.ct-tl .tx small{display:block;color:#645c50;font-size:12px}
+.ct-doc{display:flex;align-items:center;gap:8px;font-size:14px;flex-wrap:wrap}
+.ct-doc .t{flex:1 1 140px;min-width:0}.ct-doc .t div{font-size:12.5px;color:#645c50}
+.ct-docform{display:flex;flex-direction:column;gap:10px;background:#fbf7f0;border-radius:14px;padding:12px}
+.ct-f{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600;color:#645c50;min-width:0}
+.ct-f input[type=file]{padding:9px 10px;background:#fff}
+.ct-row-btns{display:flex;gap:8px;flex-wrap:wrap}
+/* חלון עריכה */
+#ctModal,#ctMini{position:fixed;inset:0;background:rgba(32,30,29,.40);z-index:700;display:none;align-items:center;justify-content:center;padding:16px;direction:rtl}
+#ctMini{z-index:880}
+.ct-modal{background:#fbf7f0;border-radius:24px;width:min(720px,100%);max-height:calc(100dvh - 32px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 2px 6px rgba(46,43,37,.12),0 24px 60px rgba(46,43,37,.22);animation:ctIn .2s ease both}
+.ct-modal.sm{width:min(560px,100%)}
+.ct-modal.xs{width:min(400px,100%);padding:18px;gap:12px;display:flex;flex-direction:column}
+.ct-modal-h{display:flex;align-items:flex-start;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(32,30,29,.10);flex:0 0 auto}
+.ct-modal-h .t{flex:1;min-width:0;font-size:13px;color:#645c50;line-height:1.45}
+.ct-modal-b{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.ct-modal-f{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(32,30,29,.10);background:#fff;flex:0 0 auto}
+.ct-g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ct-g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ct-prow{display:grid;grid-template-columns:1.2fr 1fr 1.2fr 40px;gap:8px;align-items:center}
+.ct-prow.head{font-size:12px;color:#645c50;font-weight:600}
+.ct-prow input{min-height:40px;font-size:13.5px;padding:0 10px}
+.ct-add{align-self:flex-start;min-height:38px;border-radius:999px;border:1px dashed #c67139;background:transparent;color:#8c491a;padding:0 14px;font-size:13px;font-weight:600}
+.ct-check{display:flex;align-items:center;gap:8px;font-size:13.5px;line-height:1.4}
+.ct-check input{width:20px;height:20px;flex:0 0 auto;accent-color:#c67139}
+.ct-mgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ct-mcol{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;background:#fff;border:2px solid rgba(32,30,29,.10);border-radius:16px;padding:14px 10px;font-size:13px;color:#645c50;cursor:pointer}
+.ct-mcol b{color:#201e1d;font-size:15px}
+.ct-mcol:has(input:checked){border-color:#c67139;background:#fff6ee}
+.ct-mcol input{accent-color:#c67139;width:18px;height:18px}
+.ct-implist{display:flex;flex-direction:column;gap:6px}
+.ct-imp{display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:9px 12px;cursor:pointer}
+.ct-imp input{width:20px;height:20px;accent-color:#c67139;flex:0 0 auto}
+.ct-imp .t{flex:1;min-width:0;display:flex;flex-direction:column;font-size:14px}.ct-imp .t span{font-size:12px;color:#645c50;overflow-wrap:anywhere}
+@media (max-width:640px){
+  .ct-h1{font-size:24px}
+  .ct-head-a{width:100%}
+  .ct-head-a .ct-btn{flex:1 1 auto;padding:0 12px;font-size:13px}
+  .ct-g2,.ct-g3{grid-template-columns:minmax(0,1fr)}
+  .ct-prow{grid-template-columns:1fr 1fr 40px}
+  .ct-prow input[data-k="phone"]{grid-column:1 / 3}
+  .ct-prow.head{display:none}
+  .ct-srch{max-width:none;flex-basis:100%}
+  .ct-bar{position:static}
+  .ct-dial{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+  .ct-modal{border-radius:20px 20px 0 0;max-height:calc(100dvh - 12px);align-self:flex-end}
+  #ctModal{padding:12px 0 0;align-items:flex-end}
+  .ct-row-last{display:none}
+}
+@media print{#ctDrawer,#ctModal,#ctMini{display:none !important}}
+</style>
 </head>
 <body>
 
@@ -3014,29 +3222,16 @@ button.tk-chip{ cursor:pointer; }
   </section>
 
   <section class="tab" id="tab-contacts">
-    <div class="card">
-      <div class="toolbar toolbar-sticky">
-        <input type="text" id="contactsSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="🔍 חיפוש לפי שם, תחום, טלפון, מייל..." oninput="filterRows('contactsBody', this.value)" style="max-width:260px">
-        <button class="btn" onclick="addContact()">+ הוספת איש קשר</button>
-      </div>
-      <div class="toolbar">
-        <div><span class="saved-flag" id="contactsSaved">נשמר</span></div>
-        <div></div>
-      </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>שם חברה / איש מקצוע</th><th>סיווג</th><th>תחום התמחות</th><th>טלפון</th>
-            <th>אימייל</th><th>סוג תמחור</th><th>מחיר / תעריף</th><th>הערות</th><th>יצירת קשר</th><th></th>
-          </tr></thead>
-          <tbody id="contactsBody"></tbody>
-        </table>
-      </div>
-    </div>
+    <div id="ctRoot" class="ct"></div>
+    <div class="ct-saved"><span class="saved-flag" id="contactsSaved">נשמר</span></div>
+    <input type="file" id="ctVcfInput" accept=".vcf,text/vcard,text/x-vcard" hidden>
   </section>
 
 </main>
 </div>
+<div id="ctDrawer"></div>
+<div id="ctModal"></div>
+<div id="ctMini"></div>
 
 
 <!-- ===== תיק עבודה: צפייה בקובץ, איש מקצוע, סכום, שיוך ===== -->
@@ -4210,13 +4405,14 @@ function switchTab(t){
 
 /* ---------- CONTACT-DRIVEN DROPDOWNS ---------- */
 function getContactSpecialties(){
-  return [...new Set(data.contacts.map(c => c.specialty).filter(Boolean))];
+  return [...new Set(data.contacts.filter(c => c && !c.archived).map(c => c.specialty).filter(Boolean))];
 }
 function getContactNames(){
-  return [...new Set(data.contacts.map(c => c.name).filter(Boolean))];
+  /* אנשי קשר בארכיון לא מוצעים לשיבוץ חדש (שיבוץ קיים נשאר — הרשימות מוסיפות את הערך הנוכחי) */
+  return [...new Set(data.contacts.filter(c => c && !c.archived).map(c => c.name).filter(Boolean))];
 }
 function getSupplierNames(){
-  return [...new Set(data.contacts.filter(c => c.contactType==="ספק" || c.contactType==="שניהם").map(c => c.name).filter(Boolean))];
+  return [...new Set(data.contacts.filter(c => c && !c.archived && (c.contactType==="ספק" || c.contactType==="שניהם")).map(c => c.name).filter(Boolean))];
 }
 function buildSelect(options, current, field){
   const opts = new Set(options.filter(Boolean));
@@ -4378,8 +4574,12 @@ async function onSyncToggle(checkboxEl, row, type){
 
 /* ---------- TASKS ---------- */
 function findContactByName(name){
-  return data.contacts.find(c => c.name === name);
+  if(!name) return undefined;
+  /* קודם שם מדויק; אחר כך שם קודם / שם שאוחד (aliases) — כדי שקישורים ישנים לא יישברו */
+  return data.contacts.find(c => c.name === name)
+    || data.contacts.find(c => Array.isArray(c.aliases) && c.aliases.includes(name));
 }
+function ctRepairsIncludedFor(name){ try{ const c = findContactByName(name); return !!(c && c.repairsIncluded); }catch(e){ return false; } }
 function quickContactWhatsAppByName(name){
   const c = findContactByName(name);
   if(!c) return;
@@ -9822,19 +10022,7 @@ function lcGotoContact(cid){
   if(!canOpenTab("contacts")){ lcToast("אין הרשאה לטאב אנשי קשר"); return; }
   const c = data.contacts.find(x => x.id === cid); if(!c) return;
   switchTab("contacts");
-  const si = document.getElementById("contactsSearchInput");
-  if(si && si.value){ si.value = ""; try{ filterRows("contactsBody", ""); }catch(e){} }
-  setTimeout(() => {
-    const rows = [...document.querySelectorAll("#contactsBody > tr")];
-    const tr = rows[data.contacts.indexOf(c)] && (rows[data.contacts.indexOf(c)].querySelector('input[data-f="name"]') || {}).value === c.name
-      ? rows[data.contacts.indexOf(c)]
-      : rows.find(r => { const i = r.querySelector('input[data-f="name"]'); return i && i.value === c.name; });
-    if(!tr) return;
-    tr.classList.add("mob-open");
-    tr.scrollIntoView({ behavior: "smooth", block: "center" });
-    tr.style.outline = "3px solid var(--brand)"; tr.style.outlineOffset = "-2px";
-    setTimeout(() => { tr.style.outline = ""; }, 2600);
-  }, 160);
+  setTimeout(() => ctOpen(c.id), 60);
 }
 
 /* ---------- תיק הגשה: PDF עם כל המסמכים מצורפים, או כל אישור בנפרד ---------- */
@@ -13381,146 +13569,1052 @@ async function downloadStaffRosterXLSX(){
   }
 }
 
-/* ---------- CONTACTS ---------- */
-function addContact(){
-  data.contacts.push({id: nextId()+6000, name:"", contactType:"", specialty:"", phone:"", email:"", priceType:"", cost:"", notes:""});
-  renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks(); renderProc(); renderFoodPrice();
+/* ---------- CONTACTS: אנשי קשר וספקים (גרסה חדשה — כרטיסים, חיוג מהיר, כרטיס 360°) ---------- */
+const CT_ICO = {
+  call:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+  wa:'<path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 2 1.8 3.8 4.5 4.8l1-1.3"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/>',
+  task:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+  grid:'<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>',
+  list:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+  shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+  nophone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/><path d="M3 3l18 18"/>',
+  people:'<circle cx="9" cy="8" r="3.5"/><circle cx="16.5" cy="10" r="2.8"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M15.5 15.2c3 0 5.5 1.8 5.5 4.8"/>',
+  import:'<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+  printer:'<path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6z"/>',
+  doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  coin:'<circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .8-3 2s1.3 1.7 3 2 3 .8 3 2-1.3 2-3 2c-1.4 0-2.5-.5-3-1.5M12 6v2M12 16v2"/>',
+  box:'<path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
+  pin:'<path d="M9 4h6l-1 6 4 3H6l4-3z"/><path d="M12 13v8"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M5 7l1 13h12l1-13M9 7V4h6v3"/>',
+  archive:'<rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M10 13h4"/>',
+  vcard:'<rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.6-1.5 1.7-2.2 3-2.2s2.4.7 3 2.2M15 10h3M15 13h3"/>',
+  open:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  upload:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>',
+  merge:'<path d="M6 4v5a5 5 0 0 0 5 5h7M14 10l4 4-4 4M6 20v-4"/>',
+  star:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'
+};
+function ctIco(n, s){ const z = s || 18; return `<svg viewBox="0 0 24 24" width="${z}" height="${z}" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${CT_ICO[n] || ""}</svg>`; }
+
+const CT_TRAITS = ["זמין", "מגיע מהר", "אמין", "מחיר הוגן", "עבודה נקייה", "מקצועי", "זמין בחירום", "חוזה כולל תיקונים"];
+const CT_DOC_PRESETS = ["ביטוח צד ג׳", "ביטוח חבות מעבידים", "אישור ניכוי מס במקור", "אישור ניהול ספרים", "רישיון", "תעודת בודק מוסמך", "חוזה שירות"];
+const CT_TERMS = ["", "שוטף", "שוטף +30", "שוטף +60", "הוראת קבע", "מזומן / העברה", "במקום"];
+const CT_PRICE_TYPES = [["", "—"], ["מחיר קבוע", "מחיר קבוע"], ["תעריף שעתי", "תעריף שעתי"], ["לפי קריאה", "לפי קריאה (משתנה)"], ["חוזה חודשי", "חוזה חודשי"], ["מחירון", "מחירון (ספק)"], ["לא ידוע", "לא ידוע מראש"]];
+
+let ctUi = { q: "", type: "all", spec: "", sort: "recent", view: "grid", openId: null, tab: "ov", alertsAll: false, edit: null, docForm: false };
+try{ const v = localStorage.getItem("ct-view"); if(v === "list" || v === "grid") ctUi.view = v; }catch(e){}
+try{ const s = localStorage.getItem("ct-sort"); if(s) ctUi.sort = s; }catch(e){}
+
+function ctSave(){ scheduleSave("contacts", "contactsSaved"); }
+function ctAfterChange(){
+  ctSave();
+  renderContacts();
+  try{ renderTasks(); }catch(e){ console.error(e); }
+  try{ renderProc(); }catch(e){ console.error(e); }
+  try{ renderFoodPrice(); }catch(e){ console.error(e); }
 }
-function removeContact(id){
-  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
-    data.contacts = data.contacts.filter(r=>r.id!==id);
-    renderContacts(); scheduleSave("contacts","contactsSaved"); renderTasks(); renderProc(); renderFoodPrice();
+function ctGet(id){ return data.contacts.find(c => c.id === Number(id)) || null; }
+function ctDigits(p){ return String(p || "").replace(/[^0-9]/g, ""); }
+function ctKind(c){ const t = c.contactType || ""; return t === "ספק" ? "sup" : t === "שניהם" ? "both" : "pro"; }
+function ctKindLabel(c){ const t = c.contactType || ""; return t === "ספק" ? "ספק" : t === "שניהם" ? "מקצוע + ספק" : t === "איש מקצוע" ? "איש מקצוע" : "ללא סיווג"; }
+function ctIsPro(c){ return (c.contactType || "") !== "ספק"; }
+function ctIsSup(c){ return c.contactType === "ספק" || c.contactType === "שניהם"; }
+function ctInitials(n){ return String(n || "").replace(/["'״׳()]/g, "").trim().split(/\s+/).filter(Boolean).slice(0, 2).map(w => w.charAt(0)).join("") || "?"; }
+function ctPeople(c){
+  /* מעבר שקט מ"מספר נוסף" הישן לרשימת אנשים בעסק — השדה הישן נשאר כמו שהוא */
+  if(!Array.isArray(c.people)){
+    c.people = (Array.isArray(c.extraContacts) ? c.extraContacts : []).filter(x => x && (x.phone || x.email || x.label))
+      .map(x => ({ name: x.label || "", role: "", phone: x.phone || "", email: x.email || "" }));
+  }
+  return c.people.filter(p => p && typeof p === "object");
+}
+function ctNames(c){ return [c.name].concat(Array.isArray(c.aliases) ? c.aliases : []).map(vpNorm).filter(Boolean); }
+function ctMatchName(c, name){ const n = vpNorm(name); return !!n && ctNames(c).includes(n); }
+function ctSchoolYearOf(iso){ const d = tkParse(String(iso || "").slice(0, 10)); if(!d) return null; return d.getMonth() + 1 >= 9 ? d.getFullYear() : d.getFullYear() - 1; }
+function ctRel(iso){
+  const n = tkDaysTo(String(iso || "").slice(0, 10));
+  if(n === null) return "—";
+  const d = -n;
+  if(d <= 0) return "היום";
+  if(d === 1) return "אתמול";
+  if(d < 7) return `לפני ${d} ימים`;
+  if(d < 30){ const w = Math.round(d / 7); return w <= 1 ? "לפני שבוע" : w === 2 ? "לפני שבועיים" : `לפני ${w} שבועות`; }
+  const m = Math.round(d / 30);
+  return m <= 1 ? "לפני חודש" : m === 2 ? "לפני חודשיים" : m < 12 ? `לפני ${m} חודשים` : "לפני יותר משנה";
+}
+function ctFmtDate(iso){ const d = tkParse(String(iso || "").slice(0, 10)); return d ? `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}` : ""; }
+function ctDocState(d){
+  const n = d && d.expiry ? tkDaysTo(d.expiry) : null;
+  if(n === null) return { k: "none", label: "ללא תוקף", n: null };
+  if(n < 0) return { k: "bad", label: "פג תוקף", n };
+  if(n <= 30) return { k: "warn", label: n === 0 ? "פג היום" : `עוד ${n} יום`, n };
+  return { k: "ok", label: "בתוקף", n };
+}
+function ctDocs(c){ return (Array.isArray(c.docs) ? c.docs : []).filter(d => d && typeof d === "object"); }
+function ctWorstDoc(c){
+  let w = null;
+  ctDocs(c).forEach(d => { const s = ctDocState(d); if(s.k === "bad" || s.k === "warn"){ if(!w || s.n < w.s.n) w = { d, s }; } });
+  return w;
+}
+function ctPriceLabel(c){
+  const pt = c.priceType || "", cost = String(c.cost || "").trim();
+  if(!pt && !cost) return "";
+  if(pt === "תעריף שעתי") return cost ? `₪${cost.replace(/^₪/, "")} לשעה` : "תעריף שעתי";
+  if(pt === "מחיר קבוע") return cost ? `₪${cost.replace(/^₪/, "")}` : "מחיר קבוע";
+  if(pt === "חוזה חודשי") return cost ? `₪${cost.replace(/^₪/, "")} לחודש` : "חוזה חודשי";
+  return cost ? `${pt ? pt + " · " : ""}${cost}` : pt;
+}
+function ctSpPriceLists(c){
+  try{
+    if(!window.SP || !SP.S || !Array.isArray(SP.S.lists)) return [];
+    return SP.S.lists.filter(l => l && ctMatchName(c, l.supplier));
+  }catch(e){ return []; }
+}
+
+/* ---------- איסוף נתונים מכל האפליקציה (קריאה בלבד) ---------- */
+function ctCollect(){
+  const cur = currentSchoolYearStart();
+  let jobs = [];
+  try{ jobs = collectJobs(); }catch(e){ console.error(e); }
+  const byName = new Map();
+  const bucket = n => { const k = vpNorm(n); if(!k) return null; if(!byName.has(k)) byName.set(k, { jobs: [], tasks: [], lic: [], orders: [], proc: [] }); return byName.get(k); };
+  jobs.forEach(j => { const b = bucket(j.pro); if(b) b.jobs.push(j); });
+  (data.tasks || []).forEach(t => { if(t && t.assignee){ const b = bucket(t.assignee); if(b) b.tasks.push(t); } });
+  (data.foodOrders || []).forEach(o => { if(o && o.vendor){ const b = bucket(o.vendor); if(b) b.orders.push(o); } });
+  (data.procurement || []).forEach(p => { if(p && p.supplier){ const b = bucket(p.supplier); if(b) b.proc.push(p); } });
+  const licByContact = new Map();
+  (data.licensing || []).forEach(r => {
+    if(!r) return;
+    let c = null;
+    try{ c = lcContact(r); }catch(e){ c = null; }
+    if(c){ if(!licByContact.has(c.id)) licByContact.set(c.id, []); licByContact.get(c.id).push(r); }
+  });
+  const jobInYear = j => {
+    if(j.task) return String(j.year) === String(cur);
+    const d = (j.vp && j.vp.paidAt) || j.date || "";
+    return ctSchoolYearOf(d) === cur;
+  };
+  const stats = new Map();
+  data.contacts.forEach(c => {
+    const s = { jobs: [], tasks: [], lic: licByContact.get(c.id) || [], orders: [], proc: [] };
+    const seen = new Set();
+    ctNames(c).forEach(n => {
+      if(seen.has(n)) return; seen.add(n);
+      const b = byName.get(n); if(!b) return;
+      s.jobs = s.jobs.concat(b.jobs); s.tasks = s.tasks.concat(b.tasks); s.orders = s.orders.concat(b.orders); s.proc = s.proc.concat(b.proc);
+    });
+    s.open = s.tasks.filter(t => tkStatus(t) !== "בוצע");
+    s.paidYear = s.jobs.filter(j => j.paid && jobInYear(j)).reduce((a, j) => a + (j.amount || 0), 0);
+    const priced = s.jobs.filter(j => j.amount > 0);
+    s.avg = priced.length ? priced.reduce((a, j) => a + j.amount, 0) / priced.length : 0;
+    let last = String(c.lastContactAt || "").slice(0, 10);
+    const bump = d => { d = String(d || "").slice(0, 10); if(/^\d{4}-\d{2}-\d{2}$/.test(d) && d > last) last = d; };
+    s.tasks.forEach(t => { bump(t.sentAt); bump(t.lastNudge); bump(t.doneAt); bump(t.created); });
+    s.orders.forEach(o => bump(o.date));
+    s.jobs.forEach(j => { if(j.vp && j.vp.paidAt) bump(j.vp.paidAt); });
+    s.last = last;
+    stats.set(c.id, s);
+  });
+  return { stats, cur };
+}
+
+/* ---------- דורש תשומת לב ---------- */
+function ctAlerts(stats){
+  const A = [];
+  const active = data.contacts.filter(c => !c.archived);
+  active.forEach(c => {
+    const s = stats.get(c.id) || { open: [] };
+    if(!ctDigits(c.phone) && (s.open.length || c.sos || c.pinned))
+      A.push({ lvl: 1, ico: "nophone", tone: "d", t: `ל${c.name || "איש קשר"} אין טלפון`, s: s.open.length ? `משובץ ב-${s.open.length === 1 ? "משימה פתוחה" : s.open.length + " משימות פתוחות"} — הודעת וואטסאפ לא תישלח` : "מסומן לחיוג מהיר / חירום", act: "edit", id: c.id, btn: "הוספה" });
+    ctDocs(c).forEach((d, i) => {
+      const st = ctDocState(d);
+      if(st.k === "bad") A.push({ lvl: 1, ico: "shield", tone: "d", t: `${d.name || "מסמך"} של ${c.name} פג תוקף`, s: `פג ב-${ctFmtDate(d.expiry)}`, act: "docreq", id: c.id, i, btn: "בקשת מסמך" });
+      else if(st.k === "warn") A.push({ lvl: 2, ico: "shield", tone: "w", t: `${d.name || "מסמך"} של ${c.name} פג ${st.n === 0 ? "היום" : "בעוד " + st.n + " יום"}`, s: ctFmtDate(d.expiry), act: "docreq", id: c.id, i, btn: "בקשת מסמך" });
+    });
+  });
+  ctDuplicates().forEach(p => A.push({ lvl: 3, ico: "people", tone: "i", t: `״${p.a.name}״ ו״${p.b.name}״ — ${p.why}`, s: "נראה כמו אותו איש קשר — איחוד ישמור את כל ההיסטוריה", act: "merge", id: p.a.id, id2: p.b.id, btn: "איחוד" }));
+  A.sort((a, b) => a.lvl - b.lvl);
+  return A;
+}
+function ctDuplicates(){
+  const out = [], list = data.contacts.filter(c => !c.archived && c.name);
+  for(let i = 0; i < list.length; i++){
+    for(let j = i + 1; j < list.length; j++){
+      const a = list[i], b = list[j];
+      if((a.notDup || []).includes(b.id) || (b.notDup || []).includes(a.id)) continue;
+      const pa = ctDigits(a.phone), pb = ctDigits(b.phone);
+      let why = "";
+      if(pa.length >= 9 && pa === pb) why = "אותו מספר טלפון";
+      else if(vpNorm(a.name) === vpNorm(b.name)) why = "אותו שם";
+      if(why) out.push({ a, b, why });
+    }
+  }
+  return out;
+}
+
+/* ---------- ציור הטאב ---------- */
+function renderContacts(){
+  const root = document.getElementById("ctRoot");
+  if(!root) return;
+  data.contacts.forEach(c => { if(c) ctPeople(c); });
+  let C;
+  try{ C = ctCollect(); }catch(e){ console.error(e); C = { stats: new Map(), cur: currentSchoolYearStart() }; }
+  ctUi._stats = C.stats;
+  const active = data.contacts.filter(c => c && !c.archived);
+  const archivedN = data.contacts.length - active.length;
+  const alerts = (() => { try{ return ctAlerts(C.stats); }catch(e){ console.error(e); return []; } })();
+  ctUi._alerts = alerts;
+  const paidAll = active.reduce((a, c) => a + ((C.stats.get(c.id) || {}).paidYear || 0), 0);
+  const openAll = active.reduce((a, c) => a + (((C.stats.get(c.id) || {}).open || []).length), 0);
+  let noReply = 0; try{ noReply = proNoReply(data.tasks).length; }catch(e){}
+  const dial = active.filter(c => c.pinned || c.sos).sort((a, b) => (b.sos ? 1 : 0) - (a.sos ? 1 : 0) || String(a.name).localeCompare(String(b.name), "he"));
+  const inType = (c, t) => t === "all" ? !c.archived : t === "arch" ? !!c.archived : c.archived ? false : t === "pro" ? ctIsPro(c) : t === "sup" ? ctIsSup(c) : t === "sos" ? !!c.sos : true;
+  if(ctUi.type === "arch" && !archivedN) ctUi.type = "all";
+  const types = [["all", "הכל"], ["pro", "אנשי מקצוע"], ["sup", "ספקים"], ["sos", "חירום"]].concat(archivedN ? [["arch", "ארכיון"]] : []);
+  const specs = [...new Set(data.contacts.filter(c => c && inType(c, ctUi.type)).map(c => (c.specialty || "").trim() || "ללא תחום"))].sort((a, b) => a === "ללא תחום" ? 1 : b === "ללא תחום" ? -1 : a.localeCompare(b, "he"));
+  if(ctUi.spec && !specs.includes(ctUi.spec)) ctUi.spec = "";
+  const shownAlerts = ctUi.alertsAll ? alerts : alerts.slice(0, 4);
+  root.innerHTML = `
+    <div class="ct-head">
+      <div class="ct-head-t"><h1 class="ct-h1">אנשי קשר וספקים</h1><div class="ct-sub">ספר טלפונים שמחובר למשימות, לחשבוניות, לרכש ולרישוי</div></div>
+      <div class="ct-head-a">
+        <button type="button" class="ct-btn" data-ct="import">${ctIco("import", 17)}ייבוא מהטלפון</button>
+        <button type="button" class="ct-btn" data-ct="sosprint">${ctIco("printer", 17)}דף חירום</button>
+        <button type="button" class="ct-btn pri" data-ct="new">${ctIco("plus", 17)}איש קשר חדש</button>
+      </div>
+    </div>
+    <div class="ct-kpis">
+      <div class="ct-kpi"><span class="l">אנשי קשר</span><span class="v">${active.length}</span><span class="s">${active.filter(ctIsPro).length} אנשי מקצוע · ${active.filter(ctIsSup).length} ספקים</span></div>
+      <div class="ct-kpi ok"><span class="l">שולם השנה לאנשי הקשר</span><span class="v">${fmtMoney(Math.round(paidAll))}</span><span class="s">${escHtml(schoolYearLabel(C.cur))}</span></div>
+      <div class="ct-kpi idle"><span class="l">עבודות פתוחות אצלם</span><span class="v">${openAll}</span><span class="s">${noReply ? `${noReply} לא חזרו אליך` : "כולם בקשר"}</span></div>
+      <div class="ct-kpi ${alerts.length ? "bad" : "ok"}"><span class="l">דורשים טיפול</span><span class="v">${alerts.length}</span><span class="s">${alerts.length ? "טלפון חסר, מסמך או כפילות" : "הכל מסודר"}</span></div>
+    </div>
+    ${alerts.length ? `<div class="ct-sec">
+      <h2 class="ct-h2">דורש תשומת לב</h2>
+      <div class="ct-alerts">${shownAlerts.map(a => `<div class="ct-alert"><div class="ic ${a.tone}">${ctIco(a.ico, 18)}</div><div class="tx">${escHtml(a.t)}<small>${escHtml(a.s)}</small></div>
+        <div class="ct-alert-a">${a.act === "merge" ? `<button type="button" class="ct-lnk" data-ct="notdup" data-id="${a.id}" data-id2="${a.id2}">לא כפילות</button>` : ""}<button type="button" class="ct-act" data-ct="al-${a.act}" data-id="${a.id}" ${a.id2 ? `data-id2="${a.id2}"` : ""} ${a.i !== undefined ? `data-i="${a.i}"` : ""}>${escHtml(a.btn)}</button></div></div>`).join("")}</div>
+      ${alerts.length > 4 ? `<button type="button" class="ct-more" data-ct="alertsall">${ctUi.alertsAll ? "הצגת פחות" : `הצגת כל ${alerts.length}`}</button>` : ""}
+    </div>` : ""}
+    ${dial.length ? `<div class="ct-sec">
+      <div class="ct-sec-h"><h2 class="ct-h2">חיוג מהיר</h2><span>נעוצים ואנשי חירום — לחיצה אחת לחיוג</span></div>
+      <div class="ct-dial">${dial.map(c => `<div class="ct-dia">
+        ${c.sos ? `<span class="sos">חירום</span>` : ""}
+        <button type="button" class="ct-dia-open" data-ct="open" data-id="${c.id}">
+          <span class="ct-av ${ctKind(c)}" style="width:46px;height:46px;font-size:16px">${escHtml(ctInitials(c.name))}</span>
+          <span class="nm">${escHtml(c.name || "ללא שם")}</span><span class="sp">${escHtml(c.specialty || "")}</span>
+        </button>
+        ${ctDigits(c.phone) ? `<a class="call" href="tel:${escHtml(ctDigits(c.phone))}" data-ct="touch" data-id="${c.id}" aria-label="חיוג ל${escHtml(c.name)}">${ctIco("call", 17)}</a>` : `<span class="call off" title="אין טלפון">${ctIco("nophone", 17)}</span>`}
+      </div>`).join("")}</div>
+    </div>` : ""}
+    <div class="ct-bar">
+      <div class="ct-bar-r">
+        <label class="ct-srch">${ctIco("search", 17)}<input type="search" id="contactsSearchInput" autocomplete="off" enterkeyhint="search" placeholder="חיפוש שם, תחום, טלפון, ח.פ…" aria-label="חיפוש אנשי קשר" value="${escHtml(ctUi.q)}"></label>
+        <div class="ct-seg" role="group" aria-label="סוג">${types.map(([k, l]) => `<button type="button" class="${ctUi.type === k ? "on" : ""}" data-ct="type" data-v="${k}" aria-pressed="${ctUi.type === k}">${l}<span class="cnt">${data.contacts.filter(c => c && inType(c, k)).length}</span></button>`).join("")}</div>
+        <span class="ct-flex"></span>
+        <label class="ct-sort">מיון<select id="ctSort" aria-label="מיון">
+          ${[["recent", "בשימוש לאחרונה"], ["name", "שם (א–ת)"], ["jobs", "הכי הרבה עבודות"], ["rating", "דירוג"]].map(([k, l]) => `<option value="${k}" ${ctUi.sort === k ? "selected" : ""}>${l}</option>`).join("")}
+        </select></label>
+        <div class="ct-seg" role="group" aria-label="תצוגה">
+          <button type="button" class="${ctUi.view === "grid" ? "on" : ""}" data-ct="view" data-v="grid" aria-label="כרטיסים">${ctIco("grid", 16)}</button>
+          <button type="button" class="${ctUi.view === "list" ? "on" : ""}" data-ct="view" data-v="list" aria-label="רשימה">${ctIco("list", 16)}</button>
+        </div>
+      </div>
+      ${specs.length > 1 ? `<div class="ct-chips"><button type="button" class="ct-chip ${!ctUi.spec ? "on" : ""}" data-ct="spec" data-v="">כל התחומים</button>${specs.map(s => `<button type="button" class="ct-chip ${ctUi.spec === s ? "on" : ""}" data-ct="spec" data-v="${escHtml(s)}">${escHtml(s)}</button>`).join("")}</div>` : ""}
+    </div>
+    <div id="ctList"></div>`;
+  ctRenderList();
+  if(ctUi.openId) ctRenderDrawer();
+}
+function ctFiltered(){
+  const t = ctUi.type, q = vpNorm(ctUi.q), qd = ctDigits(ctUi.q);
+  const st = ctUi._stats || new Map();
+  let list = data.contacts.filter(c => c && (t === "arch" ? c.archived : !c.archived));
+  if(t === "pro") list = list.filter(ctIsPro);
+  if(t === "sup") list = list.filter(ctIsSup);
+  if(t === "sos") list = list.filter(c => c.sos);
+  if(ctUi.spec) list = list.filter(c => ((c.specialty || "").trim() || "ללא תחום") === ctUi.spec);
+  if(q){
+    const toks = q.split(" ").filter(Boolean);
+    list = list.filter(c => {
+      const hay = vpNorm([c.name, c.specialty, c.phone, c.email, c.bizId, c.notes, c.area, c.address, ctKindLabel(c)].concat(c.aliases || [], (c.traits || []), ctPeople(c).map(p => [p.name, p.role, p.phone].join(" "))).join(" "));
+      const digs = ctDigits([c.phone].concat(ctPeople(c).map(p => p.phone)).join(" "));
+      return toks.every(tk => hay.includes(tk)) || (qd.length >= 3 && digs.includes(qd));
+    });
+  }
+  const g = c => st.get(c.id) || { last: "", jobs: [] };
+  const byName = (a, b) => String(a.name || "").localeCompare(String(b.name || ""), "he");
+  if(ctUi.sort === "name") list.sort(byName);
+  else if(ctUi.sort === "jobs") list.sort((a, b) => (g(b).jobs.length + g(b).tasks.length) - (g(a).jobs.length + g(a).tasks.length) || byName(a, b));
+  else if(ctUi.sort === "rating") list.sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0) || byName(a, b));
+  else list.sort((a, b) => String(g(b).last || "").localeCompare(String(g(a).last || "")) || byName(a, b));
+  return list;
+}
+function ctStars(n, size){
+  n = Math.max(0, Math.min(5, Number(n) || 0));
+  if(!n) return `<span class="ct-stars none">טרם דורג</span>`;
+  return `<span class="ct-stars" aria-label="דירוג ${n} מתוך 5" style="${size ? "font-size:" + size + "px" : ""}">${"★".repeat(n)}<span class="off">${"★".repeat(5 - n)}</span></span>`;
+}
+function ctActions(c, compact){
+  const ph = ctDigits(c.phone);
+  return `<div class="ct-acts ${compact ? "sm" : ""}">
+    ${ph ? `<a class="ab c" href="tel:${escHtml(ph)}" data-ct="touch" data-id="${c.id}" aria-label="חיוג">${ctIco("call", 17)}</a>` : `<span class="ab off" title="אין טלפון">${ctIco("nophone", 17)}</span>`}
+    <button type="button" class="ab w" data-ct="wa" data-id="${c.id}" aria-label="וואטסאפ">${ctIco("wa", 17)}</button>
+    ${compact ? "" : `<button type="button" class="ab m" data-ct="mail" data-id="${c.id}" aria-label="אימייל">${ctIco("mail", 17)}</button>
+    <button type="button" class="ab x" data-ct="newtask" data-id="${c.id}" aria-label="משימה חדשה עבורו" title="משימה חדשה עבורו">${ctIco("task", 17)}</button>`}
+  </div>`;
+}
+function ctRenderList(){
+  const box = document.getElementById("ctList");
+  if(!box) return;
+  const list = ctFiltered();
+  const st = ctUi._stats || new Map();
+  const total = data.contacts.filter(c => c && !c.archived).length;
+  if(!data.contacts.length){
+    box.innerHTML = `<div class="ct-empty">${ctIco("people", 34)}<b>עוד אין אנשי קשר</b><div>מוסיפים ידנית או מייבאים מהטלפון.</div><button type="button" class="ct-btn pri" data-ct="new">${ctIco("plus", 17)}איש קשר חדש</button></div>`;
+    return;
+  }
+  const head = `<div class="ct-count">${list.length === total && ctUi.type === "all" ? `${list.length} אנשי קשר` : `מוצגים ${list.length} מתוך ${total}`}</div>`;
+  if(!list.length){ box.innerHTML = head + `<div class="ct-empty">${ctIco("search", 30)}<b>לא נמצאו אנשי קשר</b><div>נסו מילה אחרת או נקו את הסינון.</div></div>`; return; }
+  if(ctUi.view === "list"){
+    box.innerHTML = head + `<div class="ct-rows">${list.map(c => {
+      const s = st.get(c.id) || {};
+      return `<div class="ct-row ${c.avoid ? "avoid" : ""}">
+        <button type="button" class="ct-hit" data-ct="open" data-id="${c.id}" aria-label="פתיחת כרטיס ${escHtml(c.name || "")}"></button>
+        <span class="ct-av ${ctKind(c)}" style="width:38px;height:38px;font-size:14px">${escHtml(ctInitials(c.name))}</span>
+        <div class="ct-row-t"><b>${escHtml(c.name || "ללא שם")}</b><span>${escHtml([c.specialty, c.phone].filter(Boolean).join(" · ") || "—")}</span></div>
+        <span class="ct-tag ${ctKind(c)}">${escHtml(ctKindLabel(c))}</span>
+        <span class="ct-row-last">${escHtml(s.last ? ctRel(s.last) : "—")}</span>
+        ${ctActions(c, true)}
+      </div>`;
+    }).join("")}</div>`;
+    return;
+  }
+  box.innerHTML = head + `<div class="ct-grid">${list.map(c => {
+    const s = st.get(c.id) || { open: [], paidYear: 0, last: "" };
+    const wd = ctWorstDoc(c);
+    const price = ctPriceLabel(c);
+    return `<div class="ct-card ${c.avoid ? "avoid" : ""}">
+      <button type="button" class="ct-hit" data-ct="open" data-id="${c.id}" aria-label="פתיחת כרטיס ${escHtml(c.name || "")}"></button>
+      <div class="ct-card-top">
+        <span class="ct-av ${ctKind(c)}" style="width:48px;height:48px;font-size:17px">${escHtml(ctInitials(c.name))}</span>
+        <div class="ct-card-t"><div class="nm">${escHtml(c.name || "ללא שם")}${c.pinned ? `<span class="pin" title="נעוץ">${ctIco("pin", 13)}</span>` : ""}</div><div class="sp">${escHtml(c.specialty || "ללא תחום")}</div></div>
+        ${ctStars(c.rating)}
+      </div>
+      <div class="ct-tags">
+        <span class="ct-tag ${ctKind(c)}">${escHtml(ctKindLabel(c))}</span>
+        ${c.sos ? `<span class="ct-tag sos">חירום 24/7</span>` : ""}
+        ${c.avoid ? `<span class="ct-tag sos">לא לעבוד איתו</span>` : ""}
+        ${wd ? `<span class="ct-tag warn">${escHtml((wd.d.name || "מסמך") + " · " + wd.s.label)}</span>` : ""}
+        ${!ctDigits(c.phone) ? `<span class="ct-tag miss">חסר טלפון</span>` : ""}
+        ${c.repairsIncluded ? `<span class="ct-tag ok">תיקונים כלולים</span>` : ""}
+        ${price ? `<span class="ct-tag both">${escHtml(price)}</span>` : ""}
+      </div>
+      <div class="ct-mets">
+        <div><b>${s.open.length}</b><span>פתוחות</span></div>
+        <div><b>${s.paidYear ? fmtMoney(Math.round(s.paidYear)) : "—"}</b><span>שולם השנה</span></div>
+        <div><b>${escHtml(s.last ? ctRel(s.last) : "—")}</b><span>קשר אחרון</span></div>
+      </div>
+      ${ctActions(c)}
+    </div>`;
+  }).join("")}</div>`;
+}
+
+/* ---------- כרטיס 360° (מגירה) ---------- */
+function ctOpen(id, tab){
+  const c = ctGet(id); if(!c) return;
+  ctUi.openId = c.id; ctUi.tab = tab || "ov"; ctUi.docForm = false;
+  if(!ctUi._stats){ try{ ctUi._stats = ctCollect().stats; }catch(e){ ctUi._stats = new Map(); } }
+  ctRenderDrawer();
+}
+function ctCloseDrawer(){
+  ctUi.openId = null;
+  const d = document.getElementById("ctDrawer");
+  if(d){ d.classList.remove("show"); d.innerHTML = ""; }
+  document.body.classList.remove("ct-lock");
+}
+function ctTimeline(c, s){
+  const T = [];
+  s.tasks.forEach(t => T.push({ k: "t", d: String(t.doneAt || t.sentAt || t.created || t.due || "").slice(0, 10), t: t.desc || "משימה ללא תיאור", s: ["משימה", tkStatus(t), t.place].filter(Boolean).join(" · "), act: "task", id: t.id }));
+  s.jobs.filter(j => !j.task).forEach(j => T.push({ k: "f", d: String((j.vp && j.vp.paidAt) || j.date || "").slice(0, 10), t: j.title, s: [j.noCharge ? "ללא תשלום" : j.amount ? fmtMoney(j.amount) : "", j.paid ? "שולם" : "ממתין לתשלום", j.topic].filter(Boolean).join(" · ") }));
+  s.tasks.forEach(t => { const j = (() => { try{ return tkJob(t); }catch(e){ return null; } })(); if(j && (j.amount || j.noCharge)){ const last = T.find(x => x.act === "task" && x.id === t.id); if(last) last.s += j.noCharge ? " · ללא תשלום" : ` · ${fmtMoney(j.amount)}${j.paid ? " שולם" : ""}`; } });
+  s.lic.forEach(r => T.push({ k: "l", d: String(r.lastDate || r.date || r.updatedAt || "").slice(0, 10), t: r.type || "אישור", s: ["רישוי ובטיחות", r.processStatus || r.status].filter(Boolean).join(" · "), act: "lic" }));
+  s.orders.forEach(o => T.push({ k: "m", d: String(o.date || "").slice(0, 10), t: "הזמנת מזון", s: ["רכש ואספקה", o.total ? fmtMoney(parseFloat(o.total) || 0) : ""].filter(Boolean).join(" · "), act: "proc" }));
+  s.proc.forEach(p => T.push({ k: "m", d: String(p.date || p.month || "").slice(0, 10), t: p.item || "פריט רכש", s: ["רכש כללי", (parseFloat(p.qty) || 0) && (parseFloat(p.price) || 0) ? fmtMoney((parseFloat(p.qty) || 0) * (parseFloat(p.price) || 0)) : ""].filter(Boolean).join(" · "), act: "proc" }));
+  T.sort((a, b) => String(b.d).localeCompare(String(a.d)));
+  return T;
+}
+function ctRenderDrawer(){
+  const host = document.getElementById("ctDrawer");
+  const c = ctGet(ctUi.openId);
+  if(!host) return;
+  if(!c){ ctCloseDrawer(); return; }
+  const s = (ctUi._stats && ctUi._stats.get(c.id)) || { jobs: [], tasks: [], lic: [], orders: [], proc: [], open: [], paidYear: 0, avg: 0, last: "" };
+  const people = ctPeople(c);
+  const tabs = [["ov", "סקירה"], ["act", "פעילות"], ["docs", "מסמכים ותוקף"], ["price", "תמחור"]];
+  const kv = (l, v, dir) => `<div class="ct-kv"><span>${l}</span><b ${dir ? `dir="${dir}"` : ""}>${v ? escHtml(v) : `<i class="soft">—</i>`}</b></div>`;
+  let body = "";
+  if(ctUi.tab === "ov"){
+    const traits = Array.isArray(c.traits) ? c.traits : [];
+    const allTraits = [...new Set(CT_TRAITS.concat(traits))];
+    const notes = (Array.isArray(c.noteLog) ? c.noteLog : []).filter(n => n && n.t);
+    body = `
+      <div class="ct-box"><h4>פרטים</h4>
+        ${kv("טלפון", c.phone, "ltr")}${kv("אימייל", c.email, "ltr")}${kv("ח.פ / עוסק", c.bizId)}${kv("כתובת", c.address)}${kv("אזור שירות", c.area)}
+        ${c.notes ? `<div class="ct-note-fixed">${escHtml(c.notes)}</div>` : ""}
+      </div>
+      <div class="ct-box"><h4>אנשים בעסק</h4>
+        ${people.length ? people.map((p, i) => `<div class="ct-person">
+          <div class="t"><b>${escHtml(p.name || "ללא שם")}</b>${p.role ? ` <span class="ct-pill">${escHtml(p.role)}</span>` : ""}<div>${escHtml(p.phone || p.email || "")}</div></div>
+          ${ctDigits(p.phone) ? `<a class="ab c" href="tel:${escHtml(ctDigits(p.phone))}" data-ct="touch" data-id="${c.id}" aria-label="חיוג ל${escHtml(p.name || "")}">${ctIco("call", 15)}</a><button type="button" class="ab w" data-ct="wa" data-id="${c.id}" data-p="${i}" aria-label="וואטסאפ ל${escHtml(p.name || "")}">${ctIco("wa", 15)}</button>` : ""}
+        </div>`).join("") : `<div class="ct-soft">אין עדיין — מוסיפים בעריכה (מוקד, טכנאי קבוע, הנהלת חשבונות…)</div>`}
+      </div>
+      <div class="ct-box"><h4>ההערכה שלי</h4>
+        <div class="ct-rate" role="group" aria-label="דירוג">${[1, 2, 3, 4, 5].map(n => `<button type="button" class="${n <= (Number(c.rating) || 0) ? "on" : ""}" data-ct="rate" data-id="${c.id}" data-v="${n}" aria-label="${n} כוכבים">★</button>`).join("")}<span>${c.rating ? `${c.rating} מתוך 5` : "לחיצה לדירוג"}</span></div>
+        <div class="ct-chips">${allTraits.map(tr => `<button type="button" class="ct-chip sm ${traits.includes(tr) ? "on" : ""}" data-ct="trait" data-id="${c.id}" data-v="${escHtml(tr)}">${escHtml(tr)}</button>`).join("")}<button type="button" class="ct-chip sm dash" data-ct="traitadd" data-id="${c.id}">+ תכונה</button></div>
+      </div>
+      <div class="ct-box"><h4>יומן הערות</h4>
+        ${notes.length ? notes.slice().reverse().map(n => `<div class="ct-lognote"><div><span>${escHtml(ctFmtDate(n.d))}</span>${escHtml(n.t)}</div><button type="button" class="ct-x" data-ct="delnote" data-id="${c.id}" data-v="${escHtml(n.id || "")}" aria-label="מחיקת הערה">${ctIco("x", 14)}</button></div>`).join("") : `<div class="ct-soft">כאן רושמים דברים שכדאי לזכור עליו.</div>`}
+        <form class="ct-addnote" data-ctform="note" data-id="${c.id}"><input type="text" id="ctNoteInput" placeholder="הוספת הערה…" aria-label="הוספת הערה" autocomplete="off"><button type="submit" class="ct-act">הוספה</button></form>
+      </div>`;
+  }else if(ctUi.tab === "act"){
+    const T = ctTimeline(c, s);
+    body = `
+      <div class="ct-minis">
+        <div class="ct-kpi"><span class="l">עבודות</span><span class="v sm">${s.tasks.length + s.jobs.filter(j => !j.task).length}</span></div>
+        <div class="ct-kpi ok"><span class="l">שולם השנה</span><span class="v sm">${s.paidYear ? fmtMoney(Math.round(s.paidYear)) : "—"}</span></div>
+        <div class="ct-kpi idle"><span class="l">ממוצע לעבודה</span><span class="v sm">${s.avg ? fmtMoney(Math.round(s.avg)) : "—"}</span></div>
+      </div>
+      <div class="ct-box"><h4>כל מה שקשור אליו באפליקציה</h4>
+        ${T.length ? T.slice(0, 40).map(e => `<${e.act ? `button type="button" data-ct="tl-${e.act}" data-id="${e.id || ""}"` : "div"} class="ct-tl"><span class="dot ${e.k}">${ctIco(e.k === "t" ? "task" : e.k === "f" ? "coin" : e.k === "l" ? "shield" : "box", 15)}</span><span class="tx">${escHtml(e.t)}<small>${escHtml([e.s, e.d ? ctFmtDate(e.d) : ""].filter(Boolean).join(" · "))}</small></span></${e.act ? "button" : "div"}>`).join("") : `<div class="ct-soft">עוד אין משימות, תשלומים, בדיקות או הזמנות שקשורים אליו.</div>`}
+      </div>
+      ${s.jobs.length && typeof openProSheet === "function" ? `<button type="button" class="ct-btn" data-ct="prosheet" data-id="${c.id}">${ctIco("coin", 17)}כרטיס עבודות ותשלומים מלא</button>` : ""}`;
+  }else if(ctUi.tab === "docs"){
+    const docs = ctDocs(c);
+    body = `
+      <div class="ct-box"><h4>מסמכים ותוקף</h4>
+        ${docs.length ? docs.map((d, i) => { const st = ctDocState(d); return `<div class="ct-doc">
+          <span class="dot ${st.k === "ok" ? "f" : st.k === "none" ? "l" : "t"}">${ctIco("doc", 15)}</span>
+          <div class="t"><b>${escHtml(d.name || "מסמך")}</b><div>${d.expiry ? `בתוקף עד ${escHtml(ctFmtDate(d.expiry))}` : "ללא תאריך תוקף"}</div></div>
+          <span class="ct-tag ${st.k === "ok" ? "ok" : st.k === "none" ? "both" : st.k === "bad" ? "sos" : "warn"}">${escHtml(st.label)}</span>
+          ${d.url ? `<button type="button" class="ct-x" data-ct="docopen" data-id="${c.id}" data-i="${i}" aria-label="פתיחת המסמך">${ctIco("open", 15)}</button>` : ""}
+          ${st.k === "bad" || st.k === "warn" ? `<button type="button" class="ct-x" data-ct="al-docreq" data-id="${c.id}" data-i="${i}" aria-label="בקשת מסמך מעודכן בוואטסאפ" title="בקשת מסמך מעודכן">${ctIco("wa", 15)}</button>` : ""}
+          <button type="button" class="ct-x" data-ct="docedit" data-id="${c.id}" data-i="${i}" aria-label="עריכה">${ctIco("edit", 15)}</button>
+          <button type="button" class="ct-x" data-ct="docdel" data-id="${c.id}" data-i="${i}" aria-label="מחיקה">${ctIco("trash", 15)}</button>
+        </div>`; }).join("") : `<div class="ct-soft">אין מסמכים. כדאי לשמור כאן ביטוח, רישיון ואישור ניכוי מס — עם תאריך תוקף.</div>`}
+        ${ctUi.docForm ? ctDocFormHtml(c) : `<button type="button" class="ct-btn" data-ct="docnew" data-id="${c.id}" style="align-self:flex-start">${ctIco("plus", 16)}מסמך עם תאריך תוקף</button>`}
+      </div>
+      <div class="ct-soft">מסמך שתוקפו מתקרב קופץ בלוח הבקרה 30 יום מראש, עם כפתור לבקשת מסמך מעודכן בוואטסאפ.</div>`;
+  }else{
+    const lists = ctSpPriceLists(c);
+    body = `
+      <div class="ct-box"><h4>הסכם מחיר</h4>
+        ${kv("סוג תמחור", c.priceType)}${kv("מחיר", ctPriceLabel(c) && c.cost ? ctPriceLabel(c) : c.cost)}${kv("תנאי תשלום", c.terms)}
+        <div class="ct-kv"><span>תיקונים כלולים בחוזה</span><b>${c.repairsIncluded ? "כן — עבודות שלו מסומנות ״ללא תשלום״" : "לא"}</b></div>
+        <button type="button" class="ct-btn" data-ct="edit" data-id="${c.id}" style="align-self:flex-start">${ctIco("edit", 16)}עריכת תמחור</button>
+      </div>
+      ${lists.length ? `<div class="ct-box"><h4>מחירונים ברכש ואספקה</h4>${lists.map(l => `<div class="ct-kv"><span>${escHtml(l.title || "מחירון")}</span><b>${(l.items || []).length} פריטים${l.updated ? " · עודכן " + escHtml(ctFmtDate(l.updated)) : ""}</b></div>`).join("")}<button type="button" class="ct-btn" data-ct="tl-proc" style="align-self:flex-start">${ctIco("box", 16)}פתיחת רכש ואספקה</button></div>` : ""}`;
+  }
+  host.innerHTML = `
+    <button type="button" class="ct-ov" data-ct="close" aria-label="סגירה"></button>
+    <aside class="ct-dr" role="dialog" aria-modal="true" aria-label="כרטיס ${escHtml(c.name || "")}">
+      <div class="ct-dr-h">
+        <div class="ct-dr-top">
+          <span class="ct-av ${ctKind(c)}" style="width:56px;height:56px;font-size:20px">${escHtml(ctInitials(c.name))}</span>
+          <div class="t"><h2 class="ct-h2 big">${escHtml(c.name || "ללא שם")}</h2><div>${escHtml([c.specialty, ctKindLabel(c)].filter(Boolean).join(" · "))}</div>
+            <div class="ct-tags" style="margin-top:6px">${c.sos ? `<span class="ct-tag sos">חירום 24/7</span>` : ""}${c.pinned ? `<span class="ct-tag both">נעוץ</span>` : ""}${c.avoid ? `<span class="ct-tag sos">לא לעבוד איתו</span>` : ""}${c.archived ? `<span class="ct-tag both">בארכיון</span>` : ""}</div></div>
+          <button type="button" class="ct-x big" data-ct="close" aria-label="סגירה">${ctIco("x", 20)}</button>
+        </div>
+        <div class="ct-acts wide">
+          ${ctDigits(c.phone) ? `<a class="ab c" href="tel:${escHtml(ctDigits(c.phone))}" data-ct="touch" data-id="${c.id}">${ctIco("call", 16)}חיוג</a>` : `<span class="ab off">${ctIco("nophone", 16)}אין טלפון</span>`}
+          <button type="button" class="ab w" data-ct="wa" data-id="${c.id}">${ctIco("wa", 16)}וואטסאפ</button>
+          <button type="button" class="ab m" data-ct="mail" data-id="${c.id}">${ctIco("mail", 16)}מייל</button>
+          <button type="button" class="ab x" data-ct="newtask" data-id="${c.id}" aria-label="משימה חדשה עבורו" title="משימה חדשה עבורו">${ctIco("task", 17)}</button>
+          <button type="button" class="ab x" data-ct="edit" data-id="${c.id}" aria-label="עריכה" title="עריכה">${ctIco("edit", 17)}</button>
+        </div>
+      </div>
+      <div class="ct-tabs" role="tablist">${tabs.map(([k, l]) => `<button type="button" role="tab" aria-selected="${ctUi.tab === k}" class="${ctUi.tab === k ? "on" : ""}" data-ct="tab" data-v="${k}">${l}</button>`).join("")}</div>
+      <div class="ct-dr-b">${body}</div>
+    </aside>`;
+  host.classList.add("show");
+  document.body.classList.add("ct-lock");
+}
+function ctDocFormHtml(c){
+  const i = ctUi.docEditIdx;
+  const d = (i !== undefined && i !== null && ctDocs(c)[i]) || {};
+  return `<form class="ct-docform" data-ctform="doc" data-id="${c.id}">
+    <datalist id="ctDocPresets">${CT_DOC_PRESETS.map(p => `<option value="${escHtml(p)}"></option>`).join("")}</datalist>
+    <label class="ct-f">שם המסמך<input type="text" id="ctDocName" list="ctDocPresets" value="${escHtml(d.name || "")}" placeholder="למשל: ביטוח צד ג׳" required></label>
+    <label class="ct-f">בתוקף עד<input type="date" id="ctDocExp" value="${escHtml(d.expiry || "")}"></label>
+    <label class="ct-f">קובץ (לא חובה)<input type="file" id="ctDocFile" accept="image/*,application/pdf,.doc,.docx"></label>
+    ${d.url ? `<div class="ct-soft">כבר מצורף קובץ — בחירת קובץ חדש תחליף אותו.</div>` : ""}
+    <div class="ct-row-btns"><button type="submit" class="ct-btn pri" id="ctDocSave">שמירה</button><button type="button" class="ct-btn" data-ct="doccancel">ביטול</button></div>
+  </form>`;
+}
+
+/* ---------- חלון עריכה / הוספה ---------- */
+function ctOpenEdit(id, focus){
+  const c = id ? ctGet(id) : null;
+  const src = c || { contactType: "איש מקצוע" };
+  ctUi.edit = {
+    id: c ? c.id : null,
+    f: {
+      name: src.name || "", bizId: src.bizId || "", phone: src.phone || "", email: src.email || "", address: src.address || "", area: src.area || "",
+      contactType: src.contactType || "", specialty: src.specialty || "", sos: !!src.sos, pinned: !!src.pinned, fav: !!src.fav, avoid: !!src.avoid,
+      priceType: src.priceType || "", cost: src.cost || "", terms: src.terms || "", repairsIncluded: !!src.repairsIncluded, notes: src.notes || "",
+      rating: Number(src.rating) || 0
+    },
+    people: (c ? ctPeople(c) : []).map(p => Object.assign({}, p))
+  };
+  ctRenderEdit(focus);
+}
+function ctRenderEdit(focus){
+  const host = document.getElementById("ctModal");
+  const E = ctUi.edit;
+  if(!host || !E) return;
+  const f = E.f, c = E.id ? ctGet(E.id) : null;
+  const specs = (() => { try{ return getContactSpecialties(); }catch(e){ return []; } })();
+  const typeBtn = (v, l) => `<button type="button" class="${f.contactType === v ? "on" : ""}" data-ct="e-type" data-v="${v}" aria-pressed="${f.contactType === v}">${l}</button>`;
+  const flag = (k, l, cls) => `<button type="button" class="ct-chip ${cls || ""} ${f[k] ? "on" : ""}" data-ct="e-flag" data-v="${k}" aria-pressed="${!!f[k]}">${l}</button>`;
+  const inp = (k, l, type, extra) => `<label class="ct-f">${l}<input type="${type || "text"}" data-ef="${k}" value="${escHtml(f[k] || "")}" ${extra || ""}></label>`;
+  host.innerHTML = `<div class="ct-modal" role="dialog" aria-modal="true" aria-label="${c ? "עריכת איש קשר" : "איש קשר חדש"}">
+    <div class="ct-modal-h">
+      <span class="ct-av ${f.contactType === "ספק" ? "sup" : f.contactType === "שניהם" ? "both" : "pro"}" style="width:48px;height:48px;font-size:17px">${escHtml(ctInitials(f.name))}</span>
+      <div class="t"><h2 class="ct-h2 big">${c ? escHtml(c.name || "עריכת איש קשר") : "איש קשר חדש"}</h2><div>${c ? "השינויים נשמרים בלחיצה על שמירה" : "שם הוא שדה החובה היחיד"}</div></div>
+      <button type="button" class="ct-x big" data-ct="e-close" aria-label="סגירה">${ctIco("x", 20)}</button>
+    </div>
+    <div class="ct-modal-b">
+      <div class="ct-box"><h4>פרטי העסק</h4><div class="ct-g2">
+        ${inp("name", "שם חברה / איש מקצוע", "text", 'required autocomplete="off"')}${inp("bizId", "ח.פ / עוסק מורשה")}
+        ${inp("phone", "טלפון ראשי", "tel", 'dir="ltr"')}${inp("email", "אימייל", "email", 'dir="ltr"')}
+        ${inp("address", "כתובת")}${inp("area", "אזור שירות")}
+      </div></div>
+      <div class="ct-box"><h4>סיווג ותגיות</h4>
+        <div class="ct-seg">${typeBtn("איש מקצוע", "איש מקצוע")}${typeBtn("ספק", "ספק")}${typeBtn("שניהם", "שניהם")}</div>
+        <datalist id="ctSpecList">${specs.map(s => `<option value="${escHtml(s)}"></option>`).join("")}</datalist>
+        <label class="ct-f">תחום<input type="text" data-ef="specialty" list="ctSpecList" value="${escHtml(f.specialty)}" placeholder="אינסטלציה, מעליות, מזון…"></label>
+        <div class="ct-chips">${flag("sos", "חירום 24/7", "sos")}${flag("pinned", "נעוץ בחיוג מהיר")}${flag("fav", "מועדף")}${flag("avoid", "לא לעבוד איתו", "sos")}</div>
+      </div>
+      <div class="ct-box"><h4>אנשים בעסק</h4>
+        ${E.people.length ? `<div class="ct-prow head"><span>שם</span><span>תפקיד</span><span>טלפון</span><span></span></div>` : ""}
+        ${E.people.map((p, i) => `<div class="ct-prow">
+          <input type="text" data-ep="${i}" data-k="name" value="${escHtml(p.name || "")}" aria-label="שם" placeholder="שם">
+          <input type="text" data-ep="${i}" data-k="role" value="${escHtml(p.role || "")}" aria-label="תפקיד" placeholder="מוקד / טכנאי…">
+          <input type="tel" data-ep="${i}" data-k="phone" value="${escHtml(p.phone || "")}" aria-label="טלפון" dir="ltr">
+          <button type="button" class="ct-x" data-ct="e-pdel" data-i="${i}" aria-label="הסרה">${ctIco("x", 15)}</button>
+        </div>`).join("")}
+        <button type="button" class="ct-add" data-ct="e-padd">+ איש נוסף בעסק</button>
+      </div>
+      <div class="ct-box"><h4>תמחור ותשלום</h4><div class="ct-g3">
+        <label class="ct-f">סוג תמחור<select data-ef="priceType">${CT_PRICE_TYPES.map(([v, l]) => `<option value="${escHtml(v)}" ${f.priceType === v ? "selected" : ""}>${l}</option>`).join("")}${f.priceType && !CT_PRICE_TYPES.some(x => x[0] === f.priceType) ? `<option selected>${escHtml(f.priceType)}</option>` : ""}</select></label>
+        ${inp("cost", "מחיר / תעריף")}
+        <label class="ct-f">תנאי תשלום<select data-ef="terms">${CT_TERMS.map(v => `<option value="${escHtml(v)}" ${f.terms === v ? "selected" : ""}>${v || "—"}</option>`).join("")}${f.terms && !CT_TERMS.includes(f.terms) ? `<option selected>${escHtml(f.terms)}</option>` : ""}</select></label>
+      </div>
+        <label class="ct-check"><input type="checkbox" data-ef="repairsIncluded" ${f.repairsIncluded ? "checked" : ""}>תיקונים כלולים בחוזה — עבודות שלו יסומנו אוטומטית ״ללא תשלום״</label>
+      </div>
+      <div class="ct-box"><h4>הערה כללית</h4><textarea data-ef="notes" rows="2" aria-label="הערה כללית">${escHtml(f.notes)}</textarea></div>
+      <div class="ct-box"><h4>ההערכה שלי</h4><div class="ct-rate">${[1, 2, 3, 4, 5].map(n => `<button type="button" class="${n <= f.rating ? "on" : ""}" data-ct="e-rate" data-v="${n}" aria-label="${n} כוכבים">★</button>`).join("")}<span>${f.rating ? f.rating + " מתוך 5" : "ללא דירוג"}</span></div></div>
+    </div>
+    <div class="ct-modal-f">
+      <button type="button" class="ct-btn pri" data-ct="e-save">שמירה</button>
+      ${c ? `<button type="button" class="ct-btn" data-ct="vcf" data-id="${c.id}">${ctIco("vcard", 16)}שמירה בטלפון</button>` : ""}
+      <span class="ct-flex"></span>
+      ${c ? `<button type="button" class="ct-lnk" data-ct="e-archive">${c.archived ? "החזרה מהארכיון" : "העברה לארכיון"}</button><button type="button" class="ct-lnk red" data-ct="e-delete">מחיקה</button>` : ""}
+    </div>
+  </div>`;
+  host.style.display = "flex";
+  document.body.classList.add("ct-lock");
+  setTimeout(() => {
+    const el = host.querySelector(focus ? `[data-ef="${focus}"]` : (E.id ? null : '[data-ef="name"]'));
+    if(el) try{ el.focus(); }catch(e){}
+  }, 60);
+}
+function ctReadEdit(){
+  const host = document.getElementById("ctModal"), E = ctUi.edit;
+  if(!host || !E) return;
+  host.querySelectorAll("[data-ef]").forEach(el => { E.f[el.dataset.ef] = el.type === "checkbox" ? el.checked : el.value; });
+  host.querySelectorAll("[data-ep]").forEach(el => { const p = E.people[Number(el.dataset.ep)]; if(p) p[el.dataset.k] = el.value; });
+}
+function ctCloseEdit(){
+  ctUi.edit = null;
+  const host = document.getElementById("ctModal");
+  if(host){ host.style.display = "none"; host.innerHTML = ""; }
+  if(!ctUi.openId) document.body.classList.remove("ct-lock");
+}
+function ctSaveEdit(){
+  ctReadEdit();
+  const E = ctUi.edit; if(!E) return;
+  const f = E.f;
+  f.name = String(f.name || "").trim();
+  if(!f.name){ jobToast("צריך למלא שם"); const el = document.querySelector('#ctModal [data-ef="name"]'); if(el) el.focus(); return; }
+  const dupName = data.contacts.find(x => x.id !== E.id && vpNorm(x.name) === vpNorm(f.name));
+  if(dupName && !E.dupOk){
+    E.dupOk = true;
+    jobToast(`כבר יש איש קשר בשם ״${dupName.name}״. לחיצה נוספת על שמירה תשמור בכל זאת.`, 4500);
+    return;
+  }
+  let c = E.id ? ctGet(E.id) : null;
+  const isNew = !c;
+  if(isNew){
+    c = { id: nextId() + 6000, name: "", contactType: "", specialty: "", phone: "", email: "", priceType: "", cost: "", notes: "", createdAt: tkToday() };
+    data.contacts.push(c);
+  }
+  const oldName = c.name;
+  ["name", "bizId", "phone", "email", "address", "area", "contactType", "specialty", "priceType", "cost", "terms", "notes"].forEach(k => { c[k] = typeof f[k] === "string" ? f[k].trim() : (f[k] || ""); });
+  ["sos", "pinned", "fav", "avoid", "repairsIncluded"].forEach(k => { c[k] = !!f[k]; });
+  c.rating = Number(f.rating) || 0;
+  c.people = E.people.map(p => ({ name: String(p.name || "").trim(), role: String(p.role || "").trim(), phone: String(p.phone || "").trim(), email: String(p.email || "").trim() })).filter(p => p.name || p.phone || p.email);
+  /* שינוי שם: השם הקודם נשמר כשם נוסף, כדי שמשימות, תשלומים ובדיקות ישנות ימשיכו להיות מקושרות */
+  if(!isNew && oldName && vpNorm(oldName) !== vpNorm(c.name)){
+    c.aliases = [...new Set((Array.isArray(c.aliases) ? c.aliases : []).concat(oldName))].filter(a => vpNorm(a) !== vpNorm(c.name));
+  }
+  ctCloseEdit();
+  ctAfterChange();
+  if(isNew){ jobToast(`${c.name} נוסף לאנשי הקשר`); ctOpen(c.id); }
+  else if(ctUi.openId) ctRenderDrawer();
+}
+function ctArchiveToggle(){
+  const E = ctUi.edit; const c = E && ctGet(E.id); if(!c) return;
+  c.archived = !c.archived;
+  ctCloseEdit(); ctCloseDrawer(); ctAfterChange();
+  jobToast(c.archived ? `${c.name} הועבר לארכיון` : `${c.name} חזר לרשימה`);
+}
+function ctDelete(){
+  const E = ctUi.edit; const c = E && ctGet(E.id); if(!c) return;
+  const s = (ctUi._stats && ctUi._stats.get(c.id)) || { tasks: [], jobs: [] };
+  const linked = s.tasks.length + s.jobs.length;
+  openConfirmModal(linked ? `ל${c.name} יש ${linked} רשומות קשורות (משימות/תשלומים). הן לא יימחקו, אבל יאבדו את הקישור לכרטיס. אולי עדיף להעביר לארכיון? למחוק בכל זאת?` : `למחוק את ${c.name}? לא ניתן לשחזר את הפעולה.`, () => {
+    data.contacts = data.contacts.filter(r => r.id !== c.id);
+    ctCloseEdit(); ctCloseDrawer(); ctAfterChange();
   });
 }
+
+/* ---------- פעולות קשר ---------- */
+function ctTouch(c){ if(!c) return; c.lastContactAt = tkToday(); ctSave(); }
+function ctWa(id, pi){
+  const c = ctGet(id); if(!c) return;
+  let phone = c.phone, who = c.name;
+  if(pi !== undefined && pi !== null && pi !== ""){ const p = ctPeople(c)[Number(pi)]; if(p){ phone = p.phone; who = p.name || c.name; } }
+  if(!ctDigits(phone)){
+    const alt = ctPeople(c).find(p => ctDigits(p.phone));
+    if(alt){ phone = alt.phone; who = alt.name || c.name; }
+  }
+  if(!ctDigits(phone)){ jobToast(`אין מספר טלפון ל${c.name}. אפשר להוסיף בעריכה.`, 3500); return; }
+  ctTouch(c);
+  window.open(`https://wa.me/${formatPhoneForWhatsApp(phone)}`, "_blank", "noopener");
+}
+function ctMail(id){
+  const c = ctGet(id); if(!c) return;
+  const to = c.email || (ctPeople(c).find(p => p.email) || {}).email || "";
+  if(!to){ jobToast(`אין כתובת אימייל ל${c.name}. אפשר להוסיף בעריכה.`, 3500); return; }
+  ctTouch(c);
+  window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}`, "_blank", "noopener");
+}
+function ctNewTask(id){
+  const c = ctGet(id); if(!c) return;
+  if(!canOpenTab("tasks")){ jobToast("אין הרשאה לטאב משימות"); return; }
+  const t = tkNewTask({ schoolYear: currentSchoolYearStart(), assignee: c.name, category: c.specialty || "" });
+  t.log = [{ d: tkToday(), t: `נפתחה המשימה מכרטיס ${c.name}` }];
+  try{ tkFreshIds.add(t.id); }catch(e){}
+  tkSave();
+  ctCloseDrawer();
+  switchTab("tasks");
+  renderTasks();
+  tkOpen(t.id, "desc");
+}
+function ctDocRequest(id, i){
+  const c = ctGet(id); if(!c) return;
+  const d = ctDocs(c)[Number(i)]; if(!d) return;
+  const phone = ctDigits(c.phone) ? c.phone : (ctPeople(c).find(p => ctDigits(p.phone)) || {}).phone;
+  const text = `שלום ${tkFirstName(c.name) || c.name}, ${ctDocState(d).k === "bad" ? "פג התוקף של" : "בקרוב יפוג התוקף של"} ${d.name || "המסמך"} שיש לנו אצלכם${d.expiry ? ` (${ctFmtDate(d.expiry)})` : ""}. אשמח לקבל עותק מעודכן. תודה!`;
+  if(!ctDigits(phone)){ jobToast(`אין מספר טלפון ל${c.name}`, 3200); return; }
+  ctTouch(c);
+  window.open(`https://wa.me/${formatPhoneForWhatsApp(phone)}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+}
+
+/* ---------- מסמכים ---------- */
+async function ctSaveDoc(id){
+  const c = ctGet(id); if(!c) return;
+  const name = (document.getElementById("ctDocName") || {}).value || "";
+  const expiry = (document.getElementById("ctDocExp") || {}).value || "";
+  const fileEl = document.getElementById("ctDocFile");
+  const btn = document.getElementById("ctDocSave");
+  if(!name.trim()){ jobToast("צריך שם למסמך"); return; }
+  if(btn){ if(btn.disabled) return; btn.disabled = true; btn.textContent = "שומר…"; }
+  let url = "";
+  try{
+    if(fileEl && fileEl.files && fileEl.files[0]){
+      const file = fileEl.files[0];
+      const ref = storage.ref().child(`contacts/${Date.now()}_${file.name}`);
+      await ref.put(file);
+      url = await ref.getDownloadURL();
+    }
+  }catch(e){
+    console.error(e);
+    jobToast("העלאת הקובץ נכשלה — המסמך לא נשמר. נסו שוב.", 4000);
+    if(btn){ btn.disabled = false; btn.textContent = "שמירה"; }
+    return;
+  }
+  c.docs = ctDocs(c);
+  const i = ctUi.docEditIdx;
+  if(i !== undefined && i !== null && c.docs[i]){
+    c.docs[i].name = name.trim(); c.docs[i].expiry = expiry;
+    if(url) c.docs[i].url = url;
+  }else{
+    c.docs.push({ id: nextId(), name: name.trim(), expiry, url, addedAt: tkToday() });
+  }
+  ctUi.docForm = false; ctUi.docEditIdx = null;
+  ctSave(); renderContacts();
+  try{ renderDashboard(); }catch(e){}
+  jobToast("המסמך נשמר");
+}
+
+/* ---------- איחוד כפילויות ---------- */
+function ctOpenMerge(a, b){
+  const A = ctGet(a), B = ctGet(b); if(!A || !B) return;
+  const host = document.getElementById("ctModal"); if(!host) return;
+  const st = ctUi._stats || new Map();
+  const col = (c, k) => { const s = st.get(c.id) || { tasks: [], jobs: [] }; return `<label class="ct-mcol"><input type="radio" name="ctKeep" value="${c.id}" ${k ? "checked" : ""}>
+    <span class="ct-av ${ctKind(c)}" style="width:44px;height:44px;font-size:16px">${escHtml(ctInitials(c.name))}</span>
+    <b>${escHtml(c.name)}</b><span>${escHtml([c.specialty, c.phone].filter(Boolean).join(" · ") || "—")}</span><span>${s.tasks.length} משימות · ${s.jobs.length} תשלומים</span></label>`; };
+  const sa = st.get(A.id) || { tasks: [], jobs: [] }, sb = st.get(B.id) || { tasks: [], jobs: [] };
+  const keepA = (sa.tasks.length + sa.jobs.length) >= (sb.tasks.length + sb.jobs.length);
+  host.innerHTML = `<div class="ct-modal sm" role="dialog" aria-modal="true" aria-label="איחוד אנשי קשר">
+    <div class="ct-modal-h"><span class="ct-ic">${ctIco("merge", 20)}</span><div class="t"><h2 class="ct-h2 big">איחוד אנשי קשר</h2><div>בוחרים איזה כרטיס נשאר. הפרטים החסרים בו יושלמו מהשני, והשם השני נשמר כשם נוסף — כך משימות, תשלומים ובדיקות ישנות ממשיכים להיות מקושרים.</div></div>
+      <button type="button" class="ct-x big" data-ct="e-close" aria-label="סגירה">${ctIco("x", 20)}</button></div>
+    <div class="ct-modal-b"><div class="ct-mgrid">${col(A, keepA)}${col(B, !keepA)}</div></div>
+    <div class="ct-modal-f"><button type="button" class="ct-btn pri" data-ct="m-do" data-id="${A.id}" data-id2="${B.id}">איחוד</button><button type="button" class="ct-btn" data-ct="e-close">ביטול</button></div>
+  </div>`;
+  ctUi.edit = { merge: true };
+  host.style.display = "flex";
+  document.body.classList.add("ct-lock");
+}
+function ctDoMerge(a, b){
+  const sel = document.querySelector('#ctModal input[name="ctKeep"]:checked');
+  const keepId = sel ? Number(sel.value) : Number(a);
+  const keep = ctGet(keepId), drop = ctGet(keepId === Number(a) ? b : a);
+  if(!keep || !drop || keep === drop) return;
+  ["bizId", "phone", "email", "address", "area", "contactType", "specialty", "priceType", "cost", "terms", "lastContactAt"].forEach(k => { if(!String(keep[k] || "").trim() && String(drop[k] || "").trim()) keep[k] = drop[k]; });
+  if(String(drop.notes || "").trim() && drop.notes !== keep.notes) keep.notes = [keep.notes, drop.notes].filter(x => String(x || "").trim()).join("\n");
+  ["sos", "pinned", "fav", "avoid", "repairsIncluded"].forEach(k => { keep[k] = !!(keep[k] || drop[k]); });
+  keep.rating = Math.max(Number(keep.rating) || 0, Number(drop.rating) || 0);
+  keep.traits = [...new Set((keep.traits || []).concat(drop.traits || []))];
+  const pp = ctPeople(keep).concat(ctPeople(drop));
+  if(ctDigits(drop.phone) && ctDigits(drop.phone) !== ctDigits(keep.phone)) pp.push({ name: drop.name, role: "", phone: drop.phone, email: "" });
+  const seen = new Set();
+  keep.people = pp.filter(p => { const k = ctDigits(p.phone) || vpNorm(p.name + p.email); if(!k || seen.has(k)) return false; seen.add(k); return true; });
+  keep.docs = ctDocs(keep).concat(ctDocs(drop));
+  keep.noteLog = (keep.noteLog || []).concat(drop.noteLog || []).sort((x, y) => String(x.d).localeCompare(String(y.d)));
+  keep.extraContacts = (keep.extraContacts || []).concat(drop.extraContacts || []);
+  keep.aliases = [...new Set((keep.aliases || []).concat(drop.name ? [drop.name] : [], drop.aliases || []))].filter(n => vpNorm(n) !== vpNorm(keep.name));
+  keep.notDup = [...new Set((keep.notDup || []).concat(drop.notDup || []))].filter(x => x !== drop.id);
+  /* בודק ברישוי שמקושר לפי מזהה — עובר לכרטיס שנשאר */
+  let licCh = false;
+  (data.licensing || []).forEach(r => { if(r && Number(r.inspectorId) === drop.id){ r.inspectorId = keep.id; licCh = true; } });
+  data.contacts = data.contacts.filter(c => c.id !== drop.id);
+  if(licCh){ try{ lcSave(); renderLic(); }catch(e){ scheduleSave("licensing", "licSaved"); } }
+  ctCloseEdit();
+  if(ctUi.openId === drop.id) ctUi.openId = keep.id;
+  ctAfterChange();
+  jobToast(`אוחד לכרטיס אחד: ${keep.name}`);
+}
+
+/* ---------- vCard: ייבוא ושמירה בטלפון ---------- */
+function ctParseVcf(text){
+  const out = [];
+  const unfolded = String(text || "").replace(/\r\n/g, "\n").replace(/\n[ \t]/g, "");
+  const dec = (v, params) => {
+    v = String(v || "");
+    if(/ENCODING=QUOTED-PRINTABLE/i.test(params)){
+      try{
+        const bytes = []; v = v.replace(/=\n/g, "");
+        for(let i = 0; i < v.length; i++){
+          if(v[i] === "=" && /^[0-9A-F]{2}$/i.test(v.substr(i + 1, 2))){ bytes.push(parseInt(v.substr(i + 1, 2), 16)); i += 2; }
+          else bytes.push(v.charCodeAt(i));
+        }
+        v = new TextDecoder("utf-8").decode(new Uint8Array(bytes));
+      }catch(e){}
+    }
+    return v.replace(/\\,/g, ",").replace(/\\;/g, ";").replace(/\\n/gi, " ").trim();
+  };
+  unfolded.split(/BEGIN:VCARD/i).slice(1).forEach(block => {
+    const c = { name: "", phones: [], emails: [], org: "", title: "" };
+    let n = "";
+    block.split("\n").forEach(line => {
+      const m = /^([^:]+):(.*)$/.exec(line); if(!m) return;
+      const head = m[1], key = head.split(";")[0].replace(/^item\d+\./i, "").toUpperCase(), val = dec(m[2], head);
+      if(key === "FN") c.name = val;
+      else if(key === "N" && !n) n = val.split(";").filter(Boolean).reverse().join(" ").trim();
+      else if(key === "TEL" && val) c.phones.push(val);
+      else if(key === "EMAIL" && val) c.emails.push(val);
+      else if(key === "ORG") c.org = val.split(";")[0];
+      else if(key === "TITLE") c.title = val;
+    });
+    if(!c.name) c.name = n || c.org;
+    if(c.name || c.phones.length) out.push(c);
+  });
+  return out;
+}
+function ctOpenImport(list){
+  const host = document.getElementById("ctModal"); if(!host) return;
+  const have = new Set(data.contacts.flatMap(c => [ctDigits(c.phone)].concat(ctPeople(c).map(p => ctDigits(p.phone)))).filter(d => d.length >= 9));
+  const norm = d => { d = ctDigits(d); return d.startsWith("972") ? "0" + d.slice(3) : d; };
+  ctUi.importList = list.map(x => Object.assign({}, x, { exists: x.phones.some(p => have.has(norm(p)) || have.has(ctDigits(p))) }));
+  host.innerHTML = `<div class="ct-modal sm" role="dialog" aria-modal="true" aria-label="ייבוא אנשי קשר">
+    <div class="ct-modal-h"><span class="ct-ic">${ctIco("import", 20)}</span><div class="t"><h2 class="ct-h2 big">ייבוא מהטלפון</h2><div>נמצאו ${list.length} אנשי קשר. מסמנים את מי להוסיף — מי שכבר קיים לא מסומן.</div></div>
+      <button type="button" class="ct-x big" data-ct="e-close" aria-label="סגירה">${ctIco("x", 20)}</button></div>
+    <div class="ct-modal-b"><div class="ct-implist">${ctUi.importList.map((x, i) => `<label class="ct-imp"><input type="checkbox" data-imp="${i}" ${x.exists ? "" : "checked"}>
+      <span class="t"><b>${escHtml(x.name || "ללא שם")}</b><span>${escHtml([x.phones[0], x.org && x.org !== x.name ? x.org : "", x.emails[0]].filter(Boolean).join(" · "))}</span></span>${x.exists ? `<span class="ct-tag both">כבר קיים</span>` : ""}</label>`).join("")}</div></div>
+    <div class="ct-modal-f"><button type="button" class="ct-btn pri" data-ct="imp-do">הוספת המסומנים</button><button type="button" class="ct-btn" data-ct="e-close">ביטול</button></div>
+  </div>`;
+  ctUi.edit = { import: true };
+  host.style.display = "flex";
+  document.body.classList.add("ct-lock");
+}
+function ctDoImport(){
+  const L = ctUi.importList || [];
+  let n = 0;
+  document.querySelectorAll("#ctModal [data-imp]").forEach(el => {
+    if(!el.checked) return;
+    const x = L[Number(el.dataset.imp)]; if(!x) return;
+    let phone = x.phones[0] || "";
+    const d = ctDigits(phone);
+    if(d.startsWith("972")) phone = "0" + d.slice(3);
+    data.contacts.push({ id: nextId() + 6000, name: x.name || phone, contactType: "", specialty: x.title || "", phone, email: x.emails[0] || "", priceType: "", cost: "", notes: x.org && x.org !== x.name ? x.org : "", createdAt: tkToday(),
+      people: x.phones.slice(1).map(p => ({ name: x.name || "", role: "טלפון נוסף", phone: p, email: "" })) });
+    n++;
+  });
+  ctCloseEdit();
+  if(n){ ctAfterChange(); jobToast(`נוספו ${n} אנשי קשר. כדאי לעבור עליהם ולסמן תחום וסיווג.`, 4500); }
+}
+async function ctStartImport(){
+  /* באנדרואיד (כרום) אפשר לבחור ישר מאנשי הקשר בטלפון; בכל מקום אחר — קובץ vCard (.vcf) */
+  try{
+    if(navigator.contacts && typeof navigator.contacts.select === "function"){
+      const res = await navigator.contacts.select(["name", "tel", "email"], { multiple: true });
+      if(res && res.length){
+        ctOpenImport(res.map(r => ({ name: (r.name && r.name[0]) || "", phones: r.tel || [], emails: r.email || [], org: "", title: "" })));
+      }
+      return;
+    }
+  }catch(e){ console.error(e); }
+  const inp = document.getElementById("ctVcfInput");
+  if(inp){ inp.value = ""; inp.click(); }
+}
+function ctVcfOf(c){
+  const esc = s => String(s || "").replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n");
+  const L = ["BEGIN:VCARD", "VERSION:3.0", `FN:${esc(c.name)}`, `N:${esc(c.name)};;;;`];
+  if(c.specialty) L.push(`TITLE:${esc(c.specialty)}`);
+  if(c.phone) L.push(`TEL;TYPE=WORK,VOICE:${esc(c.phone)}`);
+  ctPeople(c).forEach(p => { if(p.phone) L.push(`TEL;TYPE=CELL:${esc(p.phone)}`); });
+  if(c.email) L.push(`EMAIL;TYPE=WORK:${esc(c.email)}`);
+  if(c.address) L.push(`ADR;TYPE=WORK:;;${esc(c.address)};;;;`);
+  const note = [c.specialty, c.bizId ? "ח.פ " + c.bizId : "", ctPeople(c).map(p => [p.name, p.role, p.phone].filter(Boolean).join(" ")).join(" | ")].filter(Boolean).join(" · ");
+  if(note) L.push(`NOTE:${esc(note)}`);
+  L.push("END:VCARD");
+  return L.join("\r\n");
+}
+function ctDownloadVcf(id){
+  const c = ctGet(id); if(!c) return;
+  try{
+    const blob = new Blob([ctVcfOf(c)], { type: "text/vcard;charset=utf-8" });
+    const fname = (String(c.name || "contact").replace(/[\\/:*?"<>|]/g, "").trim() || "contact") + ".vcf";
+    if(navigator.canShare && typeof File === "function"){
+      const file = new File([blob], fname, { type: "text/vcard" });
+      if(navigator.canShare({ files: [file] })){ navigator.share({ files: [file], title: c.name }).catch(() => {}); return; }
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = fname;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  }catch(e){ console.error(e); jobToast("לא הצלחתי ליצור את הקובץ"); }
+}
+
+/* ---------- דף חירום להדפסה ---------- */
+function ctPrintEmergency(){
+  const list = data.contacts.filter(c => c && !c.archived && (c.sos || c.pinned)).sort((a, b) => (b.sos ? 1 : 0) - (a.sos ? 1 : 0) || String(a.name).localeCompare(String(b.name), "he"));
+  if(!list.length){ jobToast("עוד אין אנשי קשר מסומנים ״חירום״ או ״נעוץ״. מסמנים בעריכת איש קשר.", 4500); return; }
+  const row = (n, role, phone) => `<tr><td><b>${escHtml(n)}</b></td><td>${escHtml(role || "")}</td><td class="p">${phone ? escHtml(phone) : `<span class="miss">חסר טלפון</span>`}</td></tr>`;
+  const block = c => row(c.name, c.specialty, c.phone) + ctPeople(c).filter(p => p.phone).map(p => row(`${c.name} — ${p.name || ""}`, p.role || c.specialty, p.phone)).join("");
+  const sos = list.filter(c => c.sos), pin = list.filter(c => !c.sos);
+  const today = new Date();
+  const html = `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>טלפונים לשעת חירום</title><style>
+    @page{size:A4;margin:16mm}
+    body{font-family:Rubik,Arial,sans-serif;color:#201e1d;margin:0}
+    .h{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:4px solid #201e1d;padding-bottom:10px;margin-bottom:18px}
+    h1{font-size:28px;margin:0}.sub{font-size:13px;color:#4d463c}
+    .nat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+    .nat div{border:2px solid #8c491a;border-radius:12px;padding:10px;text-align:center;font-size:13px;font-weight:600}
+    .nat b{display:block;font-size:28px;color:#8c491a}
+    h3{font-size:15px;color:#8c491a;border-bottom:2px solid #c67139;padding-bottom:5px;margin:18px 0 6px}
+    table{width:100%;border-collapse:collapse}td{padding:8px 4px;border-bottom:1px solid #ddd;font-size:14px;vertical-align:baseline}
+    td.p{font-size:17px;font-weight:700;direction:ltr;text-align:right;white-space:nowrap}.miss{font-size:12px;color:#8c491a}
+    .f{margin-top:26px;font-size:11px;color:#4d463c;border-top:1px solid #ccc;padding-top:8px}
+  </style></head><body>
+    <div class="h"><div><h1>טלפונים לשעת חירום</h1><div class="sub">לתלייה בעמדת השומר ובחדר המנהל</div></div><div class="sub">עודכן: ${today.getDate()}.${today.getMonth() + 1}.${today.getFullYear()}<br>${escHtml(schoolYearLabel(currentSchoolYearStart()))}</div></div>
+    <div class="nat"><div>משטרה<b>100</b></div><div>מד״א<b>101</b></div><div>כבאות והצלה<b>102</b></div></div>
+    ${sos.length ? `<h3>חירום — 24/7</h3><table>${sos.map(block).join("")}</table>` : ""}
+    ${pin.length ? `<h3>חיוג מהיר</h3><table>${pin.map(block).join("")}</table>` : ""}
+    <div class="f">הדף נבנה אוטומטית מאנשי הקשר המסומנים ״חירום״ ו״נעוץ״ בטאב אנשי קשר וספקים.</div>
+  </body></html>`;
+  openPrintWindow(html);
+}
+
+/* ---------- טיפול בלחיצות ---------- */
+function ctHandleClick(e){
+  const el = e.target.closest("[data-ct]");
+  if(!el) return;
+  if(!el.closest("#tab-contacts, #ctDrawer, #ctModal")) return;
+  const a = el.dataset.ct, id = el.dataset.id ? Number(el.dataset.id) : null, v = el.dataset.v;
+  const run = fn => { try{ fn(); }catch(err){ console.error(err); jobToast("משהו השתבש — לא בוצע שינוי", 3500); } };
+  if(a === "touch"){ ctTouch(ctGet(id)); return; } /* הקישור tel: ממשיך כרגיל */
+  e.preventDefault();
+  run(() => {
+    switch(a){
+      case "new": ctOpenEdit(null); break;
+      case "import": ctStartImport(); break;
+      case "sosprint": ctPrintEmergency(); break;
+      case "type": ctUi.type = v; ctUi.spec = ""; renderContacts(); break;
+      case "spec": ctUi.spec = v || ""; renderContacts(); break;
+      case "view": ctUi.view = v; try{ localStorage.setItem("ct-view", v); }catch(_){} renderContacts(); break;
+      case "alertsall": ctUi.alertsAll = !ctUi.alertsAll; renderContacts(); break;
+      case "open": ctOpen(id); break;
+      case "close": ctCloseDrawer(); break;
+      case "tab": ctUi.tab = v; ctUi.docForm = false; ctRenderDrawer(); break;
+      case "wa": ctWa(id, el.dataset.p); break;
+      case "mail": ctMail(id); break;
+      case "newtask": ctNewTask(id); break;
+      case "edit": ctOpenEdit(id); break;
+      case "al-edit": ctOpenEdit(id, "phone"); break;
+      case "al-docreq": ctDocRequest(id, el.dataset.i); break;
+      case "al-merge": ctOpenMerge(id, Number(el.dataset.id2)); break;
+      case "notdup": { const c = ctGet(id); if(c){ c.notDup = [...new Set((c.notDup || []).concat(Number(el.dataset.id2)))]; ctSave(); renderContacts(); } break; }
+      case "rate": { const c = ctGet(id); if(c){ c.rating = Number(c.rating) === Number(v) ? 0 : Number(v); ctSave(); renderContacts(); } break; }
+      case "trait": { const c = ctGet(id); if(c){ const t = Array.isArray(c.traits) ? c.traits : []; c.traits = t.includes(v) ? t.filter(x => x !== v) : t.concat(v); ctSave(); renderContacts(); } break; }
+      case "traitadd": {
+        const c = ctGet(id); if(!c) break;
+        tkModalOpenSafe("תכונה חדשה", "למשל: עונה מהר, עובד גם בשישי", val => { val = String(val || "").trim(); if(!val) return; c.traits = [...new Set((c.traits || []).concat(val))]; ctSave(); renderContacts(); });
+        break;
+      }
+      case "delnote": {
+        const c = ctGet(id); if(!c) break;
+        openConfirmModal("למחוק את ההערה?", () => { c.noteLog = (c.noteLog || []).filter(n => String(n.id || "") !== String(v)); ctSave(); renderContacts(); });
+        break;
+      }
+      case "docnew": ctUi.docForm = true; ctUi.docEditIdx = null; ctRenderDrawer(); setTimeout(() => { const n = document.getElementById("ctDocName"); if(n) n.focus(); }, 40); break;
+      case "docedit": ctUi.docForm = true; ctUi.docEditIdx = Number(el.dataset.i); ctRenderDrawer(); break;
+      case "doccancel": ctUi.docForm = false; ctUi.docEditIdx = null; ctRenderDrawer(); break;
+      case "docopen": { const c = ctGet(id); const d = c && ctDocs(c)[Number(el.dataset.i)]; if(d && d.url){ try{ openFileViewer(d.url, { title: d.name || "מסמך", meta: c.name }); }catch(_){ window.open(d.url, "_blank", "noopener"); } } break; }
+      case "docdel": {
+        const c = ctGet(id); const i = Number(el.dataset.i); const d = c && ctDocs(c)[i]; if(!d) break;
+        openConfirmModal(`למחוק את ״${d.name || "המסמך"}״ מהכרטיס?`, () => { c.docs = ctDocs(c).filter((_, k) => k !== i); ctSave(); renderContacts(); try{ renderDashboard(); }catch(_){} });
+        break;
+      }
+      case "tl-task": if(id && canOpenTab("tasks")){ ctCloseDrawer(); switchTab("tasks"); renderTasks(); tkOpen(id); } break;
+      case "tl-lic": if(canOpenTab("licensing")){ ctCloseDrawer(); switchTab("licensing"); } break;
+      case "tl-proc": if(canOpenTab("procurement")){ ctCloseDrawer(); switchTab("procurement"); } break;
+      case "prosheet": { const c = ctGet(id); if(c){ ctCloseDrawer(); openProSheet(c.name); } break; }
+      case "vcf": ctDownloadVcf(id); break;
+      case "e-close": ctCloseEdit(); break;
+      case "e-type": ctReadEdit(); ctUi.edit.f.contactType = v; ctRenderEdit(); break;
+      case "e-flag": ctReadEdit(); ctUi.edit.f[v] = !ctUi.edit.f[v]; ctRenderEdit(); break;
+      case "e-rate": ctReadEdit(); ctUi.edit.f.rating = ctUi.edit.f.rating === Number(v) ? 0 : Number(v); ctRenderEdit(); break;
+      case "e-padd": ctReadEdit(); ctUi.edit.people.push({ name: "", role: "", phone: "", email: "" }); ctRenderEdit(); setTimeout(() => { const l = document.querySelectorAll('#ctModal [data-ep][data-k="name"]'); if(l.length) l[l.length - 1].focus(); }, 40); break;
+      case "e-pdel": ctReadEdit(); ctUi.edit.people.splice(Number(el.dataset.i), 1); ctRenderEdit(); break;
+      case "e-save": ctSaveEdit(); break;
+      case "e-archive": ctArchiveToggle(); break;
+      case "e-delete": ctDelete(); break;
+      case "m-do": ctDoMerge(id, Number(el.dataset.id2)); break;
+      case "imp-do": ctDoImport(); break;
+    }
+  });
+}
+/* חלון קלט קטן ומעוצב (במקום prompt של הדפדפן) */
+function tkModalOpenSafe(title, ph, onOk){
+  const host = document.getElementById("ctMini"); if(!host) return;
+  host.innerHTML = `<form class="ct-modal xs" data-ctform="mini"><h2 class="ct-h2">${escHtml(title)}</h2><input type="text" id="ctMiniInput" placeholder="${escHtml(ph || "")}" autocomplete="off"><div class="ct-row-btns"><button type="submit" class="ct-btn pri">הוספה</button><button type="button" class="ct-btn" id="ctMiniCancel">ביטול</button></div></form>`;
+  host.style.display = "flex";
+  ctUi._miniOk = onOk;
+  const cancel = () => { host.style.display = "none"; host.innerHTML = ""; ctUi._miniOk = null; };
+  document.getElementById("ctMiniCancel").onclick = cancel;
+  host.onclick = ev => { if(ev.target === host) cancel(); };
+  setTimeout(() => { const i = document.getElementById("ctMiniInput"); if(i) i.focus(); }, 40);
+}
+function ctHandleSubmit(e){
+  const f = e.target.closest("[data-ctform]");
+  if(!f) return;
+  e.preventDefault();
+  try{
+    const kind = f.dataset.ctform;
+    if(kind === "note"){
+      const c = ctGet(f.dataset.id); const inp = document.getElementById("ctNoteInput");
+      const t = inp ? inp.value.trim() : "";
+      if(!c || !t) return;
+      c.noteLog = (Array.isArray(c.noteLog) ? c.noteLog : []).concat({ id: String(nextId()), d: tkToday(), t });
+      ctSave(); renderContacts();
+      setTimeout(() => { const i = document.getElementById("ctNoteInput"); if(i) i.focus(); }, 30);
+    }else if(kind === "doc"){
+      ctSaveDoc(f.dataset.id);
+    }else if(kind === "mini"){
+      const v = (document.getElementById("ctMiniInput") || {}).value || "";
+      const ok = ctUi._miniOk;
+      const host = document.getElementById("ctMini"); if(host){ host.style.display = "none"; host.innerHTML = ""; }
+      ctUi._miniOk = null;
+      if(ok) ok(v);
+    }
+  }catch(err){ console.error(err); jobToast("משהו השתבש — לא בוצע שינוי", 3500); }
+}
+function ctInitEvents(){
+  if(ctInitEvents.done) return; ctInitEvents.done = true;
+  document.addEventListener("click", ctHandleClick);
+  document.addEventListener("submit", ctHandleSubmit);
+  document.addEventListener("input", e => {
+    if(e.target && e.target.id === "contactsSearchInput"){ ctUi.q = e.target.value; ctRenderList(); }
+  });
+  document.addEventListener("change", e => {
+    if(e.target && e.target.id === "ctSort"){ ctUi.sort = e.target.value; try{ localStorage.setItem("ct-sort", ctUi.sort); }catch(_){} ctRenderList(); }
+    if(e.target && e.target.id === "ctVcfInput"){
+      const file = e.target.files && e.target.files[0]; if(!file) return;
+      const r = new FileReader();
+      r.onload = () => { const list = ctParseVcf(r.result); if(!list.length){ jobToast("לא נמצאו אנשי קשר בקובץ", 3500); return; } ctOpenImport(list); };
+      r.readAsText(file);
+    }
+  });
+  document.addEventListener("keydown", e => {
+    if(e.key !== "Escape") return;
+    const mini = document.getElementById("ctMini");
+    if(mini && mini.style.display === "flex"){ mini.style.display = "none"; mini.innerHTML = ""; return; }
+    const m = document.getElementById("ctModal");
+    if(m && m.style.display === "flex"){ ctCloseEdit(); return; }
+    if(ctUi.openId) ctCloseDrawer();
+  });
+}
+ctInitEvents();
+
+/* ---------- תאימות לפונקציות הישנות (נקראות ממקומות אחרים באפליקציה) ---------- */
+function addContact(){
+  if(canOpenTab("contacts")) switchTab("contacts");
+  ctOpenEdit(null);
+}
+function removeContact(id){ ctOpenEdit(id); }
 function formatPhoneForWhatsApp(phone){
   let digits = (phone||"").replace(/[^0-9]/g,"");
   if(digits.startsWith("0")) digits = "972" + digits.slice(1);
   return digits;
 }
-function sendContactWhatsApp(id){
-  const c = data.contacts.find(x=>x.id===id);
-  if(!c || !c.phone){ alert("אין מספר טלפון שמור לאיש קשר זה."); return; }
-  window.open(`https://wa.me/${formatPhoneForWhatsApp(c.phone)}`, "_blank");
-}
-function sendContactEmail(id){
-  const c = data.contacts.find(x=>x.id===id);
-  if(!c || !c.email){ alert("אין כתובת אימייל שמורה לאיש קשר זה."); return; }
-  window.location.href = `mailto:${c.email}`;
-}
-function renderContacts(){
-  const body = document.getElementById("contactsBody");
-  body.innerHTML = "";
-  data.contacts.forEach(row => {
-    const tr = document.createElement("tr");
-    const priceKnown = row.priceType === "מחיר קבוע" || row.priceType === "תעריף שעתי";
-    const priceLabel = row.priceType === "תעריף שעתי" ? "₪ לשעה" : "מחיר קבוע";
-    const extras = row.extraContacts || [];
-    tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${escHtml(row.name)}" data-f="name" style="min-width:130px"></td>
-      <td class="field-narrow"><select data-f="contactType">
-            <option value="" ${!row.contactType?"selected":""}></option>
-            <option value="איש מקצוע" ${row.contactType==="איש מקצוע"?"selected":""}>איש מקצוע</option>
-            <option value="ספק" ${row.contactType==="ספק"?"selected":""}>ספק</option>
-            <option value="שניהם" ${row.contactType==="שניהם"?"selected":""}>שניהם</option>
-          </select></td>
-      <td><input type="text" value="${escHtml(row.specialty)}" data-f="specialty"></td>
-      <td><input type="text" value="${escHtml(row.phone)}" data-f="phone" style="width:110px"></td>
-      <td><input type="text" value="${escHtml(row.email)}" data-f="email" style="min-width:140px"></td>
-      <td><select data-f="priceType">
-            <option value="" ${!row.priceType?"selected":""}></option>
-            <option value="מחיר קבוע" ${row.priceType==="מחיר קבוע"?"selected":""}>מחיר קבוע</option>
-            <option value="תעריף שעתי" ${row.priceType==="תעריף שעתי"?"selected":""}>תעריף שעתי</option>
-            <option value="לפי קריאה" ${row.priceType==="לפי קריאה"?"selected":""}>לפי קריאה (משתנה)</option>
-            <option value="לא ידוע" ${row.priceType==="לא ידוע"?"selected":""}>לא ידוע מראש</option>
-          </select></td>
-      <td><input type="text" value="${escHtml(row.cost)}" data-f="cost" style="width:90px" placeholder="${priceLabel}" ${priceKnown?"":"disabled"}></td>
-      <td><input type="text" value="${escHtml(row.notes)}" data-f="notes" style="min-width:120px"></td>
-      <td class="contact-actions">
-        <button class="contact-action-btn ca-call" title="התקשרות" onclick="callContact(${row.id})">${svgIcon("phoneCall",15)}</button>
-        <button class="contact-action-btn ca-whatsapp" title="שליחת וואטסאפ" onclick="handleContactSend(${row.id},'whatsapp')">${svgIcon("whatsapp",15)}</button>
-        <button class="contact-action-btn ca-mail" title="שליחת אימייל" onclick="handleContactSend(${row.id},'email')">${svgIcon("mail",15)}</button>
-        <button class="contact-action-btn ca-add" title="הוספת מספר/איש קשר נוסף" onclick="addExtraContact(${row.id})">${svgIcon("plus",14)}</button>
-      </td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeContact(${row.id})">${svgIcon('trash',13)}</button></td>
-    `;
-    if(extras.length){
-      const extraTd = document.createElement("td");
-      extraTd.setAttribute("data-label", "אנשי קשר נוספים");
-      extraTd.style.flex = "1 1 100%";
-      extraTd.innerHTML = extras.map((ex,i) => `
-        <span class="extra-contact-chip">
-          ${ex.label||"נוסף"}: ${ex.phone||ex.email||""}
-          <button type="button" class="ca-mini" title="התקשרות" onclick="callExtra(${row.id},${i})">${svgIcon("phoneCall",12)}</button>
-          <button type="button" class="ca-mini" title="וואטסאפ" onclick="sendExtraWhatsApp(${row.id},${i})">${svgIcon("whatsapp",12)}</button>
-          <button type="button" class="ca-mini" title="מחיקה" onclick="removeExtraContact(${row.id},${i})">✕</button>
-        </span>`).join("");
-      tr.appendChild(extraTd);
-    }
-    tr.querySelectorAll("[data-f]").forEach(inp => {
-      inp.addEventListener("input", () => {
-        row[inp.dataset.f] = inp.value;
-        scheduleSave("contacts","contactsSaved");
-        if(inp.dataset.f === "specialty" || inp.dataset.f === "name"){
-          renderTasks();
-        }
-      });
-      inp.addEventListener("change", () => {
-        if(inp.dataset.f === "priceType"){ renderContacts(); }
-        if(inp.dataset.f === "contactType" || inp.dataset.f === "name"){ renderProc(); renderFoodPrice(); }
-      });
-    });
-    body.appendChild(tr);
-  });
-}
+function sendContactWhatsApp(id){ ctWa(id); }
+function sendContactEmail(id){ ctMail(id); }
 function callContact(id){
-  const c = data.contacts.find(x=>x.id===id);
-  if(!c || !c.phone){ alert("אין מספר טלפון שמור לאיש קשר זה."); return; }
-  window.location.href = `tel:${c.phone}`;
+  const c = ctGet(id);
+  if(!c || !ctDigits(c.phone)){ jobToast("אין מספר טלפון שמור לאיש קשר זה."); return; }
+  ctTouch(c);
+  window.location.href = `tel:${ctDigits(c.phone)}`;
 }
-function handleContactSend(id, channel){
-  const c = data.contacts.find(x=>x.id===id);
-  if(!c) return;
-  const extras = c.extraContacts || [];
-  if(extras.length === 0){
-    if(channel === "whatsapp") sendContactWhatsApp(id); else sendContactEmail(id);
-    return;
-  }
-  // multiple numbers exist — ask which one
-  let msg = `שליחה עבור "${c.name}" — בחר מספר/כתובת (הראשי הוא ${c.phone||c.email||"—"}).\nלחץ אישור לשליחה לראשי, או ביטול כדי לבחור מהרשימה למטה בכרטיס.`;
-  if(confirm(msg)){
-    if(channel === "whatsapp") sendContactWhatsApp(id); else sendContactEmail(id);
-  }
-}
-function addExtraContact(id){
-  const c = data.contacts.find(x=>x.id===id);
-  if(!c) return;
-  const label = prompt("תיאור קצר (למשל: מנהל, נציג שירות):");
-  if(label === null) return;
-  const phone = prompt("מספר טלפון (אפשר להשאיר ריק אם לא רלוונטי):") || "";
-  c.extraContacts = c.extraContacts || [];
-  c.extraContacts.push({label, phone});
-  scheduleSave("contacts","contactsSaved");
-  renderContacts();
-}
-function removeExtraContact(id, idx){
-  const c = data.contacts.find(x=>x.id===id);
-  if(!c || !c.extraContacts) return;
-  c.extraContacts.splice(idx,1);
-  scheduleSave("contacts","contactsSaved");
-  renderContacts();
-}
-function callExtra(id, idx){
-  const c = data.contacts.find(x=>x.id===id);
-  const ex = c && c.extraContacts && c.extraContacts[idx];
-  if(!ex || !ex.phone){ alert("אין מספר טלפון לרשומה זו."); return; }
-  window.location.href = `tel:${ex.phone}`;
-}
-function sendExtraWhatsApp(id, idx){
-  const c = data.contacts.find(x=>x.id===id);
-  const ex = c && c.extraContacts && c.extraContacts[idx];
-  if(!ex || !ex.phone){ alert("אין מספר טלפון לרשומה זו."); return; }
-  window.open(`https://wa.me/${formatPhoneForWhatsApp(ex.phone)}`, "_blank");
-}
+function handleContactSend(id, channel){ if(channel === "whatsapp") ctWa(id); else ctMail(id); }
 
 /* ---------- FOOD PROCUREMENT ---------- */
 function addFoodPrice(){
@@ -14546,7 +15640,6 @@ const SEARCH_TABLES = {
   tasksBody:    { input:"tasksSearchInput",    yearSelect:"tasksYearFilter", records:() => data.tasks },
   procBody:     { input:"procSearchInput",     yearSelect:"procYearFilter",  records:() => data.procurement },
   licBody:      { input:"licSearchInput" },
-  contactsBody: { input:"contactsSearchInput" },
   staffBody:    { input:"staffSearchInput",    matcher:(tr,tokens) => staffRowMatcher(tr,tokens), extraHint:(tokens) => staffOtherInstallmentsHint(tokens) }
 };
 const rowFilterState = {};
@@ -15227,8 +16320,10 @@ function buildJob(task, proc, vp){
   const topic = topicSet || (topicDoc && topicDoc.topic) || (task && task.category) || (proc ? "רכש" : "") || (vp && vp.sourceType) || "כללי";
   /* ללא תשלום: עבודה שכלולה בחוזה אחזקה / באחריות — לא נספרת כחוב ולא נשלחת למנהל החשבונות */
   const ncSrc = [vp, task, proc].find(x => x && x.noCharge) || null;
-  const noCharge = !!ncSrc && !paid;
-  const noChargeNote = ncSrc ? String(([vp, task, proc].find(x => x && x.noCharge && x.noChargeNote) || {}).noChargeNote || "") : "";
+  /* איש מקצוע שהתיקונים כלולים בחוזה שלו (טאב אנשי קשר) — עבודה שלו נחשבת ללא תשלום, אלא אם הוזן סכום או בוטל ידנית */
+  const contractNC = !ncSrc && !!task && task.noCharge !== false && !(vp && (parseFloat(vp.amount) || 0) > 0) && ctRepairsIncludedFor(task.assignee);
+  const noCharge = (!!ncSrc || contractNC) && !paid;
+  const noChargeNote = ncSrc ? String(([vp, task, proc].find(x => x && x.noCharge && x.noChargeNote) || {}).noChargeNote || "") : contractNC ? "כלול בחוזה השירות" : "";
   const title = (task && task.desc) || (proc && proc.item) || (vp && vp.desc) || "ללא תיאור";
   const pro = ((vp && vp.vendor) || (task && task.assignee) || (proc && proc.supplier) || "").trim();
   const dated = docs.find(d => d.uploadedAt);
@@ -16141,8 +17236,10 @@ function confirmJobEditModal(){
   if(nc){
     if(!hadNc || j.noChargeNote !== reason) msgs.push("סומן ללא תשלום");
     recs.forEach(r => { r.noCharge = true; r.noChargeNote = reason; });
-  }else if(hadNc){
+  }else if(hadNc || j.noCharge){
     recs.forEach(r => { delete r.noCharge; delete r.noChargeNote; });
+    /* ביטול ידני של "כלול בחוזה" — נשמר כדי שהחוזה לא יחזיר את הסימון */
+    if(j.task && ctRepairsIncludedFor(j.task.assignee)) j.task.noCharge = false;
     msgs.push("חזר למסלול תשלום רגיל");
   }
   closeJobEditModal();
@@ -17044,6 +18141,16 @@ function dbAlerts(D){
   D.licMissing.forEach(r => add(3, "doc", `מסמכים חסרים: ${r.type || "אישור"}`, r.processStatus || "בתהליך", null, dbGo("licensing"), "licensing"));
   D.cSoon.forEach(x => add(3, "report", `לחדש חוזה: ${x.c.name || x.c.supplier || "חוזה"}`, x.c.supplier || "", x.n, dbGo("equipment", () => { eqUi.view = "contracts"; renderEquipment(); eqOpen("contract", x.c.id); }), "equipment"));
   D.warrSoon.forEach(x => add(3, "wrench", `אחריות נגמרת: ${x.e.name || "ציוד"}`, x.e.place || x.e.category || "", tkDaysTo(x.e.warrantyEnd), dbGo("equipment", () => { eqUi.view = "equip"; renderEquipment(); eqOpen("equip", x.e.id); }), "equipment"));
+  try{
+    (data.contacts || []).forEach(c => {
+      if(!c || c.archived) return;
+      (Array.isArray(c.docs) ? c.docs : []).forEach(d => {
+        if(!d || !d.expiry) return;
+        const n = tkDaysTo(d.expiry); if(n === null || n > 30) return;
+        add(n < 0 ? 2 : 3, "doc", `${n < 0 ? "פג תוקף" : "מסמך מתקרב לתפוגה"}: ${d.name || "מסמך"} — ${c.name || ""}`, "אנשי קשר וספקים · אפשר לבקש עותק מעודכן בוואטסאפ", n, dbGo("contacts", () => ctOpen(c.id, "docs")), "contacts");
+      });
+    });
+  }catch(e){ console.error(e); }
   D.recSoon.filter(x => x.n <= 3).forEach(x => add(3, "repeat", `תשלום שוטף קרוב: ${x.r.name || "—"}`, [x.r.vendor, x.r.amount ? fmtMoney(parseFloat(x.r.amount) || 0) : ""].filter(Boolean).join(" · "), x.n, dbGo("finance"), "finance"));
   try{
     (data.vendorPayments || []).concat(...(data.installments || [])).forEach(r => {
