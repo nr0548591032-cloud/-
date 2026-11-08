@@ -2197,32 +2197,14 @@ button.tk-chip{ cursor:pointer; }
       <div class="sp-pills" role="tablist" id="sp-pills"></div>
       <div id="sp-view" class="wrap"></div>
     </div>
-    <div id="procGeneralWrap" style="display:none">
-    <div class="section-title" id="procGeneralAnchor">רכש כללי</div>
-    <div class="card">
-      <div class="toolbar toolbar-sticky">
-        <input type="text" id="procSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="🔍 חיפוש לפי פריט, ספק, מק״ט, קטגוריה..." oninput="filterRows('procBody', this.value)" style="max-width:280px">
-        <button class="btn" onclick="addProc()">+ הוספת פריט</button>
+    <div id="procGeneralWrap" class="spx" style="display:none">
+      <div class="sp-head" id="procGeneralAnchor"><div class="section-title" style="margin:0">רכש כללי</div><span class="saved-flag" id="procSaved">נשמר</span></div>
+      <div class="gtool">
+        <div class="search" style="flex:1 1 220px"><svg class="i sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input type="text" id="procSearchInput" data-search-input autocomplete="off" enterkeyhint="search" placeholder="חיפוש לפי פריט, ספק, מק״ט, קטגוריה" aria-label="חיפוש ברכש כללי" oninput="if(window.SP){SP.GN.q=this.value;SP.renderGeneral()}"></div>
+        <select id="procYearFilter" aria-label="שנת לימודים" onchange="data.uiPrefs.procYear=this.value; saveUiPrefs(); renderProc();" style="width:auto"></select>
+        <button class="sb" onclick="addProc()"><svg class="i sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>הוספת פריט</button>
       </div>
-      <div class="toolbar">
-        <div>שנת לימודים: <select id="procYearFilter" onchange="data.uiPrefs.procYear=this.value; saveUiPrefs(); renderProc();" style="width:170px;display:inline-block"></select></div>
-        <div><span class="saved-flag" id="procSaved">נשמר</span></div>
-      </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th>חודש</th><th>מק"ט</th><th>שם הפריט</th><th>ספק מועדף</th>
-            <th>כמות</th><th>יחידת מידה</th><th>מחיר ליחידה</th><th>סה"כ לתשלום</th>
-            <th>קטגוריה</th><th>שנת לימודים</th><th>מסמך הזמנה מצורף</th><th></th>
-          </tr></thead>
-          <tbody id="procBody"></tbody>
-        </table>
-      </div>
-      <div class="table-scroll" style="margin-top:14px;">
-        <div id="procTotals"></div>
-      </div>
-    </div>
-
+      <div id="sp-gen"></div>
     </div>
     <div id="procFoodLegacyWrap" style="display:none">
     <div class="card" style="font-size:13px;color:var(--ink-soft)">זה המחירון וההזמנות מהגרסה הקודמת, כמו שהיו. הם הועתקו אוטומטית ללשונית "מחירונים" (קטגוריה "מזון (מהמחירון הקודם)") ול"הזמנות וחשבוניות". כאן הם נשמרים לעיון ולא נמחקו.</div>
@@ -7471,6 +7453,7 @@ function printWorkSlip(){
 
 /* ---------- PROCUREMENT ---------- */
 function addProc(){
+  if(window.SP && SP.openGen && document.getElementById("sp-gen")){ SP.openGen(null); return; }
   const yearSel = document.getElementById("procYearFilter");
   const targetYear = (yearSel && yearSel.value) ? Number(yearSel.value) : currentSchoolYearStart();
   data.procurement.push({id: nextId()+2000, month:"", sku:"", item:"", supplier:"", qty:0, unit:"", price:0, category:"", schoolYear: targetYear});
@@ -7483,7 +7466,10 @@ function removeProc(id){
   });
 }
 function renderProc(){
+  /* רכש כללי מוצג עכשיו ככרטיסים בתוך מודול רכש ואספקה */
+  if(document.getElementById("sp-gen")){ if(window.SP && SP.renderGeneral) SP.renderGeneral(); return; }
   const body = document.getElementById("procBody");
+  if(!body) return;
   body.innerHTML = "";
   const yearSel = document.getElementById("procYearFilter");
   if(yearSel && !yearSel.dataset.built){
@@ -18840,6 +18826,53 @@ async function autoBackupIfDue(){
 .spx .sp-pill .cnt{color:var(--sp-brand-ink)}
 .sp-toast.spx{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:#2b2723;color:#f5ead8;padding:9px 16px;border-radius:999px;font-size:14px;z-index:9999;box-shadow:0 2px 4px rgba(46,43,37,.12),0 14px 30px rgba(46,43,37,.12);max-width:calc(100% - 32px)}
 #sp-modalRoot .ov{z-index:9000}
+/* עדכון רכש: דף הזמנה, הזמנה מכווצת, מלאי בקרטונים, ייבוא מלאי, רכש כללי */
+.spx .sheetwrap{border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.12),0 10px 26px rgba(0,0,0,.10);background:#fff;flex:none}
+.spx .ordtxt{background:var(--sp-tint-b);border-radius:var(--sp-r-sm);padding:10px 12px;white-space:pre-wrap;font-size:14px;line-height:1.65;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.spx .obfold{flex-direction:row;align-items:center;gap:10px;width:100%;border:0;cursor:pointer;text-align:right;font:inherit;color:inherit;padding:12px 14px;transition:transform .15s,box-shadow .15s}
+.spx .obfold:hover{transform:translateY(-1px);box-shadow:var(--sp-shadow-up)}
+.spx .obfold>svg:first-child{color:var(--sp-brand)}
+.spx .par.par2{grid-template-columns:minmax(0,1fr) auto 78px 78px auto;align-items:start;gap:10px;padding:10px 0}
+.spx .par2 .pname{min-width:0;display:flex;flex-direction:column;gap:2px}
+.spx .par2 .pmode{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.spx .par2 .pmode .seg{display:inline-flex}
+.spx .par2 .pmode .pkchip{margin-top:0}
+.spx .par2 .pcol{display:flex;flex-direction:column;gap:3px;align-items:center;min-width:0;font-size:inherit;color:inherit}
+.spx .par2 .plbl{font-size:11px;color:var(--sp-soft);white-space:nowrap}
+.spx .par2 .pconv{font-size:11.5px;color:var(--sp-green)}
+.spx .par2 input.min{width:100%}
+.spx .par2 .tagcell{align-self:center}
+@media (max-width:600px){.spx .par.par2{grid-template-columns:auto minmax(0,1fr) minmax(0,1fr)}.spx .par2 .pname,.spx .par2 .tagcell{grid-column:1/-1}}
+.spx .mcost{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;background:var(--sp-tint-b);border-radius:var(--sp-r-sm);padding:8px 12px}
+.spx .mcost b{font-family:var(--sp-f-head);font-weight:400;font-size:1.15rem}
+.spx .sti-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto}
+.spx .sti{display:flex;gap:10px;align-items:flex-start;background:var(--sp-bg);border-radius:var(--sp-r-sm);padding:8px 10px}
+.spx .sti.off{opacity:.62}
+.spx .sti .grow{display:flex;flex-direction:column;gap:4px;min-width:0}
+.spx .sti-act{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+@media (max-width:480px){.spx .sti{flex-direction:column}.spx .sti-act{flex-direction:row;align-items:center;align-self:stretch;justify-content:space-between}}
+#procGeneralWrap.spx{display:flex;flex-direction:column;gap:12px}
+.spx .gtool{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.spx .gtop{display:flex;gap:8px;flex-wrap:wrap}
+.spx .gpill{background:var(--sp-card);border:2px solid transparent;border-radius:var(--sp-r-sm);padding:7px 12px;display:flex;flex-direction:column;text-align:right;cursor:pointer;font:inherit;color:inherit;box-shadow:var(--sp-shadow);min-width:0;transition:transform .15s}
+.spx .gpill:hover{transform:translateY(-1px)}
+.spx .gpill.on{border-color:var(--sp-brand)}
+.spx .gpill .k{font-size:12px;color:var(--sp-soft)}
+.spx .gpill b{font-family:var(--sp-f-head);font-weight:400;font-size:1.1rem}
+.spx .gcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px}
+.spx .gcard{border-radius:var(--sp-r-sm);padding:12px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--sp-shadow);transition:transform .15s,box-shadow .15s;min-width:0;background:var(--sp-card)}
+.spx .gcard:hover{transform:translateY(-2px);box-shadow:var(--sp-shadow-up)}
+.spx .gcard:nth-child(4n+1){background:var(--sp-tint-a)}
+.spx .gcard:nth-child(4n+3){background:var(--sp-tint-b)}
+.spx .gtitle{border:0;background:none;padding:0;font:600 15px var(--sp-f-body);color:var(--sp-ink);text-align:right;cursor:pointer;min-width:0;overflow-wrap:anywhere}
+.spx .gtitle:hover{color:var(--sp-brand)}
+.spx .gamt{font-family:var(--sp-f-head);font-weight:400;font-size:1.15rem;white-space:nowrap}
+.spx .gfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px dashed var(--sp-line);padding-top:6px;margin-top:2px}
+.spx .gdocs{min-width:0}
+.spx .gcalc{display:flex;justify-content:space-between;align-items:center;background:var(--sp-tint-b);border-radius:var(--sp-r-sm);padding:10px 12px}
+.spx .fgrid.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.spx .gcalc b{font-family:var(--sp-f-head);font-weight:400;font-size:1.3rem}
+
 
 </style>
 <script>
@@ -19296,7 +19329,7 @@ function render(){
   if(!tabs().some(t=>t.id===tab)) tab = tabs()[0].id;
   renderTop();
   $('#sp-view').className = 'wrap' + (isCook()?' cook':'');
-  if(tab === 'general' || tab === 'legacy'){ showLegacy(tab); return; }
+  if(tab === 'general' || tab === 'legacy'){ showLegacy(tab); if(tab === 'general') renderGeneral(); return; }
   showLegacy(null);
   ({lists:renderLists, analyze:renderAnalyze, menu:renderMenu, order:renderOrder, orders:renderOrders, stock:renderStock, report:renderReport, requests:renderRequests})[tab]();
 }
@@ -20040,7 +20073,7 @@ function productDetail(p, notes){
     <div class="search">${ic('search','sm')}<input id="sp-lkQ" placeholder="אותו מוצר נקרא אחרת אצל ספק אחר? חפש וקשר" value="${esc(AZ.linkQ)}" oninput="with(SP){AZ.linkQ=this.value;renderLinkRes('${p.key}')}" autocomplete="off"></div>
     <div class="results" id="sp-lkRes">${linkResHTML(p)}</div>
     <h3>מלאי מינימום</h3>
-    <div class="row between"><span class="muted">${par?`מינימום ${qn(par.min)} ${esc(p.unit)} · במלאי ${qn(par.current)}`:'המוצר עוד לא במעקב מלאי'}</span>
+    <div class="row between"><span class="muted">${par?`מינימום ${qn(parShow(par,par.min))} ${esc(parULbl(par,p))} · במלאי ${qn(parShow(par,par.current))}${par.monthly>0?` · מלאי חודשי ${qn(parShow(par,par.monthly))}`:''}`:'המוצר עוד לא במעקב מלאי'}</span>
       <button class="sb sb-soft sm" onclick="with(SP){trackPar('${p.key}')}">${ic('box','sm')}${par?'למסך המלאי':'הוספה למעקב מלאי'}</button></div>
     <h3>הערות איכות</h3>
     ${notes.length ? notes.slice().reverse().map(n=>`<div class="note"><div class="row between"><b>${esc(n.supplier)}</b><span class="tag ${n.rating===1?'r':n.rating===2?'a':'g'}">${['','לא טוב','בינוני','טוב'][n.rating]}</span></div><span>${esc(n.text)}</span><span class="muted">${heDate(n.date)}</span></div>`).join('') : `<div class="muted">עוד אין הערות על המוצר הזה.</div>`}
@@ -20669,10 +20702,7 @@ function renderOrder(){
       <button class="sb sb-soft sm" onclick="with(SP){MN.view='calc';pref('mnview','calc');setTab('menu')}">${ic('menu','sm')}חישוב לפי התפריט</button>
     </div>
   </div>
-  <div class="sp-card">
-    <div class="row between"><h2>ההזמנה</h2>${OB.lines.length?`<button class="sb sb-ghost sm" onclick="with(SP){confirmBox('לרוקן את ההזמנה?',()=>{OB.lines=[];OB.pick=null;saveDraft();render()})}">ריקון</button>`:''}</div>
-    <div id="sp-obLines">${orderLinesHTML()}</div>
-  </div>
+  <div id="sp-obCard">${obCardHTML()}</div>
   <div id="sp-obQuotes"></div>`;
   renderResults(); renderQuotes();
 }
@@ -20680,7 +20710,7 @@ function reqToOrder(id){
   const r = S.requests.find(x=>x.id===id); const p = productMap().get(resolve(r.key)); if(!p) return;
   if(OB.lines.length && OB.catId!==p.catId){ toast('בטיוטה יש הזמנה מקטגוריה אחרת. סיים אותה קודם'); return; }
   OB.catId = p.catId; const ex = OB.lines.find(l=>l.key===p.key); ex ? ex.qty += r.qty : OB.lines.push({key:p.key, name:p.name, unit:p.unit, qty:r.qty});
-  r.status = 'done'; OB.pick=null; save(); saveDraft(); render(); toast('נוסף להזמנה');
+  r.status = 'done'; OB.pick=null; OB.fold=false; save(); saveDraft(); render(); toast('נוסף להזמנה');
 }
 function switchOrderCat(id){
   if(OB.lines.length && id!==OB.catId){ confirmBox('מעבר קטגוריה ירוקן את ההזמנה הנוכחית. להמשיך?', ()=>{OB.catId=id;OB.lines=[];OB.pick=null;saveDraft();render();}); return; }
@@ -20696,17 +20726,17 @@ function renderResults(){
 }
 function addLine(key, qty){ const p = products(OB.catId).find(x=>x.key===key); if(!p) return;
   const ex = OB.lines.find(l=>l.key===key); if(ex) ex.qty += (qty||1); else OB.lines.push({key, name:p.name, unit:p.unit, qty:qty||1});
-  OB.q=''; OB.pick=null; saveDraft(); renderOrder(); renderTop(); $('#sp-obQ')?.focus(); }
+  OB.q=''; OB.pick=null; OB.fold=false; saveDraft(); renderOrder(); renderTop(); $('#sp-obQ')?.focus(); }
 function orderLinesHTML(){
   if(!OB.lines.length) return `<div class="sp-empty">חפש מוצרים למעלה, או צור הזמנה מהתפריט או ממלאי המינימום. ההצעות מכל הספקים יחושבו כאן מיד.</div>`;
   const pm = new Map(products(OB.catId).map(p=>[p.key,p]));
   return OB.lines.map((l,i)=>`<div class="line">
-    <div class="grow"><div>${esc(l.name)}</div><span class="muted">${esc(l.unit)} · כמה צריך</span>${lineHint(l, pm.get(l.key))}</div>
+    <div class="grow"><div>${esc(l.name)}</div><span class="muted">${esc(l.unit)} · כמה צריך${(()=>{ const d = parDiv(S.par[l.key]); return d>1 && l.qty>0 ? ` · <span class="sp-num">${qn(r2(l.qty/d))} קרטונים של ${d}</span>` : ''; })()}</span>${lineHint(l, pm.get(l.key))}</div>
     <div class="stepper"><button aria-label="פחות" onclick="with(SP){stepLine(${i},-1)}">−</button><input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${l.qty}" aria-label="כמות" onchange="with(SP){setQty(${i},this.value)}"><button aria-label="יותר" onclick="with(SP){stepLine(${i},1)}">+</button></div>
     <button class="sb icon sb-ghost danger" aria-label="הסרה" onclick="with(SP){OB.lines.splice(${i},1);OB.pick=null;saveDraft();renderOrder();renderTop()}">${ic('x','sm')}</button>
   </div>`).join('');
 }
-function stepLine(i,d){ OB.lines[i].qty = Math.max(0, r2(OB.lines[i].qty + d)); if(!OB.lines[i].qty) OB.lines.splice(i,1); saveDraft(); $('#sp-obLines').innerHTML = orderLinesHTML(); renderQuotes(); renderTop(); }
+function stepLine(i,d){ OB.lines[i].qty = Math.max(0, r2(OB.lines[i].qty + d*parDiv(S.par[OB.lines[i].key]))); if(!OB.lines[i].qty) OB.lines.splice(i,1); saveDraft(); $('#sp-obLines').innerHTML = orderLinesHTML(); renderQuotes(); renderTop(); }
 function setQty(i,v){ const n = num(v); OB.lines[i].qty = n>0 ? n : 0; if(!OB.lines[i].qty) OB.lines.splice(i,1); saveDraft(); $('#sp-obLines').innerHTML = orderLinesHTML(); renderQuotes(); renderTop(); }
 
 function buildQuotes(){
@@ -20748,7 +20778,7 @@ function renderQuotes(){
     <h2>הצעות מחיר לפי המחירונים</h2>
     <div class="quotes">${all.map(q=>{ const nd = q.smart ? '' : nextDelivery(q.supplier);
       const warns = q.smart ? q.sups.map(s=>minWarn(s, q.lines.filter(l=>l.supplier===s).reduce((t,l)=>t+l.qty*l.price,0))).join('') : minWarn(q.supplier, q.total);
-      return `<button class="quote ${q.smart?'smart':''}" aria-pressed="${OB.pick===q.id}" onclick="with(SP){OB.pick='${q.id}';renderQuotes()}">
+      return `<button class="quote ${q.smart?'smart':''}" aria-pressed="${OB.pick===q.id}" onclick="with(SP){pickQuote('${q.id}')}">
       <span class="row between"><b>${esc(q.supplier)}</b>${q===bestFull?`<span class="tag g">הכי משתלם מספק אחד</span>`:''}</span>
       <span class="tot sp-num">${money(q.total)}</span>
       ${q.smart ? `<span class="muted">${q.sups.length} ספקים: ${q.sups.map(esc).join(', ')}${bestFull?` · חיסכון ${money(bestFull.total-q.total)}`:''}</span>`
@@ -20758,15 +20788,10 @@ function renderQuotes(){
     ${pick ? quoteDetail(pick) : `<p class="muted">בחר הצעה כדי לראות פירוט ולשלוח לספק.</p>`}
   </div>`;
 }
-function orderText(sup, lines){
-  const t = lines.reduce((s,l)=>s+l.qty*l.price,0);
-  const c = supInfo(sup).contact;
-  return `שלום ${c||sup},\nאבקש להזמין:\n` + lines.map(l=>`• ${l.name} — ${l.packs ? `${packsTxt(l.packs)} (${qn(l.qty)} ${uLbl(l.unit)})` : `${qn(l.qty)} ${l.unit}`}`).join('\n') + `\n\nסה"כ לפי המחירון שלכם: ${money(t)}\nתודה, נפתלי`;
-}
 let QTXT = [];
 function quoteDetail(q){
   const groups = q.smart ? q.sups.map(s=>({s, lines:q.lines.filter(l=>l.supplier===s)})) : [{s:q.supplier, lines:q.lines}];
-  QTXT = groups.map(g=>orderText(g.s, g.lines));
+  QGROUPS = groups; QTXT = groups.map((g,gi)=>orderText(g.s, g.lines, {date:today(), delivery:nextDeliveryDate(g.s), no:nextOrderNo()+gi}));
   return `<div class="detail">
     ${groups.map((g,gi)=>{ const t = g.lines.reduce((s,l)=>s+l.qty*l.price,0); const si = supInfo(g.s);
       return `<div class="qtable">
@@ -20774,8 +20799,9 @@ function quoteDetail(q){
       ${g.lines.map(l=>`<div class="qrow"><span>${esc(l.name)} ${l.packs ? `<span class="muted sp-num">· צריך ${qn(l.need)} → ${packsTxt(l.packs)} × ${l.pack} = ${qn(l.qty)}</span>${l.extra?` <span class="tag g sp-num">+${qn(l.extra)} ${S.par[resolve(l.key)]?'למלאי':'עודף'}</span>`:''}` : `<span class="muted sp-num">× ${qn(l.qty)} ${esc(l.unit)}</span>`}</span><span class="muted sp-num">${money(l.price)}</span><b class="sp-num">${money(l.qty*l.price)}</b></div>`).join('')}
       <div class="qrow sum"><span>סה״כ ${esc(g.s)}</span><span></span><span class="sp-num">${money(t)}</span></div>
       <div class="row">
+        <button class="sb sm" onclick="with(SP){openSheet('g',${gi})}">${ic('file','sm')}דף הזמנה (PDF)</button>
         <a class="sb sb-soft sm" target="_blank" rel="noopener" href="${waLink(g.s, QTXT[gi])}">${ic('chat','sm')}וואטסאפ</a>
-        <a class="sb sb-soft sm" target="_blank" rel="noopener" href="${gmailLink(g.s, 'הזמנה — '+g.s, QTXT[gi])}">${ic('mail','sm')}Gmail</a>
+        <a class="sb sb-soft sm" target="_blank" rel="noopener" href="${gmailLink(g.s, 'הזמנה – '+g.s, plainTxt(QTXT[gi]))}">${ic('mail','sm')}Gmail</a>
         <button class="sb sb-soft sm" onclick="with(SP){copyText(QTXT[${gi}])}">${ic('copy','sm')}העתקה</button>
       </div></div>`; }).join('')}
     ${q.missing.length ? `<div class="tag a wrap">${ic('alert','sm')}לא נכללו כי אין במחירון: ${q.missing.map(m=>esc(m.name)).join(', ')}</div>`:''}
@@ -20791,9 +20817,12 @@ function saveOrder(qid){
   const bestFull = quotes.filter(x=>!x.missing.length)[0];
   const groups = q.smart ? q.sups.map(s=>({s, lines:q.lines.filter(l=>l.supplier===s)})) : [{s:q.supplier, lines:q.lines}];
   const saved = q.smart && bestFull ? r2(bestFull.total - q.total) : 0;
-  groups.forEach((g,i) => S.orders.push({id:uid(), date:today(), catId:OB.catId, supplier:g.s, status:'sent', lines:g.lines.map(l=>({key:l.key,name:l.name,unit:l.unit,qty:l.qty,price:l.price,supplier:g.s, ...(l.packs ? {need:l.need, packs:l.packs, pack:l.pack} : {})})), total:g.lines.reduce((s,l)=>s+l.qty*l.price,0), saved: i===0 ? saved : 0}));
+  let seq = +(S.meta && S.meta.orderSeq) || 1000;
+  groups.forEach((g,i) => { seq++; S.orders.push({id:uid(), no:seq, date:today(), delivery:nextDeliveryDate(g.s), catId:OB.catId, supplier:g.s, status:'sent', lines:g.lines.map(l=>({key:l.key,name:l.name,unit:l.unit,qty:l.qty,price:l.price,supplier:g.s, ...(l.packs ? {need:l.need, packs:l.packs, pack:l.pack} : (l.pack>1 ? {cpack:l.pack} : {}))})), total:g.lines.reduce((s,l)=>s+l.qty*l.price,0), saved: i===0 ? saved : 0}); });
+  if(!S.meta || typeof S.meta !== 'object' || Array.isArray(S.meta)) S.meta = {};
+  S.meta.orderSeq = seq;
   S.shortages.forEach(s=>{ if(s.open && q.lines.some(l=>l.key===resolve(s.key))) s.open=false; });
-  OB.lines=[]; OB.pick=null; saveDraft(); save(); toast(groups.length>1?`נשמרו ${groups.length} הזמנות`:'ההזמנה נשמרה'); setTab('orders');
+  OB.lines=[]; OB.pick=null; OB.fold=false; saveDraft(); save(); toast(groups.length>1?`נשמרו ${groups.length} הזמנות`:'ההזמנה נשמרה'); setTab('orders');
 }
 
 /* ============ 5. הזמנות, קבלה וחשבוניות ============ */
@@ -20830,6 +20859,7 @@ function renderOrders(){
         ${o.status==='sent'?`<button class="sb sm" onclick="with(SP){openReceipt('${o.id}')}">${ic('truck','sm')}קבלת סחורה</button>`:''}
         ${!cook && o.status!=='sent' ? `<button class="sb ${o.invoice?'sb-ghost':''} sm" onclick="with(SP){openInvoice('${o.id}')}">${ic('receipt','sm')}${o.invoice?'החשבונית':'בדיקת חשבונית'}</button>`:''}
         <button class="sb sb-ghost sm" onclick="with(SP){ORD.open=ORD.open==='${o.id}'?null:'${o.id}';renderOrders()}">${open?'הסתרה':'פירוט'}</button>
+        ${!cook?`<button class="sb sb-ghost sm" onclick="with(SP){openSheet('o','${o.id}')}">${ic('file','sm')}דף הזמנה</button>`:''}
         ${!cook?`<button class="sb sb-ghost sm" onclick="with(SP){reorder('${o.id}')}">${ic('repeat','sm')}הזמן שוב</button>`:''}
       </div>
       ${open?`<div class="qtable">${o.lines.map(l=>{ const r = o.receipt?.find(x=>x.key===l.key);
@@ -20974,20 +21004,18 @@ function renderStock(){
     .sort((a,b)=>((a.p.min>0&&a.p.current<a.p.min)?0:1)-((b.p.min>0&&b.p.current<b.p.min)?0:1) || a.prod.name.localeCompare(b.prod.name,'he'));
   const bmCat = c => belowMin().filter(k=>pm.get(k)?.catId===c);
   const untracked = STK.cat ? products(STK.cat).filter(p=>!S.par[p.key]) : [];
+  const mc = monthlyCost(parRows.map(x=>x.k)); const bmo = STK.cat ? belowMonthly(STK.cat) : [];
   $('#sp-view').innerHTML = `
   <div class="sp-card">
-    <div class="row between"><h2>ספירת מלאי ומינימום</h2><span class="muted">מה שמתחת למינימום נכנס להזמנה בלחיצה</span></div>
+    <div class="row between"><h2>ספירת מלאי ומינימום</h2>${!cook?`<button class="sb sb-soft sm" onclick="with(SP){openStockImport()}">${ic('upload','sm')}ייבוא מטבלה</button>`:''}</div>
+    <p class="muted" style="margin:0">ליד כל מוצר בוחרים אם סופרים ביחידות או בקרטונים. מלאי חודשי = כמה צריך לחודש, והשלמת המלאי מזמינה עד אליו.</p>
     <div class="chips">${[{id:'',name:'הכל'},...S.cats].map(c=>`<button class="chip" aria-pressed="${STK.cat===c.id}" onclick="with(SP){STK.cat='${c.id}';renderStock()}">${esc(c.name)}${c.id&&bmCat(c.id).length?` <span class="sp-num">(${bmCat(c.id).length})</span>`:''}</button>`).join('')}</div>
-    <div>${parRows.length ? parRows.map(({k,p,prod})=>{ const low = p.min>0 && p.current < p.min;
-      return `<div class="par" id="sp-par-${parId(k)}" ${STK.focus===k?'style="background:var(--tint-a);border-radius:10px;padding-inline:8px"':''}>
-        <div class="grow"><div>${esc(prod.name)}</div><span class="muted">${esc(prod.unit)}${p.countedAt?` · נספר ${heDate(p.countedAt)}`:' · עוד לא נספר'}</span></div>
-        <div class="stepper"><button aria-label="פחות" onclick="with(SP){parSet('${k}','current',-1)}">−</button><input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${p.current}" aria-label="כמה יש במלאי" onchange="with(SP){parSet('${k}','current',null,this.value)}"><button aria-label="יותר" onclick="with(SP){parSet('${k}','current',1)}">+</button></div>
-        <label class="f" style="font-size:11px">מינימום<input class="min sp-num" type="number" min="0" step="any" inputmode="decimal" value="${p.min}" aria-label="מלאי מינימום" onchange="with(SP){parSet('${k}','min',null,this.value)}" ${cook?'disabled':''}></label>
-        <span class="tagcell">${low?`<span class="tag r sp-num">חסרים ${qn(p.min-p.current)}</span>`:p.min?`<span class="tag g">תקין</span>`:'<span class="tag">אין מינימום</span>'}</span>
-      </div>`; }).join('') : `<div class="sp-empty">${STK.cat?'עוד אין מוצרים במעקב בקטגוריה הזו.':'עוד אין מוצרים במעקב מלאי.'}</div>`}</div>
+    ${!cook && mc.n ? `<div class="mcost"><span class="muted">מלאי חודשי${STK.cat?' בקטגוריה':''} · <span class="sp-num">${mc.n===1?'מוצר אחד':mc.n+' מוצרים'}</span></span><b class="sp-num">${money(mc.t)}</b><span class="muted">לפי המחיר הזול במחירונים</span></div>`:''}
+    <div>${parRows.length ? parRows.map(({k,p,prod})=>parRowHTML(k,p,prod,cook)).join('') : `<div class="sp-empty">${STK.cat?'עוד אין מוצרים במעקב בקטגוריה הזו.':'עוד אין מוצרים במעקב מלאי.'}</div>`}</div>
     <div class="row">
       ${!cook ? (STK.cat ? `<select style="width:auto" aria-label="הוספת מוצר למעקב" onchange="with(SP){if(this.value){S.par[this.value]={min:0,current:0,countedAt:''};STK.focus=this.value;save();renderStock()}}"><option value="">+ מוצר למעקב</option>${untracked.map(p=>`<option value="${p.key}">${esc(p.name)}</option>`).join('')}</select>` : '<span class="muted">בחר קטגוריה כדי להוסיף מוצרים למעקב</span>') : ''}
       ${!cook && STK.cat && bmCat(STK.cat).length ? `<button class="sb sm" onclick="with(SP){parToOrder('${STK.cat}')}">${ic('cart','sm')}הזמנה מהחסר (${bmCat(STK.cat).length})</button>`:''}
+      ${!cook && STK.cat && bmo.length ? `<button class="sb sb-soft sm" onclick="with(SP){parToOrder('${STK.cat}',true)}">${ic('cart','sm')}השלמה למלאי חודשי (${bmo.length})</button>`:''}
       ${cook && belowMin().length ? `<button class="sb sm" onclick="with(SP){parToRequests()}">${ic('inbox','sm')}לבקש מהמנהל את החסר (${belowMin().length})</button>`:''}
     </div>
   </div>
@@ -21013,15 +21041,35 @@ function renderStock(){
   if(STK.focus){ const el = document.getElementById('sp-par-'+parId(STK.focus)); el && el.scrollIntoView({block:'center'}); STK.focus = null; }
 }
 const parId = k => Array.from(k).map(c=>c.charCodeAt(0).toString(36)).join('');
-function parSet(k, f, d, v){ const p = S.par[k]; const val = v!==undefined && v!==null ? num(v) : r2((p[f]||0) + d); p[f] = val>=0 ? val : 0; if(f==='current') p.countedAt = today(); save(); renderStock(); renderTop(); }
-function parToOrder(catId){
-  const pm = productMap(); const ks = belowMin().filter(k=>pm.get(k)?.catId===catId);
-  const go = () => { OB.catId = catId; ks.forEach(k=>{ const p = pm.get(k), par = S.par[k]; const q = Math.ceil(par.min - par.current); const ex = OB.lines.find(l=>l.key===k); ex ? ex.qty = Math.max(ex.qty, q) : OB.lines.push({key:k, name:p.name, unit:p.unit, qty:q}); }); OB.pick=null; saveDraft(); setTab('order'); toast(`נוספו ${ks.length} מוצרים להשלמת מלאי`); };
+/* ההזנה במסך היא ביחידות או בקרטונים לפי המוצר. נשמר תמיד ביחידות */
+function parSet(k, f, d, v){ const p = S.par[k]; if(!p) return; const dv = parDiv(p);
+  const val = v!==undefined && v!==null ? num(v)*dv : r2((+p[f]||0) + d*dv);
+  p[f] = val>=0 ? r2(val) : 0; if(f==='current') p.countedAt = today(); save(); renderStock(); renderTop(); }
+function parRowHTML(k, p, prod, cook){
+  const d = parDiv(p), u = parULbl(p, prod), base = uLbl(prod.unit) || 'יח׳';
+  const low = p.min>0 && p.current < p.min, under = !low && p.monthly>0 && p.current < p.monthly;
+  return `<div class="par par2" id="sp-par-${parId(k)}" ${STK.focus===k?'style="background:var(--sp-tint-a);border-radius:10px;padding-inline:8px"':''}>
+    <div class="pname"><div>${esc(prod.name)}</div><span class="muted">${esc(prod.unit)}${p.countedAt?` · נספר ${heDate(p.countedAt)}`:' · עוד לא נספר'}</span>
+      <div class="pmode"><div class="seg small" role="group" aria-label="סופרים לפי"><button aria-pressed="${d===1}" ${cook?'disabled':''} onclick="with(SP){setParUnits('${k}')}">יח׳</button><button aria-pressed="${d>1}" ${cook?'disabled':''} onclick="with(SP){openParMode('${k}')}">קרטונים</button></div>
+        ${d>1?`<button class="pkchip on" ${cook?'disabled':''} title="שינוי גודל הקרטון" onclick="with(SP){openParMode('${k}')}">${ic('box','sm')}<span class="sp-num">קרטון = ${d} ${esc(base)}</span></button>`:''}</div></div>
+    <div class="pcol"><span class="plbl">יש במלאי (${u})</span>
+      <div class="stepper"><button aria-label="פחות" onclick="with(SP){parSet('${k}','current',-1)}">−</button><input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${parShow(p,p.current)}" aria-label="כמה יש במלאי" onchange="with(SP){parSet('${k}','current',null,this.value)}"><button aria-label="יותר" onclick="with(SP){parSet('${k}','current',1)}">+</button></div>
+      ${d>1?`<span class="pconv sp-num">${qn(p.current)} ${esc(base)}</span>`:''}</div>
+    <label class="pcol"><span class="plbl">מינימום</span><input class="min sp-num" type="number" min="0" step="any" inputmode="decimal" value="${parShow(p,p.min)}" aria-label="מלאי מינימום" onchange="with(SP){parSet('${k}','min',null,this.value)}" ${cook?'disabled':''}></label>
+    <label class="pcol"><span class="plbl">מלאי חודשי</span><input class="min sp-num" type="number" min="0" step="any" inputmode="decimal" value="${p.monthly>0?parShow(p,p.monthly):''}" placeholder="—" aria-label="מלאי חודשי" onchange="with(SP){parSet('${k}','monthly',null,this.value)}" ${cook?'disabled':''}></label>
+    <span class="tagcell">${low?`<span class="tag r sp-num">חסרים ${qn(r2((p.min-p.current)/d))} ${u}</span>`:under?`<span class="tag a sp-num">לחודש חסרים ${qn(r2((p.monthly-p.current)/d))} ${u}</span>`:p.min||p.monthly?`<span class="tag g">תקין</span>`:'<span class="tag">אין מינימום</span>'}</span>
+  </div>`;
+}
+function parToOrder(catId, monthly){
+  const pm = productMap();
+  const ks = (monthly ? belowMonthly(catId) : belowMin().filter(k=>pm.get(k)?.catId===catId)).filter(k=>parNeed(k)>0);
+  if(!ks.length){ toast('אין מה להשלים'); return; }
+  const go = () => { OB.catId = catId; ks.forEach(k=>{ const p = pm.get(k); const q = parNeed(k); const ex = OB.lines.find(l=>l.key===k); ex ? ex.qty = Math.max(ex.qty, q) : OB.lines.push({key:k, name:p.name, unit:p.unit, qty:q}); }); OB.pick=null; OB.fold=true; saveDraft(); setTab('order'); toast(`נוספו ${ks.length} מוצרים ${monthly?'להשלמת מלאי חודשי':'להשלמת מלאי'}`); };
   OB.lines.length && OB.catId!==catId ? confirmBox('בטיוטה יש הזמנה מקטגוריה אחרת. להחליף אותה?', ()=>{ OB.lines=[]; go(); }) : go();
 }
 function parToRequests(){
   const pm = productMap(); let n = 0;
-  belowMin().forEach(k=>{ const p = pm.get(k), par = S.par[k]; if(!S.requests.some(r=>r.status==='open' && r.key===k)){ n++; S.requests.push({id:uid(), date:today(), key:k, name:p.name, qty:Math.ceil(par.min-par.current), unit:p.unit, note:'מתחת למינימום', urgent:false, status:'open'}); } });
+  belowMin().forEach(k=>{ const p = pm.get(k), par = S.par[k]; if(!S.requests.some(r=>r.status==='open' && r.key===k)){ n++; S.requests.push({id:uid(), date:today(), key:k, name:p.name, qty:parNeed(k) || Math.ceil(par.min-par.current), unit:p.unit, note:'מתחת למינימום', urgent:false, status:'open'}); } });
   save(); render(); toast(n ? `נשלחו ${n} בקשות למנהל` : 'הבקשות כבר נשלחו קודם');
 }
 function shortToOrder(id){
@@ -21132,6 +21180,452 @@ function renderReport(){
       <button class="sb sb-soft sm" onclick="with(SP){copyText(RP.txt)}">${ic('copy','sm')}העתקה</button>
     </div>
   </div>`;
+}
+
+/* ============ דף הזמנה לספק (PDF) והודעה ממוספרת ============ */
+IC.share = '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>';
+IC.up = '<path d="M6 15l6-6 6 6"/>';
+const cartonsTxt = n => n===1 ? '1 קרטון' : `${qn(n)} קרטונים`;
+const fmtDMY = s => { const p = String(s||'').split('-'); return p.length===3 ? `${p[2]}/${p[1]}/${p[0]}` : String(s||''); };
+const deliveryTxt = s => { if(!isDate(s)) return ''; const d = new Date(s+'T00:00:00'); const p = s.split('-'); return `יום ${DAYS_S[d.getDay()]} ${p[2]}/${p[1]}`; };
+/* כמות כמו שהספק צריך לראות אותה: קרטונים כשמזמינים קרטונים שלמים, אחרת יחידות */
+function qtyLbl(l){
+  const pk = l.packs ? (+l.pack||0) : (+l.cpack>1 ? +l.cpack : (+l.pack>1 ? +l.pack : 0));
+  const u = uLbl(l.unit) || 'יח׳';
+  let packs = l.packs || 0;
+  if(!packs && pk>1 && l.qty>0){ const c = l.qty/pk; if(Math.abs(c-Math.round(c)) < 1e-9) packs = Math.round(c); }
+  return packs && pk>1 ? {main:cartonsTxt(packs), sub:`${qn(packs*pk)} ${u}`} : {main:`${qn(l.qty)} ${u}`, sub:''};
+}
+function nextDeliveryDate(name){
+  const si = supInfo(name); if(!si.days || !si.days.length) return '';
+  const now = new Date(); const [h,m] = (si.cutoff||'23:59').split(':').map(Number);
+  const pastCut = now.getHours()*60+now.getMinutes() > h*60+m;
+  for(let i=1;i<=8;i++){ const d = new Date(); d.setDate(d.getDate()+i); if(si.days.includes(d.getDay())){ if(i===1 && pastCut) continue; return iso(d); } }
+  return '';
+}
+const OPT_DEF = {price:true, units:true, note:true, txtPrice:false};
+function ordOpts(){ let o = {}; try{ o = JSON.parse(pref('ordOpts')||'{}') || {}; }catch(e){ o = {}; } return {...OPT_DEF, ...o}; }
+function setOrdOpt(k, v){ const o = ordOpts(); o[k] = !!v; pref('ordOpts', JSON.stringify(o)); }
+const ordSigner = () => pref('ordSigner') || 'נפתלי רוזנברג';
+const ordNote = () => pref('ordNote') || '';
+const nextOrderNo = () => (+(S.meta && S.meta.orderSeq) || 1000) + 1;
+
+function orderText(sup, lines, m){
+  m = m || {}; const op = ordOpts(); const t = lines.reduce((s,l)=>s+l.qty*l.price,0);
+  const sub = [fmtDMY(m.date||today())];
+  if(m.delivery) sub.push('אספקה ' + deliveryTxt(m.delivery));
+  if(m.no) sub.push('הזמנה מס׳ ' + m.no);
+  const body = lines.map((l,i)=>`${i+1}. ${l.name} – *${qtyLbl(l).main}*${op.txtPrice?` (${money(l.qty*l.price)})`:''}`);
+  const tail = [`סה״כ ${lines.length===1?'פריט אחד':lines.length+' פריטים'}.` + (op.txtPrice?` לפי המחירון: ${money(t)}`:'')];
+  const note = ordNote().trim(); if(note) tail.push(note);
+  tail.push(`תודה, ${ordSigner().split(' ')[0]}`);
+  return `*הזמנה – ${sup}*\n${sub.join(' · ')}\n\n${body.join('\n')}\n\n${tail.join('\n')}`;
+}
+const plainTxt = t => t.replace(/\*/g, '');
+
+/* הדף עצמו: סגנונות בתוך השורות כדי שה-PDF ייראה בדיוק כמו התצוגה */
+function sheetHTML(m, op, forPdf){
+  /* בנוי מ-div ולא מטבלה, כדי שעיצוב הטבלאות של האפליקציה לא ישנה את הדף */
+  const C = {band:'#c67139', ink:'#1f1d1b', soft:'#6b6257', line:'#eadfce', zebra:'#fbf5ec'};
+  const si = supInfo(m.supplier); const note = op.note ? ordNote().trim() : '';
+  const row = (bg) => `display:flex;align-items:flex-start;gap:10px;padding:8px 8px;border-bottom:1px solid ${C.line};background:${bg};page-break-inside:avoid;break-inside:avoid`;
+  const cIdx = 'flex:0 0 26px', cName = 'flex:1 1 auto;min-width:0', cQty = 'flex:0 0 118px', cPr = 'flex:0 0 86px;text-align:left;white-space:nowrap';
+  const rows = m.lines.map((l,i)=>{ const q = qtyLbl(l); return `<div style="${row(i%2?C.zebra:'#ffffff')}">
+      <div style="${cIdx};color:${C.band};font-weight:700">${i+1}</div>
+      <div style="${cName}">${esc(l.name)}</div>
+      <div style="${cQty};font-weight:700">${esc(q.main)}${op.units&&q.sub?`<div style="font-weight:400;color:${C.soft};font-size:11.5px">${esc(q.sub)}</div>`:''}</div>
+      ${op.price?`<div style="${cPr}">${money(l.qty*l.price)}</div>`:''}
+    </div>`; }).join('');
+  const meta = (k, v, last) => `<div style="flex:1 1 0;min-width:0;padding:9px 12px;${last?'':`border-left:1px solid ${C.line};`}"><div style="font-size:10.5px;color:${C.soft}">${k}</div><div style="font-weight:600;font-size:13.5px">${v}</div></div>`;
+  const hd = `font-size:11.5px;font-weight:600;color:${C.soft}`;
+  return `<div style="${forPdf?'width:760px;':'width:100%;'}background:#ffffff;color:${C.ink};direction:rtl;text-align:right;font-family:Rubik,'Segoe UI',Arial,sans-serif;font-size:13.5px;line-height:1.45;box-sizing:border-box">
+    <div style="background:${C.band};color:#ffffff;padding:18px 20px 16px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+      <div><div style="font-size:13px;opacity:.9">הזמנת רכש${si.contact?` · לכבוד ${esc(si.contact)}`:''}</div>
+        <div style="font-family:'Suez One',Rubik,serif;font-size:26px;line-height:1.15">${esc(m.supplier)}</div></div>
+      ${m.no?`<div style="font-size:12.5px;font-weight:600;background:rgba(255,255,255,.22);border-radius:999px;padding:4px 12px;white-space:nowrap">הזמנה מס׳ ${esc(m.no)}</div>`:''}
+    </div>
+    <div style="display:flex;border-bottom:1px solid ${C.line}">
+      ${meta('תאריך הזמנה', fmtDMY(m.date))}${meta('אספקה מבוקשת', m.delivery ? deliveryTxt(m.delivery) : 'בתיאום')}${meta('מזמין', esc(ordSigner()), true)}
+    </div>
+    <div style="padding:12px 16px 4px">
+      <div style="display:flex;gap:10px;padding:6px 8px;border-bottom:2px solid ${C.band}">
+        <div style="${cIdx};${hd}">#</div><div style="${cName};${hd}">תיאור המוצר</div><div style="${cQty};${hd}">כמות</div>${op.price?`<div style="${cPr};${hd}">מחיר</div>`:''}
+      </div>
+      ${rows}
+    </div>
+    <div style="padding:10px 16px 16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12.5px;color:${C.soft}">
+      <span>${note?`הערות: ${esc(note)}`:`${m.lines.length===1?'פריט אחד':m.lines.length+' פריטים'}`}</span>
+      ${op.price?`<span style="color:${C.ink};font-weight:700;font-size:14px">סה״כ לפי המחירון: ${money(m.total)}</span>`:''}
+    </div>
+  </div>`;
+}
+let QGROUPS = [];
+function sheetModel(kind, id){
+  if(kind==='o'){ const o = S.orders.find(x=>x.id===id); if(!o) return null;
+    return {supplier:o.supplier, date:o.date, no:o.no||'', delivery:o.delivery||'', lines:o.lines, total:o.total}; }
+  const g = QGROUPS[id]; if(!g) return null;
+  return {supplier:g.s, date:today(), no:nextOrderNo()+id, delivery:nextDeliveryDate(g.s), lines:g.lines, total:g.lines.reduce((s,l)=>s+l.qty*l.price,0)};
+}
+const sheetFileName = m => `הזמנה ${String(m.supplier).replace(/[\\/:*?"<>|]/g,' ').trim()} ${fmtDMY(m.date).replace(/\//g,'-')}.pdf`;
+let SH = null;
+function canShareFiles(){ try{ return !!(navigator.canShare && navigator.canShare({files:[new File([new Blob(['x'])], 'x.pdf', {type:'application/pdf'})]})); }catch(e){ return false; } }
+function openSheet(kind, id){
+  const m = sheetModel(kind, id); if(!m){ toast('ההזמנה לא נמצאה'); return; }
+  SH = {m, blob:null, v:0, busy:null, share:canShareFiles()}; drawSheet(); buildSheetPdf();
+}
+function drawSheet(){
+  if(!SH) return; const m = SH.m, op = ordOpts(); SH.txt = orderText(m.supplier, m.lines, m);
+  modal(`<div class="mhead"><h2>דף הזמנה · ${esc(m.supplier)}</h2>${closeBtn()}</div>
+    <div class="sheetwrap">${sheetHTML(m, op, false)}</div>
+    <div class="row">
+      ${SH.share?`<button class="sb" id="sp-shShare" onclick="with(SP){shareSheet()}">${ic('share','sm')}<span>${SH.blob?'שיתוף ה-PDF':'מכין PDF…'}</span></button>`:''}
+      <button class="sb ${SH.share?'sb-soft':''}" onclick="with(SP){downloadSheet()}">${ic('download','sm')}הורדת PDF</button>
+    </div>
+    ${SH.share?`<p class="muted" style="margin:0">"שיתוף" פותח את חלון השיתוף של הטלפון, ושם בוחרים וואטסאפ. הקובץ מצורף.</p>`:`<p class="muted" style="margin:0">מורידים את הקובץ ומצרפים אותו בוואטסאפ או במייל.</p>`}
+    <div class="sp-card flat">
+      <h3>מה להציג בדף</h3>
+      <label class="radio"><input type="checkbox" ${op.price?'checked':''} onchange="with(SP){sheetOpt('price',this.checked)}"><span>מחירים וסה״כ</span></label>
+      <label class="radio"><input type="checkbox" ${op.units?'checked':''} onchange="with(SP){sheetOpt('units',this.checked)}"><span>כמה יחידות יש בקרטונים, מתחת לכמות</span></label>
+      <label class="radio"><input type="checkbox" ${op.note?'checked':''} onchange="with(SP){sheetOpt('note',this.checked)}"><span>הערות לספק</span></label>
+      <div class="fgrid">
+        <label class="f">הערות לספק<input id="sp-shNote" value="${esc(ordNote())}" placeholder="למשל: נא לתאם הגעה עד 10:00" onchange="with(SP){pref('ordNote',this.value.trim());sheetChanged()}"></label>
+        <label class="f">שם המזמין<input id="sp-shSigner" value="${esc(ordSigner())}" onchange="with(SP){pref('ordSigner',this.value.trim()||'נפתלי רוזנברג');sheetChanged()}"></label>
+      </div>
+    </div>
+    <div class="sp-card flat">
+      <div class="row between"><h3>או הודעת טקסט ממוספרת</h3><label class="radio"><input type="checkbox" ${op.txtPrice?'checked':''} onchange="with(SP){sheetOpt('txtPrice',this.checked,true)}"><span>עם מחירים</span></label></div>
+      <div class="ordtxt">${esc(SH.txt)}</div>
+      <div class="row">
+        <a class="sb sb-soft sm" target="_blank" rel="noopener" href="${waLink(m.supplier, SH.txt)}">${ic('chat','sm')}וואטסאפ</a>
+        <a class="sb sb-soft sm" target="_blank" rel="noopener" href="${gmailLink(m.supplier, 'הזמנה – '+m.supplier, plainTxt(SH.txt))}">${ic('mail','sm')}Gmail</a>
+        <button class="sb sb-soft sm" onclick="with(SP){copyText(SH.txt)}">${ic('copy','sm')}העתקה</button>
+      </div>
+    </div>`);
+}
+function sheetOpt(k, v, textOnly){ setOrdOpt(k, v); if(textOnly){ drawSheet(); return; } sheetChanged(); }
+function sheetChanged(){ if(!SH) return; SH.blob = null; SH.v++; drawSheet(); clearTimeout(SH.t); SH.t = setTimeout(buildSheetPdf, 300); }
+function buildSheetPdf(){
+  const s = SH; if(!s) return Promise.resolve(); const v = s.v;
+  if(s.busy && s.busyV === v) return s.busy;
+  s.busyV = v;
+  s.busy = (async () => {
+    try{
+      await loadHtml2Pdf(); try{ await document.fonts.ready; }catch(e){}
+      const blob = await html2pdf().set({
+        margin:[8,8,8,8], image:{type:'jpeg', quality:0.95},
+        html2canvas:{scale:2, backgroundColor:'#ffffff', useCORS:true},
+        jsPDF:{unit:'mm', format:'a4', orientation:'portrait'},
+        pagebreak:{mode:['css','legacy']}
+      }).from(sheetHTML(s.m, ordOpts(), true), 'string').outputPdf('blob');
+      if(SH === s && s.v === v){ s.blob = blob; const b = $('#sp-shShare span'); if(b) b.textContent = 'שיתוף ה-PDF'; }
+    }catch(e){ if(SH === s){ const b = $('#sp-shShare span'); if(b) b.textContent = 'שיתוף ה-PDF'; } }
+    finally{ if(SH === s && s.busyV === v) s.busy = null; }
+  })();
+  return s.busy;
+}
+async function shareSheet(){
+  if(!SH) return;
+  if(!SH.blob){ toast('ה-PDF עוד בהכנה, עוד רגע ולחץ שוב'); buildSheetPdf(); return; }
+  const f = new File([SH.blob], sheetFileName(SH.m), {type:'application/pdf'});
+  try{ await navigator.share({files:[f], title:'הזמנה – '+SH.m.supplier}); }
+  catch(e){ if(e && e.name === 'AbortError') return; toast('השיתוף לא הצליח. אפשר להוריד את הקובץ ולצרף אותו'); }
+}
+async function downloadSheet(){
+  if(!SH) return; const s = SH;
+  if(!s.blob){ toast('מכין PDF…'); await buildSheetPdf(); }
+  if(SH === s && s.blob) offerFile(sheetFileName(s.m), s.blob); else if(SH === s) toast('לא הצלחתי להכין את ה-PDF. בדוק חיבור לאינטרנט ונסה שוב');
+}
+
+/* ============ ההזמנה: כיווץ לשורה אחת ============ */
+function obCardHTML(){
+  const n = OB.lines.length;
+  if(OB.fold && n){
+    const nPk = OB.lines.filter(l=>parDiv(S.par[l.key])>1).length;
+    return `<button class="sp-card obfold" aria-expanded="false" onclick="with(SP){foldOrder(false)}">
+      ${ic('cart')}<span class="grow"><b>ההזמנה</b> <span class="muted sp-num">· ${n===1?'פריט אחד':n+' פריטים'}</span></span>
+      ${nPk?`<span class="tag a sp-num">${nPk} בקרטונים</span>`:''}<span class="muted">פתיחה</span>${ic('down','sm')}</button>`;
+  }
+  return `<div class="sp-card">
+    <div class="row between"><h2>ההזמנה</h2><span class="row">${n>1?`<button class="sb sb-ghost sm" onclick="with(SP){foldOrder(true)}">${ic('up','sm')}כיווץ לשורה</button>`:''}${n?`<button class="sb sb-ghost sm" onclick="with(SP){confirmBox('לרוקן את ההזמנה?',()=>{OB.lines=[];OB.pick=null;OB.fold=false;saveDraft();render()})}">ריקון</button>`:''}</span></div>
+    <div id="sp-obLines">${orderLinesHTML()}</div>
+  </div>`;
+}
+function foldOrder(v){ OB.fold = !!v; const c = $('#sp-obCard'); if(c) c.innerHTML = obCardHTML(); }
+function pickQuote(id){ OB.pick = id; if(!OB.fold && OB.lines.length > 1) foldOrder(true); renderQuotes(); }
+
+/* ============ מלאי: יחידות או קרטונים, מינימום ומלאי חודשי ============
+   הכמויות נשמרות תמיד ביחידות (current, min, monthly). par.mode='pack' + par.pack = גודל הקרטון במחסן:
+   רק התצוגה, ההזנה וההזמנה עוברות לקרטונים. כך ההשוואה בין ספקים עם קרטונים בגדלים שונים נשארת נכונה.
+   מלאי חודשי (רשות) = כמה צריך לחודש. כשמשלימים מלאי, מזמינים עד המלאי החודשי (ואם אין, עד המינימום). */
+const parDiv = p => p && p.mode==='pack' && Math.round(+p.pack||0) > 1 ? Math.round(+p.pack) : 1;
+const parShow = (p, v) => r2((+v||0) / parDiv(p));
+const parULbl = (p, prod) => parDiv(p) > 1 ? 'קרט׳' : (uLbl(prod && prod.unit) || 'יח׳');
+const parTarget = p => Math.max(+p.min||0, +p.monthly||0);
+function parNeed(k){
+  const p = S.par[k]; if(!p) return 0;
+  const need = parTarget(p) - (+p.current||0); if(!(need > 0)) return 0;
+  const d = parDiv(p); return d > 1 ? Math.ceil(need/d - 1e-9) * d : Math.ceil(need - 1e-9);
+}
+function belowMonthly(catId){ const pm = productMap(); return Object.entries(S.par).filter(([k,p]) => pm.has(k) && (!catId || pm.get(k).catId===catId) && p.monthly>0 && (+p.current||0) < p.monthly).map(([k])=>k); }
+/* גודל הקרטון הנפוץ במחירונים של המוצר */
+function parPackGuess(k){
+  const p = productMap().get(k); if(!p) return 0; const cnt = {};
+  p.offers.forEach(o => { const n = packOf(o.item); if(n > 1) cnt[n] = (cnt[n]||0) + 1; });
+  const best = Object.entries(cnt).sort((a,b)=>b[1]-a[1] || a[0]-b[0])[0]; return best ? +best[0] : 0;
+}
+let PM = null;
+function openParMode(k){
+  const p = S.par[k], prod = productMap().get(k); if(!p || !prod) return;
+  const guess = parPackGuess(k);
+  PM = {k, pack: p.pack > 1 ? Math.round(p.pack) : (guess || ''), was: parDiv(p) > 1, guess, asCartons:false};
+  const has = ['current','min','monthly'].some(f => +p[f] > 0);
+  modal(`<div class="mhead"><h2>${PM.was?'גודל הקרטון':'ספירה בקרטונים'} · ${esc(prod.name)}</h2>${closeBtn()}</div>
+    <label class="f">כמה ${esc(uLbl(prod.unit)||'יחידות')} יש בקרטון במחסן<input id="sp-pmN" class="sp-num" type="number" min="2" step="1" inputmode="numeric" value="${PM.pack}"></label>
+    <p class="muted" style="margin:0">${guess ? `לפי המחירון: קרטון של ${guess}.` : 'במחירונים אין גודל קרטון למוצר הזה, הזן אותו כאן.'}</p>
+    ${PM.was ? `<p class="muted" style="margin:0">מספר הקרטונים שספרת נשאר כמו שהוא. רק החישוב ליחידות מתעדכן לפי הגודל החדש.</p>`
+      : has ? `<div class="sp-card flat">
+        <b>המספרים שכבר הוזנו למוצר הזה: במלאי ${qn(p.current)}, מינימום ${qn(p.min)}${p.monthly?`, חודשי ${qn(p.monthly)}`:''}</b>
+        <label class="radio"><input type="radio" name="sp-pmAs" checked onchange="with(SP){PM.asCartons=false}"><span>הם יחידות<br><span class="muted">יוצגו מחולקים לקרטונים</span></span></label>
+        <label class="radio"><input type="radio" name="sp-pmAs" onchange="with(SP){PM.asCartons=true}"><span>הם כבר מספר קרטונים<br><span class="muted">המספרים יישארו כמו שהם, כקרטונים</span></span></label>
+      </div>` : ''}
+    <div class="row"><button class="sb" onclick="with(SP){saveParMode()}">${ic('check','sm')}שמירה</button><button class="sb sb-ghost" onclick="with(SP){closeModal()}">ביטול</button></div>`);
+}
+function saveParMode(){
+  if(!PM) return; const p = S.par[PM.k], prod = productMap().get(PM.k); if(!p){ closeModal(); return; }
+  const n = Math.round(num($('#sp-pmN').value));
+  if(!(n > 1)){ toast('גודל קרטון צריך להיות 2 יחידות ומעלה'); return; }
+  const flds = ['current','min','monthly'];
+  if(PM.was){ const old = parDiv(p); if(old !== n) flds.forEach(f => { if(+p[f] > 0) p[f] = r2(p[f] / old * n); }); }
+  else if(PM.asCartons){ flds.forEach(f => { if(+p[f] > 0) p[f] = r2(p[f] * n); }); }
+  p.mode = 'pack'; p.pack = n; PM = null;
+  save(); closeModal(); renderStock(); renderTop(); toast(`נשמר: ${prod ? prod.name : 'המוצר'} נספר בקרטונים של ${n}`);
+}
+function setParUnits(k){ const p = S.par[k]; if(!p || parDiv(p) === 1) return; p.mode = 'unit'; save(); renderStock(); toast('נספר ביחידות. הכמויות מוצגות עכשיו ביחידות'); }
+function monthlyCost(keys){
+  const pm = productMap(); let t = 0, n = 0;
+  keys.forEach(k => { const p = S.par[k], prod = pm.get(k); if(prod && p && p.monthly > 0){ t += p.monthly * prod.offers[0].price; n++; } });
+  return {t:r2(t), n};
+}
+
+/* ---------- ייבוא ספירת מלאי מטבלה ---------- */
+let STI = null;
+const STI_RE = {
+  min:/מינימ|min/i, monthly:/חודש|monthly/i, mode:/ספירה\s*לפי|יחידת\s*ספירה|נספר\s*(לפי|ב)|סופרים\s*לפי|count\s*unit/i,
+  current:/במלאי|מלאי|קיים|יש\b|ספירה|נספר|כמות|stock|on\s*hand|qty|count/i
+};
+function openStockImport(fresh){ if(!STI || fresh) STI = {src:'file', rows:null, header:0, map:{}, def:'keep', pick:{}, modeOv:{}, skip:{}, edit:{}}; drawStockImport(); }
+function stiGuess(rows, header){
+  const h = (rows[header]||[]).map(c => String(c||''));
+  const map = {name:'', current:'', min:'', monthly:'', mode:'', pack:''}; const used = new Set();
+  const take = (f, re, not) => { const i = h.findIndex((c,ix) => !used.has(ix) && c && c.length < 40 && re.test(c) && !(not && not.test(c))); if(i >= 0){ map[f] = String(i); used.add(i); } };
+  take('min', STI_RE.min); take('monthly', STI_RE.monthly); take('mode', STI_RE.mode);
+  take('pack', RE.pack, /מינימ|חודש|מלאי/); take('name', RE.name, /מינימ|חודש|כמות|מלאי/); take('current', STI_RE.current, /מינימ|חודש|מחיר/);
+  return map;
+}
+function onStiWb(wb){ onStiRows(sheetRows(wb, wb.SheetNames[0])); }
+function onStiRows(rows){ STI.rows = rows; STI.header = findHeader(rows); STI.map = stiGuess(rows, STI.header); STI.pick = {}; STI.modeOv = {}; STI.skip = {}; STI.edit = {}; drawStockImport(); }
+function stiPaste(){ const t = ($('#sp-stiPaste')||{}).value || ''; if(!t.trim()){ toast('לא הודבק טקסט'); return; } onStiRows(pasteRows(t.trim())); }
+function stiIndex(){
+  const ps = products(); const exact = new Map();
+  ps.forEach(p => { exact.set(p.key, p.key); exact.set(norm(p.name), p.key); p.aliases.forEach(a => exact.set(norm(a), p.key)); });
+  return {ps, exact};
+}
+function stiMatch(name, idx){
+  const n = norm(name); if(!n) return null;
+  const r = resolve(n); if(idx.exact.has(r)) return {k:idx.exact.get(r), sure:true};
+  const t = new Set(n.split(' ')); let best = null, bs = 0;
+  idx.ps.forEach(p => { const pt = p.key.split(' '); const inter = pt.filter(x => t.has(x)).length; const sc = inter / Math.max(t.size, pt.length); if(sc > bs){ bs = sc; best = p.key; } });
+  return bs >= 0.5 ? {k:best, sure:false} : null;
+}
+function stiPack(x){
+  if(x.mode !== 'pack') return 1;
+  if(x.packCell > 1) return Math.round(x.packCell);
+  const p = x.k && S.par[x.k]; if(p && Math.round(+p.pack||0) > 1) return Math.round(+p.pack);
+  return x.k ? parPackGuess(x.k) : 0;
+}
+function stiParsed(){
+  if(!STI || !STI.rows) return [];
+  const m = STI.map, idx = stiIndex(), out = [];
+  STI.rows.slice(STI.header+1).forEach((r, j) => {
+    const i = STI.header + 1 + j;
+    const name = cell(r, m, 'name'); if(!name) return;
+    const cur = pnum(cell(r, m, 'current')), mn = pnum(cell(r, m, 'min')), mo = pnum(cell(r, m, 'monthly'));
+    if(![cur, mn, mo].some(v => isFinite(v))) return;
+    const auto = STI.pick[i] !== undefined ? null : stiMatch(name, idx);
+    const k = STI.pick[i] !== undefined ? STI.pick[i] : (auto ? auto.k : '');
+    const mc = cell(r, m, 'mode');
+    const fileMode = /קרט|ארגז|מארז|carton|case|ctn/i.test(mc) ? 'pack' : (mc ? 'unit' : '');
+    /* ברירת מחדל: כמו שהמוצר כבר מוגדר במלאי (יחידות או קרטונים), כדי לא להחליף לו יחידת ספירה בטעות */
+    const keep = k && parDiv(S.par[k]) > 1 ? 'pack' : 'unit';
+    const x = {i, name, cur, mn, mo, k, sure: STI.pick[i] !== undefined || !!(auto && auto.sure), mode: STI.modeOv[i] || fileMode || (STI.def === 'keep' ? keep : STI.def), packCell: packNum(cell(r, m, 'pack'))};
+    x.pack = stiPack(x);
+    out.push(x);
+  });
+  return out;
+}
+function drawStockImport(){
+  const pm = productMap(); const all = [...pm.values()].sort((a,b)=>a.name.localeCompare(b.name,'he'));
+  const rows = stiParsed(); const ok = rows.filter(x => x.k && !STI.skip[x.i]);
+  const dup = {}; ok.forEach(x => dup[x.k] = (dup[x.k]||0) + 1);
+  const r = STI.rows;
+  const v = (n, x) => isFinite(n) ? `${qn(n)} ${x.mode==='pack' && x.pack>1 ? 'קרט׳' : 'יח׳'}` : '—';
+  const sel = x => `<select aria-label="מוצר במחירון" onchange="with(SP){STI.pick[${x.i}]=this.value;STI.edit[${x.i}]=false;drawStockImport()}"><option value="">— לא לייבא —</option>${all.map(p=>`<option value="${esc(p.key)}" ${p.key===x.k?'selected':''}>${esc(p.name)} · ${esc(catById(p.catId)?.name||'')}</option>`).join('')}</select>`;
+  modal(`<div class="mhead"><h2>ייבוא ספירת מלאי מטבלה</h2>${closeBtn()}</div>
+    <p class="muted" style="margin:0">טבלה עם שם מוצר, כמה יש במלאי, מינימום ומלאי חודשי. כל שורה מותאמת למוצר במחירון. תאים ריקים בקובץ לא משנים כלום, ושום מוצר לא נמחק.</p>
+    <div class="seg" role="group" aria-label="מקור"><button aria-pressed="${STI.src==='file'}" onclick="with(SP){STI.src='file';drawStockImport()}">קובץ אקסל / CSV</button><button aria-pressed="${STI.src==='paste'}" onclick="with(SP){STI.src='paste';drawStockImport()}">הדבקה מאקסל</button></div>
+    ${STI.src==='file' ? `<label class="drop">${ic('file')}<span>${r?'הקובץ נטען · אפשר לבחור קובץ אחר':'בחר קובץ אקסל או CSV'}</span><input type="file" accept=".xlsx,.xls,.csv" style="max-width:240px" onchange="with(SP){readTableFile(this.files[0], onStiWb)}"></label>`
+      : `<label class="f">סמן באקסל את הטבלה (כולל שורת הכותרות), העתק והדבק כאן<textarea id="sp-stiPaste" placeholder="מוצר&#9;במלאי&#9;מינימום&#9;מלאי חודשי"></textarea></label><div><button class="sb sb-soft sm" onclick="with(SP){stiPaste()}">קריאת הטבלה</button></div>`}
+    ${r ? `<div class="fgrid">
+        <label class="f">שם המוצר${colSelect(r, STI.header, STI.map, 'name', "STI.map.name=this.value;drawStockImport()")}</label>
+        <label class="f">כמה יש במלאי${colSelect(r, STI.header, STI.map, 'current', "STI.map.current=this.value;drawStockImport()")}</label>
+        <label class="f">מינימום${colSelect(r, STI.header, STI.map, 'min', "STI.map.min=this.value;drawStockImport()")}</label>
+        <label class="f">מלאי חודשי${colSelect(r, STI.header, STI.map, 'monthly', "STI.map.monthly=this.value;drawStockImport()")}</label>
+        <label class="f"><span>נספר לפי (יח׳/קרטון) <span class="muted">רשות</span></span>${colSelect(r, STI.header, STI.map, 'mode', "STI.map.mode=this.value;drawStockImport()")}</label>
+        <label class="f"><span>כמות בקרטון <span class="muted">רשות</span></span>${colSelect(r, STI.header, STI.map, 'pack', "STI.map.pack=this.value;drawStockImport()")}</label>
+      </div>
+      <div class="row"><span class="muted">הכמויות בקובץ הן:</span><div class="seg small" role="group" aria-label="יחידת ספירה בקובץ"><button aria-pressed="${STI.def==='keep'}" onclick="with(SP){STI.def='keep';drawStockImport()}">כמו שמוגדר במלאי</button><button aria-pressed="${STI.def==='unit'}" onclick="with(SP){STI.def='unit';drawStockImport()}">ביחידות</button><button aria-pressed="${STI.def==='pack'}" onclick="with(SP){STI.def='pack';drawStockImport()}">בקרטונים</button></div><span class="muted">אפשר לשנות לכל שורה</span></div>
+      <div class="sti-list">${rows.length ? rows.map(x => { const skip = STI.skip[x.i];
+        return `<div class="sti ${skip||!x.k?'off':''}">
+          <div class="grow"><div><b>${esc(x.name)}</b></div>
+            <div class="muted sp-num">יש ${v(x.cur,x)} · מינ׳ ${v(x.mn,x)} · חודשי ${v(x.mo,x)}</div>
+            ${x.k && !STI.edit[x.i] ? `<div class="row" style="gap:6px">${ic('link','sm')}<span>${esc(pm.get(x.k)?.name||'')}</span>${x.sure?'':'<span class="tag a">התאמה משוערת</span>'}${dup[x.k]>1?'<span class="tag r">מופיע פעמיים בקובץ</span>':''}<button class="sb sb-ghost sm" onclick="with(SP){STI.edit[${x.i}]=true;drawStockImport()}">שינוי</button></div>` : sel(x)}
+            ${x.k && x.mode==='pack' && !(x.pack>1) ? `<span class="tag r wrap">אין גודל קרטון למוצר. ייובא כמו שהוא, ותקבע קרטון אחר כך במסך המלאי</span>` : ''}
+          </div>
+          <div class="sti-act">
+            <div class="seg small" role="group" aria-label="נספר לפי"><button aria-pressed="${x.mode!=='pack'}" onclick="with(SP){STI.modeOv[${x.i}]='unit';drawStockImport()}">יח׳</button><button aria-pressed="${x.mode==='pack'}" onclick="with(SP){STI.modeOv[${x.i}]='pack';drawStockImport()}">קרט׳${x.mode==='pack'&&x.pack>1?` ${x.pack}`:''}</button></div>
+            ${x.k ? `<label class="radio" style="font-size:12.5px"><input type="checkbox" ${skip?'':'checked'} onchange="with(SP){STI.skip[${x.i}]=!this.checked;drawStockImport()}"><span>לייבא</span></label>` : ''}
+          </div>
+        </div>`; }).join('') : `<div class="sp-empty">לא זוהו שורות עם שם מוצר וכמות. בדוק את בחירת העמודות.</div>`}</div>
+      <div class="row between"><span class="muted sp-num">${ok.length} מוצרים יעודכנו${rows.length-ok.length?` · ${rows.length-ok.length} לא ייובאו`:''}</span>
+        <span class="row"><button class="sb sb-ghost sm" onclick="with(SP){openStockImport(true)}">התחלה מחדש</button><button class="sb" ${ok.length?'':'disabled'} onclick="with(SP){commitStockImport()}">${ic('check','sm')}עדכון המלאי</button></span></div>` : ''}`);
+}
+function commitStockImport(){
+  const rows = stiParsed().filter(x => x.k && !STI.skip[x.i]);
+  if(!rows.length){ toast('אין שורות מותאמות לייבוא'); return; }
+  confirmBox(`לעדכן ${rows.length} מוצרים במלאי לפי הטבלה? רק ערכים שמופיעים בטבלה ישתנו. תאים ריקים לא משנים כלום, ושום מוצר לא נמחק.`, () => {
+    let n = 0;
+    rows.forEach(x => {
+      if(!S.par[x.k]) S.par[x.k] = {min:0, current:0, countedAt:''};
+      const p = S.par[x.k];
+      if(x.mode === 'pack' && x.pack > 1){ p.mode = 'pack'; p.pack = x.pack; }
+      else if(x.mode === 'unit') p.mode = 'unit';
+      const d = parDiv(p);
+      if(isFinite(x.cur)){ p.current = r2(Math.max(0, x.cur) * d); p.countedAt = today(); }
+      if(isFinite(x.mn)) p.min = r2(Math.max(0, x.mn) * d);
+      if(isFinite(x.mo)) p.monthly = r2(Math.max(0, x.mo) * d);
+      n++;
+    });
+    STI = null; save(); STK.cat = ''; setTab('stock'); renderTop(); toast(`עודכנו ${n} מוצרים במלאי`);
+  });
+}
+
+/* ============ רכש כללי (data.procurement של האפליקציה) ============
+   אותן רשומות כמו בטבלה הקודמת: רק התצוגה והעריכה התחדשו. שום שדה קיים לא נמחק. */
+let GN = {q:'', cat:'', cats:[]};
+let GE = null;
+const gTot = r => (parseFloat(r.qty)||0) * (parseFloat(r.price)||0);
+function genYearSelect(){
+  const sel = document.getElementById('procYearFilter'); if(!sel || sel.dataset.built) return;
+  sel.dataset.built = '1';
+  const has = Object.prototype.hasOwnProperty.call(data.uiPrefs||{}, 'procYear');
+  const cur = has ? data.uiPrefs.procYear : String(currentSchoolYearStart());
+  sel.innerHTML = `<option value="" ${cur===''?'selected':''}>כל השנים</option>` + schoolYearOptions().map(y => `<option value="${y}" ${String(y)===String(cur)?'selected':''}>${schoolYearLabel(y)}</option>`).join('');
+}
+function renderGeneral(){
+  const box = document.getElementById('sp-gen'); if(!box || typeof data === 'undefined' || !Array.isArray(data.procurement)) return;
+  genYearSelect();
+  const ySel = document.getElementById('procYearFilter'); const y = ySel ? ySel.value : '';
+  const all = data.procurement.filter(r => !y || String(r.schoolYear || currentSchoolYearStart()) === y);
+  const cats = {}; let grand = 0;
+  all.forEach(r => { const c = r.category || 'ללא קטגוריה'; cats[c] = (cats[c]||0) + gTot(r); grand += gTot(r); });
+  GN.cats = Object.entries(cats).sort((a,b) => b[1]-a[1]);
+  if(GN.cat && !cats.hasOwnProperty(GN.cat)) GN.cat = '';
+  const toks = String(GN.q||'').trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const rows = all.filter(r => (!GN.cat || (r.category||'ללא קטגוריה') === GN.cat)
+      && (!toks.length || toks.every(t => [r.item, r.supplier, r.sku, r.category, r.month, r.unit].join(' ').toLowerCase().includes(t))))
+    .sort((a,b) => b.id - a.id);
+  const yLbl = y ? schoolYearLabel(Number(y)) : 'כל השנים';
+  box.innerHTML = `
+    <div class="gtop">
+      <button class="gpill ${!GN.cat?'on':''}" onclick="with(SP){GN.cat='';renderGeneral()}"><span class="k">${esc(yLbl)}</span><b class="sp-num">${money(grand)}</b><span class="k sp-num">${all.length===1?'פריט אחד':all.length+' פריטים'}</span></button>
+      ${GN.cats.map(([c,v],i) => `<button class="gpill ${GN.cat===c?'on':''}" onclick="with(SP){genCat(${i})}"><span class="k">${esc(c)}</span><b class="sp-num">${money(v)}</b></button>`).join('')}
+    </div>
+    ${rows.length ? `<div class="gcards">${rows.map(genCard).join('')}</div>`
+      : `<div class="sp-card sp-empty">${all.length ? 'אין פריטים שמתאימים לחיפוש.' : 'עוד אין פריטי רכש כללי בשנה הזו. לחץ "הוספת פריט" כדי להתחיל.'}</div>`}`;
+}
+function genCat(i){ const c = GN.cats[i]; if(!c) return; GN.cat = GN.cat === c[0] ? '' : c[0]; renderGeneral(); }
+function genCard(r){
+  if(typeof migrateSingleDocToArray === 'function') migrateSingleDocToArray(r, 'link', 'docs', 'מסמך הזמנה');
+  const hasDoc = (r.docs||[]).some(d => d.fileUrl);
+  let contact = false; try{ contact = typeof findContactByName === 'function' && !!r.supplier && !!findContactByName(r.supplier); }catch(e){}
+  const docs = typeof renderDocsChecklist === 'function' ? renderDocsChecklist(r, 'docs', 'procurement') : '';
+  return `<article class="gcard">
+    <div class="row between" style="align-items:flex-start;flex-wrap:nowrap"><button class="gtitle" onclick="with(SP){openGen(${r.id})}">${r.item ? esc(r.item) : '<span class="muted">פריט ללא שם</span>'}</button><b class="gamt sp-num">${money(gTot(r))}</b></div>
+    <span class="muted">${[r.category, r.supplier, r.month].filter(Boolean).map(esc).join(' · ') || '—'}</span>
+    <div class="row" style="gap:6px"><span class="tag sp-num">${qn(parseFloat(r.qty)||0)} ${esc(r.unit||'יח׳')} × ${money(parseFloat(r.price)||0)}</span>${r.sku?`<span class="tag">מק״ט ${esc(r.sku)}</span>`:''}${hasDoc?'':'<span class="tag a">חסר מסמך</span>'}</div>
+    <div class="gfoot"><div class="gdocs">${docs}</div>
+      <span class="row" style="gap:4px;flex-wrap:nowrap">
+        ${contact?`<button class="sb icon sb-ghost" title="וואטסאפ לספק" aria-label="וואטסאפ לספק" onclick="with(SP){genWa(${r.id})}">${ic('chat','sm')}</button>`:''}
+        <button class="sb icon sb-ghost" title="עריכה" aria-label="עריכה" onclick="with(SP){openGen(${r.id})}">${ic('edit','sm')}</button>
+        <button class="sb icon sb-ghost danger" title="מחיקה" aria-label="מחיקה" onclick="removeProc(${r.id})">${ic('trash','sm')}</button>
+      </span></div>
+  </article>`;
+}
+function genWa(id){ const r = data.procurement.find(x => x.id === id); if(r && typeof quickContactWhatsAppByName === 'function') quickContactWhatsAppByName(r.supplier); }
+function openGen(id){
+  if(typeof data === 'undefined') return;
+  const r = id ? data.procurement.find(x => x.id === id) : null; if(id && !r){ toast('הפריט לא נמצא'); return; }
+  const ySel = document.getElementById('procYearFilter'); const y = ySel && ySel.value ? Number(ySel.value) : currentSchoolYearStart();
+  const now = new Date();
+  GE = {id: r ? r.id : null, f: r
+    ? {month:r.month||'', sku:r.sku||'', item:r.item||'', supplier:r.supplier||'', qty:r.qty ?? '', unit:r.unit||'', price:r.price ?? '', category:r.category||'', schoolYear:r.schoolYear||currentSchoolYearStart()}
+    : {month:`${HE_MONTHS[now.getMonth()]} ${now.getFullYear()}`, sku:'', item:'', supplier:'', qty:1, unit:'יח׳', price:'', category:(GN.cat && GN.cat!=='ללא קטגוריה') ? GN.cat : '', schoolYear:y}};
+  const f = GE.f;
+  let sups = []; try{ sups = typeof getSupplierNames === 'function' ? getSupplierNames() : []; }catch(e){}
+  sups = [...new Set([...sups, ...data.procurement.map(x => x.supplier)].filter(Boolean))];
+  const cats = [...new Set(data.procurement.map(x => x.category).filter(Boolean))];
+  const months = [...new Set([...data.procurement.map(x => x.month).filter(Boolean), ...HE_MONTHS])].slice(0, 40);
+  const years = (() => { try{ return schoolYearOptions(); }catch(e){ return [f.schoolYear]; } })();
+  if(!years.some(v => String(v) === String(f.schoolYear))) years.push(f.schoolYear);
+  const inp = (id, k, extra) => `<input id="${id}" value="${esc(f[k])}" oninput="with(SP){GE.f.${k}=this.value${extra||''}}"`;
+  modal(`<div class="mhead"><h2>${GE.id ? 'עריכת פריט רכש' : 'פריט רכש חדש'}</h2>${closeBtn()}</div>
+    <label class="f">שם הפריט${inp('sp-gItem','item')} placeholder="למשל: נייר טואלט ג׳מבו"></label>
+    <div class="fgrid g2">
+      <label class="f">ספק${inp('sp-gSup','supplier')} list="sp-gSups" autocomplete="off"></label>
+      <label class="f">קטגוריה${inp('sp-gCat','category')} list="sp-gCats" autocomplete="off" placeholder="ניקיון, חשמל, משרד…"></label>
+      <label class="f">כמות${inp('sp-gQty','qty',';genCalc()')} class="sp-num" type="number" min="0" step="any" inputmode="decimal"></label>
+      <label class="f">יחידת מידה${inp('sp-gUnit','unit')} placeholder="יח׳, שק, ליטר"></label>
+      <label class="f">מחיר ליחידה (₪)${inp('sp-gPrice','price',';genCalc()')} class="sp-num" type="number" min="0" step="any" inputmode="decimal"></label>
+      <label class="f">חודש${inp('sp-gMonth','month')} list="sp-gMonths" autocomplete="off"></label>
+      <label class="f"><span>מק״ט <span class="muted">(רשות)</span></span>${inp('sp-gSku','sku')}></label>
+      <label class="f">שנת לימודים<select id="sp-gYear" onchange="with(SP){GE.f.schoolYear=Number(this.value)}">${years.map(v => `<option value="${v}" ${String(v)===String(f.schoolYear)?'selected':''}>${esc(typeof schoolYearLabel==='function'?schoolYearLabel(v):v)}</option>`).join('')}</select></label>
+    </div>
+    <datalist id="sp-gSups">${sups.map(s => `<option value="${esc(s)}">`).join('')}</datalist>
+    <datalist id="sp-gCats">${cats.map(s => `<option value="${esc(s)}">`).join('')}</datalist>
+    <datalist id="sp-gMonths">${months.map(s => `<option value="${esc(s)}">`).join('')}</datalist>
+    <div class="gcalc"><span class="muted">סה״כ לתשלום</span><b class="sp-num" id="sp-gTot">${money((num(f.qty)||0) * (num(f.price)||0))}</b></div>
+    ${GE.id ? `<p class="muted" style="margin:0">מסמכים מצורפים: בכרטיס הפריט.</p>` : ''}
+    <div class="row">
+      <button class="sb" onclick="with(SP){saveGen(false)}">${ic('check','sm')}שמירה</button>
+      ${GE.id ? '' : `<button class="sb sb-soft" onclick="with(SP){saveGen(true)}">${ic('file','sm')}שמירה וצירוף מסמך</button>`}
+      <button class="sb sb-ghost" onclick="with(SP){closeModal()}">ביטול</button>
+    </div>`);
+  if(!GE.id) setTimeout(() => { const el = $('#sp-gItem'); if(el) el.focus(); }, 40);
+}
+function genCalc(){ if(!GE) return; const el = $('#sp-gTot'); if(el) el.textContent = money((num(GE.f.qty)||0) * (num(GE.f.price)||0)); }
+function saveGen(withDoc){
+  if(!GE) return; const f = GE.f;
+  if(!String(f.item||'').trim()){ toast('צריך שם פריט'); const el = $('#sp-gItem'); if(el) el.focus(); return; }
+  const n = v => { const x = num(v); return isFinite(x) && x >= 0 ? x : 0; };
+  const vals = {month:String(f.month||'').trim(), sku:String(f.sku||'').trim(), item:String(f.item).trim(), supplier:String(f.supplier||'').trim(),
+    qty:n(f.qty), unit:String(f.unit||'').trim(), price:n(f.price), category:String(f.category||'').trim(), schoolYear:Number(f.schoolYear) || currentSchoolYearStart()};
+  let row;
+  if(GE.id){ row = data.procurement.find(x => x.id === GE.id); if(!row){ toast('הפריט כבר לא קיים'); closeModal(); GE = null; return; } Object.assign(row, vals); }
+  else { row = {id: nextId() + 2000, ...vals}; data.procurement.push(row); }
+  const wasNew = !GE.id; GE = null;
+  scheduleSave('procurement', 'procSaved'); closeModal(); renderGeneral();
+  toast(wasNew ? 'הפריט נוסף' : 'השינויים נשמרו');
+  if(withDoc && typeof addGenericDoc === 'function') addGenericDoc('procurement', row.id, 'docs');
 }
 
 /* ============ מודאלים ============ */
@@ -21483,6 +21977,56 @@ Object.defineProperties(SPX, {
 "confirmFn":{get(){return confirmFn},set(v){confirmFn=v},enumerable:true},
 "confirmBox":{get(){return confirmBox},enumerable:true},
 "runConfirm":{get(){return runConfirm},enumerable:true}
+});
+/* עדכון רכש: דף הזמנה, קרטונים במלאי, מלאי חודשי, רכש כללי */
+Object.defineProperties(SPX, {
+"QGROUPS":{get(){return QGROUPS},set(x){QGROUPS=x},enumerable:true},
+"SH":{get(){return SH},set(x){SH=x},enumerable:true},
+"PM":{get(){return PM},set(x){PM=x},enumerable:true},
+"STI":{get(){return STI},set(x){STI=x},enumerable:true},
+"GN":{get(){return GN},set(x){GN=x},enumerable:true},
+"GE":{get(){return GE},set(x){GE=x},enumerable:true},
+"qtyLbl":{get(){return qtyLbl},enumerable:true},
+"nextDeliveryDate":{get(){return nextDeliveryDate},enumerable:true},
+"ordOpts":{get(){return ordOpts},enumerable:true},
+"setOrdOpt":{get(){return setOrdOpt},enumerable:true},
+"plainTxt":{get(){return plainTxt},enumerable:true},
+"sheetHTML":{get(){return sheetHTML},enumerable:true},
+"sheetModel":{get(){return sheetModel},enumerable:true},
+"openSheet":{get(){return openSheet},enumerable:true},
+"drawSheet":{get(){return drawSheet},enumerable:true},
+"sheetOpt":{get(){return sheetOpt},enumerable:true},
+"sheetChanged":{get(){return sheetChanged},enumerable:true},
+"buildSheetPdf":{get(){return buildSheetPdf},enumerable:true},
+"shareSheet":{get(){return shareSheet},enumerable:true},
+"downloadSheet":{get(){return downloadSheet},enumerable:true},
+"obCardHTML":{get(){return obCardHTML},enumerable:true},
+"foldOrder":{get(){return foldOrder},enumerable:true},
+"pickQuote":{get(){return pickQuote},enumerable:true},
+"parDiv":{get(){return parDiv},enumerable:true},
+"parShow":{get(){return parShow},enumerable:true},
+"parNeed":{get(){return parNeed},enumerable:true},
+"belowMonthly":{get(){return belowMonthly},enumerable:true},
+"parPackGuess":{get(){return parPackGuess},enumerable:true},
+"openParMode":{get(){return openParMode},enumerable:true},
+"saveParMode":{get(){return saveParMode},enumerable:true},
+"setParUnits":{get(){return setParUnits},enumerable:true},
+"monthlyCost":{get(){return monthlyCost},enumerable:true},
+"parRowHTML":{get(){return parRowHTML},enumerable:true},
+"openStockImport":{get(){return openStockImport},enumerable:true},
+"onStiWb":{get(){return onStiWb},enumerable:true},
+"onStiRows":{get(){return onStiRows},enumerable:true},
+"stiPaste":{get(){return stiPaste},enumerable:true},
+"stiParsed":{get(){return stiParsed},enumerable:true},
+"drawStockImport":{get(){return drawStockImport},enumerable:true},
+"commitStockImport":{get(){return commitStockImport},enumerable:true},
+"renderGeneral":{get(){return renderGeneral},enumerable:true},
+"genCat":{get(){return genCat},enumerable:true},
+"genCard":{get(){return genCard},enumerable:true},
+"genWa":{get(){return genWa},enumerable:true},
+"openGen":{get(){return openGen},enumerable:true},
+"genCalc":{get(){return genCalc},enumerable:true},
+"saveGen":{get(){return saveGen},enumerable:true}
 });
 return SPX;
 })();
