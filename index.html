@@ -19933,6 +19933,90 @@ async function autoBackupIfDue(){
 .spx .sp-pill .cnt{color:var(--sp-brand-ink)}
 .sp-toast.spx{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:#2b2723;color:#f5ead8;padding:9px 16px;border-radius:999px;font-size:14px;z-index:9999;box-shadow:0 2px 4px rgba(46,43,37,.12),0 14px 30px rgba(46,43,37,.12);max-width:calc(100% - 32px)}
 #sp-modalRoot .ov{z-index:9000}
+/* מצב ספירה במחסן */
+html.cm-open, html.cm-open body{overflow:hidden}
+html.cm-open .sp-toast.spx{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+.spx.cm{position:fixed;inset:0;z-index:8800;background:var(--sp-bg);display:flex;flex-direction:column;max-width:560px;margin:0 auto;
+  padding-top:env(safe-area-inset-top,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+@media (min-width:600px){.spx.cm{box-shadow:0 0 0 100vmax var(--sp-overlay)}}
+.cm .cm-top{padding:10px 16px 10px;display:flex;flex-direction:column;gap:10px;flex:none}
+.cm .cm-row{display:flex;align-items:center;gap:8px}
+.cm .cm-row h2{font-family:var(--sp-f-head);font-weight:400;font-size:20px;margin:0;flex:1;min-width:0}
+.cm .cm-ib{width:42px;height:42px;border-radius:12px;border:1px solid var(--sp-line);background:var(--sp-card);display:grid;place-items:center;color:var(--sp-ink);cursor:pointer;flex:none}
+.cm .cm-sync{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 10px;border-radius:999px;background:var(--sp-green-bg);color:var(--sp-green);font-weight:600;white-space:nowrap}
+.cm .cm-sync.off{background:var(--sp-amber-bg);color:var(--sp-amber)}
+.cm .cm-sync.busy{background:var(--sp-chip);color:var(--sp-soft)}
+.cm .cm-sync i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.cm .cm-prog{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--sp-soft)}
+.cm .cm-bar{flex:1;height:8px;border-radius:999px;background:var(--sp-chip);overflow:hidden}
+.cm .cm-bar b{display:block;height:100%;background:var(--sp-brand);border-radius:999px;transition:width .35s ease}
+.cm .cm-cats{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+.cm .cm-cats::-webkit-scrollbar{display:none}
+.cm .cm-cat{flex:none;border:1px solid var(--sp-line);background:var(--sp-card);color:var(--sp-ink);border-radius:999px;padding:6px 12px;font-size:13px;white-space:nowrap;cursor:pointer}
+.cm .cm-cat[aria-pressed="true"]{background:var(--sp-brand-dark);color:var(--sp-bg);border-color:transparent}
+.cm .cm-cat small{opacity:.7}
+.cm .cm-body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.cm .cm-card{background:var(--sp-card);border-radius:22px;box-shadow:var(--sp-shadow);padding:18px 16px;display:flex;flex-direction:column;gap:14px;animation:cmIn .22s ease both}
+@keyframes cmIn{from{transform:translateX(-12px);opacity:.5}to{transform:none;opacity:1}}
+.cm .cm-loc{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--sp-soft);flex-wrap:wrap}
+.cm .cm-ok{display:inline-flex;align-items:center;gap:3px;color:var(--sp-green);font-weight:600}
+.cm .cm-name{font-size:21px;font-weight:600;line-height:1.25;margin:0;overflow-wrap:anywhere}
+.cm .cm-meta{display:flex;flex-wrap:wrap;gap:6px}
+.cm .cm-month{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--sp-soft);padding:0 2px;margin-top:-4px}
+.cm .cm-month b{color:var(--sp-ink);font-weight:600}
+.cm #cm-month:empty{display:none}
+.cm .cm-counter{display:grid;grid-template-columns:72px minmax(0,1fr) 72px;align-items:center;gap:8px}
+.cm .cm-big{width:72px;height:72px;border-radius:20px;border:0;font-size:34px;font-weight:500;display:grid;place-items:center;cursor:pointer;transition:transform .08s;touch-action:manipulation;color:var(--sp-ink)}
+.cm .cm-big:active{transform:scale(.94)}
+.cm .cm-big.plus{background:var(--sp-brand);color:var(--sp-brand-ink)}
+.cm .cm-big.minus{background:var(--sp-chip)}
+.cm .cm-val{display:flex;flex-direction:column;align-items:center;min-width:0}
+.cm .cm-val input{width:100%;max-width:150px;text-align:center;font-size:48px;font-weight:600;line-height:1.1;border:0;background:transparent;color:var(--sp-ink);padding:0;font-family:var(--sp-f-body);-moz-appearance:textfield}
+.cm .cm-val input::-webkit-inner-spin-button,.cm .cm-val input::-webkit-outer-spin-button,.cm .cm-mini input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.cm .cm-val span{font-size:14px;color:var(--sp-soft)}
+.cm .cm-quick{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.cm .cm-quick button{border:1px solid var(--sp-line);background:var(--sp-card);color:var(--sp-ink);border-radius:999px;padding:6px 13px;font-size:13px;cursor:pointer;touch-action:manipulation}
+.cm .cm-loose{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--sp-bg);border-radius:14px;font-size:14px;flex-wrap:wrap}
+.cm .cm-mini{display:flex;align-items:center;border:1px solid var(--sp-line);border-radius:999px;background:var(--sp-card)}
+.cm .cm-mini button{width:40px;height:38px;border:0;background:none;font-size:20px;color:var(--sp-ink);cursor:pointer;touch-action:manipulation}
+.cm .cm-mini input{width:44px;text-align:center;border:0;background:transparent;font-weight:600;font-size:15px;color:var(--sp-ink);padding:0;-moz-appearance:textfield}
+.cm .cm-total{font-size:13px;color:var(--sp-soft);text-align:center}
+.cm .cm-total:empty{display:none}
+.cm .cm-list{display:flex;flex-direction:column;background:var(--sp-card);border-radius:18px;box-shadow:var(--sp-shadow);overflow:hidden;flex:none}
+.cm .cm-lr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:11px 14px;border:0;border-bottom:1px solid var(--sp-line);text-align:right;background:none;width:100%;color:var(--sp-ink);font:inherit;cursor:pointer}
+.cm div.cm-lr{cursor:default}
+.cm .cm-lr:last-child{border-bottom:0}
+.cm .cm-lr>span:first-child{min-width:0;overflow-wrap:anywhere}
+.cm .cm-lr small{display:block;color:var(--sp-soft);font-size:12.5px}
+.cm .cm-lr.soft{color:var(--sp-soft)}
+.cm .cm-foot{flex:none;padding:10px 16px calc(14px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;background:var(--sp-bg);border-top:1px solid var(--sp-line)}
+.cm .cm-btn{border:0;border-radius:16px;min-height:54px;padding:0 16px;font-weight:600;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-family:var(--sp-f-body);touch-action:manipulation;flex:none}
+.cm .cm-btn.main{background:var(--sp-brand-dark);color:var(--sp-bg)}
+.cm .cm-btn.ghost{background:var(--sp-chip);color:var(--sp-ink)}
+.cm .cm-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cm .cm-tiles>div{background:var(--sp-card);border-radius:16px;padding:12px 8px;box-shadow:var(--sp-shadow);text-align:center}
+.cm .cm-tiles b{display:block;font-size:26px;font-weight:600;line-height:1.1}
+.cm .cm-tiles span{font-size:12.5px;color:var(--sp-soft)}
+.cm .cm-tiles .r b{color:var(--sp-red)}
+.cm h3{margin:4px 2px 0;font-size:15px;font-weight:600}
+.cm .cm-note{margin:0;font-size:13.5px;background:var(--sp-amber-bg);color:var(--sp-amber);border-radius:12px;padding:8px 12px}
+.cm .cm-sheet{position:absolute;inset:0;background:var(--sp-overlay);display:flex;align-items:flex-end;z-index:5}
+.cm .cm-sin{background:var(--sp-card);width:100%;border-radius:26px 26px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;max-height:92%;overflow-y:auto}
+.cm .cm-cam{height:220px;border-radius:18px;background:#111;position:relative;overflow:hidden;display:grid;place-items:center;flex:none}
+.cm .cm-cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cm .cm-frame{width:78%;height:46%;border:3px solid #f2b17e;border-radius:12px;position:relative;z-index:1;box-shadow:0 0 0 999px rgba(0,0,0,.28)}
+.cm .cm-laser{position:absolute;left:4%;right:4%;top:50%;height:2px;background:#ff6a3d;box-shadow:0 0 8px #ff6a3d;animation:cmScan 1.4s ease-in-out infinite alternate}
+@keyframes cmScan{from{top:15%}to{top:85%}}
+.cm .cm-cam p{position:absolute;bottom:8px;left:10px;right:10px;margin:0;color:#eee;font-size:12.5px;text-align:center;z-index:1}
+.cm .cm-search{display:flex;align-items:center;gap:8px;border:1px solid var(--sp-line);border-radius:14px;padding:0 12px;background:var(--sp-bg)}
+.cm .cm-search input{flex:1;border:0;background:transparent;height:46px;font:inherit;font-size:16px;color:var(--sp-ink);min-width:0;outline:none}
+.cm button:focus-visible,.cm input:focus-visible{outline:2px solid var(--sp-brand);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.cm .cm-card{animation:none}.cm .cm-bar b{transition:none}.cm .cm-laser{animation:none}}
+.spx .cm-fab{display:none}
+@media (max-width:700px){
+  .spx .cm-fab{display:inline-flex;position:fixed;left:calc(14px + env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:600;align-items:center;gap:8px;border:0;border-radius:999px;padding:12px 18px;background:var(--sp-brand-dark);color:var(--sp-bg);font:600 15px var(--sp-f-body);box-shadow:var(--sp-shadow-up);cursor:pointer}
+}
+@media (max-width:700px){#supplyApp #sp-view{padding-bottom:64px}}
 /* עדכון רכש: דף הזמנה, הזמנה מכווצת, מלאי בקרטונים, ייבוא מלאי, רכש כללי */
 .spx .sheetwrap{border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.12),0 10px 26px rgba(0,0,0,.10);background:#fff;flex:none}
 .spx .ordtxt{background:var(--sp-tint-b);border-radius:var(--sp-r-sm);padding:10px 12px;white-space:pre-wrap;font-size:14px;line-height:1.65;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
@@ -20127,6 +20211,7 @@ function mergeIdArrays(base, mine, theirs){
 let saveTimer = null, flushing = null, saveState = 'idle', mergedFromOther = false; const sizeWarned = {};
 function setSaveState(st){
   saveState = st;
+  try{ if(st === 'saved') cmMarkSynced(); cmRefreshChip(); }catch(e){}
   const el = document.getElementById('sp-save'); if(!el) return;
   const txt = {pending:'שומר…', saving:'שומר…', saved:'נשמר בענן', error:'לא נשמר', waiting:'ממתין לאישור שלך', idle:''}[st] || '';
   el.textContent = txt; el.className = 'sp-save ' + st;
@@ -20173,7 +20258,7 @@ async function flush(){
   if(mergedFromOther){ mergedFromOther = false; renderSafe(); toast('עודכן גם עם שינויים שנשמרו ממכשיר אחר'); }
   if(st === 'saved' && anyDirty()){ save(); return; }
   setSaveState(st);
-  if(st === 'error') toast('השמירה נכשלה. בדוק חיבור לאינטרנט, השינויים עדיין כאן וננסה שוב בשינוי הבא');
+  if(st === 'error' && !CM) toast('השמירה נכשלה. בדוק חיבור לאינטרנט, השינויים עדיין כאן וננסה שוב בשינוי הבא');
 }
 /* רענון מהענן כשחוזרים לטאב: רק אם אין כאן שינויים שלא נשמרו */
 let lastRefresh = 0;
@@ -20425,6 +20510,14 @@ function renderTop(){
     <button class="tile ${alerts?'is-bad':''}" onclick="with(SP){setTab(openReqs().length?'order':'stock')}"><span class="k">דורש טיפול</span><span class="tv sp-num">${alerts}</span><span class="s">${[openReqs().length&&(openReqs().length===1?'בקשה אחת':openReqs().length+' בקשות'), bm.length&&bm.length+' מתחת למינימום', exp.length&&exp.length+' תוקף קרוב'].filter(Boolean).join(' · ')||'אין התראות'}</span></button>`;
 }
 
+/* כפתור קבוע לספירה במחסן, בטלפון בלבד (CSS) */
+function cmFab(){
+  const root = document.getElementById('supplyApp'); if(!root) return;
+  let f = document.getElementById('sp-cmFab');
+  if(!f){ f = document.createElement('button'); f.id = 'sp-cmFab'; f.className = 'cm-fab'; f.type = 'button'; f.setAttribute('onclick', 'with(SP){openCount()}'); root.appendChild(f); }
+  f.innerHTML = ic('count','sm') + 'ספירה במחסן';
+  f.style.display = tab !== 'general' && tab !== 'legacy' && cmAllKeys().length ? '' : 'none';
+}
 function showLegacy(which){
   const g = document.getElementById('procGeneralWrap'), f = document.getElementById('procFoodLegacyWrap'), v = $('#sp-view');
   if(g) g.style.display = which === 'general' ? '' : 'none';
@@ -20435,6 +20528,7 @@ function render(){
   if(!$('#sp-view')) return;
   if(!tabs().some(t=>t.id===tab)) tab = tabs()[0].id;
   renderTop();
+  cmFab();
   $('#sp-view').className = 'wrap' + (isCook()?' cook':'');
   if(tab === 'general' || tab === 'legacy'){ showLegacy(tab); if(tab === 'general') renderGeneral(); return; }
   showLegacy(null);
@@ -22115,7 +22209,7 @@ function renderStock(){
   const mc = monthlyCost(parRows.map(x=>x.k)); const bmo = STK.cat ? belowMonthly(STK.cat) : [];
   $('#sp-view').innerHTML = `
   <div class="sp-card">
-    <div class="row between"><h2>ספירת מלאי ומינימום</h2>${!cook?`<button class="sb sb-soft sm" onclick="with(SP){openStockImport()}">${ic('upload','sm')}ייבוא מטבלה</button>`:''}</div>
+    <div class="row between"><h2>ספירת מלאי ומינימום</h2><span class="row">${parRows.length||Object.keys(S.par).length?`<button class="sb sm" onclick="with(SP){openCount()}">${ic('count','sm')}ספירה במחסן</button>`:''}${!cook?`<button class="sb sb-soft sm" onclick="with(SP){openStockImport()}">${ic('upload','sm')}ייבוא מטבלה</button>`:''}</span></div>
     <p class="muted" style="margin:0">ליד כל מוצר בוחרים אם סופרים ביחידות או בקרטונים. מלאי חודשי = כמה צריך לחודש, והשלמת המלאי מזמינה עד אליו.</p>
     <div class="chips">${[{id:'',name:'הכל'},...S.cats].map(c=>`<button class="chip" aria-pressed="${STK.cat===c.id}" onclick="with(SP){STK.cat='${c.id}';renderStock()}">${esc(c.name)}${c.id&&bmCat(c.id).length?` <span class="sp-num">(${bmCat(c.id).length})</span>`:''}</button>`).join('')}</div>
     ${!cook && mc.n ? `<div class="mcost"><span class="muted">מלאי חודשי${STK.cat?' בקטגוריה':''} · <span class="sp-num">${mc.n===1?'מוצר אחד':mc.n+' מוצרים'}</span></span><b class="sp-num">${money(mc.t)}</b><span class="muted">לפי המחיר הזול במחירונים</span></div>`:''}
@@ -22538,6 +22632,363 @@ function monthlyCost(keys){
   keys.forEach(k => { const p = S.par[k], prod = pm.get(k); if(prod && p && p.monthly > 0){ t += p.monthly * prod.offers[0].price; n++; } });
   return {t:r2(t), n};
 }
+
+/* ============ מצב ספירה במחסן (מסך מלא לטלפון) ============
+   כל ספירה נשמרת מיד גם בטלפון (localStorage) וגם בענן דרך save() הרגיל.
+   אם אין קליטה, הספירות נשארות בטלפון ומסומנות "לא נשמרו בענן"; כשהקליטה חוזרת נשמרות.
+   אם הדף נסגר לפני שנשמרו, בפתיחה הבאה נשאלים אם לעדכן אותן. שום נתון לא נמחק.
+   ברקוד: מהמחירונים (item.barcode), או נלמד בסריקה ונשמר על המוצר במלאי (S.par[k].bc). */
+IC.scan = '<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M8 9v6M11 9v6M14 9v6M17 9v6"/>';
+IC.count = '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>';
+IC.next = IC.next || '<path d="M15 6l-6 6 6 6"/>';
+let CM = null;
+const CM_KEY = 'countDraft';
+function cmDraft(){ try{ const d = JSON.parse(pref(CM_KEY)||'null'); return d && typeof d === 'object' && d.entries ? d : null; }catch(e){ return null; } }
+function cmStore(){ if(!CM) return; pref(CM_KEY, JSON.stringify({day:CM.day, prev:CM.prev, entries:CM.entries})); }
+const cmUnits = k => (S.par[k] && +S.par[k].current) || 0;
+/* מוצרים במעקב, לפי סדר הקטגוריות ואז לפי שם */
+function cmAllKeys(){
+  const pm = productMap(); const ci = id => { const i = S.cats.findIndex(c=>c.id===id); return i < 0 ? 999 : i; };
+  return Object.keys(S.par).filter(k => pm.has(k)).sort((a,b) => ci(pm.get(a).catId) - ci(pm.get(b).catId) || pm.get(a).name.localeCompare(pm.get(b).name,'he'));
+}
+const cmKeys = () => { const pm = productMap(); return cmAllKeys().filter(k => !CM.cat || pm.get(k).catId === CM.cat); };
+function cmPending(d){ return d ? Object.entries(d.entries).filter(([k,e]) => !e.ok && S.par[k] && Math.abs(cmUnits(k) - e.u) > 1e-9) : []; }
+
+function openCount(){
+  if(!cmAllKeys().length){ toast('עוד אין מוצרים במעקב מלאי. מוסיפים אותם במסך המלאי'); return; }
+  const d = cmDraft(); const pend = cmPending(d);
+  if(pend.length){
+    const pm = productMap();
+    modal(`<div class="mhead"><h2>ספירות שלא הגיעו לענן</h2>${closeBtn()}</div>
+      <p style="margin:0">בספירה האחרונה בטלפון הזה ${pend.length===1?'מוצר אחד נספר':pend.length+' מוצרים נספרו'} בלי קליטה, והספירה לא נשמרה בענן:</p>
+      <div class="sp-card flat sp-num">${pend.slice(0,8).map(([k,e]) => `<div>${esc(pm.get(k)?.name||k)}: ${qn(e.u)} ${esc(uLbl(pm.get(k)?.unit)||'יח׳')} <span class="muted">(בענן ${qn(cmUnits(k))})</span></div>`).join('')}${pend.length>8?`<div class="muted">ועוד ${pend.length-8}</div>`:''}</div>
+      <div class="row"><button class="sb" onclick="with(SP){cmRestore(true)}">${ic('check','sm')}לעדכן לפי הספירה בטלפון</button><button class="sb sb-ghost" onclick="with(SP){cmRestore(false)}">להשאיר כמו בענן</button></div>`);
+    return;
+  }
+  cmStart(d);
+}
+function cmRestore(apply){
+  const d = cmDraft(); if(!d){ closeModal(); cmStart(null); return; }
+  cmPending(d).forEach(([k,e]) => { if(apply){ S.par[k].current = r2(e.u); S.par[k].countedAt = today(); } else delete d.entries[k]; });
+  if(!apply) pref(CM_KEY, JSON.stringify(d));
+  if(apply) save();
+  closeModal(); cmStart(cmDraft());
+}
+function cmStart(d){
+  const keys = cmAllKeys();
+  const same = d && d.day === today();
+  const prev = {}; keys.forEach(k => prev[k] = same && d.prev && d.prev[k] !== undefined ? d.prev[k] : cmUnits(k));
+  CM = {day: today(), prev, entries: same ? d.entries : {}, cat: pref('countCat') || '', i: 0, view: 'count', val: {}, sheet: null};
+  if(CM.cat && !S.cats.some(c => c.id === CM.cat)) CM.cat = '';
+  cmStore();
+  const ks = cmKeys(); const f = ks.findIndex(k => !CM.entries[k]); CM.i = f < 0 ? 0 : f;
+  let el = document.getElementById('sp-cm');
+  if(!el){ el = document.createElement('div'); el.id = 'sp-cm'; el.className = 'spx cm'; el.setAttribute('role','dialog'); el.setAttribute('aria-modal','true'); el.setAttribute('aria-label','ספירה במחסן'); document.body.appendChild(el); }
+  document.documentElement.classList.add('cm-open');
+  cmDraw();
+}
+function closeCount(){
+  cmScanStop();
+  const el = document.getElementById('sp-cm'); if(el) el.remove();
+  document.documentElement.classList.remove('cm-open');
+  CM = null; render();
+}
+/* הערך שמוצג במונה: מה שנספר עכשיו, ואם עוד לא נספר, מה שיש כרגע במלאי */
+function cmVal(k){
+  if(CM.val[k]) return CM.val[k];
+  const p = S.par[k], d = parDiv(p); const u = CM.entries[k] ? CM.entries[k].u : cmUnits(k);
+  const c = d > 1 ? Math.floor(u / d + 1e-9) : u;
+  return CM.val[k] = {c, l: d > 1 ? r2(u - c * d) : 0};
+}
+const cmTotal = k => { const v = cmVal(k), d = parDiv(S.par[k]); return d > 1 ? r2(v.c * d + v.l) : r2(v.c); };
+function cmSyncChip(){
+  const off = typeof navigator !== 'undefined' && navigator.onLine === false;
+  const pend = CM ? Object.values(CM.entries).filter(e => !e.ok).length : 0;
+  if(off || saveState === 'error' || saveState === 'waiting') return `<span class="cm-sync off"><i></i>נשמר בטלפון${pend?` · <span class="sp-num">${pend}</span> ממתינים`:''}</span>`;
+  if(saveState === 'pending' || saveState === 'saving') return `<span class="cm-sync busy"><i></i>שומר…</span>`;
+  return `<span class="cm-sync"><i></i>נשמר בענן</span>`;
+}
+function cmRefreshChip(){ const c = document.getElementById('cm-sync'); if(c) c.innerHTML = cmSyncChip(); }
+/* נקרא משמירה מוצלחת: כל מה שנספר ונמצא עכשיו בענן מסומן כנשמר */
+function cmMarkSynced(){
+  if(!CM){ const d = cmDraft(); if(!d) return; let ch = false; Object.entries(d.entries).forEach(([k,e]) => { if(!e.ok && S.par[k] && Math.abs(cmUnits(k)-e.u) < 1e-9){ e.ok = true; ch = true; } }); if(ch) pref(CM_KEY, JSON.stringify(d)); return; }
+  Object.entries(CM.entries).forEach(([k,e]) => { if(!e.ok && S.par[k] && Math.abs(cmUnits(k)-e.u) < 1e-9) e.ok = true; });
+  cmStore(); cmRefreshChip();
+}
+
+function cmHead(){
+  const ks = cmKeys(), dn = ks.filter(k => CM.entries[k]).length; const pm = productMap(); const all = cmAllKeys();
+  const cats = S.cats.filter(c => all.some(k => pm.get(k).catId === c.id));
+  return `<div class="cm-top">
+    <div class="cm-row">
+      <button class="cm-ib" aria-label="יציאה מהספירה" onclick="with(SP){closeCount()}">${ic('x')}</button>
+      <h2>ספירה במחסן</h2>
+      <span id="cm-sync">${cmSyncChip()}</span>
+    </div>
+    <div class="cm-prog sp-num"><div class="cm-bar"><b style="width:${ks.length ? dn/ks.length*100 : 0}%"></b></div><span>${dn} מתוך ${ks.length}</span></div>
+    ${cats.length > 1 ? `<div class="cm-cats">${[{id:'',name:'הכל'}, ...cats].map(c => { const k2 = all.filter(k => !c.id || pm.get(k).catId === c.id); const d2 = k2.filter(k => CM.entries[k]).length;
+      return `<button class="cm-cat" aria-pressed="${CM.cat===c.id}" onclick="with(SP){cmCat('${c.id}')}">${esc(c.name)} <small class="sp-num">${d2}/${k2.length}</small></button>`; }).join('')}</div>` : ''}
+  </div>`;
+}
+function cmCountHTML(){
+  const ks = cmKeys(); if(CM.i >= ks.length) CM.i = Math.max(0, ks.length - 1);
+  const k = ks[CM.i]; const pm = productMap(); const prod = pm.get(k), p = S.par[k];
+  if(!prod || !p) return cmHead() + `<div class="cm-body"><div class="sp-empty">אין מוצרים במעקב בקטגוריה הזו.</div></div>`;
+  const d = parDiv(p), base = uLbl(prod.unit) || 'יח׳', v = cmVal(k);
+  const unitTxt = d > 1 ? 'קרטונים סגורים' : base;
+  const bc = cmCodesOf(k).length;
+  const cat = S.cats.find(c => c.id === prod.catId);
+  const next = ks.slice(CM.i + 1, CM.i + 4);
+  const last = CM.i >= ks.length - 1;
+  return `${cmHead()}
+  <div class="cm-body" id="cm-body">
+    <div class="cm-card" id="cm-card">
+      <div class="cm-loc">${esc(cat ? cat.name : '')}${bc ? ' · יש ברקוד' : ''}${CM.entries[k] ? ` · <span class="cm-ok">${ic('check','sm')}נספר</span>` : ''}</div>
+      <p class="cm-name">${esc(prod.name)}</p>
+      <div class="cm-meta" id="cm-meta">${cmInfo(k).meta}</div>
+      <div id="cm-month">${cmInfo(k).month}</div>
+      <div class="cm-counter">
+        <button class="cm-big minus" aria-label="פחות" onclick="with(SP){cmStep('${k}',-1)}">−</button>
+        <label class="cm-val"><input id="cm-c" class="sp-num" type="number" min="0" step="any" inputmode="${d>1?'numeric':'decimal'}" value="${v.c}" aria-label="כמה ${unitTxt}" onfocus="this.select()" oninput="with(SP){cmTyped('${k}','c',this.value)}" onkeydown="if(event.key==='Enter'){this.blur()}"><span>${unitTxt}</span></label>
+        <button class="cm-big plus" aria-label="יותר" onclick="with(SP){cmStep('${k}',1)}">+</button>
+      </div>
+      <div class="cm-quick">${[0,5,10,20].map(n => `<button class="sp-num" onclick="with(SP){cmSet('${k}',${n},true)}">${n}</button>`).join('')}<button onclick="with(SP){cmSame('${k}')}">כמו בפעם הקודמת</button></div>
+      ${d > 1 ? `<div class="cm-loose"><span>ועוד ${esc(base)} מקרטון פתוח</span>
+        <span class="cm-mini"><button aria-label="פחות" onclick="with(SP){cmLoose('${k}',-1)}">−</button><input id="cm-l" class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${v.l}" aria-label="יחידות מקרטון פתוח" onfocus="this.select()" oninput="with(SP){cmTyped('${k}','l',this.value)}"><button aria-label="יותר" onclick="with(SP){cmLoose('${k}',1)}">+</button></span></div>
+      ` : ''}
+      <div class="cm-total sp-num" id="cm-tot">${cmInfo(k).tot}</div>
+    </div>
+    <div class="cm-list" aria-label="הבאים בתור">
+      ${next.length ? next.map(j => `<button class="cm-lr" onclick="with(SP){cmGo('${j}')}"><span>${esc(pm.get(j).name)}<small>${esc(S.cats.find(c=>c.id===pm.get(j).catId)?.name||'')}</small></span>${CM.entries[j]?'<span class="tag g">נספר</span>':'<span class="tag">הבא</span>'}</button>`).join('')
+        : `<div class="cm-lr"><span>זה המוצר האחרון ב${CM.cat?'קטגוריה':'רשימה'}<small>בלחיצה על "סיום" תראה סיכום</small></span></div>`}
+      ${CM.i > 0 ? `<button class="cm-lr soft" onclick="with(SP){cmGo('${ks[CM.i-1]}')}"><span>חזרה למוצר הקודם<small>${esc(pm.get(ks[CM.i-1]).name)}</small></span>${ic('chevR','sm')}</button>` : ''}
+      <button class="cm-lr soft" onclick="with(SP){cmSummary()}"><span>סיכום הספירה<small>מה נספר, מה חסר ומה מתחת למינימום</small></span>${ic('chevL','sm')}</button>
+    </div>
+  </div>
+  <div class="cm-foot">
+    <button class="cm-btn ghost" aria-label="סריקת ברקוד או חיפוש" onclick="with(SP){cmScanOpen()}">${ic('scan')}</button>
+    <button class="cm-btn main" onclick="with(SP){cmCommit('${k}')}">${last ? `${ic('check')}נספר · סיום` : `נספר · הבא${ic('chevL')}`}</button>
+  </div>`;
+}
+/* השורות שמשתנות תוך כדי הקלדה (תגיות, מלאי חודשי, סה״כ). מתעדכנות בלי לצייר מחדש את הכפתורים */
+function cmInfo(k){
+  const p = S.par[k], prod = productMap().get(k); const d = parDiv(p), base = uLbl(prod && prod.unit) || 'יח׳', tot = cmTotal(k);
+  const asU = n => d > 1 ? `${qn(r2(n/d))} קרט׳` : `${qn(n)} ${esc(base)}`;
+  const prev = CM.prev[k] !== undefined ? CM.prev[k] : cmUnits(k); const diff = r2(tot - prev);
+  const mo = +p.monthly || 0; const moNeed = mo > tot ? (d > 1 ? Math.ceil((mo - tot)/d - 1e-9) : Math.ceil(mo - tot - 1e-9)) : 0;
+  return {
+    meta: `${d > 1 ? `<span class="tag sp-num">קרטון = ${d} ${esc(base)}</span>` : `<span class="tag">נספר לפי ${esc(base)}</span>`}
+      <span class="tag sp-num">בספירה הקודמת ${asU(prev)}</span>
+      ${p.min > 0 ? (tot < p.min ? `<span class="tag r sp-num">מתחת למינימום ${qn(parShow(p,p.min))}</span>` : `<span class="tag g">מעל המינימום</span>`) : ''}`,
+    month: mo > 0 ? `<div class="cm-month sp-num"><span>מלאי חודשי <b>${qn(parShow(p,mo))}</b></span><span>${moNeed ? `להזמנה עוד <b>${moNeed}</b> ${d>1?'קרט׳':esc(base)} עד החודשי` : 'יש מספיק לחודש'}</span></div>` : '',
+    tot: d > 1 ? `סה״כ ${qn(tot)} ${esc(base)} · ${qn(r2(tot/d))} קרטונים${diff ? ` · ${diff>0?'+':''}${asU(diff)} מהספירה הקודמת` : ''}`
+      : (diff ? `${diff>0?'+':''}${qn(diff)} ${esc(base)} מהספירה הקודמת` : '')
+  };
+}
+function cmTyped(k, f, x){
+  const v = cmVal(k), n = num(x);
+  if(f === 'c') v.c = n > 0 ? (parDiv(S.par[k]) > 1 ? Math.round(n) : r2(n)) : 0; else v.l = n > 0 ? r2(n) : 0;
+  const i = cmInfo(k); const set = (id, h) => { const e = document.getElementById(id); if(e) e.innerHTML = h; };
+  set('cm-meta', i.meta); set('cm-month', i.month); set('cm-tot', i.tot);
+}
+function cmSummaryHTML(){
+  const ks = cmKeys(), pm = productMap();
+  const dn = ks.filter(k => CM.entries[k]);
+  const bm = dn.filter(k => S.par[k].min > 0 && cmUnits(k) < S.par[k].min);
+  const ch = dn.filter(k => Math.abs(cmUnits(k) - (CM.prev[k] ?? cmUnits(k))) > 1e-9);
+  const pend = Object.values(CM.entries).filter(e => !e.ok).length;
+  const nameU = k => { const p = S.par[k]; return parDiv(p) > 1 ? 'קרט׳' : (uLbl(pm.get(k).unit) || 'יח׳'); };
+  const sh = (k, n) => qn(parShow(S.par[k], n));
+  const bmCats = [...new Set(bm.map(k => pm.get(k).catId))];
+  return `<div class="cm-top"><div class="cm-row">
+      <button class="cm-ib" aria-label="חזרה לספירה" onclick="with(SP){CM.view='count';cmDraw()}">${ic('chevR')}</button>
+      <h2>סיכום הספירה</h2><span id="cm-sync">${cmSyncChip()}</span></div></div>
+  <div class="cm-body">
+    <div class="cm-tiles sp-num">
+      <div><b>${dn.length}</b><span>נספרו</span></div>
+      <div><b>${ks.length - dn.length}</b><span>לא נספרו</span></div>
+      <div class="${bm.length?'r':''}"><b>${bm.length}</b><span>מתחת למינימום</span></div>
+    </div>
+    ${pend ? `<p class="cm-note">${pend===1?'ספירה אחת עוד לא נשמרה':pend+' ספירות עוד לא נשמרו'} בענן. הן שמורות בטלפון ויישמרו כשתחזור קליטה.</p>` : ''}
+    ${bm.length ? `<h3>מתחת למינימום</h3><div class="cm-list">${bm.map(k => { const p = S.par[k]; const t = parTarget(p); const need = parNeed(k);
+      return `<div class="cm-lr"><span>${esc(pm.get(k).name)}<small class="sp-num">יש ${sh(k,p.current)} · מינימום ${sh(k,p.min)}${p.monthly>0?` · חודשי ${sh(k,p.monthly)}`:''}</small></span><span class="tag r sp-num">${p.monthly>0&&p.monthly>=t?'עד החודשי':'חסרים'} ${sh(k,need)} ${nameU(k)}</span></div>`; }).join('')}</div>
+      ${isCook() ? `<button class="cm-btn main" onclick="with(SP){closeCount();parToRequests()}">${ic('inbox')}לבקש מהמנהל את החסר</button>`
+        : bmCats.map(c => `<button class="cm-btn main" onclick="with(SP){closeCount();parToOrder('${c}')}">${ic('cart')}הזמנה מהחסר${bmCats.length>1?` · ${esc(S.cats.find(x=>x.id===c)?.name||'')}`:''}</button>`).join('')}` : ''}
+    ${ch.length ? `<h3>השתנה מהספירה הקודמת</h3><div class="cm-list">${ch.map(k => { const dd = r2(cmUnits(k) - CM.prev[k]);
+      return `<button class="cm-lr" onclick="with(SP){cmGo('${k}')}"><span>${esc(pm.get(k).name)}<small class="sp-num">${sh(k,CM.prev[k])} ← ${sh(k,cmUnits(k))} ${nameU(k)}</small></span><span class="tag ${dd<0?'a':''} sp-num">${dd>0?'+':''}${sh(k,dd)}</span></button>`; }).join('')}</div>` : ''}
+    ${ks.length - dn.length ? `<h3>לא נספרו</h3><div class="cm-list">${ks.filter(k => !CM.entries[k]).map(k => `<button class="cm-lr" onclick="with(SP){cmGo('${k}')}"><span>${esc(pm.get(k).name)}<small>${esc(S.cats.find(c=>c.id===pm.get(k).catId)?.name||'')}</small></span><span class="tag">לספור</span></button>`).join('')}</div>` : ''}
+    <button class="cm-btn ghost" onclick="with(SP){closeCount()}">סגירה וחזרה למלאי</button>
+  </div>`;
+}
+function cmDraw(){
+  const el = document.getElementById('sp-cm'); if(!el || !CM) return;
+  el.innerHTML = (CM.view === 'sum' ? cmSummaryHTML() : cmCountHTML()) + (CM.sheet ? cmSheetHTML() : '');
+  if(CM.sheet && CM.sheet.mode === 'cam') cmAttachVideo();
+}
+function cmCat(id){ CM.cat = id; pref('countCat', id); const ks = cmKeys(); const f = ks.findIndex(k => !CM.entries[k]); CM.i = f < 0 ? 0 : f; CM.view = 'count'; cmDraw(); }
+function cmGo(k){
+  let ks = cmKeys(); if(!ks.includes(k)){ CM.cat = ''; ks = cmKeys(); }
+  CM.i = Math.max(0, ks.indexOf(k)); CM.view = 'count'; cmDraw();
+  const b = document.getElementById('cm-body'); if(b) b.scrollTop = 0;
+}
+function cmStep(k, dlt){ const v = cmVal(k); v.c = Math.max(0, r2(v.c + dlt)); cmDraw(); }
+function cmSet(k, x, closed){ const n = num(x); const v = cmVal(k); v.c = n > 0 ? (parDiv(S.par[k]) > 1 ? Math.round(n) : r2(n)) : 0; if(closed) v.l = 0; cmDraw(); }
+function cmLoose(k, dlt, x){
+  const d = parDiv(S.par[k]); const v = cmVal(k);
+  let n = dlt !== null && dlt !== undefined ? r2(v.l + dlt) : num(x); if(!(n > 0)) n = 0;
+  if(n >= d){ v.c += Math.floor(n / d); n = r2(n - Math.floor(n / d) * d); }   // יותר מקרטון: הופך לקרטון שלם
+  v.l = n; cmDraw();
+}
+function cmSame(k){ const u = CM.prev[k] ?? cmUnits(k), d = parDiv(S.par[k]); const c = d > 1 ? Math.floor(u/d + 1e-9) : u; CM.val[k] = {c, l: d > 1 ? r2(u - c*d) : 0}; cmDraw(); }
+function cmCommit(k){
+  const p = S.par[k]; if(!p){ cmDraw(); return; }
+  const d = parDiv(p), v = cmVal(k); if(d > 1 && v.l >= d){ v.c += Math.floor(v.l / d); v.l = r2(v.l - Math.floor(v.l / d) * d); }
+  const u = cmTotal(k);
+  p.current = u; p.countedAt = today();
+  CM.entries[k] = {u, at: Date.now(), ok: false};
+  cmStore(); save();
+  const ks = cmKeys();
+  if(CM.i >= ks.length - 1){ CM.view = 'sum'; }
+  else { CM.i++; }
+  if(navigator.vibrate) try{ navigator.vibrate(15); }catch(e){}
+  cmDraw(); const b = document.getElementById('cm-body'); if(b) b.scrollTop = 0;
+}
+function cmSummary(){ CM.view = 'sum'; cmDraw(); }
+
+/* ---------- ברקודים ---------- */
+function cmCodesOf(k){
+  const out = new Set((S.par[k] && Array.isArray(S.par[k].bc)) ? S.par[k].bc : []);
+  const p = productMap().get(k); if(p) p.offers.forEach(o => { const b = String(o.item.barcode||'').replace(/\D/g,''); if(b) out.add(b); });
+  return [...out];
+}
+function cmFindCode(code){
+  code = String(code||'').replace(/\D/g,''); if(!code) return '';
+  const alt = c => [c, c.replace(/^0+/,''), c.length === 12 ? '0'+c : c];   // UPC-A מול EAN-13
+  const want = new Set(alt(code));
+  for(const k of cmAllKeys()) if(cmCodesOf(k).some(c => alt(c).some(x => want.has(x)))) return k;
+  const pm = productMap();   // מוצר עם ברקוד במחירון שעוד לא במעקב
+  for(const p of pm.values()) if(p.offers.some(o => { const b = String(o.item.barcode||'').replace(/\D/g,''); return b && alt(b).some(x => want.has(x)); })) return p.key;
+  return '';
+}
+function cmScanOpen(){ CM.sheet = {mode: 'cam', q: '', code: '', err: ''}; cmDraw(); }
+function cmScanClose(){ cmScanStop(); CM.sheet = null; cmDraw(); }
+function cmSheetHTML(){
+  const s = CM.sheet; const pm = productMap(); const q = norm(s.q);
+  const pool = cmAllKeys().map(k => pm.get(k)).filter(p => !q || norm([p.name, ...p.aliases].join(' ')).includes(q)).slice(0, q ? 8 : 0);
+  const learn = s.mode === 'learn';
+  const pick = k => learn ? `cmLearn('${k}')` : `cmFound('${k}')`;
+  return `<div class="cm-sheet" onclick="if(event.target===this){with(SP){cmScanClose()}}"><div class="cm-sin">
+    <div class="cm-row"><h2>${learn ? 'ברקוד חדש' : 'סריקה או חיפוש'}</h2><button class="cm-ib" aria-label="סגירה" onclick="with(SP){cmScanClose()}">${ic('x')}</button></div>
+    ${learn ? `<p style="margin:0">הברקוד <b class="sp-num" dir="ltr">${esc(s.code)}</b> עוד לא מוכר. איזה מוצר זה? בוחרים פעם אחת, ומעכשיו הוא יזוהה בסריקה.</p>`
+      : s.mode === 'cam' ? `<div class="cm-cam" id="cm-cam"><div class="cm-frame"><span class="cm-laser"></span></div><p id="cm-camMsg">${s.err ? esc(s.err) : 'מפעיל מצלמה…'}</p></div>`
+      : `<p class="muted" style="margin:0">${esc(s.err || '')}</p>`}
+    <label class="cm-search">${ic('search','sm')}<input id="cm-q" placeholder="${learn ? 'הקלד שם מוצר' : 'או הקלד שם מוצר'}" value="${esc(s.q)}" autocomplete="off" oninput="with(SP){cmQ(this.value)}"></label>
+    <div id="cm-res">${pool.length ? `<div class="cm-list">${pool.map(p => `<button class="cm-lr" onclick="with(SP){${pick(p.key)}}"><span>${esc(p.name)}<small>${esc(S.cats.find(c=>c.id===p.catId)?.name||'')}</small></span>${ic('chevL','sm')}</button>`).join('')}</div>` : (q ? `<p class="muted" style="margin:0">אין מוצר כזה במעקב המלאי.</p>` : '')}</div>
+    ${!learn && s.mode !== 'cam' ? `<button class="cm-btn ghost" onclick="with(SP){CM.sheet.mode='cam';CM.sheet.err='';cmDraw()}">${ic('scan')}נסה שוב את המצלמה</button>` : ''}
+  </div></div>`;
+}
+function cmQ(v){
+  CM.sheet.q = v;   // מעדכנים רק את התוצאות, כדי לא לאבד את המקלדת והמצלמה
+  const pm = productMap(), q = norm(v); const learn = CM.sheet.mode === 'learn';
+  const pool = cmAllKeys().map(k => pm.get(k)).filter(p => q && norm([p.name, ...p.aliases].join(' ')).includes(q)).slice(0, 8);
+  const r = document.getElementById('cm-res'); if(!r) return;
+  r.innerHTML = pool.length ? `<div class="cm-list">${pool.map(p => `<button class="cm-lr" onclick="with(SP){${learn?`cmLearn('${p.key}')`:`cmFound('${p.key}')`}}"><span>${esc(p.name)}<small>${esc(S.cats.find(c=>c.id===p.catId)?.name||'')}</small></span>${ic('chevL','sm')}</button>`).join('')}</div>` : (q ? `<p class="muted" style="margin:0">אין מוצר כזה במעקב המלאי.</p>` : '');
+}
+function cmFound(k){ cmScanStop(); CM.sheet = null; cmGo(k); }
+function cmLearn(k){
+  const code = CM.sheet && CM.sheet.code; const p = S.par[k];
+  if(code && p){ p.bc = Array.isArray(p.bc) ? p.bc : []; if(!p.bc.includes(code)) p.bc.push(code); save(); toast('הברקוד נשמר. מעכשיו המוצר יזוהה בסריקה'); }
+  cmFound(k);
+}
+function cmOnCode(code){
+  code = String(code||'').replace(/\D/g,''); if(!code || !CM || !CM.sheet) return;
+  cmScanStop(); if(navigator.vibrate) try{ navigator.vibrate(60); }catch(e){}
+  const k = cmFindCode(code);
+  if(k && S.par[k]){ CM.sheet = null; cmGo(k); toast('נסרק: ' + (productMap().get(k)?.name || '')); return; }
+  if(k){
+    CM.sheet = null; cmDraw();
+    const name = productMap().get(k)?.name || '';
+    if(isCook()){ toast(`${name} עוד לא במעקב מלאי. אפשר לבקש מהמנהל להוסיף אותו`); return; }
+    confirmBox(`${esc(name)} עוד לא במעקב מלאי. להוסיף אותו ולספור עכשיו?`, () => { S.par[k] = {min:0, current:0, countedAt:''}; save(); CM.prev[k] = 0; cmStore(); cmGo(k); });
+    return;
+  }
+  CM.sheet = {mode: 'learn', q: '', code, err: ''}; cmDraw();
+}
+/* מצלמה: BarcodeDetector מובנה (אנדרואיד/כרום), ואם אין (אייפון) ספריית ZXing */
+let CMS = null;
+let zxLoad = null;
+function loadZX(){
+  if(window.ZXing && window.ZXing.MultiFormatReader) return Promise.resolve();
+  return zxLoad = zxLoad || new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js'; s.onload = res; s.onerror = () => { zxLoad = null; s.remove(); rej(new Error('load')); }; document.head.appendChild(s); });
+}
+async function cmMakeDecoder(){
+  const fm = ['ean_13','ean_8','upc_a','upc_e','code_128','itf','code_39'];
+  try{
+    if('BarcodeDetector' in window){
+      const sup = await window.BarcodeDetector.getSupportedFormats();
+      const use = fm.filter(f => sup.includes(f));
+      if(use.length){ const bd = new window.BarcodeDetector({formats: use}); return async c => { const r = await bd.detect(c); return r && r[0] ? r[0].rawValue : ''; }; }
+    }
+  }catch(e){}
+  await loadZX();
+  const Z = window.ZXing, hints = new Map();
+  hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A, Z.BarcodeFormat.UPC_E, Z.BarcodeFormat.CODE_128, Z.BarcodeFormat.ITF, Z.BarcodeFormat.CODE_39]);
+  hints.set(Z.DecodeHintType.TRY_HARDER, true);
+  const rd = new Z.MultiFormatReader(); rd.setHints(hints);
+  return async c => {
+    const w = c.width, h = c.height, px = c.getContext('2d', {willReadFrequently:true}).getImageData(0, 0, w, h).data;
+    const lum = new Uint8ClampedArray(w * h);
+    for(let i = 0, j = 0; j < lum.length; i += 4, j++) lum[j] = (px[i] * 77 + px[i+1] * 150 + px[i+2] * 29) >> 8;
+    try{ return rd.decode(new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.RGBLuminanceSource(lum, w, h)))).getText(); }
+    catch(e){ return ''; }
+  };
+}
+async function cmAttachVideo(){
+  const box = document.getElementById('cm-cam'); if(!box) return;
+  const msg = t => { const m = document.getElementById('cm-camMsg'); if(m) m.textContent = t; };
+  if(CMS && CMS.stream){ box.prepend(CMS.video); msg('כוון לברקוד שעל הקרטון או על המוצר'); return; }
+  if(CMS) return;   // כבר בהפעלה
+  const me = CMS = {stream:null, video:null, timer:null, dec:null};
+  const fail = t => { if(CMS !== me) return; cmScanStop(); if(CM && CM.sheet){ CM.sheet.mode = 'search'; CM.sheet.err = t; cmDraw(); setTimeout(()=>{ const q = document.getElementById('cm-q'); if(q) q.focus(); }, 50); } };
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ fail('המצלמה לא זמינה בדפדפן הזה. אפשר לחפש לפי שם.'); return; }
+  try{
+    me.dec = await cmMakeDecoder();
+  }catch(e){ fail('לא הצלחתי לטעון את רכיב הסריקה. בדוק חיבור לאינטרנט, או חפש לפי שם.'); return; }
+  try{
+    me.stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: {ideal: 'environment'}, width: {ideal: 1280}, height: {ideal: 720}}, audio: false});
+  }catch(e){
+    fail(e && (e.name === 'NotAllowedError' || e.name === 'SecurityError') ? 'אין הרשאה למצלמה. אפשר לאשר אותה בהגדרות האתר בדפדפן, או לחפש לפי שם.' : 'לא הצלחתי להפעיל את המצלמה. אפשר לחפש לפי שם.');
+    return;
+  }
+  if(CMS !== me){ me.stream.getTracks().forEach(t => t.stop()); return; }
+  const v = me.video = document.createElement('video');
+  v.setAttribute('playsinline', ''); v.muted = true; v.autoplay = true; v.srcObject = me.stream;
+  const b2 = document.getElementById('cm-cam'); if(b2) b2.prepend(v);
+  try{ await v.play(); }catch(e){}
+  msg('כוון לברקוד שעל הקרטון או על המוצר');
+  const cv = document.createElement('canvas'); let busy = false;
+  me.timer = setInterval(async () => {
+    if(busy || CMS !== me || !v.videoWidth) return; busy = true;
+    try{
+      /* פס רחב באמצע התמונה: שם נמצא הברקוד, וזה מהיר יותר מכל התמונה */
+      const sw = v.videoWidth, sh = Math.round(v.videoHeight * 0.5), sy = Math.round((v.videoHeight - sh) / 2);
+      const sc = Math.min(1, 960 / sw); cv.width = Math.round(sw * sc); cv.height = Math.round(sh * sc);
+      cv.getContext('2d', {willReadFrequently:true}).drawImage(v, 0, sy, sw, sh, 0, 0, cv.width, cv.height);
+      const t = await me.dec(cv);
+      if(t && CMS === me) cmOnCode(t);
+    }catch(e){}
+    busy = false;
+  }, 220);
+}
+function cmScanStop(){
+  const s = CMS; CMS = null; if(!s) return;
+  clearInterval(s.timer);
+  if(s.stream) s.stream.getTracks().forEach(t => t.stop());
+  if(s.video){ s.video.srcObject = null; s.video.remove(); }
+}
+window.addEventListener('online', () => { try{ if(typeof cloudReady !== 'undefined' && cloudReady && anyDirty()) save(); cmRefreshChip(); }catch(e){} });
+window.addEventListener('offline', () => { try{ cmRefreshChip(); }catch(e){} });
+document.addEventListener('visibilitychange', () => { if(document.hidden && CMS && CM && CM.sheet){ cmScanStop(); CM.sheet.mode = 'search'; CM.sheet.err = 'המצלמה נעצרה. לסריקה נוספת לחץ על "נסה שוב את המצלמה".'; cmDraw(); } });
 
 /* ---------- ייבוא ספירת מלאי מטבלה ---------- */
 let STI = null;
@@ -23144,6 +23595,30 @@ Object.defineProperties(SPX, {
 "saveParMode":{get(){return saveParMode},enumerable:true},
 "setParUnits":{get(){return setParUnits},enumerable:true},
 "doParUnits":{get(){return doParUnits},enumerable:true},
+"CM":{get(){return CM},enumerable:true},
+"openCount":{get(){return openCount},enumerable:true},
+"cmRestore":{get(){return cmRestore},enumerable:true},
+"closeCount":{get(){return closeCount},enumerable:true},
+"cmCat":{get(){return cmCat},enumerable:true},
+"cmGo":{get(){return cmGo},enumerable:true},
+"cmStep":{get(){return cmStep},enumerable:true},
+"cmSet":{get(){return cmSet},enumerable:true},
+"cmLoose":{get(){return cmLoose},enumerable:true},
+"cmSame":{get(){return cmSame},enumerable:true},
+"cmCommit":{get(){return cmCommit},enumerable:true},
+"cmSummary":{get(){return cmSummary},enumerable:true},
+"cmTyped":{get(){return cmTyped},enumerable:true},
+"cmScanOpen":{get(){return cmScanOpen},enumerable:true},
+"cmScanClose":{get(){return cmScanClose},enumerable:true},
+"cmQ":{get(){return cmQ},enumerable:true},
+"cmFound":{get(){return cmFound},enumerable:true},
+"cmLearn":{get(){return cmLearn},enumerable:true},
+"cmOnCode":{get(){return cmOnCode},enumerable:true},
+"cmFindCode":{get(){return cmFindCode},enumerable:true},
+"cmCodesOf":{get(){return cmCodesOf},enumerable:true},
+"cmDraw":{get(){return cmDraw},enumerable:true},
+"cmAllKeys":{get(){return cmAllKeys},enumerable:true},
+"cmFab":{get(){return cmFab},enumerable:true},
 "pmPreview":{get(){return pmPreview},enumerable:true},
 "monthlyCost":{get(){return monthlyCost},enumerable:true},
 "parRowHTML":{get(){return parRowHTML},enumerable:true},
