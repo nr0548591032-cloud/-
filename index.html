@@ -8777,7 +8777,7 @@ function ttdLoadPdfLib(){
 }
 const TTD_PDF_CFG = () => ({
   margin: [10, 9, 12, 9], image: { type: "jpeg", quality: 0.95 },
-  html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true },
+  html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS:true, scrollX:0, scrollY:0 },
   jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
   pagebreak: { mode: ["css", "legacy"], avoid: ["tr", ".ttdp-h", ".ttdp-g"] }
 });
@@ -10057,7 +10057,7 @@ async function lcBuildPack(rows, title, onStep){
   try{ await document.fonts.ready; }catch(e){}
   await ttdLoadPdfLib();
   const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
-  const cfg = () => ({ margin: [8, 8, 8, 8], image: { type: "jpeg", quality: 0.95 }, html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true },
+  const cfg = () => ({ margin: [8, 8, 8, 8], image: { type: "jpeg", quality: 0.95 }, html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS:true, scrollX:0, scrollY:0 },
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"] } });
   const mainBuf = await html2pdf().set(cfg()).from(lcPdfHtml(rows, title, { history: false, phones: true }), "string").outputPdf("arraybuffer");
   const out = await PDFDocument.create();
@@ -10710,7 +10710,7 @@ async function lcMakePdf(rows, title, opts, btn){
     try{ await document.fonts.ready; }catch(e){}
     const blob = await html2pdf().set({
       margin: [8, 8, 8, 8], image: { type: "jpeg", quality: 0.95 }, enableLinks: true,
-      html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true },
+      html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS:true, scrollX:0, scrollY:0 },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"] }
     }).from(lcPdfHtml(rows, title, opts || {}), "string").outputPdf("blob");
     const name = `${title.replace(/[\\/:*?"<>|]+/g, "-")}.pdf`;
@@ -16881,7 +16881,7 @@ async function jobsBuildPdf(list, opts, onStep){
   }));
   const mainBuf = await html2pdf().set({
     margin: [8, 8, 8, 8], image: { type: "jpeg", quality: 0.95 },
-    html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true },
+    html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS:true, scrollX:0, scrollY:0 },
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"] }
   }).from(jobsPdfHtml(list, attNums), "string").outputPdf("arraybuffer");
   const out = await PDFDocument.create();
@@ -21774,7 +21774,7 @@ async function exportMenuPDF(){
     try{ await document.fonts.ready; }catch(e){}
     const blob = await html2pdf().set({
       margin:[6,6,6,6], image:{type:'jpeg', quality:0.95},
-      html2canvas:{scale:2, backgroundColor:'#ffffff', useCORS:true},
+      html2canvas:{scale:2, backgroundColor:'#ffffff', useCORS:true, scrollX:0, scrollY:0},
       jsPDF:{unit:'mm', format:'a4', orientation:'landscape'},
       pagebreak:{mode:['legacy']}
     }).from(menuDocHTML(), 'string').outputPdf('blob');
@@ -21838,13 +21838,14 @@ function orderLinesHTML(){
   if(!OB.lines.length) return `<div class="sp-empty">חפש מוצרים למעלה, או צור הזמנה מהתפריט או ממלאי המינימום. ההצעות מכל הספקים יחושבו כאן מיד.</div>`;
   const pm = new Map(products(OB.catId).map(p=>[p.key,p]));
   return OB.lines.map((l,i)=>`<div class="line">
-    <div class="grow"><div>${esc(l.name)}</div><span class="muted">${esc(l.unit)} · כמה צריך${(()=>{ const d = parDiv(S.par[l.key]); return d>1 && l.qty>0 ? ` · <span class="sp-num">${qn(r2(l.qty/d))} קרטונים של ${d}</span>` : ''; })()}</span>${lineHint(l, pm.get(l.key))}</div>
-    <div class="stepper"><button aria-label="פחות" onclick="with(SP){stepLine(${i},-1)}">−</button><input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${l.qty}" aria-label="כמות" onchange="with(SP){setQty(${i},this.value)}"><button aria-label="יותר" onclick="with(SP){stepLine(${i},1)}">+</button></div>
+    ${(()=>{ const d = parDiv(S.par[l.key]); const base = uLbl(l.unit) || 'יח׳';
+      return `<div class="grow"><div>${esc(l.name)}</div><span class="muted">${d>1 ? `<span class="sp-num">כמות בקרטונים · קרטון = ${d} ${esc(base)}${l.qty>0?` · סה״כ ${qn(l.qty)} ${esc(base)}`:''}</span>` : `${esc(l.unit)} · כמה צריך`}</span>${lineHint(l, pm.get(l.key))}</div>
+    <div class="stepper"><button aria-label="פחות" onclick="with(SP){stepLine(${i},-1)}">−</button><input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${r2(l.qty/d)}" aria-label="${d>1?'כמות בקרטונים':'כמות'}" onchange="with(SP){setQty(${i},this.value)}"><button aria-label="יותר" onclick="with(SP){stepLine(${i},1)}">+</button></div>`; })()}
     <button class="sb icon sb-ghost danger" aria-label="הסרה" onclick="with(SP){OB.lines.splice(${i},1);OB.pick=null;saveDraft();renderOrder();renderTop()}">${ic('x','sm')}</button>
   </div>`).join('');
 }
 function stepLine(i,d){ OB.lines[i].qty = Math.max(0, r2(OB.lines[i].qty + d*parDiv(S.par[OB.lines[i].key]))); if(!OB.lines[i].qty) OB.lines.splice(i,1); saveDraft(); $('#sp-obLines').innerHTML = orderLinesHTML(); renderQuotes(); renderTop(); }
-function setQty(i,v){ const n = num(v); OB.lines[i].qty = n>0 ? n : 0; if(!OB.lines[i].qty) OB.lines.splice(i,1); saveDraft(); $('#sp-obLines').innerHTML = orderLinesHTML(); renderQuotes(); renderTop(); }
+function setQty(i,v){ const n = num(v) * parDiv(S.par[OB.lines[i].key]); OB.lines[i].qty = n>0 ? r2(n) : 0; if(!OB.lines[i].qty) OB.lines.splice(i,1); saveDraft(); $('#sp-obLines').innerHTML = orderLinesHTML(); renderQuotes(); renderTop(); }
 
 function buildQuotes(){
   const ps = new Map(products(OB.catId).map(p=>[p.key,p]));
@@ -22345,7 +22346,7 @@ function sheetHTML(m, op, forPdf){
     </div>`; }).join('');
   const meta = (k, v, last) => `<div style="flex:1 1 0;min-width:0;padding:9px 12px;${last?'':`border-left:1px solid ${C.line};`}"><div style="font-size:10.5px;color:${C.soft}">${k}</div><div style="font-weight:600;font-size:13.5px">${v}</div></div>`;
   const hd = `font-size:11.5px;font-weight:600;color:${C.soft}`;
-  return `<div style="${forPdf?'width:760px;':'width:100%;'}background:#ffffff;color:${C.ink};direction:rtl;text-align:right;font-family:Rubik,'Segoe UI',Arial,sans-serif;font-size:13.5px;line-height:1.45;box-sizing:border-box">
+  return `<div style="${forPdf?'width:728px;letter-spacing:.01px;':'width:100%;'}background:#ffffff;color:${C.ink};direction:rtl;text-align:right;font-family:Rubik,'Segoe UI',Arial,sans-serif;font-size:13.5px;line-height:1.45;box-sizing:border-box">
     <div style="background:${C.band};color:#ffffff;padding:18px 20px 16px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
       <div><div style="font-size:13px;opacity:.9">הזמנת רכש${si.contact?` · לכבוד ${esc(si.contact)}`:''}</div>
         <div style="font-family:'Suez One',Rubik,serif;font-size:26px;line-height:1.15">${esc(m.supplier)}</div></div>
@@ -22420,7 +22421,7 @@ function buildSheetPdf(){
       await loadHtml2Pdf(); try{ await document.fonts.ready; }catch(e){}
       const blob = await html2pdf().set({
         margin:[8,8,8,8], image:{type:'jpeg', quality:0.95},
-        html2canvas:{scale:2, backgroundColor:'#ffffff', useCORS:true},
+        html2canvas:{scale:2, backgroundColor:'#ffffff', useCORS:true, scrollX:0, scrollY:0},
         jsPDF:{unit:'mm', format:'a4', orientation:'portrait'},
         pagebreak:{mode:['css','legacy']}
       }).from(sheetHTML(s.m, ordOpts(), true), 'string').outputPdf('blob');
@@ -22486,16 +22487,29 @@ function openParMode(k){
   const guess = parPackGuess(k);
   PM = {k, pack: p.pack > 1 ? Math.round(p.pack) : (guess || ''), was: parDiv(p) > 1, guess, asCartons:false};
   const has = ['current','min','monthly'].some(f => +p[f] > 0);
+  /* מספרים שכולם קטנים מגודל הקרטון הם כמעט תמיד ספירה של קרטונים */
+  if(!PM.was && has && PM.pack > 1) PM.asCartons = ['current','min','monthly'].every(f => !(+p[f] > 0) || +p[f] < PM.pack);
   modal(`<div class="mhead"><h2>${PM.was?'גודל הקרטון':'ספירה בקרטונים'} · ${esc(prod.name)}</h2>${closeBtn()}</div>
-    <label class="f">כמה ${esc(uLbl(prod.unit)||'יחידות')} יש בקרטון במחסן<input id="sp-pmN" class="sp-num" type="number" min="2" step="1" inputmode="numeric" value="${PM.pack}"></label>
+    <label class="f">כמה ${esc(uLbl(prod.unit)||'יחידות')} יש בקרטון במחסן<input id="sp-pmN" class="sp-num" type="number" min="2" step="1" inputmode="numeric" value="${PM.pack}" oninput="with(SP){pmPreview()}"></label>
     <p class="muted" style="margin:0">${guess ? `לפי המחירון: קרטון של ${guess}.` : 'במחירונים אין גודל קרטון למוצר הזה, הזן אותו כאן.'}</p>
     ${PM.was ? `<p class="muted" style="margin:0">מספר הקרטונים שספרת נשאר כמו שהוא. רק החישוב ליחידות מתעדכן לפי הגודל החדש.</p>`
       : has ? `<div class="sp-card flat">
-        <b>המספרים שכבר הוזנו למוצר הזה: במלאי ${qn(p.current)}, מינימום ${qn(p.min)}${p.monthly?`, חודשי ${qn(p.monthly)}`:''}</b>
-        <label class="radio"><input type="radio" name="sp-pmAs" checked onchange="with(SP){PM.asCartons=false}"><span>הם יחידות<br><span class="muted">יוצגו מחולקים לקרטונים</span></span></label>
-        <label class="radio"><input type="radio" name="sp-pmAs" onchange="with(SP){PM.asCartons=true}"><span>הם כבר מספר קרטונים<br><span class="muted">המספרים יישארו כמו שהם, כקרטונים</span></span></label>
+        <b>המספרים שכבר הוזנו למוצר הזה: במלאי ${qn(p.current)}, מינימום ${qn(p.min)}${p.monthly?`, חודשי ${qn(p.monthly)}`:''}. מה הם?</b>
+        <label class="radio"><input type="radio" name="sp-pmAs" ${PM.asCartons?'checked':''} onchange="with(SP){PM.asCartons=true;pmPreview()}"><span>הם כבר מספר קרטונים<br><span class="muted" id="sp-pmPvC"></span></span></label>
+        <label class="radio"><input type="radio" name="sp-pmAs" ${PM.asCartons?'':'checked'} onchange="with(SP){PM.asCartons=false;pmPreview()}"><span>הם יחידות<br><span class="muted" id="sp-pmPvU"></span></span></label>
       </div>` : ''}
     <div class="row"><button class="sb" onclick="with(SP){saveParMode()}">${ic('check','sm')}שמירה</button><button class="sb sb-ghost" onclick="with(SP){closeModal()}">ביטול</button></div>`);
+  pmPreview();
+}
+/* מה יופיע במסך המלאי אחרי השמירה, לכל אחת מהאפשרויות */
+function pmPreview(){
+  if(!PM || PM.was) return; const p = S.par[PM.k], prod = productMap().get(PM.k); if(!p) return;
+  const n = Math.round(num(($('#sp-pmN')||{}).value)); const base = uLbl(prod && prod.unit) || 'יח׳';
+  const c = $('#sp-pmPvC'), u = $('#sp-pmPvU'); if(!c || !u) return;
+  if(!(n > 1)){ c.textContent = u.textContent = 'הזן גודל קרטון'; return; }
+  const fl = [['current','במלאי'],['min','מינימום'],['monthly','חודשי']].filter(([f]) => +p[f] > 0);
+  c.textContent = 'יוצג: ' + fl.map(([f,t]) => `${t} ${qn(p[f])} קרט׳ (${qn(r2(p[f]*n))} ${base})`).join(', ');
+  u.textContent = 'יוצג: ' + fl.map(([f,t]) => `${t} ${qn(r2(p[f]/n))} קרט׳`).join(', ');
 }
 function saveParMode(){
   if(!PM) return; const p = S.par[PM.k], prod = productMap().get(PM.k); if(!p){ closeModal(); return; }
@@ -22507,7 +22521,18 @@ function saveParMode(){
   p.mode = 'pack'; p.pack = n; PM = null;
   save(); closeModal(); renderStock(); renderTop(); toast(`נשמר: ${prod ? prod.name : 'המוצר'} נספר בקרטונים של ${n}`);
 }
-function setParUnits(k){ const p = S.par[k]; if(!p || parDiv(p) === 1) return; p.mode = 'unit'; save(); renderStock(); toast('נספר ביחידות. הכמויות מוצגות עכשיו ביחידות'); }
+function setParUnits(k){
+  const p = S.par[k], prod = productMap().get(k); if(!p || parDiv(p) === 1) return;
+  const d = parDiv(p), base = uLbl(prod && prod.unit) || 'יחידות';
+  const fl = [['current','במלאי'],['min','מינימום'],['monthly','חודשי']].filter(([f]) => +p[f] > 0);
+  if(!fl.length){ p.mode = 'unit'; save(); renderStock(); toast('נספר ביחידות'); return; }
+  modal(`<div class="mhead"><h2>מעבר לספירה ביחידות · ${esc(prod ? prod.name : '')}</h2>${closeBtn()}</div>
+    <p style="margin:0">הכמויות יוצגו מעכשיו ב${esc(base)} ולא בקרטונים של ${d}:</p>
+    <div class="sp-card flat sp-num">${fl.map(([f,t]) => `<div>${t}: ${qn(r2(p[f]/d))} קרט׳ ← <b>${qn(p[f])} ${esc(base)}</b></div>`).join('')}</div>
+    <p class="muted" style="margin:0">זו אותה כמות בדיוק, רק ביחידה אחרת. ההזמנות יחושבו אותו דבר.</p>
+    <div class="row"><button class="sb" onclick="with(SP){doParUnits('${k}')}">${ic('check','sm')}לעבור ליחידות</button><button class="sb sb-ghost" onclick="with(SP){closeModal()}">להישאר בקרטונים</button></div>`);
+}
+function doParUnits(k){ const p = S.par[k]; if(p){ p.mode = 'unit'; save(); } closeModal(); renderStock(); renderTop(); toast('נספר ביחידות'); }
 function monthlyCost(keys){
   const pm = productMap(); let t = 0, n = 0;
   keys.forEach(k => { const p = S.par[k], prod = pm.get(k); if(prod && p && p.monthly > 0){ t += p.monthly * prod.offers[0].price; n++; } });
@@ -23118,6 +23143,8 @@ Object.defineProperties(SPX, {
 "openParMode":{get(){return openParMode},enumerable:true},
 "saveParMode":{get(){return saveParMode},enumerable:true},
 "setParUnits":{get(){return setParUnits},enumerable:true},
+"doParUnits":{get(){return doParUnits},enumerable:true},
+"pmPreview":{get(){return pmPreview},enumerable:true},
 "monthlyCost":{get(){return monthlyCost},enumerable:true},
 "parRowHTML":{get(){return parRowHTML},enumerable:true},
 "openStockImport":{get(){return openStockImport},enumerable:true},
