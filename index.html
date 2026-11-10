@@ -20382,6 +20382,22 @@ const packOf = it => { const n = Math.round(+(it && it.pack) || 1); return n > 1
 const packPriceOf = it => it.basis==='pack' && it.packPrice > 0 && packOf(it) > 1 ? it.packPrice : r2((it.price||0) * packOf(it));
 const mustPack = it => packOf(it) > 1 && !!it.packOnly;
 const unitPrice4 = n => Math.round(n*10000)/10000;
+/* מע"מ: כל המחירונים נשמרים כולל מע"מ, כמו החשבוניות. לספק שמחירון שלו בלי מע"מ (למשל וגשל) מוסיפים בייבוא */
+const VAT_RATE = 0.18, VAT_PCT = Math.round(VAT_RATE*100);
+const supNoVat = sup => { const x = S.suppliers[String(sup||'').trim()]; return x && typeof x.noVat === 'boolean' ? x.noVat : null; };
+/* מוסיף מע"מ לכל המחירים במחירון (או מוריד, undo). גם ההיסטוריה מומרת, כדי שלא ייראה כמו עליית מחיר */
+function vatConvert(l, undo){
+  if(!l || !!l.vatAdded === !undo) return false;
+  const f = undo ? 1/(1+VAT_RATE) : 1+VAT_RATE, conv = v => unitPrice4(v*f);
+  l.items.forEach(it => {
+    if(it.price > 0) it.price = conv(it.price);
+    if(it.packPrice > 0) it.packPrice = r2(it.packPrice*f);
+    (it.history||[]).forEach(h => { if(h && h.price > 0) h.price = conv(h.price); });
+    if(it.ok && typeof it.ok === 'object' && it.ok.p > 0) it.ok.p = conv(it.ok.p);
+  });
+  if(undo){ delete l.vatAdded; delete l.vatNoUndo; } else l.vatAdded = today();
+  return true;
+}
 const uLbl = u => /^יחיד/.test(u||'') ? 'יח׳' : (u||'');
 const packsTxt = n => n===1 ? 'קרטון 1' : `${n} קרטונים`;
 /* כמה מזמינים בפועל מספק: כשהוא מוכר רק בקרטון, מעגלים למעלה לקרטונים שלמים */
@@ -20596,7 +20612,7 @@ function renderLists(){
 function listEditor(l){
   return `<div class="sp-card flat">
     <div class="row between">
-      <h3>${esc(l.supplier)} · ${esc(l.title||'')}</h3>
+      <h3>${esc(l.supplier)} · ${esc(l.title||'')}${l.vatAdded ? ' <span class="tag b">+מע״מ</span>' : ''}</h3>
       <div class="row">
         <button class="sb sb-soft sm" data-s="${esc(l.supplier)}" onclick="with(SP){openSupplier(this.dataset.s)}">${ic('user','sm')}פרטי ספק</button>
         <select class="sm-select" aria-label="קטגוריה של המחירון" onchange="with(SP){moveList('${l.id}',this.value)}">${S.cats.map(c=>`<option value="${c.id}" ${c.id===l.catId?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
@@ -20744,7 +20760,7 @@ function saveCat(id){
 let SUPED = null;
 function openSupplier(name){
   const s = {contact:'', phone:'', email:'', days:[], cutoff:'', minOrder:'', notes:'', ...supInfo(name)};
-  SUPED = {name, days:[...(s.days||[])]};
+  SUPED = {name, days:[...(s.days||[])], noVat: !!s.noVat, ask:null};
   modal(`<div class="mhead"><h2>${esc(name)}</h2>${closeBtn()}</div>
     <div class="fgrid">
       <label class="f">איש קשר<input id="sp-spContact" value="${esc(s.contact)}"></label>
@@ -20755,12 +20771,38 @@ function openSupplier(name){
     </div>
     <div class="f"><span class="muted">ימי אספקה</span><div class="days" id="sp-spDays">${daysChips()}</div></div>
     <label class="f">הערות<input id="sp-spNotes" value="${esc(s.notes)}" placeholder="למשל: מספקים יום אחרי ההזמנה"></label>
+    <div class="sp-card flat" id="sp-vatBox" style="gap:8px;background:var(--tint-a)">${vatBoxHTML()}</div>
     <div class="row"><button class="sb" onclick="with(SP){saveSupplier()}">${ic('check','sm')}שמירה</button></div>`);
 }
 function daysChips(){ return DAYS_S.map((d,i)=>`<button class="chip" aria-pressed="${SUPED.days.includes(i)}" onclick="with(SP){toggleSupDay(${i})}">${d}</button>`).join(''); }
 function toggleSupDay(i){ const k = SUPED.days.indexOf(i); k>=0 ? SUPED.days.splice(k,1) : SUPED.days.push(i); SUPED.days.sort(); $('#sp-spDays').innerHTML = daysChips(); }
+/* מע"מ בפרטי הספק: סימון אחד, וכפתור חד-פעמי למחירון שכבר יובא */
+function vatBoxHTML(){
+  const ls = S.lists.filter(l => l.supplier === SUPED.name);
+  const row = l => { const t = ls.length > 1 ? ` "${esc(l.title||'מחירון')}"` : '';
+    if(SUPED.ask && SUPED.ask.id === l.id){ const it = l.items.find(x => x.price > 0), f = SUPED.ask.undo ? 1/(1+VAT_RATE) : 1+VAT_RATE;
+      return `<div class="sp-card flat" style="gap:6px"><b>${SUPED.ask.undo ? `להוריד את המע״מ מהמחירון${t}?` : `להוסיף ${VAT_PCT}% מע״מ ל-<span class="sp-num">${l.items.length}</span> הפריטים במחירון${t}?`}</b>
+        ${it ? `<span class="muted sp-num">למשל: ${esc(it.name)} · ${money(it.price)} ← ${money(it.price*f)}</span>` : ''}
+        <span class="muted">${SUPED.ask.undo ? 'המחירים יחזרו להיות כמו בקובץ של הספק.' : 'אפשר לבטל אחר כך מכאן.'}</span>
+        <div class="row"><button class="sb sm" onclick="with(SP){vatDo()}">${ic('check','sm')}${SUPED.ask.undo ? 'כן, להוריד' : 'כן, להוסיף'}</button><button class="sb sb-ghost sm" onclick="with(SP){SUPED.ask=null;vatRedraw()}">לא</button></div></div>`; }
+    if(l.vatAdded) return `<div class="row between"><span class="tag g sp-num">${ic('check','sm')}המחירון${t} כולל מע״מ שנוסף ב-${heDate(l.vatAdded)}</span>${l.vatNoUndo ? '' : `<button class="sb sb-ghost sm" onclick="with(SP){SUPED.ask={id:'${l.id}',undo:true};vatRedraw()}">ביטול</button>`}</div>`;
+    return SUPED.noVat ? `<div><button class="sb sb-soft sm" onclick="with(SP){SUPED.ask={id:'${l.id}',undo:false};vatRedraw()}">${ic('plus','sm')}הוספת מע״מ למחירון הקיים${t}</button></div>` : ''; };
+  return `<label class="radio"><input type="checkbox" id="sp-spNoVat" ${SUPED.noVat?'checked':''} onchange="with(SP){SUPED.noVat=this.checked;SUPED.ask=null;vatRedraw()}"><span><b>המחירים של הספק לא כוללים מע״מ</b><br><span class="muted">בכל ייבוא מחירון מהספק יתווסף ${VAT_PCT}%</span></span></label>
+    ${ls.map(row).join('')}`;
+}
+function vatRedraw(){ const b = $('#sp-vatBox'); if(b) b.innerHTML = vatBoxHTML(); }
+function vatDo(){
+  const a = SUPED && SUPED.ask; if(!a) return;
+  const l = S.lists.find(x => x.id === a.id); SUPED.ask = null;
+  if(l && vatConvert(l, a.undo)){
+    const sp = S.suppliers[SUPED.name] = S.suppliers[SUPED.name] || {};
+    if(!a.undo){ sp.noVat = true; SUPED.noVat = true; }
+    save(); render(); toast(a.undo ? 'המע״מ הורד מהמחירון' : 'נוסף מע״מ למחירון. המחירים הקודמים בהיסטוריה עודכנו גם הם');
+  }
+  vatRedraw();
+}
 function saveSupplier(){
-  S.suppliers[SUPED.name] = {contact:$('#sp-spContact').value.trim(), phone:$('#sp-spPhone').value.trim(), email:$('#sp-spEmail').value.trim(),
+  S.suppliers[SUPED.name] = {...(S.suppliers[SUPED.name]||{}), noVat: SUPED.noVat, contact:$('#sp-spContact').value.trim(), phone:$('#sp-spPhone').value.trim(), email:$('#sp-spEmail').value.trim(),
     minOrder: num($('#sp-spMin').value) || 0, cutoff:$('#sp-spCut').value, days:SUPED.days, notes:$('#sp-spNotes').value.trim()};
   save(); closeModal(); render(); toast('פרטי הספק נשמרו');
 }
@@ -21053,7 +21095,7 @@ function supDatalist(){ let extra = []; try{ extra = typeof getSupplierNames ===
 function openImport(catId, listId){
   const l = listId ? S.lists.find(x=>x.id===listId) : null;
   PDFST = null;
-  IMP = {rows:null, sheets:null, wb:null, header:0, map:{}, catId: catId || S.cats[0]?.id || '', newCat:'', supplier: l?.supplier||'', title: l?.title||'', targetList: listId||null, src:'file', mode:'merge', basis:'unit', basisSet:false, basisAuto:false, more:false, sugg:{}, sugList:[]};
+  IMP = {rows:null, sheets:null, wb:null, header:0, map:{}, catId: catId || S.cats[0]?.id || '', newCat:'', supplier: l?.supplier||'', title: l?.title||'', targetList: listId||null, src:'file', mode:'merge', basis:'unit', basisSet:false, basisAuto:false, more:false, sugg:{}, sugList:[], vat:false, vatSet:false};
   drawImport();
 }
 const IMP_FIELDS = ['name','price','cprice','total','unit','sku','barcode','pack','cartons','qty','disc'];
@@ -21118,13 +21160,14 @@ function drawImport(){
         </div>
         ${IMP.basisAuto ? `<span class="tag a wrap">${ic('alert','sm')}לפי עמודת הסה״כ, המחירים בקובץ הם לקרטון. המחיר ליחידה מחושב מהם.</span>` : ''}
       </div>` : ''}
+      ${(()=>{ const v = impVat(); return `<label class="radio"><input type="checkbox" ${v?'checked':''} onchange="with(SP){IMP.vat=this.checked;IMP.vatSet=true;drawImport()}"><span>המחירים בקובץ לא כוללים מע״מ <span class="muted">(יתווסף ${VAT_PCT}%)</span>${v && IMP.vatAuto ? ' <span class="tag b">זוהה בקובץ</span>' : ''}${v && existing && !existing.vatAdded ? `<br><span class="muted">גם לפריטים שכבר במחירון ולא בקובץ יתווסף מע״מ</span>` : ''}</span></label>`; })()}
       ${(()=>{ const ch = parsed.filter(p=>p.chk!==undefined); if(!ch.length) return '';
         const bad = ch.filter(p=>!p.chk);
         return bad.length===0 ? `<div><span class="tag g wrap">${ic('check','sm')}החישוב מאומת: בכל ${ch.length} השורות מחיר ליחידה × כמות = הסה״כ בקובץ</span></div>`
           : `<div class="sp-card flat" style="background:var(--sp-amber-bg);gap:4px"><b style="color:var(--sp-red)">${ic('alert','sm')} ב-${bad.length} מתוך ${ch.length} שורות הסה״כ בקובץ לא מתאים לחישוב</b>
             ${bad.slice(0,3).map(p=>`<span class="muted sp-num">${esc(p.name)}: ${esc(p.chkTxt||'')}</span>`).join('')}
             <span class="muted">בדוק את בחירת העמודות, או אם המחיר הוא ליחידה או לקרטון. אפשר גם לייבא כך, ולתקן פריטים אחר כך במחירון.</span></div>`; })()}
-      <div class="preview"><div class="pv pv-h"><span>פריט</span><span>בקרטון</span><span>ליחידה</span><span>לקרטון</span><span>מק״ט</span></div>
+      <div class="preview"><div class="pv pv-h"><span>פריט</span><span>בקרטון</span><span>ליחידה${impVat()?' כולל מע״מ':''}</span><span>לקרטון</span><span>מק״ט</span></div>
         ${parsed.slice(0,6).map(p=>`<div class="pv ${p.chk===false?'bad':''}"><span>${esc(p.name)}</span><span class="sp-num">${p.pack>1?p.pack:'—'}</span><span class="sp-num">${money(p.price)}</span><span class="sp-num">${p.pack>1?money(p.packPrice||p.price*p.pack):'—'}</span><span>${esc(p.sku)}</span></div>`).join('') || `<div class="pv"><span style="grid-column:1/-1">לא זוהו שורות עם תיאור ומחיר. בדוק את בחירת העמודות.</span></div>`}
       </div>
       <p class="muted sp-num">זוהו ${parsed.length} פריטים תקינים${skipped>0?` · ${skipped} שורות דולגו (ללא תיאור או מחיר, או כפולות)`:''}${parsed.some(p=>p.pack>1)?` · ${parsed.filter(p=>p.pack>1).length} עם כמות בקרטון`:''}${parsed.some(p=>p.disc)?` · ${parsed.filter(p=>p.disc).length} עם הנחה (המחיר נשמר אחרי ההנחה)`:''}</p>
@@ -21193,7 +21236,25 @@ function importTarget(){
   const sup = (IMP.supplier||'').trim(); if(!sup || IMP.catId==='__new') return null;
   return S.lists.find(l=>l.catId===IMP.catId && l.supplier===sup) || null;
 }
+/* האם להוסיף מע"מ: מה שסימנת בייבוא, אחרת מה שנשמר לספק, אחרת לפי הקובץ (שורת מע"מ בסיכום) */
+function vatInFile(){
+  const t = (IMP.rows||[]).map(r => r.join(' ')).join('\n');
+  if(/(לא\s*כולל(ים|ות|ת)?|ללא|\+)\s*מע["״]?מ/.test(t)) return true;
+  if(/(^|[^א-ת])כולל(ים|ות|ת)?\s*מע["״]?מ/.test(t.replace(/לא\s*כולל/g,''))) return false;
+  return /^\s*מע["״]?מ\s*%?\s*\d/m.test(t);
+}
+function impVat(){
+  if(IMP.vatSet) return IMP.vat;
+  const s = supNoVat(IMP.supplier); IMP.vatAuto = false;
+  if(s !== null) return s;
+  IMP.vatAuto = vatInFile(); return IMP.vatAuto;
+}
 function parseImport(){
+  const out = parseImport0();
+  if(impVat()) out.forEach(p => { p.price = unitPrice4(p.price*(1+VAT_RATE)); if(p.packPrice > 0) p.packPrice = r2(p.packPrice*(1+VAT_RATE)); });
+  return out;
+}
+function parseImport0(){
   const m = IMP.map; if(m.name==='' || (!m.price && !m.cprice && !m.total)) return [];
   const ex = importTarget(); IMP.exMap = ex ? new Map(ex.items.map(i=>[norm(i.name), i])) : new Map();
   /* המחיר בעמודת "מחיר" ליחידה או לקרטון? כשיש עמודת סה"כ, בודקים בחשבון איזו אפשרות מסתדרת */
@@ -21271,6 +21332,11 @@ function commitImport(){
   let catId = IMP.catId;
   if(catId==='__new'){ const n = (IMP.newCat||'').trim(); if(!n){ toast('צריך שם לקטגוריה החדשה'); return; } const c = {id:uid(), name:n, cycleDays:14}; S.cats.push(c); catId = c.id; IMP.catId = catId; }
   const ex = importTarget();
+  /* מע"מ: נזכר לספק. מחירון קיים שעוד בלי מע"מ מקבל מע"מ קודם, כדי שכל המחירון יהיה באותו בסיס */
+  const addVat = impVat();
+  { const sp = S.suppliers[IMP.supplier] = S.suppliers[IMP.supplier] || {}; sp.noVat = addVat; }
+  if(ex && addVat && !ex.vatAdded) vatConvert(ex, false);
+  if(ex && ex.vatAdded){ if(addVat) delete ex.vatNoUndo; else ex.vatNoUndo = true; }
   /* מה שתוקן או אושר בבדיקה נשמר ככלל לספק */
   Object.entries(IMP.fix||{}).forEach(([k, f]) => { const it = items.find(p => norm(p.name) === k); if(!it) return;
     if(f.stock){ plStockFollow(plKey(it.name), it.pack); return; }
@@ -21289,6 +21355,7 @@ function commitImport(){
     toast(`המחירון עודכן: ${ch} מחירים השתנו, ${nw} פריטים חדשים`);
   } else {
     const l = {id:uid(), catId, supplier:IMP.supplier, title:IMP.title||'מחירון', updated:today(), items: items.map(importItem)};
+    if(addVat) l.vatAdded = today();
     S.lists.push(l); markOk(l); openList = l.id; toast(`יובאו ${items.length} פריטים ל${IMP.supplier}`);
   }
   openCats.add(catId); save(); closeModal(); setTab('lists');
@@ -23593,6 +23660,16 @@ Object.defineProperties(SPX, {
 "daysChips":{get(){return daysChips},enumerable:true},
 "toggleSupDay":{get(){return toggleSupDay},enumerable:true},
 "saveSupplier":{get(){return saveSupplier},enumerable:true},
+"vatBoxHTML":{get(){return vatBoxHTML},enumerable:true},
+"vatRedraw":{get(){return vatRedraw},enumerable:true},
+"vatDo":{get(){return vatDo},enumerable:true},
+"vatConvert":{get(){return vatConvert},enumerable:true},
+"impVat":{get(){return impVat},enumerable:true},
+"vatInFile":{get(){return vatInFile},enumerable:true},
+"parseImport0":{get(){return parseImport0},enumerable:true},
+"VAT_RATE":{get(){return VAT_RATE},enumerable:true},
+"VAT_PCT":{get(){return VAT_PCT},enumerable:true},
+"supNoVat":{get(){return supNoVat},enumerable:true},
 "waLink":{get(){return waLink},enumerable:true},
 "gmailLink":{get(){return gmailLink},enumerable:true},
 "nextDelivery":{get(){return nextDelivery},enumerable:true},
