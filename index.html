@@ -3523,6 +3523,15 @@ const appStorage = {
       showCloudError(msg);
       throw new Error(msg);
     }
+    if(!roleCanWrite(key)){
+      // משתמש מוגבל: לא מנסים לשמור נתונים שאין לו הרשאה עליהם (גם חוקי Firestore חוסמים את זה)
+      console.info("שמירה דולגה - אין הרשאה למשתמש הזה:", key);
+      if(key !== "uiPrefs-data"){
+        const label = (typeof BACKUP_KEY_LABELS !== "undefined" && BACKUP_KEY_LABELS[key]) || key;
+        showToast(`השינוי ב"${label}" לא נשמר - אין לך הרשאה לעדכן את זה`);
+      }
+      return { value };
+    }
     const ref = db.collection(APP_COLLECTION).doc(key);
     const prev = await ref.get({ source: "server" });   // אם זה נכשל - השמירה נכשלת, ולא דורסים
     const prevValue = prev.exists ? prev.data().value : null;
@@ -3896,6 +3905,15 @@ const ROLES = {
   cook: { label:"טבח", tabs:["procurement"] }
 };
 let currentRole = "admin";
+/* אילו נתונים כל משתמש מוגבל רשאי לשמור. חייב להתאים לחוקי Firestore בקונסול של Firebase. */
+const ROLE_WRITE_KEYS = {
+  accountant: ["acctInbox-data", "loginLog-data"],
+  moshe: ["licensing-data", "ttd-data", "tasks-data", "vendorPayments-data", "files-data", "loginLog-data"]
+};
+function roleCanWrite(key){
+  const list = ROLE_WRITE_KEYS[currentRole];
+  return !list || list.includes(key);
+}
 function allowedTabs(){
   const r = ROLES[currentRole];
   return r.tabs ? tabs.filter(t => r.tabs.includes(t)) : tabs;
