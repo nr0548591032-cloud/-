@@ -3419,7 +3419,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261105; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261111; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -3438,6 +3438,7 @@ const UID_TO_ROLE = {
    4. שמירה שמוחקת חלק גדול מהרשומות נעצרת ודורשת אישור מפורש.
    ===================================================================== */
 const loadStatus = {};          // key -> "ok" | "failed"
+const loadErrorCode = {};       // key -> קוד השגיאה של Firebase בטעינה שנכשלה (permission-denied, unavailable...)
 const originalLoad = {};        // key -> הערך שהיה בענן כשהמכשיר הזה טען אותו (לזיהוי שינוי ממכשיר אחר)
 let cloudReady = false;         // true רק אחרי שכל המפתחות נטענו בהצלחה
 const BACKUP_MAX_VERSIONS = 10;
@@ -3512,6 +3513,7 @@ const appStorage = {
       }
     }
     loadStatus[key] = "failed";
+    loadErrorCode[key] = (lastErr && lastErr.code) || (lastErr && lastErr.message) || "unknown";
     throw lastErr;
   },
   async set(key, value, opts){
@@ -3890,7 +3892,7 @@ const ROLES = {
   admin: { label:"מנהל", tabs:null },
   moshe: { label:"משה כהן", tabs:["licensing"] },
   maintenance: { label:"איש תחזוקה", tabs:["tasks","equipment","licensing"] },
-  accountant: { label:"מנהל חשבונות", tabs:["accountant","files"] },
+  accountant: { label:"מנהל חשבונות", tabs:["accountant"] },
   cook: { label:"טבח", tabs:["procurement"] }
 };
 let currentRole = "admin";
@@ -19183,6 +19185,33 @@ function backfillProcInvoiceSync(){
   }
 }
 
+/* הסבר בעברית לסיבה האמיתית שהטעינה נכשלה, לפי קוד השגיאה של Firebase */
+function cloudLoadFailReason(failedKeys){
+  const codes = failedKeys.map(k => String(loadErrorCode[k] || "")).filter(Boolean);
+  const code = codes[0] || "";
+  const has = c => codes.some(x => x === c || x.indexOf(c) !== -1);
+  const who = (ROLES[currentRole] && ROLES[currentRole].label) || "המשתמש הזה";
+  const safe = "האפליקציה לא נפתחה כדי לא לפגוע בנתונים הקיימים.";
+  if(has("permission-denied") || /insufficient permissions/i.test(code)){
+    return { code, title: "אין הרשאה לקרוא את הנתונים",
+      msg: `המשתמש <b>${escHtml(who)}</b> מחובר, אבל שרת הנתונים (Firestore) לא מרשה לו לקרוא את הנתונים. זו לא בעיה בסיסמה או באינטרנט: צריך לעדכן את חוקי ההרשאות ב-Firebase. פנה למנהל המערכת.<br>${safe}` };
+  }
+  if(has("unauthenticated")){
+    return { code, title: "פג תוקף ההתחברות",
+      msg: `צריך להתחבר מחדש. לחץ "נסה שוב", ואם המסך חוזר - התנתק והתחבר שוב.<br>${safe}` };
+  }
+  if(has("unavailable") || has("deadline-exceeded") || has("offline") || has("failed-precondition") || has("network")){
+    return { code, title: "אין חיבור לשרת הנתונים",
+      msg: `ההתחברות הצליחה, אבל אין גישה לשרת הנתונים של Google (firestore.googleapis.com). בדרך כלל זה בגלל אינטרנט לא יציב, או סינון אינטרנט (כמו נטפרי או רימון) שחוסם את הכתובת הזו. נסה מרשת אחרת (למשל גלישה סלולרית), או בקש מספק הסינון לפתוח את הכתובת firestore.googleapis.com.<br>${safe}` };
+  }
+  if(has("resource-exhausted")){
+    return { code, title: "השרת עמוס כרגע",
+      msg: `שרת הנתונים הגיע למכסה זמנית. נסה שוב בעוד כמה דקות.<br>${safe}` };
+  }
+  return { code, title: "לא הצלחנו לטעון את הנתונים מהענן",
+    msg: `בדוק את חיבור האינטרנט ונסה שוב. אם זה חוזר, שלח למנהל צילום של המסך הזה (כולל הקוד למטה).<br>${safe}` };
+}
+
 async function initAppData(){
   await loadAll();
   const failedKeys = Object.keys(loadStatus).filter(k => loadStatus[k] === "failed");
@@ -19190,8 +19219,9 @@ async function initAppData(){
     // טעינה נכשלה: לא מציגים את האפליקציה עם נתוני התחלה ולא שומרים כלום. מסך חסימה עם "נסה שוב".
     cloudReady = false;
     console.error("טעינה מהענן נכשלה", failedKeys);
-    showCloudBlock("לא הצלחנו לטעון את הנתונים מהענן",
-      "כדי לא לפגוע בנתונים הקיימים, האפליקציה לא תיפתח עד שהטעינה תצליח. בדוק את חיבור האינטרנט ונסה שוב.<br><span style=\"font-size:12px;opacity:.8\">נכשל: " + failedKeys.map(k => BACKUP_KEY_LABELS[k] || k).join(", ") + "</span>");
+    const why = cloudLoadFailReason(failedKeys);
+    showCloudBlock(why.title,
+      why.msg + "<br><span style=\"font-size:12px;opacity:.8\">נכשל: " + failedKeys.map(k => BACKUP_KEY_LABELS[k] || k).join(", ") + (why.code ? " · קוד: " + escHtml(why.code) : "") + "</span>");
     return;
   }
   cloudReady = true;
