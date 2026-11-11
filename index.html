@@ -11741,6 +11741,7 @@ async function acxRefreshRemote(force){
       originalLoad["acctInbox-data"] = v;
       const applied = acxApplyInbox();
       if(applied.length) jobToast(`מנהל החשבונות סימן ${applied.length === 1 ? "תשלום אחד" : applied.length + " תשלומים"} כשולם`, 4000);
+      else if(applied.bankUpdates) jobToast(`מנהל החשבונות עדכן פרטי בנק (${applied.bankUpdates})`, 4000);
     }else if(acxIsAcc()){
       const v = await acxFetchDoc("acctSends-data");
       data.acctSends = acxParseSends(v);
@@ -11770,7 +11771,7 @@ function acxApplyInbox(){
   const applied = [];
   if(!acxIsAdmin() || !acctLink.ready) return applied;
   const marks = (data.acctInbox && data.acctInbox.marks) || {};
-  let chV = false, chS = false;
+  let chV = false, chS = false, bankUpdates = 0;
   Object.keys(marks).forEach(key => {
     const m = marks[key]; if(!m || typeof m !== "object") return;
     const pk = acxParseKey(key), k = pk.k;
@@ -11797,6 +11798,19 @@ function acxApplyInbox(){
       }
       row.acctReceiptApplied = m.receiptUrl; ch = true;
     }
+    if(m.bank && m.bank.at && row.acctBankApplied !== m.bank.at){
+      const nb = { bank: String(m.bank.bank || ""), branch: String(m.bank.branch || ""), account: String(m.bank.account || ""), holder: String(m.bank.holder || "") };
+      if(k === "s"){
+        data.bank = data.bank || [];
+        let br = data.bank.find(x => x && x.name && x.name === row.name);
+        if(!br && row.name){ br = { id: nextId() + 8000, name: row.name, bank: "", branch: "", account: "", holder: "" }; data.bank.push(br); }
+        if(br) Object.assign(br, nb);
+      }else{
+        Object.assign(row, nb);
+      }
+      if(row.paymentStatus === "חסר פרטים" && nb.account.trim()) row.paymentStatus = "ממתין";
+      row.acctBankApplied = m.bank.at; ch = true; bankUpdates++;
+    }
     if(ch){ if(k === "s") chS = true; else chV = true; }
   });
   if(chS) saveInstallments();
@@ -11805,6 +11819,7 @@ function acxApplyInbox(){
     try{ renderVendorPay(); }catch(e){}
     if(chS){ try{ renderStaff(); renderPayment(); }catch(e){ console.error(e); } }
   }
+  applied.bankUpdates = bankUpdates;
   return applied;
 }
 
@@ -12906,7 +12921,9 @@ function acxInboxItem(x){
   const mark = ((data.acctInbox && data.acctInbox.marks) || {})[key] || null;
   const paidRow = !!row && acctStatusOf(row) === "שולם";
   const paidMark = !!(mark && mark.paidAt && !mark.undone);
-  const bank = row ? acxBankFor(x.k, row) : { bank: "", branch: "", account: "", holder: "" };
+  let bank = row ? acxBankFor(x.k, row) : { bank: "", branch: "", account: "", holder: "" };
+  const bankByAcc = !!(mark && mark.bank && mark.bank.at && !(row && row.acctBankApplied === mark.bank.at));
+  if(mark && mark.bank && mark.bank.at) bank = { bank: mark.bank.bank || "", branch: mark.bank.branch || "", account: mark.bank.account || "", holder: mark.bank.holder || "" };
   let amount = x.amount || 0;
   if(row){ try{ amount = x.k === "s" ? computeStaffTotal(row) : (parseFloat(row.amount) || amount); }catch(e){} }
   let docs = [];
@@ -12914,7 +12931,7 @@ function acxInboxItem(x){
   const inv = docs.find(d => isInvoiceDocType(d.docType)) || null;
   const rec = (mark && mark.receiptUrl) ? { fileUrl: mark.receiptUrl } : (docs.find(d => isReceiptDocType(d.docType)) || null);
   const canUndo = paidMark && (!paidRow || (row && row.paidBy === "מנהל החשבונות"));
-  return { key, k: x.k, x, row, mark, paid: paidRow || paidMark, paidAt: (paidMark && mark.paidAt) || (row && row.paidAt) || "", bank, amount, inv, rec, canUndo,
+  return { key, k: x.k, x, row, mark, paid: paidRow || paidMark, paidAt: (paidMark && mark.paidAt) || (row && row.paidAt) || "", bank, bankByAcc, amount, inv, rec, canUndo,
            name: (row && (x.k === "s" ? row.name : row.vendor)) || x.name, title: x.desc || (row && row.desc) || "" };
 }
 function acxInboxCard(it, i){
@@ -12924,12 +12941,32 @@ function acxInboxCard(it, i){
     <div class="acx-top"><div class="acx-main"><span class="acx-name">${escHtml(it.name)}</span><span class="acx-title">${escHtml(it.title)}</span></div>
       <div class="acx-side"><span class="acx-amt">${fmtMoney(it.amount)}</span><span class="acx-chip ${it.paid ? "paid" : "ready"}">${it.paid ? "שולם" : "לטיפול"}</span></div></div>
     ${!it.row ? `<div class="acx-m-note">הרשומה הוסרה במערכת. כדאי לבדוק עם נפתלי.</div>` : ""}
+    ${acctUi.bankEdit === it.key && it.row ? `
+    <div class="acx-bankedit" data-bank-key="${it.key}" style="display:flex;flex-direction:column;gap:10px;background:#f6f1e7;border-radius:14px;padding:12px">
+      <span class="acx-lbl">עדכון פרטי בנק</span>
+      <div class="acx-f2">
+        <label class="acx-f"><span>בנק</span><input type="text" data-bank-f="bank" value="${escHtml(b.bank || "")}" placeholder="למשל: לאומי"></label>
+        <label class="acx-f"><span>סניף</span><input type="text" inputmode="numeric" data-bank-f="branch" value="${escHtml(b.branch || "")}"></label>
+      </div>
+      <div class="acx-f2">
+        <label class="acx-f"><span>מספר חשבון</span><input type="text" inputmode="numeric" data-bank-f="account" value="${escHtml(b.account || "")}"></label>
+        <label class="acx-f"><span>שם בעל החשבון</span><input type="text" data-bank-f="holder" value="${escHtml(b.holder || "")}"></label>
+      </div>
+      <div class="acx-row">
+        <button type="button" class="acx-btn ok" data-acx-in="banksave" data-key="${it.key}">${acxIco("check", 16, 2.6)}שמירה</button>
+        <button type="button" class="acx-btn ghost" data-acx-in="bankcancel" data-key="${it.key}">ביטול</button>
+      </div>
+    </div>` : `
     <div class="acx-bankbox">
       <div><span>בנק</span><b>${escHtml(b.bank || "—")}</b></div>
       <div><span>סניף</span><b>${escHtml(b.branch || "—")}</b></div>
       <div><span>חשבון</span><span style="display:inline-flex;align-items:center;gap:6px"><b>${escHtml(b.account || "—")}</b>${b.account ? `<button type="button" class="acx-copy" data-acx-in="copy" data-v="${escHtml(b.account)}" aria-label="העתקת מספר החשבון">${acxIco("copy", 14)}</button>` : ""}</span></div>
       <div><span>ע״ש</span><b>${escHtml(b.holder || "—")}</b></div>
     </div>
+    ${it.row ? `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:-4px">
+      <span style="font-size:12.5px;color:var(--ink-soft)">${it.bankByAcc ? "עדכנת את פרטי הבנק · נפתלי מקבל עדכון" : ""}</span>
+      <button type="button" class="acx-btn ghost" style="min-height:34px;border:none;text-decoration:underline;color:var(--ink-soft);padding:0 4px" data-acx-in="bankedit" data-key="${it.key}">${b.account ? "עדכון פרטי בנק" : "הוספת פרטי בנק"}</button>
+    </div>` : ""}`}
     <div class="acx-row">
       ${it.inv ? `<button type="button" class="acx-pill" data-fv-url="${escHtml(it.inv.fileUrl)}" data-fv-title="חשבונית · ${escHtml(it.name)}" data-fv-kind="invoice">${acxIco("doc", 15)}חשבונית</button>` : (it.k === "s" ? "" : `<span class="acx-ck soft">אין חשבונית מצורפת</span>`)}
       ${it.rec ? `<button type="button" class="acx-pill" data-fv-url="${escHtml(it.rec.fileUrl)}" data-fv-title="קבלה · ${escHtml(it.name)}" data-fv-kind="receipt">${acxIco("doc", 15)}קבלה</button>` : ""}
@@ -13008,6 +13045,22 @@ function acxInboxAction(act, el){
     return;
   }
   if(!acctLink.ready){ jobToast("המשלוחים לא נטענו, רענן את הדף"); return; }
+  if(act === "bankedit"){ acctUi.bankEdit = key; withScrollPreserved(() => renderAccountantReport()); const f = document.querySelector(`[data-bank-key="${key}"] [data-bank-f="bank"]`); if(f) f.focus(); return; }
+  if(act === "bankcancel"){ acctUi.bankEdit = null; withScrollPreserved(() => renderAccountantReport()); return; }
+  if(act === "banksave"){
+    const box = document.querySelector(`[data-bank-key="${key}"]`); if(!box) return;
+    const v = f => { const i = box.querySelector(`[data-bank-f="${f}"]`); return i ? i.value.trim() : ""; };
+    const nb = { bank: v("bank"), branch: v("branch"), account: v("account"), holder: v("holder") };
+    if(!nb.bank && !nb.branch && !nb.account && !nb.holder){ jobToast("לא מולאו פרטים"); return; }
+    if(nb.account && !/^[0-9\-\s\/]+$/.test(nb.account)){ jobToast("מספר החשבון יכול להכיל רק ספרות"); return; }
+    const m = acxInMark(key);
+    m.bank = Object.assign(nb, { at: new Date().toISOString() });
+    acxSaveInbox();
+    acctUi.bankEdit = null;
+    withScrollPreserved(() => renderAccountantReport());
+    jobToast("פרטי הבנק נשמרו · נפתלי יקבל עדכון");
+    return;
+  }
   if(act === "paid"){
     const m = acxInMark(key);
     const inp = document.querySelector(`[data-acx-in-note="${key}"]`);
@@ -19256,6 +19309,7 @@ async function initAppData(){
   try{
     const appliedMarks = acxApplyInbox();
     if(appliedMarks.length) setTimeout(() => jobToast(`מנהל החשבונות סימן ${appliedMarks.length === 1 ? "תשלום אחד" : appliedMarks.length + " תשלומים"} כשולם`, 4500), 900);
+    else if(appliedMarks.bankUpdates) setTimeout(() => jobToast(`מנהל החשבונות עדכן פרטי בנק (${appliedMarks.bankUpdates})`, 4500), 900);
   }catch(e){ console.error(e); }
   buildNav();
   buildInstallmentTabs();
