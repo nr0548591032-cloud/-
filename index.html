@@ -19798,6 +19798,39 @@ async function autoBackupIfDue(){
 .spx .plcmp>div{background:var(--sp-bg);border-radius:10px;padding:6px 9px;min-width:0}
 .spx .plcmp span{display:block;font-size:11.5px;color:var(--sp-soft)}
 .spx .plcmp b{font-weight:600}
+.spx .plnew{gap:12px;padding:14px;border-radius:16px;box-shadow:var(--sp-shadow)}
+.spx .pltop{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.spx .pltop .plname{font-size:16px;line-height:1.35}
+.spx .plq{display:flex;align-items:center;gap:8px}
+.spx .plq>span{width:24px;height:24px;border-radius:50%;background:var(--sp-brand);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.spx .plq b{font-size:15.5px;font-weight:600}
+.spx .pltiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.spx .pltile{position:relative;border:1px solid var(--sp-line);background:#fff;border-radius:14px;padding:12px 6px 10px;font:inherit;color:var(--sp-ink);display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;cursor:pointer;min-height:108px}
+.spx .pltile[aria-pressed="true"]{border:2px solid var(--sp-brand);background:var(--sp-tint-a);padding:11px 5px 9px}
+.spx .pltile .pli{color:var(--sp-brand)}.spx .pltile .pli svg.i{width:30px;height:30px;stroke-width:1.5}
+.spx .pltile b{font-size:14px;font-weight:600}.spx .pltile>span:last-child{font-size:12px;color:var(--sp-soft);line-height:1.35}
+.spx .plon{position:absolute;top:6px;left:6px;width:20px;height:20px;border-radius:50%;background:var(--sp-brand);color:#fff;display:flex;align-items:center;justify-content:center}
+.spx .plopts{display:flex;flex-direction:column;gap:8px}
+.spx .plopt{border:1px solid var(--sp-line);background:#fff;border-radius:14px;padding:11px 12px;font:inherit;color:var(--sp-ink);display:flex;gap:10px;text-align:right;align-items:flex-start;cursor:pointer;min-height:56px}
+.spx .plopt[aria-pressed="true"]{border:2px solid var(--sp-brand);background:var(--sp-tint-a);padding:10px 11px}
+.spx .plopt>span:last-child{display:flex;flex-direction:column;gap:2px}.spx .plopt b{font-size:14.5px;font-weight:600}.spx .plopt>span:last-child>span{font-size:12.5px;color:var(--sp-soft)}
+.spx .plrad{width:22px;height:22px;border-radius:50%;flex:none;margin-top:1px;border:2px solid rgba(32,30,29,.3);display:flex;align-items:center;justify-content:center}
+.spx .plopt[aria-pressed="true"] .plrad{background:var(--sp-brand);border-color:var(--sp-brand);color:#fff}
+.spx .plstep{display:inline-flex;align-items:center;border:1px solid var(--sp-line);border-radius:999px;background:#fff;overflow:hidden}
+.spx .plstep button{width:42px;height:42px;border:0;background:transparent;font:inherit;font-size:20px;cursor:pointer;color:var(--sp-ink)}
+.spx .plstep input{width:58px;height:42px;border:0;text-align:center;font:inherit;font-size:17px;font-weight:600;background:transparent;padding:0}
+.spx .chip.big{min-height:42px;padding:0 16px;font-size:14px}
+.spx .plsides{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.spx .plsides>div{background:var(--sp-bg);border-radius:12px;padding:9px;display:flex;flex-direction:column;align-items:center;gap:1px;text-align:center;font-size:12.5px;color:var(--sp-soft)}
+.spx .plsides b{font-size:17px;color:var(--sp-ink);font-weight:700}
+.spx .plres{background:var(--sp-green-bg);color:#2f3a1f;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;font-size:14px}
+.spx .plres b{font-weight:600}.spx .plres-h{font-size:12.5px;font-weight:600;color:var(--sp-green)}
+.spx .plres-ex{border-top:1px dashed rgba(95,111,69,.45);margin-top:3px;padding-top:5px;font-size:13.5px}
+.spx .plres.wait{background:var(--sp-chip);color:var(--sp-soft);font-size:13.5px}
+.spx .plprog{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--sp-soft)}
+.spx .plbar2{flex:1;height:6px;border-radius:99px;background:#e3d8c6;overflow:hidden}.spx .plbar2>span{display:block;height:100%;background:var(--sp-brand);border-radius:99px}
+.spx .sb-link{background:none;border:0;padding:2px 0;font:13.5px var(--sp-f-body);color:var(--sp-red);text-decoration:underline;cursor:pointer;align-self:flex-start}
+@media (max-width:380px){.spx .pltiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .spx .plN{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;background:var(--sp-bg);border-radius:10px;padding:3px 3px 3px 10px}
 .spx .plN input{width:64px;text-align:center;padding:5px 6px}
 .spx .plbox{gap:10px}
@@ -21243,28 +21276,31 @@ function impReviewHTML(parsed){
   const ruled = parsed.filter(p => p.fixed === 'rule' || p.fixed === 'item' || p.okd === 'rule').length;
   IMP.flagList = [...fl.map(x => norm(x.p.name)), ...man.map(p => norm(p.name))];
   if(!fl.length && !man.length && !ruled) return '';
-  const card = (p, iss, i, done) => plCardHTML({id:'i'+i, name:p.name, sub: p.raw ? 'בקובץ: '+esc(p.raw) : '', price:p.price, pack:p.pack>1?p.pack:1, packPrice:p.packPrice, iss,
-    done, doneTxt: p.okd ? 'סומן כתקין' : p.stockFix ? `בשמירה: המלאי ייספר בקרטונים של ${p.pack}` : p.basis==='pack' ? `קרטון של ${p.pack} ב-${money(p.packPrice)}, ${money(p.price)} ליחידה` : `קרטון של ${p.pack}, ${money(p.price)} ליחידה`, undo: `impUndo(${i})`}, 'impFix');
+  const card = (p, iss, i, done, next) => { const d = {id:'i'+i, name:p.name, sub: p.raw ? 'בקובץ: '+esc(p.raw) : '', price:p.price, pack:p.pack>1?p.pack:1, packPrice:p.packPrice, unit:p.unit, key:plKey(p.name), iss, next,
+    done, doneTxt: p.measure ? `יחידה של ${qn(p.measure)} ב-${money(p.price)}` : p.single ? `${money(p.price)} ליחידה, בלי קרטון` : p.okd ? 'סומן כתקין' : p.stockFix ? `בשמירה: המלאי ייספר בקרטונים של ${p.pack}` : p.basis==='pack' ? `קרטון של ${p.pack} ב-${money(p.packPrice)}, ${money(p.price)} ליחידה` : (p.pack > 1 ? `קרטון של ${p.pack}, ${money(p.price)} ליחידה` : `${money(p.price)} ליחידה`), undo: `impUndo(${i})`}; if(!done) PLC_CARDS[d.id] = d; return plCardHTML(d, 'impFix'); };
+  const vis = fl.map((x, i) => ({x, i})).filter(o => !PLSKIP.has('impFix:' + norm(o.x.p.name))), skipped = fl.length - vis.length;
   return `<div class="sp-card flat plbox">
     <div class="row between"><h3 style="margin:0">בדיקת שורות</h3><span class="row">
       <span class="tag g sp-num">${parsed.length - fl.length} תקינות</span>${fl.length?`<span class="tag a sp-num">${fl.length} לבדיקה</span>`:''}${ruled?`<span class="tag b sp-num">${ruled} תוקנו לפי מה שקבעת בעבר</span>`:''}</span></div>
-    ${fl.length ? `<p class="muted" style="margin:0">בשורות האלה משהו לא מסתדר מול המלאי, המחירון הקודם או ספק אחר. אפשר לייבא גם בלי לבדוק, והן יחכו במסך "בדיקת מחירון". מה שתתקן כאן יישמר לספק ויוחל בייבוא הבא.</p>` : ''}
-    <div class="plist">${fl.slice(0, 40).map((x, i) => card(x.p, x.iss, i, false)).join('')}
+    ${fl.length ? `<p class="muted" style="margin:0">בשורות האלה משהו לא מסתדר מול המלאי, המחירון הקודם או ספק אחר. עונים על שאלה אחת לכל מוצר. אפשר גם לדלג או לייבא בלי לבדוק, והן יחכו במסך "בדיקת מחירון".</p>` : ''}
+    ${vis.length ? (() => { IMP.plStart = Math.max(IMP.plStart || 0, fl.length); const pos = IMP.plStart - vis.length + 1; return `<div class="plprog"><span class="sp-num">מוצר ${pos} מתוך ${IMP.plStart}</span><span class="plbar2"><span style="width:${Math.round((pos-1)/IMP.plStart*100)}%"></span></span></div>`; })() : ''}
+    <div class="plist">${vis.length ? card(vis[0].x.p, vis[0].x.iss, vis[0].i, false, vis.length > 1) : ''}
+      ${skipped ? `<div class="row between"><span class="muted sp-num">דילגת על ${skipped} שורות. הן ייובאו כמו בקובץ ויחכו בבדיקת המחירון.</span><button class="sb sb-ghost sm" onclick="with(SP){plUnskip('impFix')}">להציג שוב</button></div>` : ''}
       ${man.map((p, j) => card(p, [{t:'nopack', sd:1}], fl.length + j, true)).join('')}</div>
-    ${fl.length > 40 ? `<p class="muted sp-num">מוצגות 40 מתוך ${fl.length}. השאר יופיעו בבדיקת המחירון.</p>` : ''}
   </div>`;
 }
-function impFix(id, basis){
+function impFix(id, basis, nIn){
   const i = +String(id).slice(1), k = IMP.flagList && IMP.flagList[i]; if(k === undefined) return;
-  const n = plNOf(id);
+  const n = nIn != null ? nIn : plNOf(id); delete PLQ[id];
   if((basis === 'pack' || basis === 'unit') && !(n > 1)){ toast('צריך לכתוב כמה יחידות בקרטון'); const e = $('#sp-plN-'+id); e && e.focus(); return; }
   IMP.fix = IMP.fix || {};
-  IMP.fix[k] = basis === 'ok' ? {ok:true} : basis === 'file' ? {file:true} : basis === 'stock' ? {stock:true} : {pack:n, basis};
+  const tosd = basis === 'tosd' ? plStockDiv(plKey(k)) : 0;
+  IMP.fix[k] = basis === 'ok' ? {ok:true} : basis === 'file' ? {file:true} : basis === 'stock' ? {stock:true} : basis === 'real' ? {real:n} : basis === 'measure' ? {measure:n} : basis === 'single' ? {single:true} : tosd > 1 ? {pack:tosd, basis:'unit'} : {pack:n, basis};
   drawImport();
 }
 function impUndo(i){ const k = IMP.flagList && IMP.flagList[i]; if(k !== undefined && IMP.fix) delete IMP.fix[k]; drawImport(); }
 function onImpWb(wb){ IMP.wb = wb; IMP.sheets = wb.SheetNames; IMP.sheet = wb.SheetNames[0]; onImpRows(sheetRows(wb, IMP.sheet)); }
-function onImpRows(rows){ IMP.fix = {}; IMP.rows = rows; IMP.header = findHeader(rows); IMP.map = guessMap(rows, IMP.header, IMP_FIELDS); IMP.basis = 'unit'; IMP.basisSet = false; IMP.basisAuto = false; drawImport(); }
+function onImpRows(rows){ IMP.fix = {}; IMP.plStart = 0; IMP.rows = rows; IMP.header = findHeader(rows); IMP.map = guessMap(rows, IMP.header, IMP_FIELDS); IMP.basis = 'unit'; IMP.basisSet = false; IMP.basisAuto = false; drawImport(); }
 function sameSupList(){ const sup=(IMP.supplier||'').trim(); return sup && IMP.catId!=='__new' && S.lists.some(l=>l.catId===IMP.catId && l.supplier===sup); }
 function importTarget(){
   if(IMP.mode==='new') return null;
@@ -21341,6 +21377,9 @@ function parseRows(basis){
     if(!fx && old && packOf(old) > 1){ fx = {pack: packOf(old), basis: old.basis === 'pack' ? 'pack' : 'unit'}; src = 'item'; }
     if(fx && fx.file){ /* "הקובץ נכון": לא מחילים את הכלל הישן */ }
     else if(fx && fx.stock){ p.fixed = 'manual'; p.stockFix = true; }
+    else if(fx && fx.measure > 0){ p.price = unitPrice4((packPrice > 0 ? packPrice : unit) * fx.measure); delete p.pack; delete p.basis; delete p.packPrice; p.measure = fx.measure; p.measurePer = unitPrice4(packPrice > 0 ? packPrice : unit); p.fixed = src || 'manual'; }
+    else if(fx && fx.single){ if(packPrice > 0) p.price = unitPrice4(packPrice); delete p.pack; delete p.basis; delete p.packPrice; p.single = true; p.fixed = src || 'manual'; }
+    else if(fx && fx.real >= 1){ if(fx.real > 1){ p.pack = fx.real; delete p.basis; delete p.packPrice; } else { delete p.pack; delete p.basis; delete p.packPrice; p.single = true; } p.real = fx.real; p.fixed = src || 'manual'; }
     else if(fx && fx.ok){ if(src === 'manual' || Math.abs(unit - (+fx.p||0)) < 0.0001) p.okd = src || 'rule'; }
     else if(fx && fx.pack > 1){
       if(pack > 1 && pack !== fx.pack && src !== 'manual') p.conflict = fx.pack;
@@ -21359,6 +21398,7 @@ function importItem(p){
   if(p.barcode) it.barcode = p.barcode;
   if(p.pack > 1){ it.pack = p.pack; it.packOnly = true; }
   if(p.basis==='pack'){ it.basis = 'pack'; it.packPrice = p.packPrice; }
+  if(p.measure) it.measure = {n: p.measure, per: p.measurePer};
   it.history = []; return it;
 }
 function commitImport(){
@@ -21376,6 +21416,9 @@ function commitImport(){
   /* מה שתוקן או אושר בבדיקה נשמר ככלל לספק */
   Object.entries(IMP.fix||{}).forEach(([k, f]) => { const it = items.find(p => norm(p.name) === k); if(!it) return;
     if(f.stock){ plStockFollow(plKey(it.name), it.pack); return; }
+    if(f.measure){ plSetRule(IMP.supplier, it.name, {measure: f.measure}); return; }
+    if(f.single){ plSetRule(IMP.supplier, it.name, {single: true}); return; }
+    if(f.real){ const key = plKey(it.name), sd = plStockDiv(key); if(sd > 1 && [it.price, it.fileUnit].some(x => Math.abs((+x||0) - sd) < 0.005)) plStockSet(key, f.real); plSetRule(IMP.supplier, it.name, f.real > 1 ? {pack: f.real, basis: 'unit'} : {single: true}); return; }
     if(f.file){ if(it.pack > 1) plSetRule(IMP.supplier, it.name, {pack: it.pack, basis: it.basis === 'pack' ? 'pack' : 'unit'}); else { const s0 = S.suppliers[IMP.supplier]; if(s0 && s0.rules) delete s0.rules[k]; } }
     else plSetRule(IMP.supplier, it.name, f.ok ? {ok:true, p: it.fileUnit} : {pack: f.pack, basis: f.basis}); });
   const markOk = list => list.items.forEach(it => { const k = norm(it.name); if(IMP.fix && IMP.fix[k] && !IMP.fix[k].file) it.ok = plSnapOf(it, plKey(it.name)); });
@@ -21385,6 +21428,8 @@ function commitImport(){
       if(o){ if(Math.abs((o.price||0)-p.price) > 0.0001){ o.history=o.history||[]; o.history.push({date:today(), price:o.price}); o.price=p.price; ch++; } if(p.sku) o.sku=p.sku; if(p.unit) o.unit=p.unit; if(p.barcode) o.barcode=p.barcode;
         /* כמות באריזה מתעדכנת רק כשהקובץ (או אישור שלך) נתן אותה. אחרת מה שהוגדר ידנית נשאר */
         if(p.pack > 1){ o.pack = p.pack; if(o.packOnly===undefined) o.packOnly = true; }
+        else if(p.single || p.measure){ delete o.pack; delete o.packOnly; }
+        if(p.measure) o.measure = {n: p.measure, per: p.measurePer}; else if(o.measure && !p.measure) delete o.measure;
         if(p.basis==='pack'){ o.basis = 'pack'; o.packPrice = p.packPrice; } else { delete o.basis; delete o.packPrice; } }
       else { ex.items.push(importItem(p)); nw++; } });
     ex.updated = today(); if(IMP.title) ex.title = IMP.title; openList = ex.id; catId = ex.catId; markOk(ex);
@@ -21502,66 +21547,192 @@ function plAll(){
 /* כרטיס אחד של חשד, משותף לייבוא ולבדיקת המחירון.
    d = {id, name, sub, price, pack, packPrice, iss, done, doneTxt}, act = שם הפונקציה (impFix / plFix) */
 function plCardHTML(d, act){
-  const n = plSugN(d.iss, d.pack), likely = plLikely(d.price, n, d.iss);
-  const t0 = d.iss[0].t, tg = PL_TAG[t0] || ['a','לבדיקה'];
-  const mism = d.iss.every(x => x.t === 'mismatch' || x.t === 'conflict');
-  const cur = `<div class="plcmp sp-num">
-      <div><span>מחיר ליחידה</span><b>${money(d.price)}</b></div>
-      <div><span>מחיר לקרטון</span><b>${d.pack > 1 ? money(d.packPrice || d.price*d.pack) : 'אין קרטון'}</b></div>
-      <div><span>יחידות בקרטון</span><b>${d.pack > 1 ? d.pack : '—'}</b></div></div>`;
-  const prev = n > 1 && !mism ? `<div class="muted sp-num" id="sp-plPv-${d.id}">אם המחיר לקרטון של ${n}: ${money(d.price/n)} ליחידה</div>` : '';
-  const btns = d.iss.some(x => x.t === 'conflict')
-    ? `<button class="sb sm" onclick="with(SP){${act}('${d.id}','file')}">${ic('check','sm')}הקובץ נכון, לעדכן את הכלל</button>`
-    : mism
-    ? (()=>{ const mi = d.iss.find(x => x.t === 'mismatch'); return `<button class="sb sm" onclick="with(SP){${act}('${d.id}','stock')}">${ic('check','sm')}זה אותו קרטון: לספור במלאי כמו הספק (${mi.pk} בקרטון)</button>
-       ${act === 'plFix' ? `<button class="sb sb-soft sm" onclick="with(SP){${act}('${d.id}','tosd')}">לתקן במחירון לקרטון של ${mi.sd}</button>` : ''}
-       <button class="sb sb-ghost sm" onclick="with(SP){${act}('${d.id}','ok')}">אותה יחידה, רק קרטון בגודל אחר</button>
-       <div class="muted" style="width:100%">"לספור כמו הספק": מספר הקרטונים במלאי לא משתנה, ומעכשיו כל קרטון נספר כ-${mi.pk} יחידות של הספק.</div>`; })()
-    : `<button class="sb sm ${likely==='unit'?'sb-soft':''}" onclick="with(SP){${act}('${d.id}','pack')}">${likely==='unit'?'':ic('check','sm')}המחיר הוא לקרטון</button>
-       <button class="sb sm ${likely==='unit'?'':'sb-soft'}" onclick="with(SP){${act}('${d.id}','unit')}">${likely==='unit'?ic('check','sm'):''}בקרטון, המחיר ליחידה</button>
-       <label class="plN">קרטון של <input id="sp-plN-${d.id}" class="sp-num" type="number" min="2" step="1" inputmode="numeric" value="${n>1?n:''}" placeholder="?" aria-label="כמה יחידות בקרטון" oninput="with(SP){plPreview('${d.id}',${d.price})}"></label>
-       <button class="sb sb-ghost sm" onclick="with(SP){${act}('${d.id}','ok')}">המחיר נכון</button>`;
-  return `<div class="plchk ${d.done?'done':''}">
-    <div class="row between" style="align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><b class="plname">${esc(d.name)}</b>${d.sub?`<div class="muted">${d.sub}</div>`:''}</div>
-      ${d.done ? `<span class="tag g">${ic('check','sm')}תוקן</span>` : `<span class="tag ${tg[0]}">${tg[1]}</span>`}</div>
-    ${d.done ? `<div class="row between"><span class="muted">${esc(d.doneTxt||'')}</span>${d.undo?`<button class="sb sb-ghost sm" onclick="with(SP){${d.undo}}">ביטול</button>`:''}</div>` : `
-    <div class="plwhy">${d.iss.map(x => `<div>${ic('alert','sm')}<span>${plWhy(x, d.price)}</span></div>`).join('')}</div>
-    ${cur}${prev}
-    <div class="row">${btns}</div>`}
+  if(d.done) return `<div class="plchk done"><div class="row between" style="flex-wrap:nowrap"><div style="min-width:0"><b class="plname">${esc(d.name)}</b><div class="muted">${esc(d.doneTxt||'')}</div></div>${d.undo?`<button class="sb sb-ghost sm" onclick="with(SP){${d.undo}}">ביטול</button>`:''}</div></div>`;
+  const ty = plType(d.iss), st = plState(d, ty), t0 = ty === 'P' ? 'packprice' : d.iss[0].t, tg = PL_TAG[t0] || ['a','לבדיקה'];
+  const oc = `with(SP){plSet('${d.id}',this.dataset.k,'${act}')}`;
+  const tile = (k, icn, t, s) => `<button type="button" class="pltile" aria-pressed="${st.k===k}" data-k="${k}" onclick="${oc}">${st.k===k?`<span class="plon">${ic('check','sm')}</span>`:''}<span class="pli">${icn}</span><b>${t}</b><span>${s}</span></button>`;
+  const opt = (k, t, s) => `<button type="button" class="plopt" aria-pressed="${st.k===k}" data-k="${k}" onclick="${oc}"><span class="plrad">${st.k===k?ic('check','sm'):''}</span><span><b>${t}</b><span>${s}</span></span></button>`;
+  const q = (n, t) => `<div class="plq"><span>${n}</span><b>${t}</b></div>`;
+  const num = (lbl, step) => `<div class="row" style="gap:10px"><div class="plstep"><button type="button" aria-label="פחות" onclick="with(SP){plStepN('${d.id}',-1,'${act}')}">−</button><input id="sp-plN-${d.id}" class="sp-num" type="text" inputmode="decimal" value="${st.n||''}" placeholder="?" aria-label="${lbl}" oninput="with(SP){plSetN('${d.id}',this.value)}"><button type="button" aria-label="יותר" onclick="with(SP){plStepN('${d.id}',1,'${act}')}">+</button></div>${step||''}</div>`;
+  const u = esc(uLbl(d.unit) || 'יח׳');
+  let body = '';
+  if(ty === 'A'){
+    body = q(1, `המחיר ${money(d.price)} הוא בשביל…`)
+      + `<div class="pltiles">${tile('unit', IC_UNIT, 'יחידה אחת', `יחידה אחת עולה ${money(d.price)}`)}${tile('pack', IC_BOX, 'קרטון שלם', `כל הקרטון ב-${money(d.price)}`)}${tile('measure', IC_RULER, 'לפי מידה', 'מטר, ק״ג או ליטר')}</div>`
+      + (st.k === 'unit' ? q(2, 'כמה יחידות יש בקרטון אצל הספק?') + num('יחידות בקרטון', `<button type="button" class="chip" aria-pressed="${st.n==1}" onclick="with(SP){plSetN('${d.id}',1);plRedraw('${act}')}">נמכר בבודדים</button>`)
+        : st.k === 'pack' ? q(2, 'כמה יחידות יש בקרטון?') + num('יחידות בקרטון')
+        : st.k === 'measure' ? q(2, 'כמה מטר / ק״ג / ליטר יש ביחידה אחת?') + num('כמות ביחידה', '<span class="muted">למשל גליל של 25 מטר: 25</span>') : '');
+  } else if(ty === 'C'){
+    const x = d.iss.find(i => i.t === 'mismatch' || i.t === 'nopack'), sd = x.sd, pk = x.t === 'mismatch' ? x.pk : 1;
+    const par = S.par[d.key] || {}, cart = r2(parTarget(par) / sd);
+    body = `<div class="plsides"><div>${IC_WARE}<span>במחסן אתה סופר</span><b class="sp-num">קרטון של ${sd}</b>${cart>0?`<span class="sp-num">מינימום: ${cartonsTxt(cart)}</span>`:''}</div><div>${ic('truck')}<span>הספק מוכר</span><b class="sp-num">${pk>1?'קרטון של '+pk:'בבודדים'}</b><span class="sp-num">${money(d.price)} ל${u}</span></div></div>`
+      + q(1, 'מה נכון?') + `<div class="plopts">`
+      + (pk > 1 ? opt('stock', `הספק צודק: בקרטון יש ${pk}`, `המחסן יעבור לספור בקרטונים של ${pk}. מספר הקרטונים במלאי לא משתנה`) : '')
+      + opt('tosd', `המחסן צודק: בקרטון יש ${sd}`, `המחירון יתעדכן לקרטון של ${sd} (${money(r2(d.price*sd))} לקרטון)`)
+      + opt('ok', pk > 1 ? 'זה לא אותו קרטון' : 'זה בסדר כך', pk > 1 ? 'למשל: הספק סופר מארזים והמחסן סופר גלילים. ההזמנה תעוגל לקרטונים של הספק' : 'הספק מוכר בבודדים, ובהזמנה הכמות תישלח לפי הקרטונים שבמחסן') + `</div>`;
+  } else if(ty === 'P'){
+    const x = d.iss.find(i => i.t === 'packprice');
+    body = q(1, 'כמה יחידות יש באמת בקרטון?')
+      + `<div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="chip big" aria-pressed="${st.n==1}" onclick="with(SP){plSetN('${d.id}',1);plRedraw('${act}')}">1 (נמכר בבודדים)</button>${num('יחידות בקרטון')}</div>`
+      + `<div class="muted" style="font-size:13px">לא בטוח? בחשבונית האחרונה של הספק, בעמודה "כמ׳ בקרטון".</div>`;
+  } else {
+    const x = d.iss.find(i => i.t === 'conflict');
+    body = q(1, 'איזה גודל קרטון נכון?') + `<div class="plopts">${opt('file', `מה שכתוב בקובץ: קרטון של ${x.pk}`, 'הכלל הקודם יתעדכן')}${opt('keep', `מה שקבעתי קודם: קרטון של ${x.was}`, 'הקובץ יתוקן לפי הכלל')}</div>`;
+  }
+  return `<div class="plchk plnew">
+    <div class="pltop"><span class="tag ${tg[0]}">${tg[1]}</span><b class="plname">${esc(d.name)}</b>${d.sub?`<div class="muted" style="font-size:13px">${d.sub}</div>`:''}</div>
+    <div class="plwhy">${d.iss.filter(i => ty !== 'P' || i.t === 'packprice').map(x => `<div>${ic('alert','sm')}<span>${plWhy(x, d.price)}</span></div>`).join('')}</div>
+    ${body}
+    <div id="sp-plRes-${d.id}">${plResHTML(d, ty, st)}</div>
+    <div class="row" style="gap:8px"><button type="button" class="sb" style="flex:1;min-height:46px" onclick="with(SP){plGo('${d.id}','${act}')}">${ic('check','sm')}שמירה${d.next?' והמוצר הבא':''}</button><button type="button" class="sb sb-ghost" style="min-height:46px" onclick="with(SP){plSkip('${d.id}','${act}')}">דלג, לא בטוח</button></div>
+    ${ty === 'A' ? `<button type="button" class="sb-link" onclick="with(SP){${act}('${d.id}','ok')}">הכל נכון כמו בקובץ, להשאיר</button>` : ''}
   </div>`;
 }
-function plPreview(id, price){
-  const n = Math.round(num(($('#sp-plN-'+id)||{}).value)); const e = $('#sp-plPv-'+id); if(!e) return;
-  e.textContent = n > 1 ? `אם המחיר לקרטון של ${n}: ${money(price/n)} ליחידה` : 'הזן כמה יחידות בקרטון';
+const IC_UNIT = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="7" width="8" height="12" rx="1.5"/><path d="M10 7V5h4v2"/></svg>';
+const IC_BOX = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-4 9 4v9l-9 4-9-4z"/><path d="M3 8l9 4 9-4M12 12v9"/></svg>';
+const IC_RULER = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15.5L15.5 3 21 8.5 8.5 21z"/><path d="M7 12l2 2M10 9l2 2M13 6l2 2"/></svg>';
+const IC_WARE = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V9l9-5 9 5v12"/><path d="M7 21v-7h10v7M7 17.5h10"/></svg>';
+/* סוג הכרטיס: P = קרטון ששווה למחיר, C = מחסן מול ספק, F = הקרטון בקובץ השתנה, A = על מה המחיר */
+function plType(iss){
+  if(iss.some(x => x.t === 'packprice')) return 'P';
+  if(iss.some(x => x.t === 'conflict')) return 'F';
+  if(iss.some(x => x.t === 'mismatch' || x.t === 'nopack')) return 'C';
+  return 'A';
 }
-const plNOf = id => Math.round(num(($('#sp-plN-'+id)||{}).value));
+const PLQ = {}, PLSKIP = new Set();
+function plState(d, ty){
+  if(!PLQ[d.id] || PLQ[d.id].nm !== d.name){
+    let k = '', n = '';
+    if(ty === 'A'){ const sn = plSugN(d.iss, d.pack); k = plLikely(d.price, sn, d.iss) === 'pack' && sn > 1 ? 'pack' : 'unit'; n = sn > 1 ? sn : (d.pack > 1 ? d.pack : 1); }
+    PLQ[d.id] = {nm: d.name, k, n};
+  }
+  return PLQ[d.id];
+}
+const plNum = v => { const x = num(String(v ?? '').replace(',', '.')); return isFinite(x) && x > 0 ? x : 0; };
+function plSet(id, k, act){ if(PLQ[id]) PLQ[id].k = k; plRedraw(act); }
+function plSetN(id, v){ if(!PLQ[id]) return; PLQ[id].n = v; const c = PLC_CARDS[id]; const e = $('#sp-plRes-'+id); if(c && e) e.innerHTML = plResHTML(c, plType(c.iss), PLQ[id]); }
+function plStepN(id, dlt, act){ const s = PLQ[id]; if(!s) return; s.n = Math.max(1, Math.round(plNum(s.n) || 1) + dlt); plRedraw(act); }
+function plRedraw(act){ if(act === 'impFix') drawImport(); else drawPlCheck(); }
+const PLC_CARDS = {};
+/* תיבת "כך זה יישמר": מה ייכנס למחירון ואיך תיראה הזמנה */
+function plResHTML(d, ty, st){
+  const n = plNum(st.n), u = uLbl(d.unit) || 'יח׳';
+  const row = (a, b) => `<div class="row between"><span>${a}</span><b class="sp-num">${b}</b></div>`;
+  const box = (rows, ex) => `<div class="plres"><div class="plres-h">כך זה יישמר</div>${rows}${ex?`<div class="plres-ex sp-num">${ex}</div>`:''}</div>`;
+  const wait = t => `<div class="plres wait">${t}</div>`;
+  if(ty === 'A'){
+    if(!st.k) return wait('בחר על מה המחיר');
+    if(st.k === 'measure'){ if(!(n > 0) || n === 1) return wait('כתוב כמה מטר / ק״ג יש ביחידה אחת');
+      return box(row('מחיר למטר / ק״ג / ליטר', money(d.price)) + row(`יחידה אחת (${qn(n)})`, money(r2(d.price*n))), `בהזמנה: 2 יחידות = <b>${money(r2(d.price*n*2))}</b>`); }
+    if(st.k === 'pack'){ if(!(n > 1)) return wait('כתוב כמה יחידות יש בקרטון');
+      return box(row(`קרטון של ${qn(n)}`, money(d.price)) + row(`${u} אחת`, money(unitPrice4(d.price/n))), `בהזמנה: 2 קרטונים = ${qn(2*n)} ${u} = <b>${money(r2(d.price*2))}</b>`); }
+    if(!(n >= 1)) return wait('כתוב כמה יחידות יש בקרטון');
+    return n > 1 ? box(row(`${u} אחת`, money(d.price)) + row(`קרטון של ${qn(n)}`, money(r2(d.price*n))), `בהזמנה: 2 קרטונים = ${qn(2*n)} ${u} = <b>${money(r2(d.price*n*2))}</b>`)
+      : box(row(`${u} אחת`, money(d.price)) + row('קרטון', 'נמכר בבודדים'), `בהזמנה: 10 ${u} = <b>${money(r2(d.price*10))}</b>`);
+  }
+  const par = S.par[d.key] || {}, tgt = parTarget(par), sd0 = parDiv(par), cart = tgt > 0 ? r2(tgt / sd0) : 0;
+  if(ty === 'C'){
+    if(!st.k) return wait('בחר מה נכון');
+    const x = d.iss.find(i => i.t === 'mismatch' || i.t === 'nopack'), pk = x.t === 'mismatch' ? x.pk : 1;
+    const per = st.k === 'stock' ? pk : st.k === 'tosd' ? x.sd : (pk > 1 ? pk : x.sd);
+    if(!(cart > 0)) return box(row('בקרטון', `${qn(per)} ${u}`), '');
+    const units = st.k === 'ok' && pk > 1 ? Math.ceil(cart*x.sd/pk - 1e-9)*pk : r2(cart*per);
+    return box(row('המינימום במחסן', cartonsTxt(cart)) + row('בהזמנה הבאה (עד המינימום)', `${qn(units)} ${u}`), `${qn(units)} × ${money(d.price)} = <b>${money(r2(units*d.price))}</b>`);
+  }
+  if(ty === 'P'){
+    if(!(n >= 1)) return wait('בחר או כתוב כמה יחידות יש בקרטון');
+    const units = cart > 0 ? r2(cart * n) : 0;
+    return box(row('בקרטון', n > 1 ? `${qn(n)} ${u}` : 'נמכר בבודדים') + (cart > 0 ? row('המינימום במחסן', `${qn(units)} ${u}`) : ''), cart > 0 ? `בהזמנה עד המינימום: ${qn(units)} × ${money(d.price)} = <b>${money(r2(units*d.price))}</b>` : '');
+  }
+  if(!st.k) return wait('בחר איזה גודל נכון');
+  return '';
+}
+/* שמירה לפי מה שנבחר בכרטיס */
+function plGo(id, act){
+  const c = PLC_CARDS[id], s = PLQ[id]; if(!c || !s) return;
+  const ty = plType(c.iss), n = plNum(s.n), f = act === 'impFix' ? impFix : plFix;
+  if(ty === 'A'){
+    if(!s.k){ toast('בחר על מה המחיר'); return; }
+    if(s.k === 'measure'){ if(!(n > 0) || n === 1){ toast('כתוב כמה מטר / ק״ג יש ביחידה אחת'); return; } return f(id, 'measure', n); }
+    if(s.k === 'pack'){ if(!(n > 1)){ toast('כתוב כמה יחידות יש בקרטון'); return; } return f(id, 'pack', Math.round(n)); }
+    if(!(n >= 1)){ toast('כתוב כמה יחידות יש בקרטון'); return; }
+    return n > 1 ? f(id, 'unit', Math.round(n)) : f(id, 'single', 1);
+  }
+  if(ty === 'P'){ if(!(n >= 1)){ toast('בחר כמה יחידות יש בקרטון'); return; } return f(id, 'real', Math.round(n)); }
+  if(!s.k){ toast('בחר מה נכון'); return; }
+  if(s.k === 'keep'){ const x = c.iss.find(i => i.t === 'conflict'); return f(id, 'unit', x.was); }
+  return f(id, s.k);
+}
+function plSkip(id, act){ const c = PLC_CARDS[id]; if(c) PLSKIP.add(act + ':' + norm(c.name)); plRedraw(act); }
+function plUnskip(act){ [...PLSKIP].forEach(k => { if(k.startsWith(act + ':')) PLSKIP.delete(k); }); plRedraw(act); }
+/* המלאי עובר לגודל קרטון אחר: מספר הקרטונים נשאר. n=1 = ספירה ביחידות */
+function plStockSet(key, n){
+  const par = S.par[key]; if(!par || !(n >= 1)) return;
+  const d = parDiv(par);
+  ['current','min','monthly'].forEach(x => { if(+par[x] > 0) par[x] = r2(par[x] / d * n); });
+  if(n > 1){ par.mode = 'pack'; par.pack = n; } else { par.mode = 'unit'; delete par.pack; }
+}
+/* "גודל אמיתי": מתקן קרטון ששווה למחיר, במחירון ובמלאי */
+function plApplyReal(it, n, sup){
+  const key = plKey(it.name), wrong = plPackIsPrice(it, key);
+  if(wrong && packOf(it) === wrong){ if(n > 1){ it.pack = n; it.packOnly = true; } else { delete it.pack; delete it.packOnly; } delete it.basis; delete it.packPrice; }
+  if(wrong && plStockDiv(key) === wrong) plStockSet(key, n);
+  plSetRule(sup, it.name, n > 1 ? {pack: n, basis: 'unit'} : {single: true});
+  it.ok = plSnapOf(it, key);
+}
+/* מחיר לפי מידה: המחיר בקובץ הוא למטר / ק״ג, ויחידה אחת = n מהם */
+function plApplyMeasure(it, n){
+  const old = +it.price || 0, per = it.basis === 'pack' && it.packPrice > 0 ? +it.packPrice : old;
+  it.history = it.history || []; it.history.push({date: today(), price: old, fix: true});
+  delete it.pack; delete it.packOnly; delete it.basis; delete it.packPrice;
+  it.measure = {n, per}; it.price = unitPrice4(per * n);
+  it.ok = plSnapOf(it, plKey(it.name));
+}
+function plApplySingle(it){
+  if(packOf(it) > 1 && it.basis === 'pack' && it.packPrice > 0){ it.history = it.history || []; it.history.push({date: today(), price: +it.price || 0, fix: true}); it.price = unitPrice4(+it.packPrice); }
+  delete it.pack; delete it.packOnly; delete it.basis; delete it.packPrice;
+  it.ok = plSnapOf(it, plKey(it.name));
+}
+const plNOf = id => plNum((PLQ[id] || {}).n);
 
 /* ---------- מסך בדיקת המחירון ---------- */
 let PLC = {sup:''};
-function openPlCheck(sup){ PLC = {sup: sup || ''}; drawPlCheck(); }
+function openPlCheck(sup){ PLC = {sup: sup || '', start: 0}; drawPlCheck(); }
 function drawPlCheck(){
   const all = plAll(); const sups = [...new Set(all.map(x => x.l.supplier))];
   if(PLC.sup && !sups.includes(PLC.sup)) PLC.sup = '';
-  const list = all.filter(x => !PLC.sup || x.l.supplier === PLC.sup);
+  const list0 = all.filter(x => !PLC.sup || x.l.supplier === PLC.sup);
+  const list = list0.filter(x => !PLSKIP.has('plFix:' + norm(x.it.name))), skipped = list0.length - list.length;
+  if(PLC.startSup !== PLC.sup){ PLC.startSup = PLC.sup; PLC.start = 0; }
+  PLC.start = Math.max(PLC.start || 0, list0.length);
+  const cur = list[0], pos = PLC.start - list.length + 1;
   const total = S.lists.reduce((s,l) => s + l.items.filter(i => i.price > 0).length, 0);
   modal(`<div class="mhead"><h2>בדיקת מחירון</h2>${closeBtn()}</div>
     <div class="row"><span class="tag sp-num">${total} פריטים</span><span class="tag ${all.length?'r':'g'} sp-num">${all.length ? `${all.length} לבדיקה` : 'הכל נבדק'}</span></div>
-    <p class="muted" style="margin:0">ארבע בדיקות: מחיר ליחידה שקפץ, פער גדול מול ספק אחר, קרטון חסר כשבמלאי סופרים בקרטונים, וקרטון שונה מהמלאי. תיקון משנה רק את הפריט הזה, המחיר הקודם נשמר בהיסטוריה, והתיקון יוחל גם בייבוא הבא מאותו ספק.</p>
+    <p class="muted" style="margin:0">מוצר אחד בכל פעם. ענה על השאלה ובדוק בתיבה הירוקה איך זה ייראה בהזמנה. המחיר הקודם נשמר בהיסטוריה, והתיקון יוחל גם בייבוא הבא מאותו ספק.</p>
     ${sups.length > 1 ? `<div class="chips">${['', ...sups].map(s => `<button class="chip" aria-pressed="${PLC.sup===s}" data-s="${esc(s)}" onclick="with(SP){PLC.sup=this.dataset.s;drawPlCheck()}">${s ? esc(s) : 'כל הספקים'} <span class="sp-num">${s ? all.filter(x=>x.l.supplier===s).length : all.length}</span></button>`).join('')}</div>` : ''}
-    <div class="plist">${list.length ? list.slice(0, 80).map(x => plCardHTML({id: x.l.id + '__' + x.it.id, name: x.it.name, sub: esc(x.l.supplier), price: x.it.price, pack: packOf(x.it), packPrice: x.it.basis==='pack' ? x.it.packPrice : 0, iss: x.iss}, 'plFix')).join('')
-      : `<div class="sp-empty">${ic('check')} לא נמצאו פריטים חשודים.</div>`}
-      ${list.length > 80 ? `<p class="muted sp-num">מוצגים 80 מתוך ${list.length}. אחרי תיקון יופיעו הבאים.</p>` : ''}</div>`);
+    ${cur ? `<div class="plprog"><span class="sp-num">מוצר ${pos} מתוך ${PLC.start}</span><span class="plbar2"><span style="width:${Math.round((pos-1)/PLC.start*100)}%"></span></span></div>` : ''}
+    <div class="plist">${cur ? plCardFor(cur.l, cur.it, cur.iss, list.length > 1) : `<div class="sp-empty">${ic('check')} ${skipped ? 'עברת על כל המוצרים.' : 'לא נמצאו פריטים חשודים.'}</div>`}
+      ${skipped ? `<div class="row between"><span class="muted sp-num">דילגת על ${skipped} מוצרים. הם נשארים מסומנים לבדיקה.</span><button class="sb sb-ghost sm" onclick="with(SP){plUnskip('plFix')}">להציג אותם שוב</button></div>` : ''}</div>`);
 }
-function plFix(id, basis){
+function plCardFor(l, it, iss, next){
+  const d = {id: l.id + '__' + it.id, name: it.name, sub: esc(l.supplier), price: it.price, pack: packOf(it), packPrice: it.basis==='pack' ? it.packPrice : 0, unit: it.unit, key: plKey(it.name), iss, next};
+  PLC_CARDS[d.id] = d; return plCardHTML(d, 'plFix');
+}
+function plFix(id, basis, nIn){
   const [lid, iid] = id.split('__'); const l = S.lists.find(x => x.id === lid), it = l && l.items.find(x => x.id === iid); if(!it) return;
-  const n = plNOf(id);
+  const n = nIn != null ? nIn : plNOf(id);
   if((basis === 'pack' || basis === 'unit') && !(n > 1)){ toast('צריך לכתוב כמה יחידות בקרטון'); const e = $('#sp-plN-'+id); e && e.focus(); return; }
-  if(basis === 'stock'){ plStockFollow(plKey(it.name), packOf(it)); it.ok = plSnapOf(it, plKey(it.name)); }
+  delete PLQ[id];
+  if(basis === 'real'){ plApplyReal(it, n, l.supplier); }
+  else if(basis === 'measure'){ plApplyMeasure(it, n); plSetRule(l.supplier, it.name, {measure: n}); }
+  else if(basis === 'single'){ plApplySingle(it); plSetRule(l.supplier, it.name, {single: true}); }
+  else if(basis === 'stock'){ plStockFollow(plKey(it.name), packOf(it)); it.ok = plSnapOf(it, plKey(it.name)); }
   else if(basis === 'tosd'){ const sd = plStockDiv(plKey(it.name)); if(it.basis === 'pack' && it.packPrice > 0) it.price = unitPrice4(it.packPrice / sd); it.pack = sd; it.packOnly = true; it.ok = plSnapOf(it, plKey(it.name)); plSetRule(l.supplier, it.name, {pack: sd, basis: it.basis === 'pack' ? 'pack' : 'unit'}); }
   else { plApply(it, basis, n); plSetRule(l.supplier, it.name, basis === 'ok' ? {ok:true, p:it.price} : {pack:n, basis}); }
   l.updated = today(); save(); drawPlCheck(); renderTop();
   if(tab === 'lists') renderLists();
-  toast(basis === 'pack' ? `נשמר: קרטון של ${n} ב-${money(it.packPrice)}, ${money(it.price)} ליחידה` : basis === 'unit' ? `נשמר: קרטון של ${n}, ${money(it.price)} ליחידה` : basis === 'stock' ? `המלאי נספר עכשיו בקרטונים של ${packOf(it)}` : basis === 'tosd' ? `המחירון עודכן לקרטון של ${packOf(it)}` : 'סומן כתקין');
+  toast(basis === 'real' ? (n > 1 ? `נשמר: קרטון של ${n}` : 'נשמר: נמכר בבודדים') : basis === 'measure' ? `נשמר: יחידה של ${qn(n)} ב-${money(it.price)}` : basis === 'single' ? `נשמר: ${money(it.price)} ליחידה, בלי קרטון` : basis === 'pack' ? `נשמר: קרטון של ${n} ב-${money(it.packPrice)}, ${money(it.price)} ליחידה` : basis === 'unit' ? `נשמר: קרטון של ${n}, ${money(it.price)} ליחידה` : basis === 'stock' ? `המלאי נספר עכשיו בקרטונים של ${packOf(it)}` : basis === 'tosd' ? `המחירון עודכן לקרטון של ${packOf(it)}` : 'סומן כתקין');
   if(basis === 'stock' && tab === 'stock') renderStock();
 }
 
@@ -23113,59 +23284,11 @@ function renderOrders(){
         <button class="sb sb-ghost sm" onclick="with(SP){ORD.open=ORD.open==='${o.id}'?null:'${o.id}';renderOrders()}">${open?'הסתרה':'פירוט'}</button>
         ${!cook?`<button class="sb sb-ghost sm" onclick="with(SP){openSheet('o','${o.id}')}">${ic('file','sm')}דף הזמנה</button>`:''}
         ${!cook?`<button class="sb sb-ghost sm" onclick="with(SP){reorder('${o.id}')}">${ic('repeat','sm')}הזמן שוב</button>`:''}
-        ${!cook && rpNeeded(o) ? `<button class="sb sb-soft sm" onclick="with(SP){openReprice('${o.id}')}">${ic('tag','sm')}עדכון סכום לפי המחירון</button>`:''}
       </div>
       ${open?`<div class="qtable">${o.lines.map(l=>{ const r = o.receipt?.find(x=>x.key===l.key);
         const diff = r ? r.received - l.qty : 0;
         return `<div class="qrow"><span>${esc(l.name)} <span class="muted sp-num">× ${qn(l.qty)}${l.packs?` (${packsTxt(l.packs)} × ${l.pack})`:''}</span>${r?(diff<0?` <span class="tag r sp-num">חסר ${qn(-diff)}</span>`:diff>0?` <span class="tag a sp-num">עודף ${qn(diff)}</span>`:` <span class="tag g">תקין</span>`):''}${r&&r.note?`<div class="muted">${esc(r.note)}</div>`:''}</span>${cook?'<span></span><span></span>':`<span class="muted sp-num">${money(l.price)}</span><b class="sp-num">${money(l.qty*l.price)}</b>`}</div>`; }).join('')}</div>`:''}
     </article>`; }).join('') : `<div class="sp-card sp-empty">${cook?'אין משלוחים פתוחים.':'אין הזמנות להצגה.'}</div>`}`;
-}
-/* ============ עדכון סכום הזמנה לפי המחירון הנוכחי ============
-   להזמנות שנשמרו לפני תיקון המחירונים (מחיר לקרטון שנרשם כמחיר ליחידה וכו׳).
-   הכמויות לא משתנות. רק המחיר ליחידה בכל שורה והסה״כ. הערכים הקודמים נשמרים בהזמנה (priceBefore / totalBefore). */
-function rpFindItem(o, l){
-  const ls = S.lists.filter(x => x.supplier === (l.supplier || o.supplier));
-  const all = []; ls.forEach(x => x.items.forEach(it => { if(it.price > 0) all.push(it); }));
-  if(l.sku){ const s = String(l.sku).trim(); const f = all.find(it => it.sku && String(it.sku).trim() === s); if(f) return f; }
-  const nm = String(l.name||'').trim();
-  return all.find(it => String(it.name||'').trim() === nm)
-      || all.find(it => norm(it.name) === norm(nm))
-      || (l.key ? all.find(it => resolve(norm(it.name)) === resolve(l.key)) : null)
-      || null;
-}
-function rpPlan(o){
-  const rows = (o.lines||[]).map(l => {
-    const it = rpFindItem(o, l), oldP = +l.price || 0, newP = it ? +it.price : oldP;
-    return {l, found: !!it, oldP, newP, changed: !!it && Math.abs(newP - oldP) > 0.0001};
-  });
-  const newTotal = r2(rows.reduce((s,x) => s + (+x.l.qty||0) * x.newP, 0));
-  return {rows, oldTotal: r2(+o.total || 0), newTotal, changed: rows.filter(x => x.changed).length};
-}
-function rpNeeded(o){ try{ const p = rpPlan(o); return p.changed > 0 && Math.abs(p.newTotal - p.oldTotal) >= 0.5; }catch(e){ return false; } }
-function openReprice(id){
-  const o = S.orders.find(x=>x.id===id); if(!o) return;
-  const p = rpPlan(o);
-  const ch = p.rows.filter(x => x.changed), miss = p.rows.filter(x => !x.found);
-  modal(`<div class="mhead"><h2>עדכון סכום לפי המחירון · ${esc(o.supplier)}</h2>${closeBtn()}</div>
-    <p class="muted">הכמויות בהזמנה נשארות כמו שהן. המחיר ליחידה בכל שורה מתעדכן לפי המחירון הנוכחי, והסכום מחושב מחדש.</p>
-    <div class="kpis three">
-      <div class="kpi"><span class="k">סכום שנשמר</span><span class="tv sp-num">${money(p.oldTotal)}</span></div>
-      <div class="kpi is-good"><span class="k">לפי המחירון</span><span class="tv sp-num">${money(p.newTotal)}</span></div>
-      <div class="kpi"><span class="k">הפרש</span><span class="tv sp-num">${money(r2(p.newTotal - p.oldTotal))}</span></div>
-    </div>
-    ${ch.length ? `<h3 style="margin-top:12px">${ch.length === 1 ? 'שורה אחת משתנה' : ch.length + ' שורות משתנות'}</h3>
-    <div class="qtable">${ch.map(x => `<div class="qrow"><span>${esc(x.l.name)} <span class="muted sp-num">× ${qn(x.l.qty)}</span><div class="muted sp-num">ליחידה: ${money(x.oldP)} ← ${money(x.newP)}</div></span><span class="muted sp-num" style="text-decoration:line-through">${money(r2(x.l.qty*x.oldP))}</span><b class="sp-num">${money(r2(x.l.qty*x.newP))}</b></div>`).join('')}</div>` : ''}
-    ${miss.length ? `<p class="muted" style="margin-top:10px">${ic('alert','sm')} לא נמצאו במחירון ונשארים במחיר הקודם: ${miss.map(x => esc(x.l.name)).join(', ')}</p>` : ''}
-    <div class="row" style="margin-top:14px"><button class="sb" onclick="with(SP){applyReprice('${o.id}')}">${ic('check','sm')}עדכון הסכום</button><button class="sb sb-ghost" onclick="with(SP){closeModal()}">ביטול</button></div>`);
-}
-function applyReprice(id){
-  const o = S.orders.find(x=>x.id===id); if(!o) return;
-  const p = rpPlan(o);
-  if(!p.changed){ closeModal(); toast('הסכום כבר תואם למחירון'); return; }
-  p.rows.forEach(x => { if(!x.changed) return; if(x.l.priceBefore == null) x.l.priceBefore = x.oldP; x.l.price = x.newP; });
-  if(o.totalBefore == null) o.totalBefore = p.oldTotal;
-  o.total = p.newTotal; o.repriced = today();
-  save(); closeModal(); renderOrders(); toast(`הסכום עודכן ל-${money(p.newTotal)}`);
 }
 function reorder(id){
   const o = S.orders.find(x=>x.id===id); if(!o) return;
@@ -24641,11 +24764,6 @@ Object.defineProperties(SPX, {
 "ORD":{get(){return ORD},set(v){ORD=v},enumerable:true},
 "renderOrders":{get(){return renderOrders},enumerable:true},
 "reorder":{get(){return reorder},enumerable:true},
-"rpFindItem":{get(){return rpFindItem},enumerable:true},
-"rpPlan":{get(){return rpPlan},enumerable:true},
-"rpNeeded":{get(){return rpNeeded},enumerable:true},
-"openReprice":{get(){return openReprice},enumerable:true},
-"applyReprice":{get(){return applyReprice},enumerable:true},
 "openReceipt":{get(){return openReceipt},enumerable:true},
 "rcStatus":{get(){return rcStatus},enumerable:true},
 "saveReceipt":{get(){return saveReceipt},enumerable:true},
@@ -24716,7 +24834,31 @@ Object.defineProperties(SPX, {
 "openPlCheck":{get(){return openPlCheck},enumerable:true},
 "drawPlCheck":{get(){return drawPlCheck},enumerable:true},
 "plFix":{get(){return plFix},enumerable:true},
-"plPreview":{get(){return plPreview},enumerable:true},
+"plSet":{get(){return plSet},enumerable:true},
+"plSetN":{get(){return plSetN},enumerable:true},
+"plStepN":{get(){return plStepN},enumerable:true},
+"plRedraw":{get(){return plRedraw},enumerable:true},
+"plGo":{get(){return plGo},enumerable:true},
+"plSkip":{get(){return plSkip},enumerable:true},
+"plUnskip":{get(){return plUnskip},enumerable:true},
+"plStockSet":{get(){return plStockSet},enumerable:true},
+"plApplyReal":{get(){return plApplyReal},enumerable:true},
+"plApplyMeasure":{get(){return plApplyMeasure},enumerable:true},
+"plApplySingle":{get(){return plApplySingle},enumerable:true},
+"plType":{get(){return plType},enumerable:true},
+"plState":{get(){return plState},enumerable:true},
+"PLQ":{get(){return PLQ},enumerable:true},
+"PLSKIP":{get(){return PLSKIP},enumerable:true},
+"PLC_CARDS":{get(){return PLC_CARDS},enumerable:true},
+"plCardFor":{get(){return plCardFor},enumerable:true},
+"plResHTML":{get(){return plResHTML},enumerable:true},
+"plSnapOf":{get(){return plSnapOf},enumerable:true},
+"plKey":{get(){return plKey},enumerable:true},
+"plStockDiv":{get(){return plStockDiv},enumerable:true},
+"plPackIsPrice":{get(){return plPackIsPrice},enumerable:true},
+"plIsOk":{get(){return plIsOk},enumerable:true},
+"plSetRule":{get(){return plSetRule},enumerable:true},
+"parTarget":{get(){return parTarget},enumerable:true},
 "impFix":{get(){return impFix},enumerable:true},
 "impUndo":{get(){return impUndo},enumerable:true},
 "PLC":{get(){return PLC},enumerable:true},
