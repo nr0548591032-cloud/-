@@ -22969,11 +22969,59 @@ function renderOrders(){
         <button class="sb sb-ghost sm" onclick="with(SP){ORD.open=ORD.open==='${o.id}'?null:'${o.id}';renderOrders()}">${open?'הסתרה':'פירוט'}</button>
         ${!cook?`<button class="sb sb-ghost sm" onclick="with(SP){openSheet('o','${o.id}')}">${ic('file','sm')}דף הזמנה</button>`:''}
         ${!cook?`<button class="sb sb-ghost sm" onclick="with(SP){reorder('${o.id}')}">${ic('repeat','sm')}הזמן שוב</button>`:''}
+        ${!cook && rpNeeded(o) ? `<button class="sb sb-soft sm" onclick="with(SP){openReprice('${o.id}')}">${ic('tag','sm')}עדכון סכום לפי המחירון</button>`:''}
       </div>
       ${open?`<div class="qtable">${o.lines.map(l=>{ const r = o.receipt?.find(x=>x.key===l.key);
         const diff = r ? r.received - l.qty : 0;
         return `<div class="qrow"><span>${esc(l.name)} <span class="muted sp-num">× ${qn(l.qty)}${l.packs?` (${packsTxt(l.packs)} × ${l.pack})`:''}</span>${r?(diff<0?` <span class="tag r sp-num">חסר ${qn(-diff)}</span>`:diff>0?` <span class="tag a sp-num">עודף ${qn(diff)}</span>`:` <span class="tag g">תקין</span>`):''}${r&&r.note?`<div class="muted">${esc(r.note)}</div>`:''}</span>${cook?'<span></span><span></span>':`<span class="muted sp-num">${money(l.price)}</span><b class="sp-num">${money(l.qty*l.price)}</b>`}</div>`; }).join('')}</div>`:''}
     </article>`; }).join('') : `<div class="sp-card sp-empty">${cook?'אין משלוחים פתוחים.':'אין הזמנות להצגה.'}</div>`}`;
+}
+/* ============ עדכון סכום הזמנה לפי המחירון הנוכחי ============
+   להזמנות שנשמרו לפני תיקון המחירונים (מחיר לקרטון שנרשם כמחיר ליחידה וכו׳).
+   הכמויות לא משתנות. רק המחיר ליחידה בכל שורה והסה״כ. הערכים הקודמים נשמרים בהזמנה (priceBefore / totalBefore). */
+function rpFindItem(o, l){
+  const ls = S.lists.filter(x => x.supplier === (l.supplier || o.supplier));
+  const all = []; ls.forEach(x => x.items.forEach(it => { if(it.price > 0) all.push(it); }));
+  if(l.sku){ const s = String(l.sku).trim(); const f = all.find(it => it.sku && String(it.sku).trim() === s); if(f) return f; }
+  const nm = String(l.name||'').trim();
+  return all.find(it => String(it.name||'').trim() === nm)
+      || all.find(it => norm(it.name) === norm(nm))
+      || (l.key ? all.find(it => resolve(norm(it.name)) === resolve(l.key)) : null)
+      || null;
+}
+function rpPlan(o){
+  const rows = (o.lines||[]).map(l => {
+    const it = rpFindItem(o, l), oldP = +l.price || 0, newP = it ? +it.price : oldP;
+    return {l, found: !!it, oldP, newP, changed: !!it && Math.abs(newP - oldP) > 0.0001};
+  });
+  const newTotal = r2(rows.reduce((s,x) => s + (+x.l.qty||0) * x.newP, 0));
+  return {rows, oldTotal: r2(+o.total || 0), newTotal, changed: rows.filter(x => x.changed).length};
+}
+function rpNeeded(o){ try{ const p = rpPlan(o); return p.changed > 0 && Math.abs(p.newTotal - p.oldTotal) >= 0.5; }catch(e){ return false; } }
+function openReprice(id){
+  const o = S.orders.find(x=>x.id===id); if(!o) return;
+  const p = rpPlan(o);
+  const ch = p.rows.filter(x => x.changed), miss = p.rows.filter(x => !x.found);
+  modal(`<div class="mhead"><h2>עדכון סכום לפי המחירון · ${esc(o.supplier)}</h2>${closeBtn()}</div>
+    <p class="muted">הכמויות בהזמנה נשארות כמו שהן. המחיר ליחידה בכל שורה מתעדכן לפי המחירון הנוכחי, והסכום מחושב מחדש.</p>
+    <div class="kpis three">
+      <div class="kpi"><span class="k">סכום שנשמר</span><span class="tv sp-num">${money(p.oldTotal)}</span></div>
+      <div class="kpi is-good"><span class="k">לפי המחירון</span><span class="tv sp-num">${money(p.newTotal)}</span></div>
+      <div class="kpi"><span class="k">הפרש</span><span class="tv sp-num">${money(r2(p.newTotal - p.oldTotal))}</span></div>
+    </div>
+    ${ch.length ? `<h3 style="margin-top:12px">${ch.length === 1 ? 'שורה אחת משתנה' : ch.length + ' שורות משתנות'}</h3>
+    <div class="qtable">${ch.map(x => `<div class="qrow"><span>${esc(x.l.name)} <span class="muted sp-num">× ${qn(x.l.qty)}</span><div class="muted sp-num">ליחידה: ${money(x.oldP)} ← ${money(x.newP)}</div></span><span class="muted sp-num" style="text-decoration:line-through">${money(r2(x.l.qty*x.oldP))}</span><b class="sp-num">${money(r2(x.l.qty*x.newP))}</b></div>`).join('')}</div>` : ''}
+    ${miss.length ? `<p class="muted" style="margin-top:10px">${ic('alert','sm')} לא נמצאו במחירון ונשארים במחיר הקודם: ${miss.map(x => esc(x.l.name)).join(', ')}</p>` : ''}
+    <div class="row" style="margin-top:14px"><button class="sb" onclick="with(SP){applyReprice('${o.id}')}">${ic('check','sm')}עדכון הסכום</button><button class="sb sb-ghost" onclick="with(SP){closeModal()}">ביטול</button></div>`);
+}
+function applyReprice(id){
+  const o = S.orders.find(x=>x.id===id); if(!o) return;
+  const p = rpPlan(o);
+  if(!p.changed){ closeModal(); toast('הסכום כבר תואם למחירון'); return; }
+  p.rows.forEach(x => { if(!x.changed) return; if(x.l.priceBefore == null) x.l.priceBefore = x.oldP; x.l.price = x.newP; });
+  if(o.totalBefore == null) o.totalBefore = p.oldTotal;
+  o.total = p.newTotal; o.repriced = today();
+  save(); closeModal(); renderOrders(); toast(`הסכום עודכן ל-${money(p.newTotal)}`);
 }
 function reorder(id){
   const o = S.orders.find(x=>x.id===id);
@@ -24449,6 +24497,11 @@ Object.defineProperties(SPX, {
 "ORD":{get(){return ORD},set(v){ORD=v},enumerable:true},
 "renderOrders":{get(){return renderOrders},enumerable:true},
 "reorder":{get(){return reorder},enumerable:true},
+"rpFindItem":{get(){return rpFindItem},enumerable:true},
+"rpPlan":{get(){return rpPlan},enumerable:true},
+"rpNeeded":{get(){return rpNeeded},enumerable:true},
+"openReprice":{get(){return openReprice},enumerable:true},
+"applyReprice":{get(){return applyReprice},enumerable:true},
 "openReceipt":{get(){return openReceipt},enumerable:true},
 "rcStatus":{get(){return rcStatus},enumerable:true},
 "saveReceipt":{get(){return saveReceipt},enumerable:true},
