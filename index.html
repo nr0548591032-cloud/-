@@ -21421,8 +21421,16 @@ const plSnapOf = (it, key) => ({p: +it.price || 0, k: packOf(it), s: plStockDiv(
 /* "נבדק ותקין": שמור עם המחיר, הקרטון והקרטון במלאי. כל שינוי באחד מהם מחזיר את הבדיקה */
 const plIsOk = (it, key) => { const o = it.ok, n = plSnapOf(it, key); return !!o && Math.abs((+o.p||0) - n.p) < 1e-6 && o.k === n.k && o.s === n.s; };
 /* it = {name, price, pack}. מחזיר רשימת חשדות */
+/* גודל קרטון (במחירון או במלאי) ששווה למחיר: סימן שהמחיר נקרא כגודל קרטון */
+function plPackIsPrice(it, key){
+  if(!it) return 0; const pr = [+it.price||0, +it.packPrice||0].filter(x => x > 1);
+  const eq = n => n > 1 && pr.some(x => Math.abs(x - n) < 0.005);
+  const pk = packOf(it), sd = plStockDiv(key);
+  return eq(pk) ? pk : eq(sd) ? sd : 0;
+}
 function plIssues(it, sup, prev, idx){
   const key = plKey(it.name), sd = plStockDiv(key), pk = packOf(it), out = [];
+  { const pp = plPackIsPrice(it, key); if(pp) out.push({t:'packprice', n:pp, stock: pp === sd && pp !== pk}); }
   const ref0 = idx ? plRef(idx, key, sup) : 0;
   if(sd > 1 && pk <= 1) out.push({t:'nopack', sd, ref: ref0 || prev || 0});
   if(sd > 1 && pk > 1 && pk !== sd) out.push({t:'mismatch', sd, pk});
@@ -21448,13 +21456,14 @@ function plLikely(price, n, iss){
 function plWhy(x, price, unitLbl){
   const r1 = n => qn(Math.round(n*10)/10);
   if(x.t === 'nopack') return `במלאי סופרים את המוצר בקרטונים של ${x.sd}, ובמחירון אין גודל קרטון`;
+  if(x.t === 'packprice') return `גודל הקרטון ${x.stock ? 'במלאי' : 'במחירון'} (${x.n}) שווה בדיוק למחיר. כנראה המחיר נקרא בטעות כגודל קרטון, וזה מנפח את הכמות בהזמנה. בדוק כמה באמת יש בקרטון ותקן`;
   if(x.t === 'mismatch') return `אצל הספק בקרטון ${x.pk}, ובמלאי סופרים קרטון של ${x.sd}. כנראה כל צד סופר ביחידה אחרת (למשל חבילות מול גלילים). כך ההזמנה תצא בכמות שגויה, ולכן צריך לספור בשני המקומות באותה יחידה`;
   if(x.t === 'jump') return `המחיר ליחידה ${x.r > 1 ? 'עלה' : 'ירד'} מ-${money(x.prev)} ל-${money(price)} (פי ${r1(x.r > 1 ? x.r : 1/x.r)})`;
   if(x.t === 'cross') return `אצל ספק אחר ${money(x.ref)} ליחידה, כאן ${money(price)} (פי ${r1(x.r)})`;
   if(x.t === 'conflict') return `קבעת בעבר קרטון של ${x.was}, ועכשיו בקובץ כתוב קרטון של ${x.pk}`;
   return '';
 }
-const PL_TAG = {nopack:['a','אין גודל קרטון'], mismatch:['a','קרטון שונה מהמלאי'], jump:['r','קפיצת מחיר'], cross:['r','פער מול ספק אחר'], conflict:['a','הקרטון בקובץ השתנה']};
+const PL_TAG = {packprice:['r','קרטון שווה למחיר'], nopack:['a','אין גודל קרטון'], mismatch:['a','קרטון שונה מהמלאי'], jump:['r','קפיצת מחיר'], cross:['r','פער מול ספק אחר'], conflict:['a','הקרטון בקובץ השתנה']};
 /* כלל לספק: איך הוא מוכר את הפריט, לפי מה שתוקן פעם אחת */
 function plRule(sup, name){ const s = S.suppliers[sup]; return s && s.rules ? s.rules[norm(name)] || null : null; }
 function plSetRule(sup, name, rule){
@@ -21485,7 +21494,7 @@ function plStockFollow(key, n){
 function plAll(){
   const idx = plIndex(), out = [];
   S.lists.forEach(l => l.items.forEach(it => {
-    if(!(it.price > 0)) return; const key = plKey(it.name); if(plIsOk(it, key)) return;
+    if(!(it.price > 0)) return; const key = plKey(it.name); if(plIsOk(it, key) && !plPackIsPrice(it, key)) return;
     const iss = plIssues(it, l.supplier, plPrev(it), idx); if(iss.length) out.push({l, it, key, iss});
   }));
   return out;
@@ -22312,6 +22321,8 @@ function quoteLine(l, o){
   const sd = plStockDiv(resolve(l.key)), sp = packOf(o.item);
   if(sd > 1 && sp <= 1){ q.cpack = sd; if(!plIsOk(o.item, resolve(l.key))) q.cwarn = 'nopack'; }
   else if(sd > 1 && sp > 1 && sp !== sd && !plIsOk(o.item, resolve(l.key))) q.cwarn = 'mismatch';
+  /* גודל קרטון ששווה בדיוק למחיר: כמעט תמיד המחיר נקרא בטעות כגודל קרטון (בייבוא). מנפח את הכמות ואת הסכום */
+  if(plPackIsPrice(o.item, resolve(l.key))) q.cwarn = 'packprice';
   q.sp = sp; q.sd = sd;
   return q;
 }
@@ -22356,7 +22367,7 @@ function quoteDetail(q){
       return `<div class="qtable">
       <div class="row between"><h3>${esc(g.s)}</h3><span class="muted">${[si.cutoff&&'סגירת הזמנות '+esc(si.cutoff), si.phone&&esc(si.phone)].filter(Boolean).join(' · ')}</span></div>
       ${g.lines.some(l=>l.cwarn) ? `<div class="plbar"><span>${ic('alert','sm')} ב-<b class="sp-num">${g.lines.filter(l=>l.cwarn).length}</b> שורות גודל הקרטון אצל הספק לא ידוע או שונה מהמלאי. בדוק לפני שליחה.</span><button class="sb sm sb-soft" data-s="${esc(g.s)}" onclick="with(SP){openPlCheck(this.dataset.s)}">בדיקת מחירון</button></div>` : ''}
-      ${g.lines.map(l=>`<div class="qrow"><span>${esc(l.name)}${l.cwarn==='nopack'?`<span class="qwarn tag a sp-num">אין קרטון במחירון · יישלח לפי המלאי: ${qtyLbl(l).main} (${l.sd} בקרטון)</span>`:l.cwarn==='mismatch'?`<span class="qwarn tag r sp-num">קרטון אצל הספק ${l.sp}, במלאי ${l.sd}</span>`:''} ${l.packs ? `<span class="muted sp-num">· צריך ${qn(l.need)} → ${packsTxt(l.packs)} × ${l.pack} = ${qn(l.qty)}</span>${l.extra?` <span class="tag g sp-num">+${qn(l.extra)} ${S.par[resolve(l.key)]?'למלאי':'עודף'}</span>`:''}` : `<span class="muted sp-num">× ${qn(l.qty)} ${esc(l.unit)}</span>`}</span><span class="muted sp-num">${money(l.price)}</span><b class="sp-num">${money(l.qty*l.price)}</b></div>`).join('')}
+      ${g.lines.map(l=>`<div class="qrow"><span>${esc(l.name)}${l.cwarn==='nopack'?`<span class="qwarn tag a sp-num">אין קרטון במחירון · יישלח לפי המלאי: ${qtyLbl(l).main} (${l.sd} בקרטון)</span>`:l.cwarn==='mismatch'?`<span class="qwarn tag r sp-num">קרטון אצל הספק ${l.sp}, במלאי ${l.sd}</span>`:l.cwarn==='packprice'?`<span class="qwarn tag r sp-num">גודל הקרטון שווה למחיר (${money(l.price)}), כנראה טעות</span>`:''} ${l.packs ? `<span class="muted sp-num">· צריך ${qn(l.need)} → ${packsTxt(l.packs)} × ${l.pack} = ${qn(l.qty)}</span>${l.extra?` <span class="tag g sp-num">+${qn(l.extra)} ${S.par[resolve(l.key)]?'למלאי':'עודף'}</span>`:''}` : `<span class="muted sp-num">× ${qn(l.qty)} ${esc(l.unit)}</span>`}</span><span class="muted sp-num">${money(l.price)}</span><b class="sp-num">${money(l.qty*l.price)}</b></div>`).join('')}
       <div class="qrow sum"><span>סה״כ ${esc(g.s)}</span><span></span><span class="sp-num">${money(t)}</span></div>
       <div class="row">
         <button class="sb sm" onclick="with(SP){openSheet('g',${gi})}">${ic('file','sm')}דף הזמנה (PDF)</button>
@@ -22372,8 +22383,19 @@ function copyText(t){
   try{ navigator.clipboard.writeText(t).then(()=>toast('הועתק'), ()=>fallbackCopy(t)); }catch(e){ fallbackCopy(t); }
 }
 function fallbackCopy(t){ modal(`<div class="mhead"><h2>העתקת טקסט</h2>${closeBtn()}</div><textarea id="sp-cpT" readonly>${esc(t)}</textarea><p class="muted">הטקסט מסומן, אפשר להעתיק.</p>`); const a=$('#sp-cpT'); a.focus(); a.select(); }
-function saveOrder(qid){
+function saveOrder(qid, sure){
   const {quotes, smart} = buildQuotes(); const q = qid==='smart' ? smart : quotes.find(x=>x.id===qid); if(!q) return;
+  /* לפני שמירה: שורות שהכמות או הסכום בהן כנראה מנופחים (קרטון לא תואם, קרטון ששווה למחיר, או עיגול לקרטונים שמכפיל את הכמות) */
+  if(!sure){
+    const sus = q.lines.filter(l => l.cwarn || (l.need > 0 && l.qty >= l.need*3 && l.qty - l.need >= 10));
+    if(sus.length){
+      modal(`<div class="mhead"><h2>לבדוק לפני שליחה</h2>${closeBtn()}</div>
+        <p>ב-${sus.length === 1 ? 'שורה אחת' : sus.length + ' שורות'} הכמות או הסכום נראים חריגים. כדאי לבדוק את גודל הקרטון לפני שהזמנה נשלחת לספק:</p>
+        <div class="qtable">${sus.map(l => `<div class="qrow"><span>${esc(l.name)}<div class="muted sp-num">${l.cwarn==='packprice' ? 'גודל הקרטון שווה למחיר' : l.cwarn==='mismatch' ? `קרטון אצל הספק ${l.sp}, במלאי ${l.sd}` : l.cwarn==='nopack' ? `אין קרטון במחירון, נשלח לפי המלאי (${l.sd} בקרטון)` : `צריך ${qn(l.need)}, מוזמן ${qn(l.qty)}`}</div></span><span class="muted sp-num">× ${qn(l.qty)}</span><b class="sp-num">${money(r2(l.qty*l.price))}</b></div>`).join('')}</div>
+        <div class="row" style="margin-top:12px"><button class="sb sb-ghost" onclick="with(SP){closeModal()}">חזרה לתיקון</button><button class="sb" onclick="with(SP){closeModal();saveOrder('${qid}',true)}">לשמור בכל זאת</button></div>`);
+      return;
+    }
+  }
   const bestFull = quotes.filter(x=>!x.missing.length)[0];
   const groups = q.smart ? q.sups.map(s=>({s, lines:q.lines.filter(l=>l.supplier===s)})) : [{s:q.supplier, lines:q.lines}];
   const saved = q.smart && bestFull ? r2(bestFull.total - q.total) : 0;
