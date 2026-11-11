@@ -19835,7 +19835,8 @@ async function autoBackupIfDue(){
 .spx .bk-row:first-child{border-top:0}
 .spx .bk-row.on .bk-n{color:var(--sp-brand)}
 .spx .bk-n{font-family:var(--sp-f-head);font-weight:400;font-size:1.05rem}
-.spx .bk-u{font-size:12px;min-width:2.2em}
+.spx .bk-u{font-size:12px;color:var(--sp-soft)}
+.spx .bk-q{display:flex;flex-direction:column;align-items:center;gap:2px}
 .spx .bk-short{color:var(--sp-amber);font-weight:500}
 .spx .bk-warn{color:var(--sp-amber)}
 .spx .bk-cmp{display:flex;flex-direction:column;gap:5px;background:var(--sp-bg);border-radius:var(--sp-r-sm);padding:8px}
@@ -20510,8 +20511,7 @@ const TABS_ADMIN = [
   {id:'lists', label:'מחירונים', icon:'tag'},
   {id:'analyze', label:'מנתח מחירים', icon:'chart'},
   {id:'menu', label:'תפריט', icon:'menu'},
-  {id:'basket', label:'הסל שלי', icon:'cart'},
-  {id:'order', label:'הזמנה לפי פריט', icon:'tag'},
+  {id:'basket', label:'הזמנה', icon:'cart'},
   {id:'orders', label:'הזמנות וחשבוניות', icon:'truck'},
   {id:'stock', label:'מלאי', icon:'box'},
   {id:'report', label:'דוח חודשי', icon:'report'},
@@ -20526,6 +20526,7 @@ const TABS_COOK = [
 const tabs = () => isCook() ? TABS_COOK : (hasLegacyFood() ? [...TABS_ADMIN, {id:'legacy', label:'מחירון מזון ישן', icon:'file'}] : TABS_ADMIN);
 let tab = 'lists';
 function setTab(t){
+  if(t === 'order') t = 'basket';   /* חלון ההזמנה הקודם אוחד לתוך "הזמנה" */
   if(!tabs().some(x=>x.id===t)) t = tabs()[0].id;
   tab = t; pref('tab-'+ROLE_KEY(), t); render();
   const ap = document.querySelector('#sp-pills [aria-selected="true"]'); if(ap && ap.scrollIntoView) ap.scrollIntoView({block:'nearest', inline:'center'});
@@ -20535,7 +20536,7 @@ function setTab(t){
 /* כניסה מהתפריט הצדדי של האפליקציה */
 function go(t){ if(typeof switchTab === 'function') switchTab('procurement'); setTab(t); }
 function quickLinks(){
-  const L = {lists:'📋 ', menu:'🍽️ ', basket:'🧺 ', order:'🛒 ', orders:'🚚 ', stock:'📦 ', report:'📊 ', general:'🧾 ', requests:'📝 '};
+  const L = {lists:'📋 ', menu:'🍽️ ', basket:'🛒 ', orders:'🚚 ', stock:'📦 ', report:'📊 ', general:'🧾 ', requests:'📝 '};
   return tabs().filter(t => L[t.id]).map(t => ({label: L[t.id] + t.label, action: () => go(t.id)}));
 }
 function onShow(){ render(); refreshFromCloud(); }
@@ -20545,6 +20546,7 @@ function init(){
   if(!isCook() && synced['supply-data'] !== undefined && !blockedKeys['supply-data'] && migrateOldFood()) save();
   openCats = new Set(S.cats[0] ? [S.cats[0].id] : []);
   tab = pref('tab-'+ROLE_KEY()) || tabs()[0].id;
+  if(tab === 'order') tab = 'basket';
   if(!tabs().some(t=>t.id===tab)) tab = tabs()[0].id;
   render();
 }
@@ -20554,7 +20556,7 @@ function expiringSoon(){ return S.stock.filter(s=>!s.used && s.expiry && dayDiff
 const openReqs = () => S.requests.filter(r=>r.status==='open');
 
 function renderTop(){
-  const cnt = {basket: bkActive().length || '', order: OB.lines.length || openReqs().length || '', orders: S.orders.filter(o=>o.status==='sent').length || '', stock: (expiringSoon().length + belowMin().length) || '', requests: openReqs().length || ''};
+  const cnt = {basket: bkActive().length || openReqs().length || '', orders: S.orders.filter(o=>o.status==='sent').length || '', stock: (expiringSoon().length + belowMin().length) || '', requests: openReqs().length || ''};
   $('#sp-pills').innerHTML = tabs().map(t => `<button class="sp-pill" role="tab" aria-selected="${t.id===tab}" onclick="with(SP){setTab('${t.id}')}">${ic(t.icon,'sm')}${t.label}${cnt[t.id]?`<span class="cnt sp-num">${cnt[t.id]}</span>`:''}</button>`).join('');
   const open = S.orders.filter(o=>o.status==='sent'), exp = expiringSoon(), bm = belowMin();
   if(isCook()){
@@ -20573,7 +20575,7 @@ function renderTop(){
     <button class="tile" onclick="with(SP){setTab('lists')}"><span class="k">מחירונים פעילים</span><span class="tv sp-num">${S.lists.length}</span><span class="s">${suppliers().length} ספקים · ${S.cats.length} קטגוריות</span></button>
     <button class="tile ${due && due.left<=1?'is-warn':''}" onclick="with(SP){setTab('orders')}"><span class="k">הזמנה הבאה</span><span class="tv">${dueTxt}</span><span class="s">${due?esc(due.c.name):''}</span></button>
     <button class="tile ${open.length?'is-warn':''}" onclick="with(SP){setTab('orders')}"><span class="k">ממתינות לקבלה</span><span class="tv sp-num">${open.length}</span><span class="s">${open[0]?esc(open[0].supplier):'הכל התקבל'}</span></button>
-    <button class="tile ${alerts?'is-bad':''}" onclick="with(SP){setTab(openReqs().length?'order':'stock')}"><span class="k">דורש טיפול</span><span class="tv sp-num">${alerts}</span><span class="s">${[openReqs().length&&(openReqs().length===1?'בקשה אחת':openReqs().length+' בקשות'), bm.length&&bm.length+' מתחת למינימום', exp.length&&exp.length+' תוקף קרוב'].filter(Boolean).join(' · ')||'אין התראות'}</span></button>`;
+    <button class="tile ${alerts?'is-bad':''}" onclick="with(SP){setTab(openReqs().length?'basket':'stock')}"><span class="k">דורש טיפול</span><span class="tv sp-num">${alerts}</span><span class="s">${[openReqs().length&&(openReqs().length===1?'בקשה אחת':openReqs().length+' בקשות'), bm.length&&bm.length+' מתחת למינימום', exp.length&&exp.length+' תוקף קרוב'].filter(Boolean).join(' · ')||'אין התראות'}</span></button>`;
 }
 
 /* כפתור קבוע לספירה במחסן, בטלפון בלבד (CSS) */
@@ -22077,8 +22079,8 @@ function menuCalc(){
 }
 function calcToOrder(catId){
   const rows = computeNeeds().rows.filter(r=>r.catId===catId && r.toOrder>0);
-  const go = () => { OB.catId = catId; OB.lines = rows.map(r=>({key:r.key, name:r.name, unit:r.unit, qty:r.toOrder})); OB.pick=null; saveDraft(); setTab('order'); toast(`נוצרה טיוטת הזמנה עם ${rows.length} מוצרים`); };
-  OB.lines.length ? confirmBox('יש כבר טיוטת הזמנה. להחליף אותה בחישוב מהתפריט?', go) : go();
+  let n = 0; rows.forEach(r => { if(toBasket(r.key, r.toOrder, {mode:'max'})) n++; });
+  bkGo(n, n ? `נוספו ${n} מוצרים מהתפריט להזמנה` : 'לא נמצאו המוצרים במחירונים');
 }
 function calcToRequests(catId){
   const rows = computeNeeds().rows.filter(r=>r.catId===catId && r.toOrder>0);
@@ -22255,10 +22257,10 @@ function renderOrder(){
   renderResults(); renderQuotes();
 }
 function reqToOrder(id){
-  const r = S.requests.find(x=>x.id===id); const p = productMap().get(resolve(r.key)); if(!p) return;
-  if(OB.lines.length && OB.catId!==p.catId){ toast('בטיוטה יש הזמנה מקטגוריה אחרת. סיים אותה קודם'); return; }
-  OB.catId = p.catId; const ex = OB.lines.find(l=>l.key===p.key); ex ? ex.qty += r.qty : OB.lines.push({key:p.key, name:p.name, unit:p.unit, qty:r.qty});
-  r.status = 'done'; OB.pick=null; OB.fold=false; save(); saveDraft(); render(); toast('נוסף להזמנה');
+  const r = S.requests.find(x=>x.id===id); if(!r) return;
+  const f = toBasket(r.key, r.qty, {mode:'add'});
+  if(!f){ toast('המוצר לא נמצא במחירונים'); return; }
+  r.status = 'done'; BK.view = 'order'; BK.fold = false; bkSave(); save(); render(); toast(`"${f.name}" נוסף להזמנה`);
 }
 function switchOrderCat(id){
   if(OB.lines.length && id!==OB.catId){ confirmBox('מעבר קטגוריה ירוקן את ההזמנה הנוכחית. להמשיך?', ()=>{OB.catId=id;OB.lines=[];OB.pick=null;saveDraft();render();}); return; }
@@ -22383,11 +22385,13 @@ function saveOrder(qid){
   OB.lines=[]; OB.pick=null; OB.fold=false; saveDraft(); save(); toast(groups.length>1?`נשמרו ${groups.length} הזמנות`:'ההזמנה נשמרה'); setTab('orders');
 }
 
-/* ============ 4א. הסל שלי: מוצרים בשמות שלי, וכל אחד מחזיק את כל הפריטים מכל הספקים ============
+/* ============ 4א. הזמנה: הסל שלי - מוצרים בשמות שלי, וכל אחד מחזיק את כל הפריטים מכל הספקים ============
    S.fams = [{id, name, catId, unit:'ק״ג'|'ליטר'|'יח׳', items:[ref], meta:{ref:{size,sunit,type}}, pref:'סוג מועדף', words:[]}]
    ref = "ספק|שם מנורמל". נשאר יציב כשמעלים מחירון מעודכן מאותו ספק, ולכן המחירים החדשים נכנסים לבד.
    המחירונים עצמם לא משתנים כאן. מחיקת מוצר מהסל מוחקת רק את הקיבוץ, לא פריטים ולא מחירים.
-   כמויות הסל (טיוטה) נשמרות במכשיר בלבד, כמו טיוטת ההזמנה. */
+   הכמות נשמרת בפנים ביחידת ההשוואה של המוצר (ק״ג / ליטר / יח׳), אבל מוצגת ומוזנת תמיד כמו שהספק מביא:
+   שקים, קרטונים, מארזים. ככה אפשר לעבור בין ספקים עם אריזות בגדלים שונים והכמות מומרת נכון.
+   כמויות ההזמנה (טיוטה) נשמרות במכשיר בלבד, כמו טיוטת ההזמנה הקודמת. */
 const famRef = (sup, name) => String(sup||'').trim() + '|' + norm(name);
 const FAM_UNITS = ['ק״ג','ליטר','יח׳'];
 const SALE_UNITS = ['שק','פח','מארז','קרטון','ארגז','חבילה','בקבוק','דלי','שקית','גליל','מגש','פחית','צנצנת','יחידה'];
@@ -22397,16 +22401,18 @@ function detectSale(name){
   const m = String(name||'').match(/(?:^|[^\p{L}])(שקית|שק|פחית|פח|מארז|קרטון|ארגז|חבילה|בקבוק|דלי|גליל|מגש|צנצנת)(?=$|[^\p{L}])/u);
   return m ? m[1] : '';
 }
-/* כמה ק״ג / ליטר יש ביחידה אחת שהספק מוכר, לפי שם הפריט. 0 = לא ידוע */
+/* כמה ק״ג / ליטר / יחידות יש ביחידה אחת שהספק מוכר, לפי שם הפריט. 0 = לא ידוע */
 const nmb = s => +String(s).replace(',', '.');
+const WUNIT = u => { u = String(u||'').replace(/["'״׳.]/g,'').trim(); return /^(קג|קילו|קילוגרם|kg)$/i.test(u) ? 'ק״ג' : /^(ליטר|ל|lit|l)$/i.test(u) ? 'ליטר' : ''; };
 function sizeIn(name, unit, fu){
-  if(fu === 'יח׳') return 1;
-  const u = String(unit||'').replace(/["'״׳.]/g,'').trim();
-  if(fu === 'ק״ג' && /^(קג|קילו|קילוגרם|kg)$/i.test(u)) return 1;
-  if(fu === 'ליטר' && /^(ליטר|ל|lit|l)$/i.test(u)) return 1;
   const s = ' ' + String(name||'').replace(/[״“”]/g,'"').replace(/[׳`’]/g,"'") + ' ';
   const N = '(\\d+(?:[.,]\\d+)?)\\s*';
   let m;
+  if(fu === 'יח׳'){
+    if((m = s.match(/(\d{1,4})\s*(?:יח'|יחי'|יחידות|יח)(?![\p{L}])/u))) return +m[1] || 1;
+    return 1;
+  }
+  if(WUNIT(unit) === fu) return 1;
   if(fu === 'ק״ג'){
     if((m = s.match(new RegExp(N + '(?:ק"ג|קג|ק\\.ג|קילו|kg)', 'iu')))) return nmb(m[1]);
     if((m = s.match(new RegExp(N + '(?:גרם|גר\'|גר|ג\'|gr|g)(?![\\p{L}])', 'iu')))) return nmb(m[1]) / 1000;
@@ -22436,21 +22442,32 @@ function famRows(f, idx){
   return (f.items||[]).map(r => idx.get(r)).filter(Boolean).map(x => {
     const md = meta[x.ref] || {}; const auto = sizeIn(x.it.name, x.it.unit, f.unit);
     const size = +md.size > 0 ? +md.size : (auto || 1);
-    return {...x, size, auto, known: +md.size > 0 || auto > 0, sunit: md.sunit || detectSale(x.it.name), type: md.type || '', ppu: x.it.price / size};
+    return {...x, size, auto, known: +md.size > 0 || auto > 0, msunit: md.sunit || '', sunit: md.sunit || detectSale(x.it.name), type: md.type || '',
+      byW: !!WUNIT(x.it.unit), ppu: x.it.price / size};
   });
 }
-/* כמה יחידות מזמינים מהספק בשביל q (ביחידות המוצר שלך), אחרי עיגול לקרטונים */
+/* יחידת המכירה של הספק: קרטון כשהוא מוכר רק בקרטון, אחרת שק / פח / מארז לפי השם, ואם אין - יחידת המחירון */
+const pkOnly = x => mustPack(x.it) ? packOf(x.it) : 1;
+const saleName = x => pkOnly(x) > 1 ? (x.msunit || 'קרטון') : x.sunit;
+const salePer = x => x.size * pkOnly(x);
+const salePrice = x => r2(x.it.price * pkOnly(x));
+const saleLbl = (x, n) => saleName(x) ? saleTxt(saleName(x), n) : `${qn(n)} ${uLbl(x.it.unit) || 'יח׳'}`;
+const saleWord = x => { const n = saleName(x); return n ? (n === 'יחידה' ? 'יח׳' : SALE_PL[n] || n) : (uLbl(x.it.unit) || 'יח׳'); };
+const saleOne = x => { const n = saleName(x); return n ? (n === 'יחידה' ? 'יחידה' : n) : (uLbl(x.it.unit) || 'יח׳'); };
+/* כמה מזמינים מהספק בשביל q (ביחידות ההשוואה), אחרי עיגול ליחידות שלמות ולקרטונים */
 function famCost(x, q){
-  const units = Math.max(1, Math.ceil((+q||0) / x.size - 1e-9)); const pq = packQty(x.it, units);
-  return {units, pq, cost: r2(pq.qty * x.it.price)};
+  q = +q || 0;
+  const units = x.byW ? Math.max(0.01, r2(q / x.size)) : Math.max(1, Math.ceil(q / x.size - 1e-9));
+  const pq = packQty(x.it, units);
+  return {units, pq, n: pq.packs || pq.qty, cost: r2(pq.qty * x.it.price)};
 }
-const famQtyTxt = (x, pq) => pq.packs ? `${packsTxt(pq.packs)} × ${pq.pack}` : x.sunit ? saleTxt(x.sunit, pq.qty) : `${qn(pq.qty)} ${uLbl(x.it.unit) || 'יח׳'}`;
+const famQtyTxt = (x, pq) => saleLbl(x, pq.packs || pq.qty);
 
 /* מספור קבוע לערכים שעוברים בתוך onclick (שמות ספקים יכולים להכיל גרשיים) */
 const RGA = [], RGM = new Map();
 const rg = v => { if(!RGM.has(v)){ RGM.set(v, RGA.length); RGA.push(v); } return RGM.get(v); };
 
-let BK = {cat:'', view:'all', qty:{}, man:{}, mode:'smart', open:null, add:false, q:'', res:[]};
+let BK = {cat:'', view:'all', qty:{}, man:{}, mode:'smart', open:null, add:false, q:'', res:[], fold:false};
 try{ const d = JSON.parse(pref('basket')); if(d && typeof d === 'object') BK = {...BK, qty:d.qty||{}, man:d.man||{}, mode:d.mode||'smart', cat:d.cat||'', view:d.view||'all'}; }catch(e){}
 function bkSave(){ pref('basket', JSON.stringify({qty:BK.qty, man:BK.man, mode:BK.mode, cat:BK.cat, view:BK.view})); }
 const famById = id => (S.fams||[]).find(f => f.id === id);
@@ -22458,19 +22475,22 @@ const bkQ = f => +BK.qty[f.id] > 0 ? +BK.qty[f.id] : 0;
 const bkFams = () => (S.fams||[]).filter(f => !BK.cat || f.catId === BK.cat);
 const bkActive = () => (S.fams||[]).filter(f => bkQ(f) > 0);
 
-/* הפריט שנבחר למוצר: mode = 'smart' (הזול לכל מוצר) או שם ספק (הכל מספק אחד) */
+/* הפריט שנבחר למוצר. mode: 'smart' = חלוקה (כולל מה שבחרת ידנית), 'cheap' = הזול בלי בחירות ידניות, או שם ספק.
+   כשאין עדיין כמות - הזול לק״ג / לליטר, וממנו מתחילים לספור. כשיש כמות - הזול בסכום בפועל, אחרי עיגול לאריזות */
 function bkPick(f, rows, q, mode){
   if(!rows.length) return {miss:true};
-  const best = arr => { let b = null, bc = Infinity; arr.forEach(x => { const c = famCost(x, q).cost; if(c < bc - 0.001){ bc = c; b = x; } }); return b; };
-  const man = BK.man[f.id] ? rows.find(x => x.ref === BK.man[f.id]) : null;
+  const best = arr => { let b = null, bc = Infinity, bp = Infinity;
+    arr.forEach(x => { const c = q > 0 ? famCost(x, q).cost : x.ppu, p = x.ppu;
+      if(c < bc - 0.001 || (Math.abs(c - bc) <= 0.001 && p < bp)){ bc = c; bp = p; b = x; } }); return b; };
+  const man = mode !== 'cheap' && BK.man[f.id] ? rows.find(x => x.ref === BK.man[f.id]) : null;
   const want = f.pref || (man && man.type) || '';
-  if(mode === 'smart'){
-    if(man) return {x:man};
+  if(mode === 'smart' || mode === 'cheap'){
+    if(man) return {x:man, man:true};
     const same = want ? rows.filter(x => x.type === want) : [];
     return {x: best(same.length ? same : rows)};
   }
   const ofS = rows.filter(x => x.sup === mode); if(!ofS.length) return {miss:true};
-  if(man && man.sup === mode) return {x:man};
+  if(man && man.sup === mode) return {x:man, man:true};
   const same = want ? ofS.filter(x => x.type === want) : ofS;
   if(same.length) return {x: best(same)};
   return {x: best(ofS), other:true};
@@ -22480,37 +22500,93 @@ function bkPlan(mode, idx){
   bkActive().forEach(f => {
     const rows = famRows(f, idx), q = bkQ(f), p = bkPick(f, rows, q, mode);
     if(p.miss){ M.push(f); return; }
-    L.push({f, x:p.x, other:!!p.other, q, ...famCost(p.x, q)});
+    /* כמות משוערת: הפריט שונה מזה שלפיו ספרת, ולאחד מהם הגודל לא ידוע */
+    const anc = rows.find(x => x.ref === BK.man[f.id]) || bkPick(f, rows, q, 'cheap').x;
+    const est = !!anc && anc.ref !== p.x.ref && (!anc.known || !p.x.known);
+    L.push({f, x:p.x, other:!!p.other, est, q, ...famCost(p.x, q)});
   });
   return {L, M, total: r2(L.reduce((s,l) => s + l.cost, 0))};
 }
-/* שורת הזמנה בפורמט של ההזמנות הקיימות: שם הפריט כמו אצל הספק, מק״ט, וכמות לפי מה שהספק מוכר */
+/* שורת הזמנה בפורמט של ההזמנות הקיימות: שם הפריט כמו אצל הספק, מק״ט, וכמות כמו שהספק מוכר */
 function bkLine(l){
   const it = l.x.it, pq = l.pq;
   const o = {key: resolve(norm(it.name)), name: it.name, unit: it.unit || '', qty: pq.qty, price: it.price, supplier: l.x.sup, fam: l.f.name};
   if(it.sku) o.sku = String(it.sku);
   if(pq.packs){ o.need = l.units; o.packs = pq.packs; o.pack = pq.pack; }
   else if(packOf(it) > 1) o.cpack = packOf(it);
-  if(!pq.packs && l.x.sunit) o.sunit = l.x.sunit;
+  const sn = saleName(l.x); if(sn) o.sunit = sn;
   return o;
 }
 function bkGroups(P){
   const g = new Map();
-  P.L.forEach(l => { if(!g.has(l.x.sup)) g.set(l.x.sup, {s:l.x.sup, lines:[], fams:[]}); const e = g.get(l.x.sup); e.lines.push(bkLine(l)); e.fams.push(l.f); });
+  P.L.forEach(l => { if(!g.has(l.x.sup)) g.set(l.x.sup, {s:l.x.sup, lines:[], fams:[], ls:[]}); const e = g.get(l.x.sup); e.lines.push(bkLine(l)); e.fams.push(l.f); e.ls.push(l); });
   return [...g.values()];
 }
-/* חסר במלאי: אחד הפריטים של המוצר מתחת למינימום. הכמות מומרת ליחידות המוצר שלך */
+/* חסר במלאי: אחד הפריטים של המוצר מתחת למינימום. הכמות מומרת ליחידת ההשוואה של המוצר */
 function bkNeed(f, rows, bm){
   let short = false, need = 0;
   rows.forEach(x => { const k = resolve(norm(x.it.name)); if(bm.has(k)){ short = true; need = Math.max(need, r2(parNeed(k) * x.size)); } });
   return short ? Math.max(need, 0) : -1;
 }
 
+/* ---------- כניסה להזמנה מכל מקום באפליקציה: מטבח, תפריט, מלאי, חוסרים, הזמן שוב ----------
+   key = מפתח מוצר (כמו בהזמנות הקיימות), qty = ביחידות של הפריט במחירון. מוצא את המוצר בסל, ואם אין - יוצר אותו
+   מכל הפריטים המקושרים אליו. רק מוסיף לסל, לא משנה מחירונים */
+/* שם נקי למוצר בסל: בלי גודל האריזה ("רסק עגבניות 4 ק"ג" -> "רסק עגבניות") */
+const cleanName = n => String(n||'').replace(/[״“”]/g,'"').replace(/[׳`’]/g,"'")
+  .replace(/\d+(?:[.,]\d+)?\s*(?:ק"ג|קג|קילו|גרם|גר'|גר|ג'|מ"ל|מל|ליטר|ל'|יח'|יחידות|יח|kg|gr|ml)?(?![\p{L}\d])/giu, ' ')
+  .replace(/\s*[xX×]\s*/g, ' ').replace(/\s+/g, ' ').trim() || String(n||'').trim();
+function famForKey(key, refHint){
+  const idx = itemIndex(), p = key ? productMap().get(resolve(key)) : null;
+  let refs = p ? [...new Set(p.offers.map(o => famRef(o.supplier, o.item.name)))].filter(r => idx.has(r)) : [];
+  if(refHint && idx.has(refHint) && !refs.includes(refHint)) refs.unshift(refHint);
+  if(!refs.length) return null;
+  if(!Array.isArray(S.fams)) S.fams = [];
+  let f = S.fams.find(x => refs.some(r => (x.items||[]).includes(r)));
+  if(!f){
+    const x0 = idx.get(refs[0]);
+    f = {id:uid(), name:cleanName(p ? p.name : x0.it.name), catId:(p ? p.catId : x0.catId), unit:famUnitOf(refs.map(r => ({it: idx.get(r).it}))), items:[], meta:{}, words:[]};
+    S.fams.push(f);
+  }
+  const used = new Set(S.fams.filter(x => x !== f).flatMap(x => x.items||[]));
+  f.items = [...new Set([...(f.items||[]), ...refs.filter(r => !used.has(r))])];
+  return {f, refs, idx};
+}
+function toBasket(key, qty, o){
+  o = o || {};
+  const r = famForKey(key, o.ref); if(!r) return null;
+  const f = r.f, rows = famRows(f, r.idx);
+  const base = rows.find(x => x.ref === o.ref) || rows.find(x => r.refs.includes(x.ref)) || rows[0];
+  const add = r2((+qty || 0) * (base ? base.size : 1));
+  if(add > 0){
+    const cur = bkQ(f);
+    BK.qty[f.id] = o.mode === 'set' ? add : o.mode === 'max' ? Math.max(cur, add) : r2(cur + add);
+  }
+  if(o.ref && rows.some(x => x.ref === o.ref)) BK.man[f.id] = o.ref;
+  return f;
+}
+function bkGo(n, msg){
+  BK.view = 'order'; BK.fold = false; BK.cat = ''; bkSave(); save();
+  setTab('basket'); toast(msg || (n ? `נוספו ${n} מוצרים להזמנה` : 'אין מה להוסיף'));
+}
+/* טיוטה מהחלון הקודם (במכשיר הזה) עוברת פעם אחת להזמנה. העותק הישן נשמר במכשיר */
+function bkMigrateDraft(){
+  if(!OB.lines.length || isCook() || !S.lists.length) return;
+  if(synced['supplyBasket-data'] === undefined || blockedKeys['supplyBasket-data']) return;
+  let n = 0;
+  OB.lines.forEach(l => { if(toBasket(l.key, l.qty, {mode:'max'})) n++; });
+  pref('draft-old', pref('draft'));
+  OB.lines = []; OB.pick = null; saveDraft();
+  if(n){ BK.view = 'order'; bkSave(); save(); toast(`טיוטת ההזמנה הקודמת (${n} מוצרים) הועברה לכאן`); }
+}
+
 function renderBasket(){
   if(!Array.isArray(S.fams)) S.fams = [];
+  bkMigrateDraft();
   const idx = itemIndex(), bm = new Set(belowMin());
   const all = bkFams(); const act = bkActive();
   if(BK.view === 'order' && !act.length) BK.view = 'all';
+  if(!act.length) BK.fold = false;
   const needs = new Map(all.map(f => [f.id, bkNeed(f, famRows(f, idx), bm)]));
   const shortN = all.filter(f => needs.get(f.id) >= 0).length;
   const list = all.filter(f => BK.view === 'order' ? bkQ(f) > 0 : BK.view === 'short' ? needs.get(f.id) >= 0 : true)
@@ -22518,9 +22594,17 @@ function renderBasket(){
   const qm = (S.fams||[]).length ? qmQueue(idx).length : 0;
   const seedN = bkSeedCands(idx).length;
   const catsWith = S.cats.filter(c => (S.fams||[]).some(f => f.catId === c.id));
+  const nAct = act.length;
   $('#sp-view').innerHTML = `
+  ${bkReqsHTML()}
   ${qm ? `<div class="plbar"><span>${ic('link','sm')} <b class="sp-num">${qm}</b> פריטים במחירונים עוד לא שייכים לאף מוצר בסל</span><button class="sb sm" onclick="with(SP){openQM()}">${ic('check','sm')}התאמה מהירה</button></div>` : ''}
+  ${BK.fold && nAct ? `<button class="sp-card obfold" aria-expanded="false" onclick="with(SP){BK.fold=false;renderBasket()}">
+      ${ic('cart')}<span class="grow"><b>ההזמנה</b> <span class="muted sp-num">· ${nAct===1?'מוצר אחד':nAct+' מוצרים'}</span></span><span class="muted">פתיחה</span>${ic('down','sm')}</button>` : `
   <div class="sp-card">
+    <div class="row between"><h2>הסל שלי</h2><span class="row">
+      ${nAct > 1 ? `<button class="sb sb-ghost sm" onclick="with(SP){BK.fold=true;renderBasket()}">${ic('up','sm')}כיווץ לשורה</button>` : ''}
+      ${nAct ? `<button class="sb sb-ghost sm" onclick="with(SP){bkClear()}">${ic('trash','sm')}ריקון ההזמנה</button>` : ''}
+    </span></div>
     ${catsWith.length > 1 ? `<div class="chips">${[{id:'',name:'הכל'}, ...catsWith].map(c => `<button class="chip" aria-pressed="${BK.cat===c.id}" onclick="with(SP){BK.cat='${c.id}';bkSave();renderBasket()}">${esc(c.name)}</button>`).join('')}</div>` : ''}
     <div class="row between">
       <button class="sb" onclick="with(SP){bkToggleAdd()}">${ic(BK.add?'x':'plus','sm')}${BK.add?'סגירת ההוספה':'הוספת מוצר לסל'}</button>
@@ -22533,82 +22617,119 @@ function renderBasket(){
     ${BK.add ? bkAddHTML() : ''}
     ${!(S.fams||[]).length && !BK.add ? `<div class="sp-empty bk-empty">
         <b>הסל שלך עוד ריק</b>
-        <span>כל מוצר בסל הוא שם שלך, למשל "אורז", ומחזיק את כל סוגי האורז מכל הספקים. ככה רואים מיד מי הכי זול, לפי מחיר לק״ג.</span>
+        <span>כל מוצר בסל הוא שם שלך, למשל "אורז", ומחזיק את כל סוגי האורז מכל הספקים. ככה רואים מיד מי הכי זול, ומזמינים בשקים, קרטונים או מארזים כמו שהספק מביא.</span>
         ${seedN ? `<button class="sb sb-soft" onclick="with(SP){bkSeed()}">${ic('repeat','sm')}בנייה מ-${seedN} מוצרים שכבר במעקב מלאי או מקושרים</button>` : ''}
       </div>` : ''}
-    ${shortN && BK.view !== 'order' ? `<div class="row"><button class="sb sb-soft sm" onclick="with(SP){bkFillShort()}">${ic('box','sm')}להוסיף להזמנה את כל החסרים במלאי (${shortN})</button></div>` : ''}
+    <div class="row">
+      ${shortN && BK.view !== 'order' ? `<button class="sb sb-soft sm" onclick="with(SP){bkFillShort()}">${ic('box','sm')}להשלים את החסרים במלאי (${shortN})</button>` : ''}
+      <button class="sb sb-soft sm" onclick="with(SP){MN.view='calc';pref('mnview','calc');setTab('menu')}">${ic('menu','sm')}חישוב לפי התפריט</button>
+    </div>
     <div class="bk-list">${list.map(f => bkRowHTML(f, idx, needs.get(f.id))).join('') || (all.length ? `<div class="sp-empty">${BK.view==='order'?'עוד אין מוצרים בהזמנה. לחץ + ליד מוצר כדי להוסיף.':'אין מוצרים חסרים במלאי.'}</div>` : '')}</div>
     ${(S.fams||[]).length && seedN ? `<button class="sb sb-ghost sm" style="align-self:flex-start" onclick="with(SP){bkSeed()}">${ic('repeat','sm')}להוסיף לסל עוד ${seedN} מוצרים מקושרים או במעקב מלאי</button>` : ''}
-  </div>
+  </div>`}
   <div id="sp-bkQuotes">${bkQuotesHTML(idx)}</div>`;
   renderTop();
+}
+/* בקשות מהמטבח (כמו בחלון ההזמנה הקודם) */
+function bkReqsHTML(){
+  const reqs = openReqs(); if(!reqs.length) return '';
+  const pm = productMap();
+  return `<div class="sp-card">
+    <div class="row between"><h2>בקשות מהמטבח</h2><span class="tag a sp-num">${reqs.length} פתוחות</span></div>
+    <div>${reqs.map(r => { const p = r.key ? pm.get(resolve(r.key)) : null; return `<div class="req">
+      <div class="grow"><div>${esc(r.name)} <span class="muted sp-num">· ${qn(r.qty)} ${esc(r.unit)}</span> ${r.urgent?'<span class="tag r">דחוף</span>':''}</div><span class="muted">${heDate(r.date)}${r.note?' · '+esc(r.note):''}${p?' · '+esc(catById(p.catId)?.name||''):''}</span></div>
+      ${p ? `<button class="sb sb-soft sm" onclick="with(SP){reqToOrder('${r.id}')}">${ic('cart','sm')}להזמנה</button>` : '<span></span>'}
+      <button class="sb icon sb-ghost" title="טופל" aria-label="סימון כטופל" onclick="with(SP){S.requests.find(x=>x.id==='${r.id}').status='done';save();render()}">${ic('check','sm')}</button>
+    </div>`; }).join('')}</div>
+  </div>`;
 }
 function bkRowHTML(f, idx, need){
   const rows = famRows(f, idx), q = bkQ(f), open = BK.open === f.id;
   const nsup = new Set(rows.map(x => x.sup)).size;
-  const p = q > 0 ? bkPick(f, rows, q, BK.mode) : null;
+  const p = rows.length ? bkPick(f, rows, q, BK.mode === 'smart' ? 'smart' : BK.mode) : {miss:true};
+  const px = !p.miss ? p.x : (rows.length ? bkPick(f, rows, q, 'smart').x : null);
+  const c = px && q > 0 ? famCost(px, q) : null;
   const minPpu = rows.length ? Math.min(...rows.map(x => x.ppu)) : 0;
-  const st = f.unit === 'יח׳' ? 1 : (f.step > 0 ? f.step : 1);
   let tag;
   if(!rows.length) tag = `<span class="tag r">${ic('alert','sm')}אין פריטים עם מחיר. לחץ ✎ להוספה</span>`;
-  else if(!p) tag = `<span class="muted sp-num">מ-${money(minPpu)} ל${esc(f.unit)} · ${nsup} ספקים</span>`;
+  else if(!(q > 0)) tag = `<span class="muted sp-num">${esc(px.sup)} · ${esc(px.it.name)} · ${money(salePrice(px))} ל${esc(saleOne(px))}${nsup > 1 ? ` · ${nsup} ספקים` : ''}</span>`;
   else if(p.miss) tag = `<span class="tag r">${ic('alert','sm')}אין אצל ${esc(BK.mode)}</span>`;
-  else { const c = famCost(p.x, q); tag = `<span class="tag ${p.other?'a':'g'} wrap sp-num">${esc(p.x.sup)} · ${esc(famQtyTxt(p.x, c.pq))} · ${money(c.cost)}${p.other?` · סוג אחר${p.x.type?': '+esc(p.x.type):''}`:''}</span>`; }
+  else tag = `<span class="tag ${p.other?'a':'g'} wrap sp-num">${esc(px.sup)} · ${esc(px.it.name)} · ${money(c.cost)}${p.other?` · סוג אחר${px.type?': '+esc(px.type):''}`:''}</span>`;
+  const n = c ? c.n : 0;
   return `<article class="bk-row ${q>0?'on':''}">
     <div class="row between" style="flex-wrap:nowrap;align-items:flex-start">
       <div class="grow"><b class="bk-n">${esc(f.name)}</b>
-        <div class="muted sp-num">${rows.length} פריטים · ${nsup} ספקים${f.pref?` · מעדיף ${esc(f.pref)}`:''}${need >= 0 ? ` · <span class="bk-short">חסר במלאי${need>0?`, צריך ${qn(need)} ${esc(f.unit)}`:''}</span>` : ''}</div></div>
-      <div class="stepper"><button aria-label="פחות" onclick="with(SP){bkStep('${f.id}',-1)}">−</button><input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${q||''}" placeholder="0" aria-label="כמות ב${esc(f.unit)}" onchange="with(SP){bkSet('${f.id}',this.value)}"><button aria-label="יותר" onclick="with(SP){bkStep('${f.id}',1)}">+</button></div>
+        <div class="muted sp-num">${rows.length} פריטים · ${nsup} ספקים${f.pref?` · מעדיף ${esc(f.pref)}`:''}${need >= 0 ? ` · <span class="bk-short">חסר במלאי</span>` : ''}</div></div>
+      ${px ? `<div class="bk-q"><div class="stepper"><button aria-label="פחות" onclick="with(SP){bkStep('${f.id}',-1)}">−</button><input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${n||''}" placeholder="0" aria-label="כמות ב${esc(saleWord(px))}" onchange="with(SP){bkSet('${f.id}',this.value)}"><button aria-label="יותר" onclick="with(SP){bkStep('${f.id}',1)}">+</button></div><span class="bk-u">${esc(saleWord(px))}</span></div>` : ''}
     </div>
-    <div class="row between">
-      <span class="muted bk-u">${esc(f.unit)}</span>
+    <div class="row between" style="flex-wrap:nowrap">
       <div class="grow">${tag}</div>
       <button class="sb icon sb-ghost" aria-label="עריכת המוצר" title="עריכה: שם, סוגים, גדלים ופריטים" onclick="with(SP){openFam('${f.id}')}">${ic('edit','sm')}</button>
       ${rows.length ? `<button class="sb sb-soft sm" aria-expanded="${open}" onclick="with(SP){BK.open=BK.open==='${f.id}'?null:'${f.id}';renderBasket()}">${open?'סגירה':'השוואה'}</button>` : ''}
     </div>
-    ${open && rows.length ? bkCmpHTML(f, rows, q, p && !p.miss ? p.x : null) : ''}
+    ${open && rows.length ? bkCmpHTML(f, rows, q, px) : ''}
   </article>`;
 }
+/* השוואה: כל הפריטים לפי סוג, מהזול לק״ג / לליטר. הכמות בכל שורה כמו שאותו ספק מביא */
 function bkCmpHTML(f, rows, q, sel){
   const types = [...new Set(rows.map(x => x.type))].sort((a,b) => (a===f.pref?-1:b===f.pref?1:0) || (!a) - (!b) || a.localeCompare(b,'he'));
-  const qq = q > 0 ? q : (f.unit === 'יח׳' ? 1 : 1);
+  const pu = f.unit === 'יח׳' ? 'יחידה' : f.unit;
   return `<div class="bk-cmp">${types.map(t => {
     const g = rows.filter(x => x.type === t).sort((a,b) => a.ppu - b.ppu);
     return (types.length > 1 || t ? `<div class="bk-type">${esc(t || 'בלי סוג')}${t && t===f.pref?' · מועדף':''}</div>` : '') + g.map((x,j) => {
-      const c = famCost(x, qq), d = j ? Math.round((x.ppu / g[0].ppu - 1) * 100) : 0;
+      const c = q > 0 ? famCost(x, q) : null, d = j ? Math.round((x.ppu / g[0].ppu - 1) * 100) : 0;
       return `<button class="bk-v ${sel && sel.ref === x.ref ? 'on' : ''}" onclick="with(SP){bkMan('${f.id}',${rg(x.ref)})}">
         <span class="grow"><span class="bk-vn">${esc(x.sup)} <span class="muted">· ${esc(x.it.name)}</span></span>
-          <span class="muted sp-num">${q>0 ? `${esc(famQtyTxt(x, c.pq))} × ${money(x.it.price)} = ${money(c.cost)}` : `${money(x.it.price)} ל${esc(uLbl(x.it.unit)||'יח׳')}`}${x.known ? '' : ` · <span class="bk-warn">גודל לא ידוע, לחץ ✎</span>`}</span></span>
-        <span class="bk-pr"><b class="sp-num">${money(x.ppu)}</b><span class="muted sp-num">ל${esc(f.unit)}${j===0 && g.length>1 ? ' · הזול' : d ? ` · +${d}%` : ''}</span></span>
+          <span class="muted sp-num">${c ? `${esc(saleLbl(x, c.n))} = ${money(c.cost)}` : `${money(salePrice(x))} ל${esc(saleOne(x))}`}${x.known ? '' : ` · <span class="bk-warn">גודל לא ידוע, לחץ ✎</span>`}</span></span>
+        <span class="bk-pr"><b class="sp-num">${money(x.ppu)}</b><span class="muted sp-num">ל${esc(pu)}${j===0 && g.length>1 ? ' · הזול' : d ? ` · +${d}%` : ''}</span></span>
       </button>`; }).join('');
   }).join('')}
-  <p class="muted" style="margin:0">לחיצה על שורה בוחרת אותה. ${types.length>1?'הבחירה נשמרת גם כסוג המועדף של המוצר.':''}</p></div>`;
+  <p class="muted" style="margin:0">לחיצה על שורה בוחרת אותה, והכמות נספרת לפי האריזה שלה. ${types.length>1?'הבחירה נשמרת גם כסוג המועדף של המוצר.':''}</p></div>`;
+}
+/* הכמות שמוזנת היא ביחידות של הפריט שמוצג (שק, קרטון...). בחלוקה לכמה ספקים, שינוי כמות נועל את הפריט הזה למוצר */
+function bkShown(f){
+  const rows = famRows(f); if(!rows.length) return null;
+  const p = bkPick(f, rows, bkQ(f), BK.mode);
+  return p.miss ? bkPick(f, rows, bkQ(f), 'smart').x : p.x;
+}
+function bkSetN(f, x, n){
+  n = x.byW && pkOnly(x) === 1 ? r2(n) : Math.ceil(n - 1e-9);
+  if(n > 0){ BK.qty[f.id] = r2(n * salePer(x)); if(BK.mode === 'smart' || BK.mode === x.sup) BK.man[f.id] = x.ref; }
+  else { delete BK.qty[f.id]; delete BK.man[f.id]; }
+  BK.fold = false; bkSave(); renderBasket();
 }
 function bkStep(id, d){
-  const f = famById(id); if(!f) return; const st = f.unit === 'יח׳' ? 1 : 1;
-  const v = Math.max(0, r2(bkQ(f) + d * st)); v > 0 ? BK.qty[id] = v : delete BK.qty[id];
-  bkSave(); renderBasket();
+  const f = famById(id); if(!f) return; const x = bkShown(f); if(!x) return;
+  const cur = bkQ(f) > 0 ? famCost(x, bkQ(f)).n : 0;
+  bkSetN(f, x, Math.max(0, cur + d));
 }
-function bkSet(id, v){ const n = num(v); n > 0 ? BK.qty[id] = r2(n) : delete BK.qty[id]; bkSave(); renderBasket(); }
+function bkSet(id, v){ const f = famById(id); if(!f) return; const x = bkShown(f); if(!x) return; bkSetN(f, x, Math.max(0, num(v))); }
 function bkMan(id, i){
   const f = famById(id), ref = RGA[i]; if(!f || !ref) return;
+  const rows = famRows(f), x = rows.find(r => r.ref === ref); if(!x) return;
   BK.man[id] = ref; BK.mode = 'smart';
-  const x = famRows(f).find(r => r.ref === ref);
-  if(x && x.type && f.pref !== x.type && new Set(famRows(f).map(r=>r.type)).size > 1){ f.pref = x.type; save(); }
-  if(!bkQ(f)) BK.qty[id] = 1;
+  if(x.type && f.pref !== x.type && new Set(rows.map(r=>r.type)).size > 1){ f.pref = x.type; save(); }
+  if(!bkQ(f)) BK.qty[id] = salePer(x);
   bkSave(); renderBasket();
 }
+function bkClear(){
+  confirmBox('לרוקן את ההזמנה? המוצרים נשארים בסל, רק הכמויות מתאפסות.', () => {
+    BK.qty = {}; BK.man = {}; BK.mode = 'smart'; BK.view = 'all'; BK.fold = false; bkSave(); renderBasket(); toast('ההזמנה רוקנה');
+  });
+}
+function bkCheapAll(){ bkActive().forEach(f => { delete BK.man[f.id]; }); BK.mode = 'smart'; bkSave(); renderBasket(); toast('כל המוצרים עברו לזול'); }
 function bkFillShort(){
   const idx = itemIndex(), bm = new Set(belowMin()); let n = 0;
-  bkFams().forEach(f => { const need = bkNeed(f, famRows(f, idx), bm); if(need >= 0){ BK.qty[f.id] = Math.max(bkQ(f), need > 0 ? need : 1); n++; } });
-  BK.view = 'order'; bkSave(); renderBasket(); toast(n ? `נוספו ${n} מוצרים להזמנה` : 'אין חסרים במלאי');
+  bkFams().forEach(f => { const rows = famRows(f, idx), need = bkNeed(f, rows, bm);
+    if(need >= 0){ const x = bkPick(f, rows, need, 'smart').x; BK.qty[f.id] = Math.max(bkQ(f), need > 0 ? need : (x ? salePer(x) : 1)); n++; } });
+  BK.view = 'order'; BK.fold = false; bkSave(); renderBasket(); toast(n ? `נוספו ${n} מוצרים להזמנה` : 'אין חסרים במלאי');
 }
-function bkMode(i){ BK.mode = i < 0 ? 'smart' : (RGA[i] || 'smart'); bkSave(); renderBasket(); }
+function bkMode(i){ BK.mode = i < 0 ? 'smart' : (RGA[i] || 'smart'); if(bkActive().length > 1) BK.fold = true; bkSave(); renderBasket(); }
 
 /* ---------- איך להזמין: הכל מספק אחד, או חלוקה לכמה ספקים ---------- */
 function bkQuotesHTML(idx){
   const act = bkActive(); if(!act.length) return '';
-  const sm = bkPlan('smart', idx);
+  const sm = bkPlan('smart', idx), ch = bkPlan('cheap', idx), manDiff = r2(sm.total - ch.total);
   const sups = [...new Set(act.flatMap(f => famRows(f, idx).map(x => x.sup)))];
   const per = sups.map(s => ({s, ...bkPlan(s, idx)})).sort((a,b) => a.M.length - b.M.length || a.total - b.total);
   const full = per.find(o => !o.M.length);
@@ -22620,9 +22741,9 @@ function bkQuotesHTML(idx){
     <div class="row between"><h2>איך להזמין?</h2><span class="muted sp-num">${act.length} מוצרים בהזמנה</span></div>
     <div class="quotes">
       <button class="quote smart" aria-pressed="${BK.mode==='smart'}" onclick="with(SP){bkMode(-1)}">
-        <span class="row between"><b>${ic('chart','sm')} חלוקה לכמה ספקים</b><span class="tag g">הכי זול</span></span>
+        <span class="row between"><b>${ic('chart','sm')} חלוקה לכמה ספקים</b>${manDiff > 0.5 ? '<span class="tag a">לפי הבחירות שלך</span>' : '<span class="tag g">הכי זול</span>'}</span>
         <span class="tot sp-num">${money(sm.total)}</span>
-        <span class="muted">כל מוצר מהספק הזול${ssups.length>1?` · ${ssups.length} ספקים`:''}${full && full.total - sm.total > 0.5 ? ` · חוסך ${money(full.total - sm.total)} מול ${esc(full.s)}` : ''}</span>
+        <span class="muted">${manDiff > 0.5 ? 'כל מוצר מהפריט שבחרת' : 'כל מוצר מהספק הזול'}${ssups.length>1?` · ${ssups.length} ספקים`:''}${full && full.total - sm.total > 0.5 ? ` · חוסך ${money(full.total - sm.total)} מול ${esc(full.s)}` : ''}</span>
         ${smWarn ? `<span class="row">${smWarn}</span>` : ''}
       </button>
       ${per.map(o => { const nd = nextDelivery(o.s); return `<button class="quote" aria-pressed="${BK.mode===o.s}" onclick="with(SP){bkMode(${rg(o.s)})}">
@@ -22633,6 +22754,7 @@ function bkQuotesHTML(idx){
         ${minWarn(o.s, o.total) || nd ? `<span class="row">${minWarn(o.s, o.total)}${nd ? `<span class="tag">${ic('truck','sm')}אספקה ${nd}</span>` : ''}</span>` : ''}
       </button>`; }).join('')}
     </div>
+    ${manDiff > 0.5 ? `<div class="plbar"><span>${ic('alert','sm')} בחרת ידנית חלק מהפריטים. אם הכל ילך לזול, החלוקה תעלה <b class="sp-num">${money(ch.total)}</b> (חיסכון ${money(manDiff)})</span><button class="sb sm sb-soft" onclick="with(SP){bkCheapAll()}">הכל לזול</button></div>` : ''}
     ${cur ? bkDetailHTML(cur) : ''}
   </div>`;
 }
@@ -22643,7 +22765,7 @@ function bkDetailHTML(P){
     ${groups.map((g,gi) => { const t = r2(g.lines.reduce((s,l) => s + l.qty*l.price, 0)); const si = supInfo(g.s);
       return `<div class="qtable">
         <div class="row between"><h3>${esc(g.s)}</h3><span class="muted">${[si.cutoff && 'סגירת הזמנות ' + esc(si.cutoff), si.phone && esc(si.phone)].filter(Boolean).join(' · ')}</span></div>
-        ${g.lines.map((l,i) => `<div class="qrow"><span>${esc(l.name)}${l.sku?` <span class="muted sp-num">· מק״ט ${esc(l.sku)}</span>`:''}<span class="muted sp-num"> · ${esc(g.fams[i].name)}: ${esc(qtyLbl(l).main)}</span></span><span class="muted sp-num">${money(l.price)}</span><b class="sp-num">${money(l.qty*l.price)}</b></div>`).join('')}
+        ${g.lines.map((l,i) => `<div class="qrow"><span>${esc(l.name)}${l.sku?` <span class="muted sp-num">· מק״ט ${esc(l.sku)}</span>`:''}<span class="muted sp-num"> · ${esc(g.fams[i].name)}: <b>${esc(qtyLbl(l).main)}</b></span>${g.ls[i].est?` <span class="tag a">כמות לפי המרה, בדוק גודל ב-✎</span>`:''}</span><span class="muted sp-num">${money(l.price)}</span><b class="sp-num">${money(l.qty*l.price)}</b></div>`).join('')}
         <div class="qrow sum"><span>סה״כ ${esc(g.s)}</span><span></span><span class="sp-num">${money(t)}</span></div>
         <div class="row">
           <button class="sb sm" onclick="with(SP){openSheet('g',${gi})}">${ic('file','sm')}דף הזמנה (PDF)</button>
@@ -22671,7 +22793,7 @@ function bkSaveOrder(){
   const keys = new Set(groups.flatMap(g => g.lines.map(l => l.key)));
   S.shortages.forEach(s => { if(s.open && keys.has(resolve(s.key))) s.open = false; });
   P.L.forEach(l => { delete BK.qty[l.f.id]; delete BK.man[l.f.id]; });
-  BK.mode = 'smart'; BK.view = Object.keys(BK.qty).length ? 'order' : 'all';
+  BK.mode = 'smart'; BK.fold = false; BK.view = Object.keys(BK.qty).length ? 'order' : 'all';
   bkSave(); save(); toast(groups.length > 1 ? `נשמרו ${groups.length} הזמנות` : 'ההזמנה נשמרה'); setTab('orders');
 }
 
@@ -22743,7 +22865,7 @@ function bkSeedCands(idx){
 function bkSeed(){
   const idx = itemIndex(), cs = bkSeedCands(idx); if(!cs.length){ toast('אין מוצרים חדשים להוסיף'); return; }
   if(!Array.isArray(S.fams)) S.fams = [];
-  cs.forEach(c => { const rows = c.refs.map(r => ({it: idx.get(r).it})); S.fams.push({id:uid(), name:c.p.name, catId:c.p.catId, unit:famUnitOf(rows), items:c.refs, meta:{}, words:[]}); });
+  cs.forEach(c => { const rows = c.refs.map(r => ({it: idx.get(r).it})); S.fams.push({id:uid(), name:cleanName(c.p.name), catId:c.p.catId, unit:famUnitOf(rows), items:c.refs, meta:{}, words:[]}); });
   save(); renderBasket(); toast(`נוספו ${cs.length} מוצרים לסל. אפשר לשנות להם שם ב-✎`);
 }
 
@@ -22809,7 +22931,7 @@ function drawFam(focusQ){
       <label class="f">סוג מועדף<select onchange="with(SP){feSet('pref',this.value)}"><option value="">בלי העדפה</option>${types.map(t => `<option ${f.pref===t?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
     </div>
     <h3>הפריטים במוצר <span class="muted sp-num">(${rows.length})</span></h3>
-    <p class="muted" style="margin:0">סוג מפריד למשל בין פרסי לבסמטי. ${f.unit!=='יח׳'?`הגודל הוא כמה ${esc(f.unit)} יש ביחידה אחת שהספק מוכר, ולפיו מחושב המחיר ל${esc(f.unit)}. `:''}יחידת המכירה היא מה שהספק רואה בכמות, למשל "2 שקים".</p>
+    <p class="muted" style="margin:0">סוג מפריד למשל בין פרסי לבסמטי. הגודל הוא כמה ${f.unit==='יח׳'?'יחידות':esc(f.unit)} יש ביחידה אחת שהספק מוכר. לפיו משווים מחיר, וממירים כמות כשעוברים לספק עם אריזה אחרת. יחידת המכירה היא מה שסופרים ומה שהספק רואה בהזמנה, למשל "2 שקים".</p>
     ${lost ? `<p class="muted" style="margin:0">${lost} פריטים לא מופיעים כרגע במחירונים (אולי הוסרו או שונה שמם). הם יחזרו לבד אם יופיעו שוב.</p>` : ''}
     <datalist id="sp-feTypes">${types.map(t => `<option value="${esc(t)}">`).join('')}</datalist>
     <div class="fe-list">${rows.map(x => { const r = rg(x.ref), md = (f.meta||{})[x.ref] || {};
@@ -22818,8 +22940,8 @@ function drawFam(focusQ){
           <button class="sb icon sb-ghost danger" aria-label="הוצאה מהמוצר" title="הוצאה מהמוצר (נשאר במחירון)" onclick="with(SP){feDrop(${r})}">${ic('x','sm')}</button></div>
         <div class="fe-f">
           <label class="f">סוג<input list="sp-feTypes" value="${esc(md.type||'')}" placeholder="למשל פרסי" onchange="with(SP){feMeta(${r},'type',this.value)}"></label>
-          ${f.unit!=='יח׳' ? `<label class="f">${esc(f.unit)} ביחידה<input class="sp-num" type="number" step="any" min="0" inputmode="decimal" value="${md.size||''}" placeholder="${x.auto ? qn(x.auto) : 'לא ידוע'}" onchange="with(SP){feMeta(${r},'size',this.value)}"></label>` : ''}
-          <label class="f">יחידת מכירה<select onchange="with(SP){feMeta(${r},'sunit',this.value)}"><option value="">${detectSale(x.it.name) ? 'אוטומטי: ' + esc(detectSale(x.it.name)) : 'לפי המחירון: ' + esc(uLbl(x.it.unit)||'יח׳')}</option>${SALE_UNITS.map(u => `<option ${md.sunit===u?'selected':''}>${u}</option>`).join('')}</select></label>
+          <label class="f">${f.unit==='יח׳'?'יחידות':esc(f.unit)} ביחידה<input class="sp-num" type="number" step="any" min="0" inputmode="decimal" value="${md.size||''}" placeholder="${x.auto ? qn(x.auto) : 'לא ידוע'}" onchange="with(SP){feMeta(${r},'size',this.value)}"></label>
+          <label class="f">יחידת מכירה<select onchange="with(SP){feMeta(${r},'sunit',this.value)}"><option value="">${pkOnly(x) > 1 ? 'אוטומטי: קרטון של ' + packOf(x.it) : detectSale(x.it.name) ? 'אוטומטי: ' + esc(detectSale(x.it.name)) : 'לפי המחירון: ' + esc(uLbl(x.it.unit)||'יח׳')}</option>${SALE_UNITS.map(u => `<option ${md.sunit===u?'selected':''}>${u}</option>`).join('')}</select></label>
         </div></div>`; }).join('') || '<div class="sp-empty">אין פריטים. הוסף למטה.</div>'}</div>
     <h3>הוספת פריטים</h3>
     <div class="search">${ic('search','sm')}<input id="sp-feQ" placeholder="חיפוש במחירונים" value="${esc(FE.q)}" oninput="with(SP){feSearch(this.value)}" autocomplete="off"></div>
@@ -23024,9 +23146,10 @@ function applyReprice(id){
   save(); closeModal(); renderOrders(); toast(`הסכום עודכן ל-${money(p.newTotal)}`);
 }
 function reorder(id){
-  const o = S.orders.find(x=>x.id===id);
-  const go = () => { OB.catId = o.catId; OB.lines = o.lines.map(l=>({key:resolve(l.key),name:l.name,unit:l.unit,qty:l.need>0 ? l.need : l.qty})); OB.pick=null; saveDraft(); setTab('order'); toast('ההזמנה הועתקה, אפשר לשנות כמויות'); };
-  OB.lines.length ? confirmBox('יש הזמנה פתוחה בטיוטה. להחליף אותה?', go) : go();
+  const o = S.orders.find(x=>x.id===id); if(!o) return;
+  let n = 0;
+  (o.lines||[]).forEach(l => { if(toBasket(l.key, l.need>0 ? l.need : l.qty, {mode:'set', ref:famRef(l.supplier||o.supplier, l.name)})) n++; });
+  bkGo(n, n ? 'ההזמנה הועתקה, אפשר לשנות כמויות' : 'הפריטים כבר לא במחירונים');
 }
 function openReceipt(id){
   const o = S.orders.find(x=>x.id===id);
@@ -23223,8 +23346,8 @@ function parToOrder(catId, monthly){
   const pm = productMap();
   const ks = (monthly ? belowMonthly(catId) : belowMin().filter(k=>pm.get(k)?.catId===catId)).filter(k=>parNeed(k)>0);
   if(!ks.length){ toast('אין מה להשלים'); return; }
-  const go = () => { OB.catId = catId; ks.forEach(k=>{ const p = pm.get(k); const q = parNeed(k); const ex = OB.lines.find(l=>l.key===k); ex ? ex.qty = Math.max(ex.qty, q) : OB.lines.push({key:k, name:p.name, unit:p.unit, qty:q}); }); OB.pick=null; OB.fold=true; saveDraft(); setTab('order'); toast(`נוספו ${ks.length} מוצרים ${monthly?'להשלמת מלאי חודשי':'להשלמת מלאי'}`); };
-  OB.lines.length && OB.catId!==catId ? confirmBox('בטיוטה יש הזמנה מקטגוריה אחרת. להחליף אותה?', ()=>{ OB.lines=[]; go(); }) : go();
+  let n = 0; ks.forEach(k => { if(toBasket(k, parNeed(k), {mode:'max'})) n++; });
+  bkGo(n);
 }
 function parToRequests(){
   const pm = productMap(); let n = 0;
@@ -23232,11 +23355,10 @@ function parToRequests(){
   save(); render(); toast(n ? `נשלחו ${n} בקשות למנהל` : 'הבקשות כבר נשלחו קודם');
 }
 function shortToOrder(id){
-  const s = S.shortages.find(x=>x.id===id); const k = resolve(s.key);
-  if(OB.lines.length && OB.catId!==s.catId){ toast('בטיוטה יש הזמנה מקטגוריה אחרת. סיים אותה קודם'); return; }
-  OB.catId = s.catId; const ex = OB.lines.find(l=>l.key===k);
-  ex ? ex.qty += s.qty : OB.lines.push({key:k, name:s.name, unit:s.unit, qty:s.qty});
-  OB.pick=null; saveDraft(); toast('נוסף לטיוטת ההזמנה'); renderTop();
+  const s = S.shortages.find(x=>x.id===id); if(!s) return;
+  const f = toBasket(s.key, s.qty, {mode:'add'});
+  if(!f){ toast('המוצר לא נמצא במחירונים'); return; }
+  BK.view = 'order'; bkSave(); save(); toast(`"${f.name}" נוסף להזמנה הבאה`); renderTop();
 }
 function useStock(id){ const s = S.stock.find(x=>x.id===id); s.used = true; s.usedDate = today(); save(); render(); toast('סומן כנוצל'); }
 function addStock(){
@@ -23353,7 +23475,7 @@ function qtyLbl(l){
   const u = uLbl(l.unit) || 'יח׳';
   let packs = l.packs || 0;
   if(!packs && pk>1 && l.qty>0){ const c = l.qty/pk; if(Math.abs(c-Math.round(c)) < 1e-9) packs = Math.round(c); }
-  if(!(packs && pk>1) && l.sunit) return {main:saleTxt(l.sunit, l.qty), sub:''};
+  if(l.sunit) return {main:saleTxt(l.sunit, packs && pk>1 ? packs : l.qty), sub:''};
   return packs && pk>1 ? {main:cartonsTxt(packs), sub:`${qn(packs*pk)} ${u}`} : {main:`${qn(l.qty)} ${u}`, sub:''};
 }
 function nextDeliveryDate(name){
@@ -24694,7 +24816,25 @@ Object.defineProperties(SPX, {
 "bkActive":{get(){return bkActive},enumerable:true},
 "QMS":{get(){return QMS},enumerable:true},
 "guessName":{get(){return guessName},enumerable:true},
-"BK":{get(){return BK},set(v){BK=v},enumerable:true}
+"BK":{get(){return BK},set(v){BK=v},enumerable:true},
+"WUNIT":{get(){return WUNIT},enumerable:true},
+"bkCheapAll":{get(){return bkCheapAll},enumerable:true},
+"bkClear":{get(){return bkClear},enumerable:true},
+"bkGo":{get(){return bkGo},enumerable:true},
+"bkMigrateDraft":{get(){return bkMigrateDraft},enumerable:true},
+"bkReqsHTML":{get(){return bkReqsHTML},enumerable:true},
+"bkSetN":{get(){return bkSetN},enumerable:true},
+"bkShown":{get(){return bkShown},enumerable:true},
+"famForKey":{get(){return famForKey},enumerable:true},
+"cleanName":{get(){return cleanName},enumerable:true},
+"pkOnly":{get(){return pkOnly},enumerable:true},
+"saleLbl":{get(){return saleLbl},enumerable:true},
+"saleName":{get(){return saleName},enumerable:true},
+"saleOne":{get(){return saleOne},enumerable:true},
+"salePer":{get(){return salePer},enumerable:true},
+"salePrice":{get(){return salePrice},enumerable:true},
+"saleWord":{get(){return saleWord},enumerable:true},
+"toBasket":{get(){return toBasket},enumerable:true}
 });
 return SPX;
 })();
