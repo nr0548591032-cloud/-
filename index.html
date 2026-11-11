@@ -3419,7 +3419,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261111; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261112; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -3592,7 +3592,7 @@ const BACKUP_KEY_LABELS = {
   "tasks-data":"משימות", "procurement-data":"רכש ואספקה", "licensing-data":"רישוי ובטיחות",
   "contacts-data":"אנשי קשר וספקים", "vendorPayments-data":"תשלומי ספקים", "recurring-data":"כספים שוטפים",
   "files-data":"קבצים", "projects-data":"פרויקטים", "staff-data":"צוות ותורנים", "keys-data":"מפתחות",
-  "food-data":"רכש אוכל", "accountantContact-data":"פרטי מנהל חשבונות", "acctSends-data":"משלוחים למנהל החשבונות", "acctInbox-data":"סימונים של מנהל החשבונות", "uiPrefs-data":"העדפות תצוגה", "loginLog-data":"יומן כניסות",
+  "food-data":"רכש אוכל", "accountantContact-data":"פרטי מנהל חשבונות", "acctSends-data":"משלוחים למנהל החשבונות", "acctInbox-data":"סימונים של מנהל החשבונות", "uiPrefs-data":"העדפות תצוגה", "loginLog-data":"יומן כניסות", "loginLog-accountant-data":"יומן הכניסות שלי", "loginLog-moshe-data":"יומן הכניסות שלי", "mosheView-data":"נתוני רישוי מהמערכת", "acctView-data":"פרטי התשלומים",
   "supply-data":"רכש ואספקה: מחירונים וספקים", "supplyOrders-data":"רכש ואספקה: הזמנות וחשבוניות", "supplyKitchen-data":"רכש ואספקה: תפריט ומלאי", "supplyBasket-data":"רכש ואספקה: הסל שלי",
   "equipment-data":"ציוד ואחריות", "serviceContracts-data":"חוזי שירות", "maintBudget-data":"תקציב תחזוקה",
   "myTasks-data":"המשימות שלי", "ttd-data":"תיק נתונים ושטח"
@@ -3759,65 +3759,12 @@ function nextId(){
 }
 
 let data = {
-  tasks: [
-    {id:1, created:"2026-07-01", category:"אינסטלטור", desc:"איתור ותיקון נזילות קומה 3 שמקומה 4", status:"בוצע", assignee:"מנחם פיליפ", due:"2026-08-20", notes:"לוודא סיום לפני הגעת הצוות", maint:"תקלות בלתי מתוכננות", link:"https://drive.google.com/file/d/1hPu9kMPQbyB2RfyGB1QI6GtMZUBkpvj7/view"},
-    {id:2, created:"2026-07-20", category:"מעליות", desc:"תיקוני קירות", status:"בוצע", assignee:"נעמן מעליות", due:"2026-07-20", notes:"", maint:"תקלות בלתי מתוכננות", link:"https://drive.google.com/file/d/1kyBV3Ui11jZPMwYk7YMb-u9MlBrOAOfn/view"},
-    {id:3, created:"2026-08-01", category:"", desc:"ניקוי פילטרים ובדיקת מזגנים", status:"טרם התחיל", assignee:"", due:"2026-08-15", notes:"הכנה לימי הקיץ החמים", maint:"", link:""},
-    {id:4, created:"2026-10-01", category:"", desc:"בדיקת מרזבים ואיטום גגות", status:"טרם התחיל", assignee:"", due:"2026-10-15", notes:"חובה לסיים לפני הגשמים", maint:"", link:""},
-    {id:5, created:"2026-11-01", category:"", desc:"תרגול פינוי מוסד בעת חירום", status:"טרם התחיל", assignee:"", due:"2026-11-10", notes:"תיאום מול ההנהלה", maint:"", link:""}
-  ],
-  procurement: [
-    {id:1, month:"אוגוסט", sku:"CLEAN-001", item:"חד פעמי וחומרי ניקיון", supplier:"ר. שמאי", qty:10, unit:"יחידה", price:45, category:"ניקיון"},
-    {id:2, month:"", sku:"DISP-002", item:"כוסות לשתייה חמה (נייר)", supplier:"ר. שמאי", qty:50, unit:"מארז", price:12, category:"חד פעמי"},
-    {id:3, month:"", sku:"CLEAN-001", item:"נוזל רצפות מקצועי 4 ליטר", supplier:"ר. שמאי", qty:8, unit:"יחידה", price:45, category:"ניקיון"},
-    {id:4, month:"ללא חודש (שנתי)", sku:"OFFC-003", item:"ציוד משרדי", supplier:"קשת", qty:30, unit:"קרטון", price:85, category:"ציוד משרדי"}
-  ],
-  licensing: [
-    {id:1, type:"בדיקת תקינות מטפים ומערכות כיבוי אש", freq:"שנתי", last:"2025-03-09", expiry:"2026-07-22", inspector:"חברת \"אש-בטוח\" בע\"מ", status:"אושר", link:"https://drive.google.com/file/d/1Tr7n27_9gKqAJ1PJXQO_jWZIeAn6Fxhr/view"},
-    {id:2, type:"אישור בטיחות", freq:"שנתי", last:"2025-04-23", expiry:"", inspector:"מהנדס בטיחות מוסמך", status:"אושר", link:"https://drive.google.com/file/d/1JsQKL8iI112jn0pj9bGzra7_oED03gpp/view"},
-    {id:3, type:"בדיקת תקינות מערכת החשמל ולוחות", freq:"שנתי", last:"2025-11-09", expiry:"", inspector:"משה בלנגה", status:"מאושר בתוקף", link:"https://drive.google.com/file/d/18OQSDLASQt8cq-bmpZ7sXTA-jzptKInY/view"},
-    {id:4, type:"אישור מצבור גז", freq:"תלת-שנתי", last:"", expiry:"", inspector:"", status:"", link:""}
-  ],
-  installments: [
-    [
-      {id:1,name:"גורי",role:"תורן מטבח ראשי",monthly:500,daily:17,missing:0,months:3,link:"https://docs.google.com/document/d/1PgU4QscJWQCFvegt76j6Ytg8SNKNw7_bYy4c6-y9rRo/edit",notes:""},
-      {id:2,name:"חיים למברג",role:"תורן מטבח משני",monthly:500,daily:17,missing:0,months:0,link:"https://docs.google.com/document/d/1fhRpfk8LwAr3j7qW71H3H05SCXNijbHW4ylU0Df2YfY/edit",notes:""},
-      {id:3,name:"ארי סגל",role:"תורן עזר בשבת",monthly:75,daily:75,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:""},
-      {id:4,name:"מנחם מנדל קורץ",role:"תורן עזר בשבת",monthly:75,daily:75,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:""},
-      {id:5,name:"לוי יצחק עוזרי",role:"תורן חדר אוכל ומפות",monthly:400,daily:13,missing:0,months:1,link:"https://docs.google.com/document/d/1yaRdxeGbC0oQ1zRSAnnTLYx7EtMHvuVA5FYjBW3-V4c/edit",notes:""},
-      {id:6,name:"יוסף יצחק לוייב",role:"ספרים ומפות",monthly:350,daily:12,missing:0,months:1,link:"",notes:""},
-      {id:7,name:"שניאור שרמן",role:"גבאי",monthly:50,daily:2,missing:0,months:1,link:"",notes:""},
-      {id:8,name:"שניאור שרמן",role:"תורן חדר קפה",monthly:170,daily:6,missing:0,months:1,link:"",notes:""}
-    ],
-    [
-      {id:1,name:"גורי",role:"מטבח",monthly:1500,daily:50,missing:0,months:1,link:"https://docs.google.com/document/d/1PgU4QscJWQCFvegt76j6Ytg8SNKNw7_bYy4c6-y9rRo/edit",notes:""},
-      {id:2,name:"",role:"מטבח",monthly:900,daily:30,missing:0,months:1,link:"https://docs.google.com/document/d/1PgU4QscJWQCFvegt76j6Ytg8SNKNw7_bYy4c6-y9rRo/edit",notes:""},
-      {id:3,name:"",role:"תורן עזר בשבת",monthly:1200,daily:40,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:"לסיים הכנת פירוט התפקיד"},
-      {id:4,name:"",role:"תורן עזר בשבת",monthly:600,daily:20,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:"לסיים הכנת פירוט התפקיד"},
-      {id:5,name:"",role:"תורן חדר אוכל",monthly:0,daily:0,missing:0,months:0,link:"https://docs.google.com/document/d/1yaRdxeGbC0oQ1zRSAnnTLYx7EtMHvuVA5FYjBW3-V4c/edit",notes:""},
-      {id:6,name:"",role:"ספרים ומפות",monthly:0,daily:0,missing:0,months:0,link:"",notes:""}
-    ],
-    [
-      {id:1,name:"גורי",role:"מטבח",monthly:1500,daily:50,missing:0,months:1,link:"https://docs.google.com/document/d/1PgU4QscJWQCFvegt76j6Ytg8SNKNw7_bYy4c6-y9rRo/edit",notes:""},
-      {id:2,name:"",role:"מטבח",monthly:900,daily:30,missing:0,months:1,link:"https://docs.google.com/document/d/1PgU4QscJWQCFvegt76j6Ytg8SNKNw7_bYy4c6-y9rRo/edit",notes:""},
-      {id:3,name:"",role:"תורן עזר בשבת",monthly:1200,daily:40,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:"לסיים הכנת פירוט התפקיד"},
-      {id:4,name:"",role:"תורן עזר בשבת",monthly:600,daily:20,missing:0,months:1,link:"https://docs.google.com/document/d/1xiK9_afnza7F5ZfTr1_zDySWt6O4VFGXfJT7zhpslnE/edit",notes:"לסיים הכנת פירוט התפקיד"},
-      {id:5,name:"",role:"תורן חדר אוכל",monthly:0,daily:0,missing:0,months:0,link:"https://docs.google.com/document/d/1yaRdxeGbC0oQ1zRSAnnTLYx7EtMHvuVA5FYjBW3-V4c/edit",notes:""},
-      {id:6,name:"",role:"ספרים ומפות",monthly:0,daily:0,missing:0,months:0,link:"",notes:""}
-    ]
-  ],
-  bank: [
-    {id:1, name:"גורי", bank:"הפועלים", branch:"475", account:"265456", holder:""},
-    {id:2, name:"חיים למברג", bank:"", branch:"", account:"", holder:""},
-    {id:3, name:"ארי סגל", bank:"", branch:"", account:"", holder:""},
-    {id:4, name:"מנחם מנדל קורץ", bank:"", branch:"", account:"", holder:""},
-    {id:5, name:"לוי יצחק עוזרי", bank:"", branch:"", account:"", holder:""}
-  ],
-  contacts: [
-    {id:1, name:"מנחם פיליפ", specialty:"אינסטלטור", phone:"", email:"", cost:"", notes:""},
-    {id:2, name:"נעמן מעליות", specialty:"מעליות", phone:"", email:"", cost:"", notes:""},
-    {id:3, name:"שלמה", specialty:"טכנאי", phone:"", email:"", cost:"", notes:""}
-  ],
+  tasks: [],
+  procurement: [],
+  licensing: [],
+  installments: [[], [], []],
+  bank: [],
+  contacts: [],
   vendorPayments: [],
   foodPriceList: [],
   foodOrders: [],
@@ -3905,15 +3852,22 @@ const ROLES = {
   cook: { label:"טבח", tabs:["procurement"] }
 };
 let currentRole = "admin";
-/* אילו נתונים כל משתמש מוגבל רשאי לשמור. חייב להתאים לחוקי Firestore בקונסול של Firebase. */
-const ROLE_WRITE_KEYS = {
-  accountant: ["acctInbox-data", "loginLog-data"],
-  moshe: ["licensing-data", "ttd-data", "tasks-data", "vendorPayments-data", "files-data", "loginLog-data"]
+/* משתמשים מוגבלים: מה כל אחד טוען מהענן ומה מותר לו לשמור. חייב להתאים לחוקי Firestore בקונסול של Firebase.
+   הם לא טוענים בכלל את שאר הנתונים - מה שהם צריכים מבחוץ מגיע ממסמך תצוגה שהאפליקציה של המנהל מכינה עבורם. */
+const ROLE_LOAD_KEYS = {
+  accountant: [["loginLog", "loginLog-accountant-data"]],                 // + acctSends / acctView / acctInbox (בטעינת הקישור)
+  moshe: [["licensing", "licensing-data"], ["ttd", "ttd-data"], ["loginLog", "loginLog-moshe-data"], ["mosheView", "mosheView-data"]]
 };
+const ROLE_WRITE_KEYS = {
+  accountant: ["acctInbox-data", "loginLog-accountant-data"],
+  moshe: ["licensing-data", "ttd-data", "loginLog-moshe-data"]
+};
+function isLimitedRole(){ return !!ROLE_LOAD_KEYS[currentRole]; }
 function roleCanWrite(key){
   const list = ROLE_WRITE_KEYS[currentRole];
   return !list || list.includes(key);
 }
+function loginLogKey(){ return isLimitedRole() ? "loginLog-" + currentRole + "-data" : "loginLog-data"; }
 function allowedTabs(){
   const r = ROLES[currentRole];
   return r.tabs ? tabs.filter(t => r.tabs.includes(t)) : tabs;
@@ -3965,10 +3919,11 @@ function switchUser(){
   });
 }
 function recordLogin(role){
+  if(!cloudReady) return;
   data.loginLog = data.loginLog || [];
   data.loginLog.unshift({role, label: ROLES[role].label, time: new Date().toISOString()});
   data.loginLog = data.loginLog.slice(0, 50);
-  appStorage.set("loginLog-data", JSON.stringify(data.loginLog)).catch(e=>console.error(e));
+  appStorage.set(loginLogKey(), JSON.stringify(data.loginLog)).catch(e=>console.error(e));
   renderLoginLog();
 }
 function renderLoginLog(){
@@ -3980,7 +3935,7 @@ function renderLoginLog(){
   if(card) card.style.display = isAdmin ? "" : "none";
   if(title) title.style.display = isAdmin ? "" : "none";
   if(!isAdmin) return;
-  el.innerHTML = (data.loginLog||[]).slice(0,15).map(l => {
+  el.innerHTML = allLoginLog().slice(0,15).map(l => {
     const d = new Date(l.time);
     const who = l.label || (ROLES[l.role] && ROLES[l.role].label) || l.role || "לא ידוע";
     return `<tr><td class="primary-field">${who}</td><td>${d.toLocaleDateString("he-IL")} ${d.toLocaleTimeString("he-IL",{hour:'2-digit',minute:'2-digit'})}</td></tr>`;
@@ -4193,6 +4148,7 @@ function fmtMoney(n){
 
 let saveTimers = {};
 function scheduleSave(key, flagId){
+  publishDerivedSoon();
   clearTimeout(saveTimers[key]);
   saveTimers[key] = setTimeout(async () => {
     try{
@@ -4206,6 +4162,7 @@ function scheduleSave(key, flagId){
 }
 
 function saveInstallments(){
+  publishDerivedSoon();
   clearTimeout(saveTimers["installments"]);
   saveTimers["installments"] = setTimeout(async () => {
     try{
@@ -4217,7 +4174,37 @@ function saveInstallments(){
 }
 
 function anyLoadFailed(){ return Object.values(loadStatus).includes("failed"); }
+/* משתמש מוגבל: מאפסים את כל הנתונים (שלא יוצג שום דבר שלא נטען עבורו) וטוענים רק את המסמכים שלו */
+async function loadLimited(){
+  const keep = { uiPrefs: {}, accountantContact: { phone: "", email: "" }, masterKeys: [], keysImportDone: true, codeMasterKeysDone: true };
+  Object.keys(data).forEach(k => {
+    if(k in keep){ data[k] = keep[k]; return; }
+    const v = data[k];
+    if(k === "installments") data[k] = [[], [], []];
+    else if(Array.isArray(v)) data[k] = [];
+    else if(v && typeof v === "object") data[k] = {};
+  });
+  data.equipment = []; data.serviceContracts = []; data.tasks = []; data.vendorPayments = [];
+  for(const [dataKey, storageKey] of ROLE_LOAD_KEYS[currentRole]){
+    if(anyLoadFailed()) return;
+    try{
+      const res = await appStorage.get(storageKey);
+      if(res && res.value){ data[dataKey] = JSON.parse(res.value); }
+    }catch(e){ /* appStorage סימן את המפתח ככושל, והאפליקציה תיחסם במסך שגיאה עם הסיבה */ }
+  }
+  if(anyLoadFailed()) return;
+  if(!Array.isArray(data.loginLog)) data.loginLog = [];
+  if(currentRole === "moshe") mosheApplyView();
+  if(currentRole === "accountant"){
+    await acctLoadLinkData();
+    if(!acctLink.ready){
+      loadStatus["acctSends-data"] = "failed";
+      loadErrorCode["acctSends-data"] = acctLink.errCode || "unknown";
+    }
+  }
+}
 async function loadAll(){
+  if(isLimitedRole()) return loadLimited();
   const simpleKeys = [["tasks","tasks-data"],["procurement","procurement-data"],["licensing","licensing-data"],["contacts","contacts-data"],["vendorPayments","vendorPayments-data"],["recurring","recurring-data"],["files","files-data"],["projects","projects-data"],["loginLog","loginLog-data"],["uiPrefs","uiPrefs-data"],["accountantContact","accountantContact-data"],["equipment","equipment-data"],["serviceContracts","serviceContracts-data"],["maintBudget","maintBudget-data"],["ttd","ttd-data"]];
   for(const [dataKey, storageKey] of simpleKeys){
     if(anyLoadFailed()) return;
@@ -4274,6 +4261,22 @@ async function loadAll(){
     if(anyLoadFailed()) return;
   }
   if(window.SP) await SP.loadFromCloud();   // רכש ואספקה (3 מסמכים)
+  // יומני הכניסה של המשתמשים המוגבלים (כל אחד כותב ליומן משלו). לא חוסם אם נכשל - זה רק לתצוגה.
+  if(currentRole === "admin"){
+    data.loginLogOthers = [];
+    for(const r of Object.keys(ROLE_LOAD_KEYS)){
+      try{
+        const doc = await db.collection(APP_COLLECTION).doc("loginLog-" + r + "-data").get({ source: "server" });
+        const v = doc.exists ? JSON.parse(doc.data().value || "[]") : [];
+        if(Array.isArray(v)) data.loginLogOthers = data.loginLogOthers.concat(v.filter(x => x && x.time));
+      }catch(e){ console.warn("טעינת יומן כניסות של " + r + " נכשלה", e); }
+    }
+  }
+}
+/* כל הכניסות (שלי + של המשתמשים המוגבלים), מהחדשה לישנה */
+function allLoginLog(){
+  return (data.loginLog || []).concat(data.loginLogOthers || []).filter(x => x && x.time)
+    .sort((a, b) => String(b.time).localeCompare(String(a.time)));
 }
 
 function saveKeys(){
@@ -4409,8 +4412,10 @@ function buildNav(){
 }
 
 function switchTab(t){
+  if(!allowedTabs().includes(t)) return;   // אין מעבר לטאב שלא אושר למשתמש (גם לא מקישור / חיפוש / כפתור)
   tabs.forEach(x => {
-    document.getElementById("tab-"+x).classList.toggle("active", x===t);
+    const sec = document.getElementById("tab-"+x);
+    if(sec) sec.classList.toggle("active", x===t);
   });
   document.querySelectorAll("#navBar button").forEach(b => {
     b.classList.toggle("active", b.dataset.tab===t);
@@ -7858,6 +7863,7 @@ function lcToday(){ return tkToday(); }
 function lcRow(id){ return data.licensing.find(r => r.id === Number(id)) || null; }
 function lcSave(){ scheduleSave("licensing", "licSaved"); }
 function lcIsAdmin(){ return typeof currentRole === "undefined" || currentRole === "admin"; }
+function lcCanContacts(){ return lcIsAdmin() || canOpenTab("contacts"); }
 function lcFreqMonths(row){
   const n = Number(row && row.freqMonths);
   if(n > 0) return n;
@@ -9409,6 +9415,7 @@ function lcNextBtn(row, nx, canTasks){
     case "coord": {
       const c = lcContact(row), nm = lcInspectorName(row);
       if(c && c.phone) return `<a class="lc-btn sm" href="${escHtml(lcWaUrl(c.phone, lcMsgCoordinate(row, nm)))}" target="_blank" rel="noopener">${lcIco("chat", 14)}תיאום ביקור</a>`;
+      if(!lcCanContacts()) return "";
       return `<button type="button" class="lc-btn sm" data-lc-act="pickcontact" data-id="${row.id}">${lcIco("user", 14)}${nm ? "קישור לאיש קשר" : "בחירת גורם בודק"}</button>`;
     }
     case "bundle": return `<button type="button" class="lc-btn sm" data-lc-act="bundle" data-id="${row.id}">${lcIco("folder", 14)}פתיחת תיק הגשה</button>`;
@@ -9484,7 +9491,7 @@ function lcBodyHtml(row, inBundle){
       <span class="acts">
         ${phone ? `<a class="lc-iconbtn" href="${escHtml(lcWaUrl(phone, lcMsgCoordinate(row, nm)))}" target="_blank" rel="noopener" title="תיאום ביקור בוואטסאפ" aria-label="תיאום ביקור בוואטסאפ">${lcIco("chat")}</a><a class="lc-iconbtn" href="tel:${escHtml(phone.replace(/[^\d+]/g, ""))}" title="חיוג" aria-label="חיוג">${lcIco("call")}</a>` : ""}
         ${email ? `<a class="lc-iconbtn" href="${escHtml(lcGmailUrl(email, "בקשת מסמכים – " + (row.type || ""), lcMsgDocs(row, nm)))}" target="_blank" rel="noopener" title="בקשת מסמך במייל" aria-label="בקשת מסמך במייל">${lcIco("mail")}</a>` : ""}
-        <button type="button" class="lc-btn sm ghost" data-lc-act="pickcontact" data-id="${row.id}">${c ? "החלפה" : nm ? "קישור לאיש קשר" : "בחירה"}</button>
+        ${lcCanContacts() ? `<button type="button" class="lc-btn sm ghost" data-lc-act="pickcontact" data-id="${row.id}">${c ? "החלפה" : nm ? "קישור לאיש קשר" : "בחירה"}</button>` : ""}
       </span></div>`);
   }
   if(isAdmin){
@@ -9805,6 +9812,12 @@ function lcPaySecHtml(row){
 /* מסנכרן את כרטיס התשלום לרשומת תשלום אחת בדוח מנה"ח (בלי כפילויות) */
 function lcPaySync(row, create){
   const p = lcPay(row);
+  if(!lcIsAdmin()){
+    // משתמש מוגבל לא נוגע בדוח מנהל החשבונות: מסמנים, והאפליקציה של המנהל תסנכרן בכניסה הבאה
+    p.needSync = true;
+    return null;
+  }
+  delete p.needSync;
   let vp = lcPayVP(row);
   if(!vp && !create) return null;
   if(!vp){
@@ -10264,8 +10277,9 @@ function lcOpenEdit(row, isNew){
       <label>בדיקה אחרונה<input type="date" id="lcE_last" value="${escHtml(r.last || "")}"></label>
       <label>תפוגה / בדיקה הבאה<input type="date" id="lcE_exp" value="${escHtml(r.expiry || "")}"></label>
       <div class="full lc-sub" id="lcE_hint" style="margin-top:-4px"></div>
-      <label>גורם בודק (מאנשי קשר)<select id="lcE_contact"><option value="">— בחירה —</option>${contacts.map(x => `<option value="${x.id}" ${c && c.id === x.id ? "selected" : ""}>${escHtml(x.name + (x.specialty ? " · " + x.specialty : ""))}</option>`).join("")}</select></label>
-      <label>או שם חופשי<input id="lcE_insp" value="${escHtml(c ? "" : (r.inspector || ""))}" placeholder="שם הבודק / החברה"></label>
+      ${lcCanContacts() ? `<label>גורם בודק (מאנשי קשר)<select id="lcE_contact"><option value="">— בחירה —</option>${contacts.map(x => `<option value="${x.id}" ${c && c.id === x.id ? "selected" : ""}>${escHtml(x.name + (x.specialty ? " · " + x.specialty : ""))}</option>`).join("")}</select></label>
+      <label>או שם חופשי<input id="lcE_insp" value="${escHtml(c ? "" : (r.inspector || ""))}" placeholder="שם הבודק / החברה"></label>`
+      : `<label class="full">גורם בודק<input id="lcE_insp" value="${escHtml(lcInspectorName(r))}" placeholder="שם הבודק / החברה"></label>`}
       <label>שנת לימודים<select id="lcE_year">${schoolYearOptions().map(y => `<option value="${y}" ${Number(r.schoolYear || currentSchoolYearStart()) === y ? "selected" : ""}>${schoolYearLabel(y)}</option>`).join("")}</select></label>
       <label style="flex-direction:row;align-items:center;gap:6px;color:var(--ink);align-self:end;padding-bottom:8px"><input type="checkbox" id="lcE_bundle" ${r.isBundle ? "checked" : ""} style="width:auto;accent-color:var(--brand)">זהו אישור מרוכז (תיק הגשה)</label>
       <div class="full lc-note" id="lcE_bundleNote" hidden></div>
@@ -10336,12 +10350,23 @@ function lcOpenEdit(row, isNew){
     target.priority = $("#lcE_prio").value;
     target.last = $("#lcE_last").value;
     target.expiry = $("#lcE_exp").value;
-    const cid = Number($("#lcE_contact").value) || null;
-    const cc = cid ? data.contacts.find(x => x.id === cid) : null;
-    target.inspectorId = cc ? cc.id : null;
-    target.inspector = cc ? cc.name : $("#lcE_insp").value.trim();
+    if(lcCanContacts()){
+      const cid = Number($("#lcE_contact").value) || null;
+      const cc = cid ? data.contacts.find(x => x.id === cid) : null;
+      target.inspectorId = cc ? cc.id : null;
+      target.inspector = cc ? cc.name : $("#lcE_insp").value.trim();
+    }else{
+      // בלי גישה לאנשי קשר: הקישור לאיש הקשר נשמר, אלא אם שינו את שם הבודק
+      const nm = $("#lcE_insp").value.trim();
+      if(nm !== lcInspectorName(target)){ target.inspector = nm; target.inspectorId = null; }
+    }
     target.schoolYear = Number($("#lcE_year").value) || currentSchoolYearStart();
-    target.equipIds = [...m.querySelectorAll("[data-lc-eq]:checked")].map(x => Number(x.value));
+    {
+      // ציוד שלא מוצג בטופס (למשל אצל משתמש מוגבל) נשאר מקושר - לא נמחק בטעות
+      const shown = new Set(eqs.map(e => e.id));
+      const hidden = (Array.isArray(target.equipIds) ? target.equipIds : []).map(Number).filter(id => !shown.has(id));
+      target.equipIds = hidden.concat([...m.querySelectorAll("[data-lc-eq]:checked")].map(x => Number(x.value)));
+    }
     target.notes = $("#lcE_notes").value.trim();
     const wantPay = $("#lcE_pay").checked;
     if(wantPay && !target.isPayment){
@@ -11708,6 +11733,12 @@ function acxParseSends(v){
   if(!Array.isArray(p)) throw new Error("acctSends: מבנה לא תקין");
   return p;
 }
+function acxParseView(v){
+  if(!v) return null;   // עוד לא הוכן (המנהל צריך לפתוח את הגרסה החדשה של האפליקציה פעם אחת)
+  const p = JSON.parse(v);
+  if(!p || typeof p !== "object" || !p.items) throw new Error("acctView: מבנה לא תקין");
+  return { items: p.items || {}, extra: Array.isArray(p.extra) ? p.extra : [] };
+}
 function acxParseInbox(v){
   if(!v) return { seen: {}, marks: {} };
   const p = JSON.parse(v);
@@ -11722,10 +11753,12 @@ async function acctLoadLinkData(){
     data.acctSends = sends; data.acctInbox = inbox;
     originalLoad["acctSends-data"] = s; originalLoad["acctInbox-data"] = i;
     loadStatus["acctSends-data"] = "ok"; loadStatus["acctInbox-data"] = "ok";
+    if(acxIsAcc()) data.acctView = acxParseView(await acxFetchDoc("acctView-data"));
     acctLink.ready = true; acctLink.failed = false; acctLink.lastRemote = Date.now();
   }catch(e){
     console.error("טעינת משלוחי מנהל החשבונות נכשלה — השליחה תעבוד בלי קישור, ולא נשמור כלום על המסמכים האלה", e);
     acctLink.failed = true;
+    acctLink.errCode = (e && e.code) || (e && e.message) || "unknown";
     if(!acctLink.ready){ loadStatus["acctSends-data"] = "failed"; loadStatus["acctInbox-data"] = "failed"; }
   }
 }
@@ -11743,9 +11776,10 @@ async function acxRefreshRemote(force){
       if(applied.length) jobToast(`מנהל החשבונות סימן ${applied.length === 1 ? "תשלום אחד" : applied.length + " תשלומים"} כשולם`, 4000);
       else if(applied.bankUpdates) jobToast(`מנהל החשבונות עדכן פרטי בנק (${applied.bankUpdates})`, 4000);
     }else if(acxIsAcc()){
-      const v = await acxFetchDoc("acctSends-data");
+      const [v, w] = await Promise.all([acxFetchDoc("acctSends-data"), acxFetchDoc("acctView-data")]);
       data.acctSends = acxParseSends(v);
       originalLoad["acctSends-data"] = v;
+      data.acctView = acxParseView(w);
     }
     const tab = document.getElementById("tab-accountant");
     if(tab && tab.classList.contains("active")) withScrollPreserved(() => renderAccountantReport());
@@ -12161,7 +12195,7 @@ function acxTogglePeek(){
   saveUiPrefs();
   renderAccountantReport();
 }
-function acxAccLastLogin(){ const l = (data.loginLog || []).find(x => x && x.role === "accountant"); return l ? l.time : ""; }
+function acxAccLastLogin(){ const l = allLoginLog().find(x => x && x.role === "accountant"); return l ? l.time : ""; }
 function acxRenderPeek(all){
   const box = document.getElementById("acxPeek");
   if(!box) return;
@@ -12915,24 +12949,58 @@ function acxRemind(sendId, channel){
 }
 
 /* ---------- תצוגת מנהל החשבונות (משתמש מוגבל) ---------- */
+/* הנתונים של תשלום אחד כפי שמנהל החשבונות רואה אותם. אצל המנהל מחושב מהנתונים החיים;
+   אצל מנהל החשבונות נלקח ממסמך התצוגה (acctView) - הוא לא טוען את שאר הנתונים בכלל. */
+function acxViewEntry(x){
+  const row = acxFindRow(x.k, x.id, x.i);
+  if(!row) return { exists: false };
+  let amount = x.amount || 0;
+  try{ amount = x.k === "s" ? computeStaffTotal(row) : (parseFloat(row.amount) || amount); }catch(e){}
+  let docs = [];
+  try{ docs = x.k === "v" ? jobForVendorPayment(row).docs : finDocs(row.docs); }catch(e){ docs = finDocs(row.docs); }
+  const inv = docs.find(d => isInvoiceDocType(d.docType)) || null;
+  const rec = docs.find(d => isReceiptDocType(d.docType)) || null;
+  const b = acxBankFor(x.k, row);
+  return {
+    exists: true, name: (x.k === "s" ? row.name : row.vendor) || "", desc: row.desc || "", amount,
+    bank: { bank: b.bank || "", branch: b.branch || "", account: b.account || "", holder: b.holder || "" },
+    inv: inv ? { fileUrl: inv.fileUrl } : null, rec: rec ? { fileUrl: rec.fileUrl } : null,
+    paid: acctStatusOf(row) === "שולם", paidAt: row.paidAt || "", paidBy: row.paidBy || "",
+    accountantNote: row.accountantNote || "", bankApplied: row.acctBankApplied || ""
+  };
+}
+/* מסמך התצוגה של מנהל החשבונות: כל מה שנשלח אליו + תשלומים מאושרים שלא נשלחו */
+function acxBuildView(){
+  const items = {};
+  const inSends = new Set();
+  (data.acctSends || []).forEach(sd => (sd.items || []).forEach(x => {
+    const key = acxKeyOf(x); inSends.add(key);
+    if(!items[key]) items[key] = acxViewEntry(x);
+  }));
+  const extra = [];
+  acctCollect().filter(it => it.row.approved && !it.paid && !inSends.has(it.key)).forEach(it => {
+    const x = { k: it.k, id: it.row.id, i: it.instIdx, name: it.name, desc: it.title, amount: it.amount };
+    extra.push(x);
+    items[acxKeyOf(x)] = acxViewEntry(x);
+  });
+  return { items, extra };
+}
 function acxInboxItem(x){
   const key = acxKeyOf(x);
-  const row = acxFindRow(x.k, x.id, x.i);
+  const e = acxIsAcc() ? (((data.acctView || {}).items || {})[key] || { exists: false }) : acxViewEntry(x);
   const mark = ((data.acctInbox && data.acctInbox.marks) || {})[key] || null;
-  const paidRow = !!row && acctStatusOf(row) === "שולם";
+  const row = e.exists ? { accountantNote: e.accountantNote || "" } : null;
+  const paidRow = !!e.exists && !!e.paid;
   const paidMark = !!(mark && mark.paidAt && !mark.undone);
-  let bank = row ? acxBankFor(x.k, row) : { bank: "", branch: "", account: "", holder: "" };
-  const bankByAcc = !!(mark && mark.bank && mark.bank.at && !(row && row.acctBankApplied === mark.bank.at));
+  let bank = e.exists ? e.bank : { bank: "", branch: "", account: "", holder: "" };
+  const bankByAcc = !!(mark && mark.bank && mark.bank.at && !(e.exists && e.bankApplied === mark.bank.at));
   if(mark && mark.bank && mark.bank.at) bank = { bank: mark.bank.bank || "", branch: mark.bank.branch || "", account: mark.bank.account || "", holder: mark.bank.holder || "" };
-  let amount = x.amount || 0;
-  if(row){ try{ amount = x.k === "s" ? computeStaffTotal(row) : (parseFloat(row.amount) || amount); }catch(e){} }
-  let docs = [];
-  if(row){ try{ docs = x.k === "v" ? jobForVendorPayment(row).docs : finDocs(row.docs); }catch(e){ docs = finDocs(row.docs); } }
-  const inv = docs.find(d => isInvoiceDocType(d.docType)) || null;
-  const rec = (mark && mark.receiptUrl) ? { fileUrl: mark.receiptUrl } : (docs.find(d => isReceiptDocType(d.docType)) || null);
-  const canUndo = paidMark && (!paidRow || (row && row.paidBy === "מנהל החשבונות"));
-  return { key, k: x.k, x, row, mark, paid: paidRow || paidMark, paidAt: (paidMark && mark.paidAt) || (row && row.paidAt) || "", bank, bankByAcc, amount, inv, rec, canUndo,
-           name: (row && (x.k === "s" ? row.name : row.vendor)) || x.name, title: x.desc || (row && row.desc) || "" };
+  const amount = e.exists ? (e.amount || 0) : (x.amount || 0);
+  const inv = e.exists ? e.inv : null;
+  const rec = (mark && mark.receiptUrl) ? { fileUrl: mark.receiptUrl } : (e.exists ? e.rec : null);
+  const canUndo = paidMark && (!paidRow || e.paidBy === "מנהל החשבונות");
+  return { key, k: x.k, x, row, mark, paid: paidRow || paidMark, paidAt: (paidMark && mark.paidAt) || (e.exists && e.paidAt) || "", bank, bankByAcc, amount, inv, rec, canUndo,
+           name: (e.exists && e.name) || x.name, title: x.desc || (e.exists && e.desc) || "" };
 }
 function acxInboxCard(it, i){
   const b = it.bank;
@@ -12994,10 +13062,14 @@ function acxRenderInbox(root, opts){
   const open = sends.find(s => s.id === openId) || null;
   if(open && !seen[open.id] && !preview){ data.acctInbox.seen[open.id] = new Date().toISOString(); acxSaveInbox(); }
   const inSends = new Set(); sends.forEach(s => (s.items || []).forEach(x => inSends.add(acxKeyOf(x))));
-  const extra = acctCollect().filter(it => it.row.approved && !it.paid && !inSends.has(it.key))
-    .map(it => acxInboxItem({ k: it.k, id: it.row.id, i: it.instIdx, name: it.name, desc: it.title, amount: it.amount }));
+  const extraX = acxIsAcc() ? (((data.acctView || {}).extra) || []).filter(x => !inSends.has(acxKeyOf(x)))
+    : acctCollect().filter(it => it.row.approved && !it.paid && !inSends.has(it.key)).map(it => ({ k: it.k, id: it.row.id, i: it.instIdx, name: it.name, desc: it.title, amount: it.amount }));
+  const extra = extraX.map(acxInboxItem);
   let html = `<div class="acx-head"><div class="acx-head-t"><span class="acx-sync">${preview ? "תצוגה מקדימה · " : ""}מחובר כ: מנהל חשבונות</span><h2 class="acx-h1">מה שנשלח אליי</h2></div>
     ${unseen.length ? `<span class="acx-new" style="font-size:12.5px;padding:4px 11px">${unseen.length} חדש</span>` : ""}</div>`;
+  if(acxIsAcc() && !data.acctView && sends.length){
+    html += `<div class="acx-m-note">פרטי התשלומים עוד מתעדכנים במערכת. נסה לרענן את הדף בעוד כמה דקות, ואם זה לא מסתדר - עדכן את נפתלי.</div>`;
+  }
   if(!sends.length && !extra.length){
     html += `<div class="acx-empty">עוד לא נשלחו אליך תשלומים דרך המערכת.</div>`;
   }
@@ -13027,7 +13099,7 @@ function acxRenderInbox(root, opts){
   if(extra.length){
     html += `<div style="display:flex;flex-direction:column;gap:8px"><span class="acx-lbl">תשלומים מאושרים נוספים (לא נשלחו בקישור)</span><div class="acx-grid">${extra.map(acxInboxCard).join("")}</div></div>`;
   }
-  html += `<p class="acx-m-note" style="text-align:center">במסך הזה אפשר לסמן "שולם", לכתוב הערה ולצרף קבלה. לא ניתן לשנות סכומים או למחוק.</p>`;
+  html += `<p class="acx-m-note" style="text-align:center">במסך הזה אפשר לסמן "שולם", לעדכן פרטי בנק, לכתוב הערה ולצרף קבלה. לא ניתן לשנות סכומים או למחוק.</p>`;
   root.innerHTML = html;
 }
 function acxInMark(key){ data.acctInbox.marks = data.acctInbox.marks || {}; return data.acctInbox.marks[key] = data.acctInbox.marks[key] || {}; }
@@ -19296,6 +19368,7 @@ async function initAppData(){
     return;
   }
   cloudReady = true;
+  if(isLimitedRole()){ initLimitedApp(); return; }
   repairDuplicateIds();
   backfillSchoolYear();
   backfillBankEntries();
@@ -19305,6 +19378,7 @@ async function initAppData(){
   backfillProcInvoiceSync();
   backfillKeysImport();
   backfillCodeMasterKeys();
+  try{ lcReconcileLimitedEdits(); }catch(e){ console.error(e); }
   await acctLoadLinkData();
   try{
     const appliedMarks = acxApplyInbox();
@@ -19333,7 +19407,81 @@ async function initAppData(){
   if(window.SP) SP.init();
   switchTab(allowedTabs()[0]);
   try{ acxHandleDeepLink(); }catch(e){ console.error(e); }
-  if(currentRole === "admin") autoBackupIfDue();
+  if(currentRole === "admin"){ autoBackupIfDue(); publishDerivedSoon(); }
+}
+
+/* ======================================================================
+   מסמכי תצוגה למשתמשים המוגבלים - האפליקציה של המנהל מכינה ומעדכנת אותם.
+   כך מנהל החשבונות ומשה קוראים רק את מה שהם צריכים, ולא את שאר הנתונים.
+   ====================================================================== */
+const derivedLast = {};      // key -> הערך האחרון שפורסם (כדי לא לכתוב שוב אותו דבר)
+let derivedTimer = null;
+function publishDerivedSoon(){
+  if(typeof currentRole === "undefined" || currentRole !== "admin" || !cloudReady) return;
+  clearTimeout(derivedTimer);
+  derivedTimer = setTimeout(publishDerivedNow, 1500);
+}
+async function publishDerived(key, obj){
+  const v = JSON.stringify(obj);
+  if(derivedLast[key] === v) return;
+  const ref = db.collection(APP_COLLECTION).doc(key);
+  if(derivedLast[key] === undefined){
+    try{ const d = await ref.get({ source: "server" }); if(d.exists && d.data().value === v){ derivedLast[key] = v; return; } }catch(e){}
+  }
+  await ref.set({ value: v, updatedAt: Date.now(), build: APP_BUILD });
+  derivedLast[key] = v;
+}
+async function publishDerivedNow(){
+  if(currentRole !== "admin" || !cloudReady || anyLoadFailed()) return;
+  try{ if(acctLink.ready) await publishDerived("acctView-data", acxBuildView()); }catch(e){ console.error("עדכון התצוגה של מנהל החשבונות נכשל", e); }
+  try{ await publishDerived("mosheView-data", mosheBuildView()); }catch(e){ console.error("עדכון התצוגה של רישוי ובטיחות נכשל", e); }
+}
+/* מה שטאב רישוי ובטיחות צריך מבחוץ: רק המשימות שנפתחו מרישוי, והציוד/החוזים שמקושרים לאישורים */
+function mosheBuildView(){
+  const lic = data.licensing || [];
+  const defTaskIds = new Set();
+  const eqIds = new Set();
+  lic.forEach(r => {
+    if(!r) return;
+    (Array.isArray(r.defects) ? r.defects : []).forEach(d => { if(d && d.taskId) defTaskIds.add(Number(d.taskId)); });
+    (Array.isArray(r.equipIds) ? r.equipIds : []).forEach(id => eqIds.add(Number(id)));
+  });
+  const tasks = (data.tasks || []).filter(t => t && (t.licId || defTaskIds.has(t.id))).map(t => ({
+    id: t.id, taskNumber: t.taskNumber, schoolYear: t.schoolYear, status: t.status, assignee: t.assignee || "",
+    due: t.due || "", licId: t.licId || null, desc: t.desc || "", category: t.category || ""
+  }));
+  const equipment = (data.equipment || []).filter(e => e && eqIds.has(e.id)).map(e => ({ id: e.id, name: e.name || "", category: e.category || "", place: e.place || "" }));
+  const contracts = (data.serviceContracts || []).filter(c => c && Array.isArray(c.equipIds) && c.equipIds.some(id => eqIds.has(Number(id))))
+    .map(c => ({ id: c.id, name: c.name || "", supplier: c.supplier || "", end: c.end || "", equipIds: c.equipIds.filter(id => eqIds.has(Number(id))) }));
+  return { tasks, equipment, serviceContracts: contracts };
+}
+function mosheApplyView(){
+  const v = data.mosheView && typeof data.mosheView === "object" ? data.mosheView : {};
+  data.tasks = Array.isArray(v.tasks) ? v.tasks : [];
+  data.equipment = Array.isArray(v.equipment) ? v.equipment : [];
+  data.serviceContracts = Array.isArray(v.serviceContracts) ? v.serviceContracts : [];
+}
+/* תשלומים שמשה עדכן בכרטיס תשלום: המנהל מסנכרן אותם לדוח מנהל החשבונות */
+function lcReconcileLimitedEdits(){
+  let n = 0;
+  (data.licensing || []).forEach(r => {
+    const p = r && r.pay;
+    if(!p || !p.needSync) return;
+    if(p.vpId || p.paid) lcPaySync(r, !!p.paid); else delete p.needSync;
+    n++;
+  });
+  if(n) lcSave();
+}
+
+/* משתמש מוגבל: הטאבים שלא אושרו לו נמחקים מהדף לגמרי, ולא מריצים שום תיקון/השלמה של נתונים */
+function initLimitedApp(){
+  const ok = allowedTabs();
+  tabs.forEach(t => { if(!ok.includes(t)){ const sec = document.getElementById("tab-" + t); if(sec) sec.remove(); } });
+  buildNav();
+  if(ok.includes("licensing")) renderLic();
+  if(ok.includes("accountant")) renderAccountantReport();
+  switchTab(ok[0]);
+  if(ok.includes("accountant")){ try{ acxHandleDeepLink(); }catch(e){ console.error(e); } }
 }
 
 /* ---------- גיבוי מקומי לקובץ (הורדה לדיסק, בלתי תלוי בענן) ---------- */
