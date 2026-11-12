@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ניהול הבניין">
-<meta name="theme-color" content="#101B24">
+<meta name="theme-color" content="#1d1a17">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -2363,8 +2363,76 @@ button.ct-tl:hover{background:#fbf7f0}
 }
 @media print{#ctDrawer,#ctModal,#ctMini{display:none !important}}
 </style>
+<style id="appSplashCss">
+#appSplash{position:fixed;inset:0;z-index:100000;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#1d1a17;color:#fff;font-family:"Rubik","Segoe UI","Heebo",Arial,sans-serif;direction:rtl;transition:opacity .45s ease, transform .45s ease}
+#appSplash.out{opacity:0;transform:scale(1.06);pointer-events:none}
+#appSplash .spb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.75;will-change:transform}
+#appSplash .b1{width:62vmax;height:62vmax;background:#c67139;top:-22vmax;right:-18vmax;animation:spA 7s ease-in-out infinite alternate}
+#appSplash .b2{width:55vmax;height:55vmax;background:#0e9a9a;bottom:-22vmax;left:-18vmax;animation:spB 8s ease-in-out infinite alternate}
+#appSplash .b3{width:40vmax;height:40vmax;background:#6c4fd8;top:30%;left:-14vmax;opacity:.55;animation:spC 9s ease-in-out infinite alternate}
+#appSplash .b4{width:38vmax;height:38vmax;background:#2f74d0;bottom:12%;right:-12vmax;opacity:.5;animation:spA 10s ease-in-out infinite alternate-reverse}
+@keyframes spA{to{transform:translate(-9vmax,8vmax) scale(1.15)}}
+@keyframes spB{to{transform:translate(10vmax,-9vmax) scale(1.1)}}
+@keyframes spC{to{transform:translate(12vmax,6vmax) scale(.85)}}
+#appSplash .spIn{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:0 24px}
+#appSplash .spLogo{width:96px;height:96px;border-radius:28px;background:linear-gradient(145deg,#e08a4c,#c67139 55%,#a35a1f);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.25),0 18px 40px rgba(198,113,57,.45);animation:spPop .7s cubic-bezier(.2,1.4,.4,1) both, spFloat 3s ease-in-out .7s infinite}
+#appSplash .spLogo svg{width:56px;height:56px}
+#appSplash .spLogo svg .w{animation:spWin 2.4s ease-in-out infinite}
+#appSplash .spLogo svg .w:nth-of-type(2){animation-delay:.3s}#appSplash .spLogo svg .w:nth-of-type(3){animation-delay:.6s}#appSplash .spLogo svg .w:nth-of-type(4){animation-delay:.9s}
+@keyframes spWin{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes spPop{from{transform:scale(.3) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes spFloat{50%{transform:translateY(-6px)}}
+#appSplash .spT{font-family:"Suez One","Rubik",serif;font-size:34px;line-height:1.1;letter-spacing:-.01em;animation:spUp .6s .25s ease both}
+#appSplash .spG{font-size:16px;opacity:.85;animation:spUp .6s .4s ease both}
+@keyframes spUp{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+#appSplash .spDots{display:flex;gap:9px;margin-top:10px;animation:spUp .6s .55s ease both}
+#appSplash .spDots i{width:11px;height:11px;border-radius:50%;display:block;animation:spBounce 1.1s ease-in-out infinite}
+#appSplash .spDots i:nth-child(1){background:#f0a46c}
+#appSplash .spDots i:nth-child(2){background:#3fd0c9;animation-delay:.15s}
+#appSplash .spDots i:nth-child(3){background:#a48cff;animation-delay:.3s}
+#appSplash .spDots i:nth-child(4){background:#6fa8ff;animation-delay:.45s}
+@keyframes spBounce{0%,80%,100%{transform:translateY(0) scale(.85);opacity:.6}40%{transform:translateY(-12px) scale(1.1);opacity:1}}
+#appSplash .spMsg{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom));font-size:12.5px;opacity:.6;transition:opacity .3s}
+@media (prefers-reduced-motion:reduce){#appSplash *{animation:none!important}}
+</style>
 </head>
 <body>
+<div id="appSplash" aria-hidden="true">
+  <span class="spb b1"></span><span class="spb b2"></span><span class="spb b3"></span><span class="spb b4"></span>
+  <div class="spIn">
+    <div class="spLogo"><svg viewBox="0 0 48 48" fill="none"><path d="M10 42V12l14-6 14 6v30" stroke="#fff" stroke-width="3.2" stroke-linejoin="round"/><path d="M6 42h36" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/><rect class="w" x="16" y="16" width="5" height="5" rx="1" fill="#fff"/><rect class="w" x="27" y="16" width="5" height="5" rx="1" fill="#fff"/><rect class="w" x="16" y="26" width="5" height="5" rx="1" fill="#fff"/><rect class="w" x="27" y="26" width="5" height="5" rx="1" fill="#fff"/><path d="M21 42v-6h6v6" stroke="#fff" stroke-width="3" stroke-linejoin="round"/></svg></div>
+    <div class="spT">ניהול הבניין</div>
+    <div class="spG" id="appSplashG"></div>
+    <div class="spDots"><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="spMsg" id="appSplashMsg">טוען את הנתונים…</div>
+</div>
+<script>
+(function(){
+  var sp = document.getElementById("appSplash"), t0 = Date.now(), gone = false, noUser = false, hooked = false;
+  var h = new Date().getHours();
+  document.getElementById("appSplashG").textContent = (h < 5 ? "לילה טוב" : h < 12 ? "בוקר טוב" : h < 17 ? "צהריים טובים" : h < 21 ? "ערב טוב" : "לילה טוב") + ", נפתלי";
+  function hide(){
+    if(gone) return; gone = true; clearInterval(iv);
+    var wait = Math.max(0, 900 - (Date.now() - t0));
+    setTimeout(function(){ sp.classList.add("out"); setTimeout(function(){ sp.remove(); }, 500); }, wait);
+  }
+  window.hideAppSplash = hide;
+  var iv = setInterval(function(){
+    try{
+      if(!hooked && typeof auth !== "undefined" && auth && auth.onAuthStateChanged){
+        hooked = true; auth.onAuthStateChanged(function(u){ if(!u) noUser = true; });
+      }
+      var cb = document.getElementById("cloudBlock");
+      var le = document.getElementById("loginError");
+      if(noUser || (cb && cb.offsetParent !== null) || (le && le.textContent.trim())) return hide();
+      if(typeof cloudReady !== "undefined" && cloudReady === true && (document.body.classList.contains("sh-on") || innerWidth > 760 || Date.now() - t0 > 4000)) return hide();
+      if(Date.now() - t0 > 6000){ var m = document.getElementById("appSplashMsg"); if(m) m.textContent = "עוד רגע… מתחבר לענן"; }
+      if(Date.now() - t0 > 15000) hide();
+    }catch(e){ hide(); }
+  }, 120);
+})();
+</script>
 
 <div id="roleGate">
   <h2>כניסה למערכת</h2>
@@ -3495,7 +3563,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261130; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261131; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
