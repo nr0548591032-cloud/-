@@ -416,7 +416,7 @@ html{ overscroll-behavior-y:contain; }
 @media (max-width:760px){
   #tab-tasks .tk-card{ touch-action:pan-y; }
   #tab-tasks .tk-col-body, #tab-tasks .tk-col, #tkView{ overflow-x:clip; }
-  body{ overflow-x:clip; }
+
 }
 
 /* חיפוש: מסננים לפי סוג, וואטסאפ ישר מהתוצאה */
