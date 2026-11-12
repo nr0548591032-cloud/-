@@ -106,7 +106,12 @@
         var interim = "";
         for (var i = ev.resultIndex; i < ev.results.length; i++) {
           var tx = ev.results[i][0].transcript;
-          if (ev.results[i].isFinal) { finalTx += tx.trim() + " "; gotAny = true; restarts = 0; }
+          if (ev.results[i].isFinal) {
+            var t2 = tx.trim();
+            /* בחלק ממכשירי אנדרואיד אותה תוצאה מגיעה פעמיים – לא מוסיפים כפול */
+            if (t2 && !finalTx.trim().endsWith(t2)) finalTx += t2 + " ";
+            gotAny = true; restarts = 0;
+          }
           else interim += tx;
         }
         ta.value = (finalTx + interim).trim();
