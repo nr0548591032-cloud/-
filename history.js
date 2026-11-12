@@ -117,14 +117,14 @@
     return d.toLocaleDateString("he-IL", { day: "numeric", month: "numeric" }) + " " + t;
   }
   var KIND = {
-    del: { l: "נמחק", c: "var(--red, #d6362f)", undo: "להחזיר" },
-    add: { l: "נוסף", c: "var(--green, #18864c)", undo: "לבטל" },
-    chg: { l: "שונה", c: "#2f6fd6", undo: "להחזיר כמו שהיה" },
+    del: { l: "נמחק/ה", c: "var(--red, #d6362f)", undo: "להחזיר" },
+    add: { l: "חדש/ה", c: "var(--green, #18864c)", undo: "לבטל" },
+    chg: { l: "עודכן/ה", c: "#2f6fd6", undo: "להחזיר כמו שהיה" },
     other: { l: "עודכן", c: "#8a7f70", undo: "" }
   };
   function row(ev, i){
     var k = KIND[ev.kind], name = ev.item ? itemName(ev.item) : "";
-    var title = ev.kind === "other" ? "עדכון כללי ב" + keyLabel(ev.key) : k.l + " " + ev.noun + (name ? ": " + name : "");
+    var title = ev.kind === "other" ? "עדכון כללי ב" + keyLabel(ev.key) : ev.noun + " " + k.l + (name ? ": " + name : "");
     var sub = [when(ev.at), ev.by ? "על ידי " + ev.by : "", tabLabel(KEY_TAB[ev.key])].filter(Boolean).join(" · ");
     if (ev.kind === "chg" && ev.fields && ev.fields.length) {
       var f = ev.fields.map(function(x){ return FIELD[x]; }).filter(Boolean);
