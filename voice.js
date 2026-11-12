@@ -159,7 +159,7 @@
     var opt = function(n){ return '<option value="' + esc(n) + '"' + (n === v.assignee ? " selected" : "") + '>' + esc(n) + '</option>'; };
     var items = Array.isArray(v.items) ? v.items : [];
     var title = v.title || "";
-    if (kind === "purchase" && items.length && !title) title = "להזמין: " + items.map(function(x){ return x.name + (x.qty ? " " + x.qty + (x.unit ? " " + x.unit : "") : ""); }).join(", ");
+    if (kind === "purchase" && items.length) title = "להזמין" + (v.assignee ? " מ" + v.assignee : "") + ": " + items.map(function(x){ return x.name + (x.qty ? " " + x.qty + (x.unit ? " " + x.unit : "") : ""); }).join(", ");
     var sh = sheet('<div class="sh-head"><div><h3>הסוכן הבין</h3><div style="font-size:12.5px;color:#645c50">תקן אם צריך – שום דבר לא נשמר עד שתלחץ "צור"</div></div>' + X + '</div>' +
       '<div style="background:#fff;border-radius:14px;padding:10px 12px;font-size:13.5px;line-height:1.5;color:#645c50">"' + esc(text) + '"</div>' +
       (warn ? '<div class="vc-tip" style="color:#b86e00">' + esc(warn) + ' – מילאתי מהטקסט, אפשר לתקן.</div>' : '') +

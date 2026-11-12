@@ -620,6 +620,28 @@
   .key-card:nth-child(even), .holder-card:nth-child(even){ background:var(--tint-b); }
   .key-card:hover, .holder-card:hover{ transform:translateY(-3px); box-shadow:0 4px 10px rgba(16,27,36,.1), 0 12px 26px rgba(16,27,36,.12); }
   .key-card.mismatch{ border-right-color:var(--red); }
+  #licTimeline .ltl{ background:#fbf7f0; border-radius:18px; padding:12px 14px; margin-bottom:14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); }
+  .ltl-h{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; } .ltl-h b{ font-size:15px; } .ltl-h span{ font-size:12px; color:var(--ink-soft); }
+  .ltl-r{ display:flex; align-items:flex-start; gap:10px; width:100%; padding:8px 0; border:none; border-top:1px solid rgba(32,30,29,.07); background:none; font:inherit; text-align:right; cursor:pointer; color:inherit; }
+  .ltl-r:first-of-type{ border-top:none; }
+  .ltl-d{ width:52px; text-align:center; font-size:11.5px; font-weight:700; color:var(--ink-soft); padding-top:3px; flex:0 0 auto; }
+  .ltl-dot{ width:12px; height:12px; border-radius:50%; margin-top:5px; flex:0 0 auto; }
+  .ltl-dot.bad{ background:#d6362f; box-shadow:0 0 0 4px #d6362f33; } .ltl-dot.warn{ background:#e8a317; box-shadow:0 0 0 4px #e8a31733; } .ltl-dot.ok{ background:#2fbf71; box-shadow:0 0 0 4px #2fbf7133; }
+  .ltl-t{ flex:1; min-width:0; } .ltl-t b{ display:block; font-size:13.5px; } .ltl-t small{ display:block; font-size:12px; color:var(--ink-soft); }
+  .ltl-p{ font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:999px; white-space:nowrap; flex:0 0 auto; }
+  .ltl-p.bad{ background:#fde3e1; color:#d6362f; } .ltl-p.warn{ background:#fff0d4; color:#b86e00; } .ltl-p.ok{ background:#ddf3e5; color:#18864c; }
+  .ltl-more{ display:block; width:100%; border:none; background:none; color:var(--m-licensing, #e0492f); font:inherit; font-size:12.5px; font-weight:700; padding:8px 0 2px; cursor:pointer; }
+  #keysOverdueTop{ display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+  .kov-card{ background:#fbf7f0; border-radius:18px; padding:12px 14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); }
+  .kov-h{ display:flex; align-items:center; gap:8px; margin-bottom:4px; } .kov-h b{ font-size:15px; } .kov-h span{ font-size:11.5px; font-weight:700; padding:2px 9px; border-radius:999px; background:#fde3e1; color:#d6362f; }
+  .kov-r{ display:flex; align-items:center; gap:9px; padding:9px 0; border-top:1px solid rgba(32,30,29,.08); }
+  .kov-i{ width:34px; height:34px; border-radius:11px; background:#d991001c; color:#d99100; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .kov-t{ flex:1; min-width:0; } .kov-t b{ display:block; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .kov-t span{ display:block; font-size:12px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .kov-p{ font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:999px; white-space:nowrap; flex:0 0 auto; } .kov-p.bad{ background:#fde3e1; color:#d6362f; } .kov-p.warn{ background:#fff0d4; color:#b86e00; }
+  .kov-wa{ width:32px; height:32px; border-radius:10px; border:none; background:#ddf3e5; color:#18864c; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:0 0 auto; }
+  .kov-ok{ height:32px; border-radius:10px; border:none; background:#eee7db; color:#201e1d; font:inherit; font-size:12px; font-weight:700; padding:0 10px; cursor:pointer; flex:0 0 auto; }
+  .kov-more{ display:block; width:100%; border:none; background:none; color:#b86e00; font:inherit; font-size:12.5px; font-weight:700; padding:8px 0 2px; cursor:pointer; }
+  .kov-quick{ display:flex; align-items:center; justify-content:space-between; gap:10px; } .kov-quick b{ display:block; font-size:14px; } .kov-quick span{ font-size:12px; color:var(--ink-soft); }
   .key-card .kc-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
   .key-card .kc-code{ font-weight:800; font-size:15.5px; color:var(--brand-dark); }
   .key-card .kc-loc{ font-size:13.5px; font-weight:600; color:var(--ink); }
@@ -2787,6 +2809,7 @@ button.ct-tl:hover{background:#fbf7f0}
   </div>
 
   <section class="tab" id="tab-licensing">
+    <div id="licTimeline"></div>
     <div id="licRoot"></div>
   </section>
 
@@ -2947,6 +2970,7 @@ button.ct-tl:hover{background:#fbf7f0}
       <span class="tab-head-pill" id="keysYearPill"></span>
     </div>
 
+    <div id="keysOverdueTop"></div>
     <div class="cards" id="keysStatCards"></div>
 
     <div class="toolbar">
@@ -3003,7 +3027,7 @@ button.ct-tl:hover{background:#fbf7f0}
     </div>
 
     <div id="keysSubAlerts" style="display:none">
-      <p class="hint">מפתחות שנמסרו לאנשים שסומנו כ"לא פעיל" ולא נרשמה החזרה — כדאי לבדוק ולתאם החזרה.</p>
+      <p class="hint">מפתחות שעבר תאריך ההחזרה שלהם, או שנמסרו לאנשים שסומנו כ"לא פעיל" ולא נרשמה החזרה — כדאי לבדוק ולתאם החזרה.</p>
       <div id="keysAlertsList"></div>
     </div>
   </section>
@@ -3116,6 +3140,7 @@ button.ct-tl:hover{background:#fbf7f0}
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">איש מפתח<select id="lnHolder"></select></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">מזהה מפתח<select id="lnKey"></select></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">תאריך מסירה<input type="date" id="lnDate"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:12px">להחזיר עד (לא חובה)<input type="date" id="lnDue"><span style="font-weight:400;font-size:11.5px">אם ממלאים – המפתח יופיע ב"באיחור החזרה" כשהתאריך עובר</span></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:14px">הערות<input type="text" id="lnNotes" placeholder="לא חובה"></label>
       <div class="toolbar">
         <button class="btn ghost" onclick="closeModalOverlay('loanModal')">ביטול</button>
@@ -3420,7 +3445,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261122; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261123; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -7916,6 +7941,27 @@ let licUi = { f:"all", q:"", view:"cards", sort:"expiry", open:new Set(), hist:n
 
 function lcToday(){ return tkToday(); }
 function lcRow(id){ return data.licensing.find(r => r.id === Number(id)) || null; }
+/* ציר זמן – 12 החודשים הקרובים (נובמבר 2026). קריאה בלבד: לחיצה פותחת את האישור לעריכה הרגילה */
+let lcTlAll = false;
+function renderLicTimeline(){
+  const box = document.getElementById("licTimeline");
+  if(!box) return;
+  const today = tkToday();
+  const rows = (data.licensing || []).filter(r => r && r.expiry && !lcRenewed(r)).map(r => ({ r, n: tkDaysTo(r.expiry) }))
+    .filter(x => x.n !== null && x.n <= 365).sort((a, b) => a.n - b.n);
+  if(!rows.length){ box.innerHTML = ""; return; }
+  const MONTHS = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+  const when = x => { const p = x.r.expiry.split("-"); return x.n <= 45 ? Number(p[2]) + "." + Number(p[1]) : MONTHS[Number(p[1]) - 1]; };
+  const tone = x => x.n < 0 ? "bad" : x.n <= 30 ? "bad" : x.n <= 90 ? "warn" : "ok";
+  const pill = x => x.n < 0 ? `פג לפני ${-x.n === 1 ? "יום" : -x.n + " ימים"}` : x.n === 0 ? "היום" : x.n <= 45 ? (x.n === 1 ? "מחר" : x.n + " ימים") : "בתוקף";
+  const list = lcTlAll ? rows : rows.slice(0, 5);
+  box.innerHTML = `<div class="ltl"><div class="ltl-h"><b>12 החודשים הקרובים</b><span>${rows.length} אישורים</span></div>
+    ${list.map(x => `<button type="button" class="ltl-r" onclick="lcOpenEdit(lcRow(${x.r.id}))">
+      <span class="ltl-d">${escHtml(when(x))}</span><span class="ltl-dot ${tone(x)}"></span>
+      <span class="ltl-t"><b>${escHtml(x.r.type || "אישור")}</b><small>${escHtml([x.r.inspector, x.r.freq].filter(Boolean).join(" · "))}</small></span>
+      <span class="ltl-p ${tone(x)}">${escHtml(pill(x))}</span></button>`).join("")}
+    ${rows.length > 5 ? `<button type="button" class="ltl-more" onclick="lcTlAll=!lcTlAll;renderLicTimeline()">${lcTlAll ? "הצגת פחות" : "עוד " + (rows.length - 5) + " – הצג הכל"}</button>` : ""}</div>`;
+}
 function lcSave(){ scheduleSave("licensing", "licSaved"); }
 function lcIsAdmin(){ return typeof currentRole === "undefined" || currentRole === "admin"; }
 function lcCanContacts(){ return lcIsAdmin() || canOpenTab("contacts"); }
@@ -8114,6 +8160,7 @@ function lcBuildShell(root){
 
 /* ---------- רינדור ---------- */
 function renderLic(){
+  try{ renderLicTimeline(); }catch(e){ console.error(e); }
   const root = document.getElementById("licRoot");
   if(!root) return;
   if(!root.dataset.built) lcBuildShell(root);
@@ -15640,6 +15687,7 @@ function populateLoanSelectors(preselectKeyId){
   }).join("");
   document.getElementById("lnDate").value = new Date().toISOString().slice(0,10);
   document.getElementById("lnNotes").value = "";
+  const due = document.getElementById("lnDue"); if(due) due.value = "";
   if(preselectKeyId) keySel.value = preselectKeyId;
 }
 function openLoanModal(preselectKeyId){ populateLoanSelectors(preselectKeyId); openModalOverlay("loanModal"); }
@@ -15649,9 +15697,12 @@ function submitLoan(){
   const keyId = parseInt(document.getElementById("lnKey").value,10);
   const date = document.getElementById("lnDate").value;
   const notes = document.getElementById("lnNotes").value.trim();
+  const dueEl = document.getElementById("lnDue"), dueBack = dueEl ? dueEl.value : "";
   if(!holder || !keyId){ alert("יש לבחור גם איש מפתח וגם מפתח."); return; }
   const k = keyById(keyId);
-  data.keysLog.push({id: nextId()+12000, keyId, keyDesc: k?keyDisplayId(k):"", holder, dateOut: date||new Date().toISOString().slice(0,10), dateIn:"", notes});
+  const entry = {id: nextId()+12000, keyId, keyDesc: k?keyDisplayId(k):"", holder, dateOut: date||new Date().toISOString().slice(0,10), dateIn:"", notes};
+  if(dueBack) entry.dueBack = dueBack;
+  data.keysLog.push(entry);
   saveKeys();
   renderKeysTab();
   closeModalOverlay("loanModal");
@@ -15693,10 +15744,41 @@ function renderKeyLogList(){
 }
 
 /* ---- מעקב החזרות ---- */
+/* באיחור החזרה (נובמבר 2026): השאלה שעבר תאריך ה"להחזיר עד" שלה, או שנמצאת אצל מי שסומן לא פעיל */
+function keysOverdue(){
+  const today = new Date().toISOString().slice(0,10);
+  return (data.keysLog || []).filter(l => {
+    if(!l || l.dateIn) return false;
+    if(l.dueBack && l.dueBack < today) return true;
+    const h = holderByName(l.holder); return !!(h && h.active === false);
+  }).map(l => {
+    const h = holderByName(l.holder), k = keyById(l.keyId);
+    const base = l.dueBack && l.dueBack < today ? l.dueBack : l.dateOut;
+    const days = base ? Math.max(0, Math.round((new Date(today) - new Date(base)) / 864e5)) : 0;
+    return { l, h, k, label: k ? keyDisplayId(k) : (l.keyDesc || "—"), loc: k ? (k.location || "") : "", late: !!(l.dueBack && l.dueBack < today), inactive: !!(h && h.active === false), days };
+  }).sort((a, b) => b.days - a.days);
+}
+function renderKeysOverdueTop(){
+  const box = document.getElementById("keysOverdueTop");
+  if(!box) return;
+  const L = keysOverdue();
+  const fmt = d => { if(!d) return ""; const p = d.split("-"); return Number(p[2]) + "." + Number(p[1]); };
+  const row = x => `<div class="kov-r">
+      <span class="kov-i">${svgIcon('keys',16)}</span>
+      <div class="kov-t"><b>${escHtml(x.label)}${x.loc ? " · " + escHtml(x.loc) : ""}</b><span>${escHtml(x.l.holder || "")} · ${x.late ? "היה צריך לחזור ב-" + fmt(x.l.dueBack) : "מאז " + fmt(x.l.dateOut) + " · סומן לא פעיל"}</span></div>
+      <span class="kov-p ${x.days >= 14 || x.inactive ? "bad" : "warn"}">${x.days ? (x.days === 1 ? "יום" : x.days + " ימים") : "היום"}</span>
+      ${x.h && x.h.phone ? `<button type="button" class="kov-wa" title="תזכורת בוואטסאפ" aria-label="תזכורת בוואטסאפ ל${escHtml(x.l.holder)}" onclick="sendHolderReturnReminder('${String(x.h.name||"").replace(/\\/g,"").replace(/'/g,"\\'")}')">${svgIcon('whatsapp',15)}</button>` : ""}
+      <button type="button" class="kov-ok" title="סימון כהוחזר" onclick="markReturned(${x.l.id})">הוחזר</button>
+    </div>`;
+  box.innerHTML = `
+    ${L.length ? `<div class="kov-card"><div class="kov-h"><b>באיחור החזרה</b><span>${L.length}</span></div>${L.slice(0, 4).map(row).join("")}${L.length > 4 ? `<button type="button" class="kov-more" onclick="setKeysSubTab('alerts')">עוד ${L.length - 4} – לרשימה המלאה</button>` : ""}</div>` : ""}
+    <div class="kov-card kov-quick"><div><b>השאלה מהירה</b><span>גם מכפתור + בכל מקום באפליקציה</span></div><button type="button" class="btn" onclick="openLoanModal()">+ השאלה</button></div>`;
+}
 function renderKeyAlerts(){
+  try{ renderKeysOverdueTop(); }catch(e){ console.error(e); }
   const list = document.getElementById("keysAlertsList");
   if(!list) return;
-  const stale = data.keysLog.filter(l => { if(l.dateIn) return false; const h = holderByName(l.holder); return h && h.active===false; });
+  const stale = data.keysLog.filter(l => { if(l.dateIn) return false; if(l.dueBack && l.dueBack < new Date().toISOString().slice(0,10)) return true; const h = holderByName(l.holder); return h && h.active===false; });
   if(stale.length===0){ list.innerHTML = `<div class="empty-hint">אין כרגע מפתחות תקועים אצל אנשים לא פעילים</div>`; return; }
   list.innerHTML = stale.map(l => {
     const h = holderByName(l.holder);
@@ -15706,7 +15788,7 @@ function renderKeyAlerts(){
     return `
     <div class="alert-card">
       <div class="ac-icon">${svgIcon('alert',20)}</div>
-      <div class="ac-txt"><b>${l.holder}</b> מחזיק במפתח <b>${keyLabel}</b> מאז ${l.dateOut}, וסומן כלא פעיל<div class="ac-sub">מומלץ ליצור קשר ולתאם החזרה</div></div>
+      <div class="ac-txt"><b>${l.holder}</b> מחזיק במפתח <b>${keyLabel}</b> מאז ${l.dateOut}${l.dueBack && l.dueBack < new Date().toISOString().slice(0,10) ? `, והיה צריך להחזיר עד ${l.dueBack}` : `, וסומן כלא פעיל`}<div class="ac-sub">מומלץ ליצור קשר ולתאם החזרה</div></div>
       <div style="display:flex;gap:8px;align-items:center">
         ${waBtn}
         <button class="btn ghost" style="padding:6px 12px;font-size:12px" onclick="markReturned(${l.id})">סימון כהוחזר</button>
@@ -18272,6 +18354,7 @@ function dbCollect(){
 
   const keysLoaned = (data.keysLog || []).filter(l => !l.dateIn);
   const keysStale = keysLoaned.filter(l => { const h = holderByName(l.holder); return h && h.active === false; });
+  const keysLate = keysLoaned.filter(l => l.dueBack && l.dueBack < today);
 
   const payMissing = [];
   (data.installments || []).forEach((inst, idx) => (inst || []).forEach(row => {
@@ -18303,7 +18386,7 @@ function dbCollect(){
 
   return { Y, today, yearTasks, open, done, late, dueToday, week, urgent, byStatus, maint, spark, jobs, waiting, waitingSum, noReceipt, noAmount,
     costItems, costTotal, budget, months, curMonth, lic, licWithExp, licExpired, licSoon, licValid, licProc, licMissing,
-    equip, contracts, warrSoon, cActive, cSoon, cExpiredRecent, rec, recLate, recSoon, recMonthly, keysLoaned, keysStale, payMissing, staff, sp, procYear, proj,
+    equip, contracts, warrSoon, cActive, cSoon, cExpiredRecent, rec, recLate, recSoon, recMonthly, keysLoaned, keysStale, keysLate, payMissing, staff, sp, procYear, proj,
     my: dbSafe(() => (typeof mtDash === "function" && mtIsAdmin()) ? mtDash() : null, null) };
 }
 
@@ -18352,6 +18435,7 @@ function dbAlerts(D){
   if(D.sp && D.sp.soon.length) add(3, "box", `${D.sp.soon.length} מוצרים יפוגו השבוע`, D.sp.soon.slice(0, 3).map(s => s.name).join(", "), null, dbGo("procurement"), "procurement");
   if(D.sp && D.sp.below) add(3, "box", `${D.sp.below} מוצרים מתחת למינימום במלאי`, "רכש ואספקה", null, dbGo("procurement"), "procurement");
   if(D.sp && D.sp.reqs) add(3, "list", `${D.sp.reqs} בקשות פתוחות מהמטבח`, "רכש ואספקה", null, dbGo("procurement"), "procurement");
+  if(D.keysLate && D.keysLate.length) add(2, "keys", `${D.keysLate.length === 1 ? "מפתח אחד" : D.keysLate.length + " מפתחות"} באיחור החזרה`, [...new Set(D.keysLate.map(l => l.holder))].slice(0, 3).join(", "), null, dbGo("keys"), "keys");
   if(D.keysStale.length) add(3, "keys", `${D.keysStale.length} מפתחות אצל מי שכבר לא פעיל`, [...new Set(D.keysStale.map(l => l.holder))].slice(0, 3).join(", "), null, dbGo("keys"), "keys");
   A.sort((a, b) => a.lvl - b.lvl || (a.n === null ? 999 : a.n) - (b.n === null ? 999 : b.n));
   return A;
