@@ -196,3 +196,14 @@
   --sp-green:#18864c; --sp-green-bg:#ddf3e5; --sp-red:#d6362f; --sp-red-bg:#fde3e1; --sp-amber:#b86e00; --sp-amber-bg:#fff0d4;
   --sp-tint-a:#e3f6f5;
 }
+
+/* בטלפון: שם הטאב כבר מופיע בסרגל העליון – מסתירים את הכותרת הגדולה הכפולה ואת שורות ההסבר הקבועות.
+   שורות עם מספרים (כמה פתוחות / באיחור / אישורים בתוקף) נשארות. */
+@media (max-width:760px){
+  body.sh-on .tk-title, body.sh-on .lc-badge, body.sh-on .lc-ttl h2, body.sh-on .acx-h1, body.sh-on .acx-sync,
+  body.sh-on .ct-h1, body.sh-on .ct-sub, body.sh-on .fx-h1, body.sh-on .fx-sub,
+  body.sh-on #tab-keys .tab-head h2, body.sh-on #supplyApp > .sp-head .section-title{ display:none !important; }
+  body.sh-on #supplyApp > .sp-head{ min-height:0; }
+  body.sh-admin #sp-tiles{ display:none !important; }   /* במקומם: "מה מחכה לך כאן" למעלה */
+  body.sh-on .sh-wait{ margin:2px 0 12px; }
+}
