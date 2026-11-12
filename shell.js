@@ -48,6 +48,7 @@
     folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
     wrench:'<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5z"/>',
     receipt:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+    bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
     filter:'<path d="M4 5h16l-6 8v5l-4 2v-7z"/>',
     clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
@@ -413,6 +414,85 @@
     if (a && typeof a.act === "function") { try { a.act(); } catch (er) { console.warn("shell:", er); } }
   });
 
+  /* ---------- מסך הבית בטלפון (כמו במוקאפ): מה מחכה היום, 3 מספרים, המשימות שלי להיום ----------
+     רק תצוגה. הפעולות קוראות לאותן פונקציות של האפליקציה. לוח הבקרה המלא נשאר – כפתור בתחתית. */
+  function greet(){ var h = new Date().getHours(); return h < 5 ? "לילה טוב" : h < 12 ? "בוקר טוב" : h < 17 ? "צהריים טובים" : h < 21 ? "ערב טוב" : "לילה טוב"; }
+  var HOME_BTN = { licensing: "לטיפול", tasks: "פתח", accountant: "להשלים", finance: "לתשלום", procurement: "להזמנה", equipment: "לחידוש", contacts: "לבקש", keys: "פתח", files: "לשייך", staff: "פתח" };
+  var LVLC = { 1: "#d6362f", 2: "#b86e00", 3: "#2f74d0" }, LVLBG = { 1: "#fde3e1", 2: "#fff0d4", 3: "#e3edfb" };
+  function allAlerts(){ try { return dbAlerts(dbCollect()) || []; } catch (e) { return []; } }   // eslint-disable-line no-undef
+  function openAllAlerts(){
+    var list = allAlerts();
+    var sh = sheet(head("כל מה שמחכה לך", list.length ? list.length + " פריטים" : "") + (list.length ? '<div class="sh-sgrp">' + list.map(function(a, i){
+      return '<button class="sh-res" type="button" data-i="' + i + '"><span style="width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:' + (LVLC[a.lvl] || "#c9bfb1") + '"></span><span style="flex:1;min-width:0"><b>' + esc(a.title) + '</b><small>' + esc([a.sub, a.tab ? label(a.tab) : ""].filter(Boolean).join(" · ")) + '</small></span></button>';
+    }).join("") + '</div>' : '<div class="sh-empty">הכל מסודר – אין כרגע שום דבר שמחכה לך</div>'));
+    sh.addEventListener("click", function(e){ var b = e.target.closest && e.target.closest(".sh-res"); if (!b) return; var a = list[Number(b.getAttribute("data-i"))]; closeSheet(); if (a && typeof a.act === "function") later(a.act, 200); });
+  }
+  function homeTasks(){
+    try {
+      var today = tkToday();                                                                       // eslint-disable-line no-undef
+      var L = mtList().filter(function(x){ var n = mtDays(x); return x && ((!x.done && n !== null && n <= 0) || (x.done && x.doneAt === today)); });   // eslint-disable-line no-undef
+      L.sort(function(a, b){ return (a.done - b.done) || ((b.star ? 1 : 0) - (a.star ? 1 : 0)); });
+      return L;
+    } catch (e) { return null; }
+  }
+  function home(){
+    var sec = document.getElementById("tab-dashboard");
+    if (!sec || !isAdmin()) return;
+    var el = document.getElementById("shHome");
+    if (!el) { el = document.createElement("div"); el.id = "shHome"; sec.insertBefore(el, sec.firstChild); }
+    var D = null; try { D = dbCollect(); } catch (e) {}                                             // eslint-disable-line no-undef
+    var alerts = allAlerts(), top3 = alerts.slice(0, 3), mt = homeTasks();
+    var bd = document.getElementById("shBellDot"); if (bd) bd.style.display = alerts.some(function(a){ return a.lvl === 1; }) ? "" : "none";
+    var money = function(n){ try { return fmtMoney(n); } catch (e) { return "₪" + Math.round(n).toLocaleString("he-IL"); } };   // eslint-disable-line no-undef
+    var kpis = D ? [
+      { t: "tasks", v: D.open.length, l: "משימות פתוחות" },
+      { t: "files", v: money(D.waitingSum || 0), l: "ממתין לתשלום" },
+      { t: "licensing", v: D.licValid.length + "/" + D.licWithExp.length, l: "אישורים בתוקף" }
+    ] : [];
+    var mtDone = mt ? mt.filter(function(x){ return x.done; }).length : 0;
+    var sig = JSON.stringify([top3.map(function(a){ return a.title + a.lvl; }), kpis.map(function(k){ return k.v; }), mt ? mt.map(function(x){ return x.id + ":" + !!x.done + ":" + x.title; }) : 0, alerts.length]);
+    if (el.getAttribute("data-sig") === sig) return;
+    el.setAttribute("data-sig", sig);
+    var tp = function(x){ try { return MT_TYPES[x.type] || MT_TYPES.general; } catch (e) { return { c: "#82796a", p: "" }; } };   // eslint-disable-line no-undef
+    el.innerHTML =
+      '<button type="button" class="shh-srch" data-shh="search">' + ic("search", 19) + '<span>חיפוש בכל המערכת – ספק, משימה, מוצר, מפתח…</span></button>' +
+      '<section class="shh-today">' +
+        '<div class="shh-th"><b>' + (alerts.length ? (alerts.length === 1 ? "דבר אחד מחכה לך היום" : alerts.length + " דברים מחכים לך היום") : "הכל מסודר היום") + '</b><span>היום</span></div>' +
+        (top3.length ? top3.map(function(a, i){
+          return '<div class="shh-al"><span class="shh-ai" style="background:' + (LVLC[a.lvl] || "#8a7f70") + '">' + ic(TAB_IC[a.tab] || "file", 19) + '</span>' +
+            '<span class="shh-at"><b>' + esc(a.title) + '</b><small>' + esc([label(a.tab), a.sub].filter(Boolean).join(" · ")) + '</small></span>' +
+            (typeof a.act === "function" ? '<button type="button" data-shh-a="' + i + '" style="background:' + (LVLBG[a.lvl] || "#eee") + ';color:' + (LVLC[a.lvl] || "#333") + '">' + esc(HOME_BTN[a.tab] || "פתח") + '</button>' : '') + '</div>';
+        }).join("") : '<div class="shh-ok">' + ic("check", 20) + '<span>אין אישורים שפגו, משימות באיחור או תשלומים תקועים</span></div>') +
+        (alerts.length > 3 ? '<button type="button" class="shh-all" data-shh="bell">ועוד ' + (alerts.length - 3) + ' – הצג הכל</button>' : '') +
+      '</section>' +
+      (kpis.length ? '<div class="shh-kpis">' + kpis.map(function(k){
+        return '<button type="button" class="shh-kpi" data-shh-go="' + k.t + '"><span class="shh-ki" style="background:color-mix(in srgb,' + col(k.t) + ' 12%, transparent);color:' + col(k.t) + '">' + ic(TAB_IC[k.t], 17) + '</span><b>' + esc(k.v) + '</b><small>' + esc(k.l) + '</small></button>';
+      }).join("") + '</div>' : '') +
+      (mt ? '<div class="shh-sec"><span>' + ic("check", 15) + ' המשימות שלי להיום</span><span style="color:' + col("tasks") + '">' + (mt.length ? mtDone + " מתוך " + mt.length : "") + '</span></div>' +
+        '<div class="shh-mt">' + mt.slice(0, 4).map(function(x){
+          var T = tp(x);
+          return '<div class="shh-mr' + (x.done ? " done" : "") + '"><button type="button" class="shh-chk" data-shh-t="' + esc(x.id) + '" aria-label="' + (x.done ? "ביטול סימון" : "סימון כבוצע") + '">' + (x.done ? ic("check", 15) : "") + '</button>' +
+            '<button type="button" class="shh-mtt" data-shh-o="' + esc(x.id) + '">' + esc(x.title) + '</button>' +
+            '<span class="shh-mi" style="color:' + T.c + '"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + T.p + '</svg></span></div>';
+        }).join("") + (mt.length ? '' : '<div class="shh-mr"><span class="shh-empty">אין משימות שלך להיום</span></div>') +
+        '<button type="button" class="shh-add" data-shh="mt">' + (mt.length > 4 ? "עוד " + (mt.length - 4) + " · " : "") + 'הוסף משימה שלי +</button></div>' : '') +
+      '<button type="button" class="shh-full" data-shh="full">' + ic("grid", 16) + '<span>לוח הבקרה המלא – גרפים, תקציב וכל הנתונים</span></button>';
+    el._alerts = top3;
+  }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest && e.target.closest("#shHome button"); if (!b) return;
+    var el = document.getElementById("shHome");
+    if (b.hasAttribute("data-shh-a")) { var a = el._alerts[Number(b.getAttribute("data-shh-a"))]; if (a && typeof a.act === "function") a.act(); return; }
+    if (b.hasAttribute("data-shh-go")) { go(b.getAttribute("data-shh-go")); return; }
+    if (b.hasAttribute("data-shh-t")) { try { mtToggle(Number(b.getAttribute("data-shh-t")) || b.getAttribute("data-shh-t")); } catch (er) { console.warn(er); } el.removeAttribute("data-sig"); later(home, 60); return; }   // eslint-disable-line no-undef
+    if (b.hasAttribute("data-shh-o")) { var id = b.getAttribute("data-shh-o"); go("tasks"); later(function(){ var m = document.querySelector('[data-mt-mode="mine"]'); if (m && m.getAttribute("aria-selected") !== "true") m.click(); later(function(){ try { mtOpenEdit(Number(id) || id); } catch (er) {} }, 150); }, 150); return; }   // eslint-disable-line no-undef
+    var k = b.getAttribute("data-shh");
+    if (k === "search") openSearch();
+    else if (k === "bell") openAllAlerts();
+    else if (k === "full") { document.body.classList.toggle("sh-dbfull"); b.querySelector("span").textContent = document.body.classList.contains("sh-dbfull") ? "הסתרת לוח הבקרה המלא" : "לוח הבקרה המלא – גרפים, תקציב וכל הנתונים"; }
+    else if (k === "mt") { go("tasks"); later(function(){ var m = document.querySelector('[data-mt-mode="mine"]'); if (m && m.getAttribute("aria-selected") !== "true") m.click(); later(function(){ var i = document.querySelector("#mtQaForm input"); if (i) i.focus(); }, 200); }, 150); }
+  });
+
   /* ---------- בניית הסרגלים ---------- */
   var BAR = ["tasks", "procurement", "licensing", "staff"];
   var top, bar, lastSig = "";
@@ -446,7 +526,8 @@
       (canHome ? '<button class="sh-ib" type="button" data-sh-go="dashboard" aria-label="בית – לוח בקרה">' + ic("home", 21) + '</button>' : '') +
       '<div class="sh-ttl"><b id="shTtl"></b><small id="shSub"></small></div>' +
       '<button class="sh-ib" type="button" data-sh="search" aria-label="חיפוש בכל המערכת">' + ic("search", 20) + '</button>' +
-      '<button class="sh-ib" type="button" data-sh="all" aria-label="כל הטאבים">' + ic("grid", 20) + '<span class="sh-dot" id="shAllDot" style="display:none"></span></button>';
+      '<button class="sh-ib" type="button" data-sh="all" aria-label="כל הטאבים">' + ic("grid", 20) + '<span class="sh-dot" id="shAllDot" style="display:none"></span></button>' +
+      '<button class="sh-ib sh-bell" type="button" data-sh="bell" aria-label="כל מה שמחכה לך">' + ic("bell", 20) + '<span class="sh-dot" id="shBellDot" style="display:none"></span></button>';
 
     var sb = document.getElementById("sidebar");
     if (sb && !sb.querySelector(".sh-side-tools")) {
@@ -464,7 +545,9 @@
     if (!top || !bar) return;
     var t = cur() || "dashboard";
     var ttl = document.getElementById("shTtl"), sub = document.getElementById("shSub");
-    if (ttl) ttl.textContent = t === "dashboard" ? "ניהול הבניין" : label(t);
+    if (ttl) ttl.textContent = t === "dashboard" ? (isAdmin() ? greet() + ", נפתלי" : "ניהול הבניין") : label(t);
+    top.classList.toggle("sh-on-home", t === "dashboard" && isAdmin());
+    try { if (t === "dashboard") home(); } catch (e) { console.warn("shell home:", e); }
     if (sub) { var dt = ""; try { dt = new Date().toLocaleDateString("he-IL", { weekday: "long", day: "numeric", month: "long" }); } catch (e) {} sub.textContent = dt; }
     top.querySelectorAll("[data-sh-go='dashboard']").forEach(function(b){ b.classList.toggle("on", t === "dashboard"); });
     var c = counts();
@@ -487,6 +570,7 @@
     var k = b.getAttribute("data-sh");
     if (k === "plus") openPlus(); else if (k === "search") openSearch(); else if (k === "all") openAll();
     else if (k === "users" && typeof window.openUsersAdmin === "function") window.openUsersAdmin();
+    else if (k === "bell") openAllAlerts();
   });
   document.addEventListener("keydown", function(e){
     if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === "k" || e.key === "K" || e.key === "ל")) {
