@@ -3420,7 +3420,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261116; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261117; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -19951,7 +19951,8 @@ async function autoBackupIfDue(){
 .spx .sp-pills{flex-wrap:wrap;overflow:visible}
 .spx .sp-subpills{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:4px;background:var(--sp-card);border-radius:12px;padding:3px;margin-top:2px;box-shadow:inset 0 0 0 1px var(--sp-line)}
 .spx .sp-subpills button{border:none;background:none;border-radius:9px;padding:6px 12px;font:600 13px var(--sp-f-body);color:var(--sp-soft);cursor:pointer}
-.spx .sp-subpills button[aria-selected="true"]{background:var(--m-procurement,#0e9a9a);color:#fff}
+.spx .sp-subpills button[aria-selected="true"]{background:#e3f6f5;color:#0b6b6b}
+#supplyApp .sp-pill[aria-selected="true"]{background:var(--m-procurement,#0e9a9a);color:#fff}
 .spx .sp-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--sp-line);background:var(--sp-card);color:var(--sp-ink);
   border-radius:999px;padding:7px 13px;font:500 14px var(--sp-f-body);cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
 .spx .sp-pill[aria-selected="true"]{background:var(--sp-brand-dark);color:var(--sp-bg);border-color:transparent}

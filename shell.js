@@ -394,6 +394,7 @@
     var al = allowed(), sig = role() + "|" + al.join(",");
     if (!ready) { document.body.classList.remove("sh-on", "sh-has-bar"); return; }
     document.body.classList.add("sh-on");
+    document.body.classList.toggle("sh-admin", isAdmin());
     if (sig === lastSig && top && bar) { refresh(); return; }
     lastSig = sig;
 
