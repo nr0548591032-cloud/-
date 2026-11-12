@@ -107,7 +107,11 @@
         ta.value = (finalTx + interim).trim();
       };
       rec.onerror = function(ev){
-        if (ev.error === "not-allowed" || ev.error === "service-not-allowed") { stop(); setState("אין הרשאה למיקרופון"); note("כדי להקליט צריך לאשר לדפדפן גישה למיקרופון.\nאפשר גם להקליד את מה שרצית להגיד."); }
+        if (ev.error === "not-allowed" || ev.error === "service-not-allowed" || ev.error === "audio-capture") {
+          on = false; stop(); setState("אין גישה למיקרופון");
+          var tip = sh.querySelector(".vc-tip"); if (tip) { tip.textContent = "צריך לאשר לדפדפן גישה למיקרופון (בהגדרות האתר). בינתיים אפשר להקליד כאן, או ללחוץ על המיקרופון שבמקלדת."; tip.style.color = "#b86e00"; }
+          try { ta.focus(); } catch (e) {}
+        }
       };
       rec.onend = function(){ if (on && document.body.contains(sh)) { try { rec.start(); } catch (e) { stop(); } } };   // אנדרואיד עוצר אחרי שקט – ממשיכים
       try { rec.start(); } catch (e) { stop(); }
