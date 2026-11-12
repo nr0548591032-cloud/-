@@ -264,8 +264,16 @@
   body.sh-on #tab-staff .sc-chev{ grid-area:chev; }
   body.sh-on #tab-staff .sc-td{ padding:10px 12px !important; }
   body.sh-on #tab-staff .sc-viewseg button{ white-space:nowrap; font-size:12.5px; padding:7px 10px; }
-  body.sh-on .sc-stats > * > :first-child{ font-size:11.5px !important; }
-  body.sh-on .sc-stats > * > :last-child{ font-size:16px !important; }
+  body.sh-on .sc-stat small{ font-size:11px !important; line-height:1.3; }
+  body.sh-on .sc-stat b{ font-size:16px !important; }
+
+  /* כרטיסי מספרים בכל הטאבים: מספר בגודל סביר */
+  body.sh-on .tab .cards .stat .value{ font-size:24px !important; line-height:1.15; }
+  body.sh-on .tab .cards .stat .label{ font-size:12px !important; }
+  body.sh-on #keysYearPill{ display:none !important; }
+  /* תתי-טאבים (מפתחות, דוח למנה"ח ועוד): בשורה אחת */
+  body.sh-on .tab .acct-subtabs{ display:flex; flex-wrap:nowrap !important; gap:4px; }
+  body.sh-on .tab .acct-subtabs .pill-tab{ flex:1 1 0; min-width:0; padding:7px 4px !important; font-size:12.5px !important; white-space:nowrap; justify-content:center; text-align:center; }
 
   /* מפתחות: שני כרטיסים בשורה, נמוכים */
   body.sh-on .key-grid{ grid-template-columns:repeat(2, minmax(0,1fr)) !important; gap:8px !important; }
