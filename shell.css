@@ -284,8 +284,14 @@
 
   /* אנשי קשר: כרטיס בשורה אחת – שם, תחום ופעולות. הפרטים המלאים בלחיצה */
   body.sh-on .ct-grid{ gap:8px; }
-  body.sh-on .ct-card{ flex-direction:row; flex-wrap:wrap; align-items:center; padding:10px 12px; gap:8px; border-radius:16px; }
-  body.sh-on .ct-card .ct-card-top{ flex:1 1 60%; min-width:0; gap:10px; }
+  body.sh-on .ct-card{ flex-direction:row; flex-wrap:nowrap; align-items:center; padding:10px 12px; gap:8px; border-radius:16px; }
+  body.sh-on .ct-card .ct-card-top{ flex:1 1 0; min-width:0; gap:10px; }
+  body.sh-on .ct-card .ct-card-t .nm{ font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  body.sh-on .ct-card .ct-acts{ flex:0 0 auto; }
+  body.sh-on .ct-kpi .v{ font-size:22px !important; }
+  body.sh-on .ct-kpi .l{ font-size:12px; }
+  body.sh-on #ctRoot .ct-head{ flex-wrap:nowrap; gap:6px; }
+  body.sh-on #ctRoot .ct-head button, body.sh-on #ctRoot .ct-head a{ padding:8px 10px !important; font-size:12.5px !important; white-space:nowrap; }
   body.sh-on .ct-card .ct-av{ width:38px !important; height:38px !important; font-size:14px !important; }
   body.sh-on .ct-card .ct-tags, body.sh-on .ct-card .ct-mets, body.sh-on .ct-card .ct-stars.none{ display:none; }
   body.sh-on .ct-card .ct-acts{ gap:6px; }
