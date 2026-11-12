@@ -37,7 +37,10 @@
     s.textContent =
       '.vc-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}.vc-h b{font-family:"Suez One",Rubik,serif;font-weight:400;font-size:20px}.vc-h span{font-weight:700;color:#645c50;font-variant-numeric:tabular-nums}' +
       '.vc-bars{display:flex;justify-content:center;align-items:center;gap:4px;height:64px;margin:6px 0}.vc-bars i{width:5px;border-radius:5px;background:#c67139;height:8px;transition:height .12s}' +
-      '.vc-bars.idle i{background:#d9d1c4}' +
+      '.vc-bars.idle i{background:#d9d1c4;animation:none!important;height:8px!important}' +
+      '.vc-bars:not(.idle) i{animation:vcWave 1.1s ease-in-out infinite}.vc-bars i:nth-child(3n){animation-delay:-.3s}.vc-bars i:nth-child(3n+1){animation-delay:-.7s}.vc-bars i:nth-child(4n){animation-delay:-.5s}' +
+      '@keyframes vcWave{0%,100%{height:8px}50%{height:22px}}.vc-bars.talk i{animation-duration:.45s}.vc-bars.talk i:nth-child(2n){height:40px}' +
+      '.vc-sheetfix{overscroll-behavior:contain}' +
       '.vc-tx{width:100%;min-height:76px;background:#fff;border-radius:14px;padding:12px;font:inherit;font-size:15px;line-height:1.5;border:1.5px solid rgba(32,30,29,.12);resize:vertical;box-sizing:border-box;color:#201e1d}' +
       '.vc-tip{font-size:12px;color:#7a7166;margin:6px 2px 0}' +
       '.vc-row{display:flex;gap:8px;margin-top:12px}.vc-btn{flex:1;height:50px;border:none;border-radius:14px;font-family:inherit;font-size:14.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer}' +
@@ -69,62 +72,78 @@
     css();
     var bars = ""; for (var i = 0; i < 22; i++) bars += "<i></i>";
     var sh = sheet('<div class="sh-head"><div><h3>הקלטה קולית</h3><div style="font-size:12.5px;color:#645c50">אמור מה צריך לעשות – הסוכן יציע, ואתה מאשר</div></div>' + X + '</div>' +
-      '<div class="vc-h"><b id="vcState">' + (SR ? "מקליט…" : "כתוב מה רצית להגיד") + '</b><span id="vcTime">0:00</span></div>' +
-      (SR ? '<div class="vc-bars" id="vcBars">' + bars + '</div>' : '') +
+      '<div class="vc-h"><b id="vcState">' + (SR ? "לחץ על המיקרופון ודבר" : "כתוב מה רצית להגיד") + '</b><span id="vcTime">0:00</span></div>' +
+      (SR ? '<div class="vc-bars idle" id="vcBars">' + bars + '</div>' : '') +
       '<textarea class="vc-tx" id="vcText" placeholder="' + (SR ? "מה שתגיד יופיע כאן. אפשר גם לתקן בכתב." : "למשל: יש נזילה בשירותים בקומה 2, לשלוח לשלמה חיים, דחוף, להזכיר לי ביום ראשון") + '"></textarea>' +
       '<div class="vc-tip">' + (SR ? "למשל: \"נזילה בשירותים קומה 2, לשלוח לשלמה חיים, דחוף, להזכיר לי ביום ראשון\"" : "הטלפון הזה לא תומך בהקלטה – אפשר להקליד או ללחוץ על המיקרופון במקלדת") + '</div>' +
-      (SR ? '<button type="button" class="vc-mic rec" id="vcMic" aria-label="עצירה">' + ic("mic", 30) + '</button>' : '') +
+      (SR ? '<button type="button" class="vc-mic" id="vcMic" aria-label="התחלת הקלטה">' + ic("mic", 30) + '</button>' : '') +
       '<div class="vc-row"><button type="button" class="vc-btn dark" id="vcGo">' + ic("spark", 18) + 'הסוכן יבין</button><button type="button" class="vc-btn soft" data-sh-close>ביטול</button></div>');
     if (!sh) return;
     var ta = sh.querySelector("#vcText"), mic = sh.querySelector("#vcMic"), barsEl = sh.querySelector("#vcBars");
-    var rec = null, on = false, finalTx = "", t0 = Date.now(), timer = null, levels = null, stream = null, raf = null;
-
+    var rec = null, on = false, finalTx = "", t0 = Date.now(), timer = null, restarts = 0, gotAny = false;
+    var ANDROID = /Android/i.test(navigator.userAgent);
+    var tip = sh.querySelector(".vc-tip");
     function setState(t){ var el = sh.querySelector("#vcState"); if (el) el.textContent = t; }
-    function stop(){
-      on = false;
-      try { rec && rec.stop(); } catch (e) {}
-      clearInterval(timer); cancelAnimationFrame(raf);
-      try { stream && stream.getTracks().forEach(function(t){ t.stop(); }); } catch (e) {}
-      if (mic) { mic.classList.remove("rec"); mic.setAttribute("aria-label", "המשך הקלטה"); }
-      if (barsEl) { barsEl.classList.add("idle"); barsEl.querySelectorAll("i").forEach(function(b){ b.style.height = "8px"; }); }
-      setState(ta.value.trim() ? "אפשר לתקן ואז להמשיך" : "לא נקלט דיבור – נסה שוב או כתוב");
+    function setTip(t, warn){ if (tip) { tip.textContent = t; tip.style.color = warn ? "#b86e00" : ""; } }
+    function ui(rec_){
+      if (mic) { mic.classList.toggle("rec", rec_); mic.setAttribute("aria-label", rec_ ? "עצירה" : "התחלת הקלטה"); }
+      if (barsEl) barsEl.classList.toggle("idle", !rec_);
     }
-    function start(){
-      if (!SR) return;
-      on = true; finalTx = ta.value.trim() ? ta.value.trim() + " " : "";
-      if (mic) { mic.classList.add("rec"); mic.setAttribute("aria-label", "עצירה"); }
-      if (barsEl) barsEl.classList.remove("idle");
-      setState("מקליט…"); t0 = Date.now();
-      clearInterval(timer);
-      timer = setInterval(function(){ var s = Math.floor((Date.now() - t0) / 1000), el = sh.querySelector("#vcTime"); if (el) el.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); if (!document.body.contains(sh)) stop(); }, 500);
-      rec = new SR(); rec.lang = "he-IL"; rec.continuous = true; rec.interimResults = true;
-      rec.onresult = function(ev){
+    /* עצירה – תמיד עובדת: מכבים את הדגל קודם, ואם המנוע לא נעצר תוך שנייה – abort */
+    function stop(msg){
+      on = false; clearInterval(timer);
+      var r = rec; rec = null;
+      if (r) { try { r.onend = null; r.onresult = null; r.onerror = null; r.stop(); } catch (e) {} setTimeout(function(){ try { r.abort(); } catch (e) {} }, 900); }
+      ui(false);
+      setState(msg || (ta.value.trim() ? "אפשר לתקן ואז ללחוץ \"הסוכן יבין\"" : "לא נקלט דיבור – לחץ על המיקרופון ונסה שוב"));
+    }
+    function begin(){
+      /* באנדרואיד: מצב רציף לא יציב – מקליטים משפט, וממשיכים אוטומטית (עד שלוחצים עצירה) */
+      var r = new SR(); rec = r;
+      r.lang = "he-IL"; r.continuous = !ANDROID; r.interimResults = true; r.maxAlternatives = 1;
+      r.onresult = function(ev){
+        if (rec !== r) return;
         var interim = "";
         for (var i = ev.resultIndex; i < ev.results.length; i++) {
-          if (ev.results[i].isFinal) finalTx += ev.results[i][0].transcript.trim() + " ";
-          else interim += ev.results[i][0].transcript;
+          var tx = ev.results[i][0].transcript;
+          if (ev.results[i].isFinal) { finalTx += tx.trim() + " "; gotAny = true; restarts = 0; }
+          else interim += tx;
         }
         ta.value = (finalTx + interim).trim();
+        if (barsEl) barsEl.classList.add("talk");
+        clearTimeout(r._q); r._q = setTimeout(function(){ if (barsEl) barsEl.classList.remove("talk"); }, 600);
       };
-      rec.onerror = function(ev){
-        if (ev.error === "not-allowed" || ev.error === "service-not-allowed" || ev.error === "audio-capture") {
-          on = false; stop(); setState("אין גישה למיקרופון");
-          var tip = sh.querySelector(".vc-tip"); if (tip) { tip.textContent = "צריך לאשר לדפדפן גישה למיקרופון (בהגדרות האתר). בינתיים אפשר להקליד כאן, או ללחוץ על המיקרופון שבמקלדת."; tip.style.color = "#b86e00"; }
-          try { ta.focus(); } catch (e) {}
-        }
+      r.onerror = function(ev){
+        if (rec !== r) return;
+        var e = ev.error;
+        if (e === "no-speech" || e === "aborted") return;   // שקט – onend ימשיך
+        if (e === "not-allowed" || e === "service-not-allowed") { stop("אין הרשאה למיקרופון"); setTip("צריך לאשר לאתר גישה למיקרופון (בהגדרות האתר בדפדפן). בינתיים אפשר להקליד, או ללחוץ על המיקרופון שבמקלדת של הטלפון.", true); return; }
+        if (e === "audio-capture") { stop("המיקרופון תפוס"); setTip("אפליקציה אחרת משתמשת במיקרופון. סגור אותה ונסה שוב, או הקלד / השתמש במיקרופון שבמקלדת.", true); return; }
+        if (e === "network") { stop("אין חיבור לזיהוי דיבור"); setTip("זיהוי הדיבור של הטלפון צריך אינטרנט. אפשר להקליד, או להשתמש במיקרופון שבמקלדת.", true); return; }
+        if (e === "language-not-supported") { stop("עברית לא נתמכת בזיהוי הדיבור כאן"); setTip("אפשר להשתמש במיקרופון שבמקלדת של הטלפון (בוחרים עברית במקלדת).", true); return; }
+        stop("ההקלטה נעצרה (" + e + ")");
       };
-      rec.onend = function(){ if (on && document.body.contains(sh)) { try { rec.start(); } catch (e) { stop(); } } };   // אנדרואיד עוצר אחרי שקט – ממשיכים
-      try { rec.start(); } catch (e) { stop(); }
-      /* גלים לפי עוצמת הקול (רק להצגה – הקול לא נשמר) */
-      try {
-        navigator.mediaDevices.getUserMedia({ audio: true }).then(function(st){
-          if (!on) { st.getTracks().forEach(function(t){ t.stop(); }); return; }
-          stream = st; var ctx = new (window.AudioContext || window.webkitAudioContext)(), an = ctx.createAnalyser(); an.fftSize = 64;
-          ctx.createMediaStreamSource(st).connect(an); levels = new Uint8Array(an.frequencyBinCount);
-          var bs = barsEl ? barsEl.querySelectorAll("i") : [];
-          (function loop(){ if (!on) { try { ctx.close(); } catch (e) {} return; } an.getByteFrequencyData(levels); bs.forEach(function(b, i){ b.style.height = Math.max(6, Math.min(56, levels[(i % 16) + 1] / 4.5)) + "px"; }); raf = requestAnimationFrame(loop); })();
-        }).catch(function(){});
-      } catch (e) {}
+      r.onend = function(){
+        if (rec !== r || !on) return;
+        if (!document.body.contains(sh)) { stop(); return; }
+        restarts++;
+        if (restarts > (gotAny ? 6 : 3)) { stop(gotAny ? "" : "לא נקלט דיבור"); if (!gotAny) setTip("לא שמעתי דיבור. נסה לדבר קרוב לטלפון, או לחץ במקלדת על סמל המיקרופון ודבר – גם זה עובד.", true); return; }
+        setTimeout(function(){ if (on && rec === r) { try { begin(); } catch (e) { stop(); } } }, 250);
+      };
+      try { r.start(); } catch (e) { stop("לא הצלחתי להתחיל הקלטה"); }
+    }
+    function start(){
+      if (!SR || on) return;
+      on = true; restarts = 0; gotAny = false;
+      finalTx = ta.value.trim() ? ta.value.trim() + " " : "";
+      ui(true); setState("מקליט… דבר עכשיו"); setTip("לסיום – לחץ על המיקרופון, ואז \"הסוכן יבין\"");
+      t0 = Date.now(); clearInterval(timer);
+      timer = setInterval(function(){
+        if (!document.body.contains(sh)) { stop(); return; }
+        var s = Math.floor((Date.now() - t0) / 1000), el = sh.querySelector("#vcTime"); if (el) el.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+        if (s >= 120) stop("הגעת לשתי דקות – ההקלטה נעצרה");
+      }, 500);
+      begin();
     }
     if (mic) mic.addEventListener("click", function(){ if (on) stop(); else start(); });
     sh.querySelector("#vcGo").addEventListener("click", function(){
@@ -133,7 +152,9 @@
       if (!text) { setState("לא נקלט כלום עדיין"); return; }
       understand(text);
     });
-    if (SR) start(); else setTimeout(function(){ ta.focus(); }, 200);
+    /* מתחילים רק בלחיצה על המיקרופון (בטלפונים זיהוי דיבור צריך לחיצה של המשתמש) */
+    if (SR) { ui(false); setState("לחץ על המיקרופון ודבר"); setTip("אפשר גם להקליד, או ללחוץ על המיקרופון שבמקלדת של הטלפון"); }
+    else setTimeout(function(){ ta.focus(); }, 200);
   };
 
   /* ---------- שלב 2: הסוכן מבין ---------- */

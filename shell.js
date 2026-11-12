@@ -546,6 +546,39 @@
     document.addEventListener("click", function(e){ if (block && card(e)) { e.stopPropagation(); e.preventDefault(); } }, true);
   })();
 
+  /* ---------- טלפון: שלא ייצאו מהאפליקציה בטעות (נובמבר 2026) ----------
+     1. "חזור" של הטלפון (כפתור או החלקה מהקצה) סוגר חלון פתוח / חוזר לבית – ולא יוצא מהאפליקציה.
+        מהבית: לחיצה שנייה תוך 2 שניות כן יוצאת.
+     2. אחרי רענון (למשל אם הדפדפן רענן לבד) – חוזרים לטאב שהיה פתוח. */
+  (function(){
+    var mobile = function(){ return window.innerWidth <= 760; };
+    var armed = false, lastBack = 0;
+    function arm(){ try { if (!history.state || !history.state.shGuard) history.pushState({ shGuard: 1 }, ""); armed = true; } catch (e) {} }
+    window.addEventListener("popstate", function(){
+      if (!armed || !mobile()) return;
+      if (openSheet) { closeSheet(); arm(); return; }
+      var ov = [].slice.call(document.querySelectorAll(".modal-overlay, .modal")).filter(function(m){ return m.offsetParent !== null || getComputedStyle(m).display === "flex"; });
+      if (ov.length) { var m = ov[ov.length - 1]; var x = m.querySelector("[data-close],.sh-x,.icon-btn,.close,.modal-close"); if (x) x.click(); else m.style.display = "none"; arm(); return; }
+      var t = cur();
+      if (t && t !== "dashboard" && can("dashboard")) { go("dashboard"); arm(); return; }
+      if (Date.now() - lastBack < 2000) { armed = false; history.back(); return; }
+      lastBack = Date.now(); arm();
+      try { showToast("לחץ שוב \"חזור\" כדי לצאת מהאפליקציה"); } catch (e) {}   // eslint-disable-line no-undef
+    });
+    var tries = 0;
+    (function wait(){
+      tries++;
+      var ready = false; try { ready = typeof cloudReady !== "undefined" && cloudReady && !!role(); } catch (e) {}   // eslint-disable-line no-undef
+      if (!ready) { if (tries < 90) setTimeout(wait, 700); return; }
+      if (mobile()) arm();
+      try {
+        var want = sessionStorage.getItem("shLastTab");
+        if (want && want !== cur() && can(want)) go(want);
+      } catch (e) {}
+    })();
+    setInterval(function(){ try { var t = cur(); if (t) sessionStorage.setItem("shLastTab", t); } catch (e) {} }, 1500);
+  })();
+
   /* ---------- בניית הסרגלים ---------- */
   var BAR = ["tasks", "procurement", "licensing", "staff"];
   var top, bar, lastSig = "";

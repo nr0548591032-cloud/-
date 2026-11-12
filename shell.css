@@ -408,3 +408,13 @@
 .tk-swbg span{ display:inline-flex; align-items:center; gap:6px; opacity:.6; transition:opacity .12s; } .tk-swbg.go span{ opacity:1; }
 @media (max-width:760px){ #tab-tasks .tk-col-body::after{ content:""; display:block; } }
 @media (max-width:760px){ body.sh-on #tkView::before{ content:"החלקה ימינה = בוצע · החלקה שמאלה = הודעה לאיש המקצוע"; display:block; text-align:center; font-size:12px; color:#7a7166; margin:2px 0 8px; } }
+
+/* טלפון: בלי "משיכה לרענון" של הדפדפן – הוא היה מרענן את האפליקציה באמצע גלילה */
+html, body{ overscroll-behavior-y:contain; }
+.sh-sheet, .modal-box, .modal-overlay, #sp-cm, .tk-drawer{ overscroll-behavior:contain; }
+/* החלקה על כרטיס משימה – רק הכרטיס זז, לא המסך */
+@media (max-width:760px){
+  #tab-tasks .tk-card{ touch-action:pan-y; }
+  #tab-tasks .tk-col-body, #tab-tasks .tk-col, #tkView{ overflow-x:clip; }
+  html, body{ overflow-x:hidden; }
+}
