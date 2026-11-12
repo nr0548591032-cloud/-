@@ -156,6 +156,11 @@
 .sh-wh{ display:flex; align-items:center; gap:8px; min-height:34px; }
 .sh-wh b{ flex:1; font-size:14px; }
 .sh-wi{ width:28px; height:28px; border-radius:9px; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; }
+.sh-fold{ height:32px; border:none; border-radius:10px; background:rgba(255,255,255,.22); color:#fff; font-family:inherit; font-size:12.5px; font-weight:700; padding:0 10px; display:none; align-items:center; gap:5px; cursor:pointer; }
+.sh-fold[aria-pressed="true"]{ background:#fff; color:var(--mc, #c67139); }
+.sh-wait.sh-calm .sh-fold{ background:color-mix(in srgb, var(--mc, #c67139) 14%, #fff); color:var(--mc, #c67139); }
+.sh-wait.sh-calm .sh-fold[aria-pressed="true"]{ background:var(--mc, #c67139); color:#fff; }
+@media (max-width:760px){ .sh-fold{ display:inline-flex; } }
 .sh-more{ width:36px; height:32px; border:none; border-radius:10px; background:rgba(255,255,255,.22); color:#fff; font-size:20px; font-weight:700; line-height:1; cursor:pointer; font-family:inherit; }
 .sh-wr{ display:flex; align-items:center; gap:9px; padding:7px 0; border-top:1px solid rgba(255,255,255,.18); }
 .sh-wr i{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
@@ -212,4 +217,42 @@
   body.sh-on #supplyApp > .sp-head{ min-height:0; }
   body.sh-admin #sp-tiles{ display:none !important; }   /* במקומם: "מה מחכה לך כאן" למעלה */
   body.sh-on .sh-wait{ margin:2px 0 12px; }
+}
+
+/* ======================================================================
+   בטלפון – פריסה צפופה כמו במוקאפ (נובמבר 2026). רק תצוגה: שום כפתור או נתון לא הוסר.
+   ====================================================================== */
+@media (max-width:760px){
+  /* שורות הסבר קבועות – בטלפון הן תופסות מסך שלם */
+  body.sh-on .tab-content p.hint{ display:none !important; }
+
+  /* רכש: 4 הקבוצות בשורה אחת */
+  body.sh-on #sp-pills > .sp-pill{ flex:1 1 0; min-width:0; justify-content:center; padding-inline:6px; font-size:13px; gap:4px; }
+  body.sh-on #sp-pills > .sp-pill svg{ display:none; }
+  body.sh-on #sp-pills .sp-subpills button{ padding:6px 9px; font-size:12.5px; }
+
+  /* כרטיסי מספרים: נמוכים ושניים בשורה */
+  body.sh-on #tab-keys .cards, body.sh-on #tab-finance .cards{ display:grid !important; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
+  body.sh-on #tab-keys .cards .stat, body.sh-on #tab-finance .cards .stat{ padding:9px 12px; min-height:0; }
+  body.sh-on .ct-kpis{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
+  body.sh-on .ct-kpi{ padding:9px 12px; border-radius:14px; }
+  body.sh-on .ct-kpi .s{ display:none; }
+  body.sh-on .sc-stats{ grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; }
+  body.sh-on .sc-stats > *{ padding:8px 9px !important; }
+
+  /* מפתחות: שני כרטיסים בשורה, נמוכים */
+  body.sh-on .key-grid{ grid-template-columns:repeat(2, minmax(0,1fr)) !important; gap:8px !important; }
+  body.sh-on .key-card{ padding:9px 10px !important; gap:3px !important; }
+  body.sh-on .key-card .kc-code{ font-size:14px; }
+  body.sh-on .key-card .kc-loc{ font-size:12.5px; line-height:1.35; }
+  body.sh-on .key-card .kc-foot{ padding-top:4px; }
+
+  /* אנשי קשר: כרטיס בשורה אחת – שם, תחום ופעולות. הפרטים המלאים בלחיצה */
+  body.sh-on .ct-grid{ gap:8px; }
+  body.sh-on .ct-card{ flex-direction:row; flex-wrap:wrap; align-items:center; padding:10px 12px; gap:8px; border-radius:16px; }
+  body.sh-on .ct-card .ct-card-top{ flex:1 1 60%; min-width:0; gap:10px; }
+  body.sh-on .ct-card .ct-av{ width:38px !important; height:38px !important; font-size:14px !important; }
+  body.sh-on .ct-card .ct-tags, body.sh-on .ct-card .ct-mets, body.sh-on .ct-card .ct-stars.none{ display:none; }
+  body.sh-on .ct-card .ct-acts{ gap:6px; }
+  body.sh-on .ct-card .ct-acts .ab{ flex:0 0 36px; min-height:36px; height:36px; border-radius:11px; }
 }

@@ -20174,7 +20174,7 @@ async function autoBackupIfDue(){
 .spx .bk-line{display:flex;align-items:center;gap:8px}
 .spx .bk-name{flex:1;min-width:0;display:block;text-align:right;background:none;border:0;padding:2px 0;font:inherit;color:inherit;cursor:pointer}
 .spx .bk-c .bk-n{font-family:inherit;font-weight:700;font-size:14.5px}
-.spx .bk-sub{display:block;font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spx .bk-sub{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;margin-top:2px;line-height:1.45}
 .spx .bk-cheap{color:var(--green,#18864c);font-weight:700}
 .spx .bk-oth{color:#b86e00;font-weight:600}
 .spx .bk-warn{color:var(--red,#d6362f);font-weight:600;display:inline-flex;align-items:center;gap:4px}
@@ -20183,6 +20183,7 @@ async function autoBackupIfDue(){
 .spx .bk-step button{width:32px;height:32px;border-radius:11px;border:0;font-size:18px;line-height:1;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
 .spx .bk-m{background:var(--sp-chip,#eee7db);color:var(--sp-ink,#201e1d)}
 .spx .bk-p{background:var(--sp-brand,#0e9a9a);color:#fff}
+.spx .bk-step input::placeholder{color:var(--sp-soft,#9a9083);font-weight:400}
 .spx .bk-step input{width:38px;height:32px;border:0;background:transparent;text-align:center;font-weight:700;font-size:15px;padding:0;-moz-appearance:textfield}
 .spx .bk-step input::-webkit-outer-spin-button,.spx .bk-step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .spx .bk-step .bk-u{width:38px;text-align:center;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

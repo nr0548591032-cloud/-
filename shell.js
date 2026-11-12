@@ -48,6 +48,7 @@
     folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
     wrench:'<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5z"/>',
     receipt:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+    filter:'<path d="M4 5h16l-6 8v5l-4 2v-7z"/>',
     clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
     camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
@@ -340,6 +341,24 @@
     return list;
   }
   var LVL = { 1: "#ff8a80", 2: "#ffd166", 3: "rgba(255,255,255,.75)" };
+  /* בטלפון, כמו במוקאפ: כלי החיפוש והסינון של הטאב מקופלים מאחורי כפתור "סינון" בפס העליון.
+     שום כלי לא הוסר – לחיצה פותחת אותם, ולחיצה נוספת מקפלת. */
+  var FOLD = {
+    licensing: ["#licRoot .lc-search", "#licYearFilter", "#licSortBy", "#lcPills"],
+    tasks: ["#mtRoot .mt-chips"],
+    staff: ["#tab-staff .sc-instbar", "#staffCardsView > div:first-child"],
+    accountant: ["#combinedReportAnchor"],
+    keys: ["#keysSubInv .toolbar-sticky select", "#keysSubInv .toolbar-push"],
+    files: ["#tab-files .fx-bar"],
+    contacts: ["#ctRoot .ct-chips", "#ctRoot .ct-sort"]
+  };
+  (function(){
+    var css = Object.keys(FOLD).map(function(t){
+      return FOLD[t].map(function(sel){ return "body.sh-admin:not(.sh-unfold-" + t + ") " + sel; }).join(",") + "{display:none!important}";
+    }).join("\n");
+    var st = document.createElement("style"); st.id = "shFoldCss"; st.textContent = "@media (max-width:760px){" + css + "}";
+    (document.head || document.documentElement).appendChild(st);
+  })();
   function strip(t){
     var sec = document.getElementById("tab-" + t);
     if (!sec) return;
@@ -348,11 +367,12 @@
     if (!el) { el = document.createElement("div"); el.className = "sh-wait"; sec.insertBefore(el, sec.firstChild); }
     var list = alertsFor(t), shown = list.slice(0, 3);
     el.style.setProperty("--mc", col(t));
-    var sig = t + "|" + list.map(function(a){ return a.title + a.n; }).join("|");
+    var sig = t + "|" + document.body.classList.contains("sh-unfold-" + t) + "|" + list.map(function(a){ return a.title + a.n; }).join("|");
     if (el.getAttribute("data-sig") === sig) return;
     el.setAttribute("data-sig", sig);
     el.classList.toggle("sh-calm", !list.length);
     el.innerHTML = '<div class="sh-wh"><span class="sh-wi">' + ic(TAB_IC[t] || "file", 18) + '</span><b>' + (list.length ? "מה מחכה לך כאן · " + list.length : "הכל מסודר כאן") + '</b>' +
+      (FOLD[t] ? '<button type="button" class="sh-fold" data-sh-fold="' + t + '" aria-pressed="' + (document.body.classList.contains("sh-unfold-" + t)) + '">' + ic("filter", 15) + '<span>סינון</span></button>' : '') +
       '<button type="button" class="sh-more" data-sh-more="' + t + '" aria-label="כל הפעולות ב' + esc(label(t)) + '">⋯</button></div>' +
       shown.map(function(a, i){
         return '<div class="sh-wr"><i style="background:' + (LVL[a.lvl] || LVL[3]) + '"></i><span><b>' + esc(a.title) + '</b>' + (a.sub ? '<small>' + esc(a.sub) + '</small>' : '') + '</span>' +
@@ -384,6 +404,8 @@
     });
   }
   document.addEventListener("click", function(e){
+    var fb = e.target.closest && e.target.closest("[data-sh-fold]");
+    if (fb) { var ft = fb.getAttribute("data-sh-fold"); document.body.classList.toggle("sh-unfold-" + ft); try { strip(ft); } catch (er) {} return; }
     var b = e.target.closest && e.target.closest("[data-sh-more],[data-sh-wa],[data-sh-wall]"); if (!b) return;
     if (b.hasAttribute("data-sh-more")) { openMore(b.getAttribute("data-sh-more")); return; }
     if (b.hasAttribute("data-sh-wall")) { openWaitAll(b.getAttribute("data-sh-wall")); return; }
