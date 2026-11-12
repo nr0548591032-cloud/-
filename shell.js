@@ -328,7 +328,13 @@
       alertsCache.t = now;
       try { alertsCache.list = dbAlerts(dbCollect()) || []; } catch (e) { alertsCache.list = []; }   // eslint-disable-line no-undef
     }
-    return alertsCache.list.filter(function(a){ return a && a.tab === t; });
+    var list = alertsCache.list.filter(function(a){ return a && a.tab === t; });
+    /* תוספות לטאבים שאין להם התראה בלוח הבקרה */
+    if (t === "files") {
+      try { var lf = unlinkedFiles(); if (lf && lf.length) list.unshift({ lvl: 2, title: lf.length + " מסמכים מחכים לשיוך", sub: "חשבוניות וקבלות שעוד לא שויכו לרכישה או למשימה", tab: "files",  // eslint-disable-line no-undef
+        act: function(){ go("files"); later(function(){ call("setJobsFilter", "loose"); }); } }); } catch (e) {}
+    }
+    return list;
   }
   var LVL = { 1: "#ff8a80", 2: "#ffd166", 3: "rgba(255,255,255,.75)" };
   function strip(t){

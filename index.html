@@ -3420,7 +3420,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261115; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261114; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -17905,33 +17905,17 @@ function fileToBase64(file){
   });
 }
 async function analyzeQuoteWithAI(file){
+  /* נובמבר 2026: דרך השרת של הסוכן (/api/ai). קודם הפנייה הייתה ישירות מהדפדפן בלי מפתח ולכן תמיד נכשלה */
+  if(typeof window.aiRead !== "function") return null;
   const isImage = file.type.startsWith("image/");
   const isPdf = file.type === "application/pdf";
   if(!isImage && !isPdf) return null;
-  const base64 = await fileToBase64(file);
-  const contentBlock = isImage
-    ? { type:"image", source:{ type:"base64", media_type:file.type, data:base64 } }
-    : { type:"document", source:{ type:"base64", media_type:"application/pdf", data:base64 } };
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: 500,
-      messages: [{
-        role: "user",
-        content: [
-          contentBlock,
-          { type:"text", text: "זו הצעת מחיר מספק. חלץ ממנה: שם הספק/החברה, הסכום הכולל הסופי (מספר בלבד, ללא סימני מטבע או פסיקים), ותמצית קצרה (עד שני משפטים) של התנאים העיקריים. החזר אך ורק אובייקט JSON תקני בפורמט המדויק הזה, ללא שום טקסט נוסף: {\"vendor\":\"...\",\"price\":0,\"notes\":\"...\"}" }
-        ]
-      }]
-    })
-  });
-  if(!response.ok) throw new Error("שגיאת שרת בניתוח: " + response.status);
-  const json = await response.json();
-  const textBlocks = (json.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
-  const clean = textBlocks.replace(/```json|```/g,"").trim();
-  try{ return JSON.parse(clean); }catch(e){ return null; }
+  const res = await window.aiRead({ task: "document", file, hint: "זו הצעת מחיר מספק לפרויקט" });
+  if(!res || !res.ok || !res.data) throw new Error((res && res.error) || "הניתוח נכשל");
+  const d = res.data;
+  const items = (d.line_items || []).slice(0, 4).map(x => x && x.text).filter(Boolean).join(", ");
+  const notes = [d.subject, items, d.valid_until ? "בתוקף עד " + d.valid_until : ""].filter(Boolean).join(" · ").slice(0, 300);
+  return { vendor: d.supplier || "", price: Number(d.total) || 0, notes };
 }
 
 function renderQuotes(){
@@ -19964,6 +19948,10 @@ async function autoBackupIfDue(){
 .spx svg.i.sm{width:14px;height:14px}
 .spx .sp-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .spx .sp-pills::-webkit-scrollbar{display:none}
+.spx .sp-pills{flex-wrap:wrap;overflow:visible}
+.spx .sp-subpills{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:4px;background:var(--sp-card);border-radius:12px;padding:3px;margin-top:2px;box-shadow:inset 0 0 0 1px var(--sp-line)}
+.spx .sp-subpills button{border:none;background:none;border-radius:9px;padding:6px 12px;font:600 13px var(--sp-f-body);color:var(--sp-soft);cursor:pointer}
+.spx .sp-subpills button[aria-selected="true"]{background:var(--m-procurement,#0e9a9a);color:#fff}
 .spx .sp-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--sp-line);background:var(--sp-card);color:var(--sp-ink);
   border-radius:999px;padding:7px 13px;font:500 14px var(--sp-f-body);cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
 .spx .sp-pill[aria-selected="true"]{background:var(--sp-brand-dark);color:var(--sp-bg);border-color:transparent}
@@ -20841,7 +20829,22 @@ const openReqs = () => S.requests.filter(r=>r.status==='open');
 
 function renderTop(){
   const cnt = {basket: bkActive().length || openReqs().length || '', orders: S.orders.filter(o=>o.status==='sent').length || '', stock: (expiringSoon().length + belowMin().length) || '', requests: openReqs().length || ''};
-  $('#sp-pills').innerHTML = tabs().map(t => `<button class="sp-pill" role="tab" aria-selected="${t.id===tab}" onclick="with(SP){setTab('${t.id}')}">${ic(t.icon,'sm')}${t.label}${cnt[t.id]?`<span class="cnt sp-num">${cnt[t.id]}</span>`:''}</button>`).join('');
+  /* נובמבר 2026: 4 קבוצות במקום 8 כפתורים. כל המסכים נשארו – מסך שני ושלישי של קבוצה מופיע כשורה קטנה מתחת */
+  const all = tabs(), has = id => all.some(t => t.id === id), byId = id => all.find(t => t.id === id);
+  const GROUPS = isCook() ? null : [
+    {label:'הזמנה', icon:'cart', views:['basket','orders','general']},
+    {label:'מחירונים', icon:'tag', views:['lists','analyze','legacy']},
+    {label:'מלאי', icon:'box', views:['stock']},
+    {label:'תפריט ודוח', icon:'menu', views:['menu','report']}
+  ].map(g => ({...g, views: g.views.filter(has)})).filter(g => g.views.length);
+  if(!GROUPS){
+    $('#sp-pills').innerHTML = all.map(t => `<button class="sp-pill" role="tab" aria-selected="${t.id===tab}" onclick="with(SP){setTab('${t.id}')}">${ic(t.icon,'sm')}${t.label}${cnt[t.id]?`<span class="cnt sp-num">${cnt[t.id]}</span>`:''}</button>`).join('');
+  } else {
+    const curG = GROUPS.find(g => g.views.includes(tab)) || GROUPS[0];
+    const sumC = g => g.views.reduce((n, v) => n + (Number(cnt[v]) || 0), 0);
+    $('#sp-pills').innerHTML = GROUPS.map(g => `<button class="sp-pill" role="tab" aria-selected="${g===curG}" onclick="with(SP){setTab('${g===curG ? tab : g.views[0]}')}">${ic(g.icon,'sm')}${g.label}${sumC(g)?`<span class="cnt sp-num">${sumC(g)}</span>`:''}</button>`).join('') +
+      (curG.views.length > 1 ? `<div class="sp-subpills" role="tablist" aria-label="${esc(curG.label)}">${curG.views.map(v => { const t = byId(v); return `<button role="tab" aria-selected="${v===tab}" onclick="with(SP){setTab('${v}')}">${t.label}${cnt[v]?` <span class="sp-num">(${cnt[v]})</span>`:''}</button>`; }).join('')}</div>` : '');
+  }
   const open = S.orders.filter(o=>o.status==='sent'), exp = expiringSoon(), bm = belowMin();
   if(isCook()){
     const todayMeals = mealsOf(weekNumOf(today()), new Date().getDay());
