@@ -620,6 +620,23 @@
   .key-card:nth-child(even), .holder-card:nth-child(even){ background:var(--tint-b); }
   .key-card:hover, .holder-card:hover{ transform:translateY(-3px); box-shadow:0 4px 10px rgba(16,27,36,.1), 0 12px 26px rgba(16,27,36,.12); }
   .key-card.mismatch{ border-right-color:var(--red); }
+  #staffClose .scc{ background:#fbf7f0; border-radius:18px; padding:12px 14px; margin:0 0 14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); display:flex; flex-direction:column; gap:10px; }
+  .scc-h{ display:flex; align-items:center; justify-content:space-between; gap:8px; } .scc-h b{ font-size:15px; display:inline-flex; align-items:center; gap:6px; } .scc-h span{ font-size:12px; color:var(--ink-soft); font-weight:600; }
+  .scc-steps{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; }
+  .scc-steps div{ border-radius:12px; padding:8px 4px; text-align:center; font-size:12px; font-weight:700; background:#eee7db; color:#645c50; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .scc-steps div.on{ background:var(--m-staff, #2f74d0); color:#fff; } .scc-steps div.done{ background:#ddf3e5; color:#18864c; }
+  .scc-sum{ display:flex; flex-wrap:wrap; gap:6px 14px; font-size:12.5px; color:var(--ink-soft); } .scc-sum b{ color:var(--ink); font-size:14px; } .scc-sum .bad b{ color:#d6362f; }
+  .scc-miss{ display:flex; flex-direction:column; gap:4px; }
+  .scc-miss button{ display:flex; justify-content:space-between; gap:8px; border:none; background:#fde3e1; color:#7a2520; border-radius:10px; padding:7px 10px; font:inherit; font-size:12.5px; cursor:pointer; text-align:right; }
+  .scc-miss button span{ color:#d6362f; font-weight:600; } .scc-miss button.more{ background:none; color:#d6362f; justify-content:center; font-weight:700; }
+  .scc-btn{ display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:44px; border:none; border-radius:13px; background:var(--m-staff, #2f74d0); color:#fff; font:inherit; font-size:14px; font-weight:700; cursor:pointer; padding:0 14px; }
+  .scc-btn.dark{ background:#2b2723; } .scc-btn.ghost{ background:#eee7db; color:#201e1d; align-self:flex-start; min-height:38px; }
+  .scc-sub{ font-size:12.5px; color:var(--ink-soft); }
+  .scc-done{ border:1.5px solid #bfe0cb; }
+  /* פעימה סגורה: הכרטיסים לקריאה בלבד */
+  #tab-staff.sc-locked #staffBody input, #tab-staff.sc-locked #staffBody select, #tab-staff.sc-locked #staffBody textarea{ pointer-events:none; background:#f3eee6 !important; color:#645c50 !important; }
+  #tab-staff.sc-locked #staffBody button:not(.sc-chev):not(.mob-toggle){ pointer-events:none; opacity:.5; }
+  #tab-staff.sc-locked .toolbar .btn[onclick="addStaffRow()"]{ pointer-events:none; opacity:.45; }
   #licTimeline .ltl{ background:#fbf7f0; border-radius:18px; padding:12px 14px; margin-bottom:14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); }
   .ltl-h{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; } .ltl-h b{ font-size:15px; } .ltl-h span{ font-size:12px; color:var(--ink-soft); }
   .ltl-r{ display:flex; align-items:flex-start; gap:10px; width:100%; padding:8px 0; border:none; border-top:1px solid rgba(32,30,29,.07); background:none; font:inherit; text-align:right; cursor:pointer; color:inherit; }
@@ -2837,6 +2854,7 @@ button.ct-tl:hover{background:#fbf7f0}
         <button type="button" class="sc-link-btn" onclick="openBankModal()">כל פרטי הבנק</button>
         <button type="button" class="sc-link-btn" onclick="openRosterExportModal()">דוח שמות וסכומים</button>
       </div>
+      <div id="staffClose"></div>
       <div class="sc-stats">
         <div class="sc-stat"><small>סה"כ לתשלום לפעימה</small><b id="staffTotal"></b></div>
         <div class="sc-stat"><small>אושרו לתשלום</small><b id="staffApprovedCount"></b></div>
@@ -3445,7 +3463,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261123; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261124; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -11320,6 +11338,106 @@ function renderStaff(){
   updateStaffSummary();
   renderRoleCatalogDatalist();
   applyStaffView();
+  try{ renderStaffClose(); }catch(e){ console.error(e); }
+}
+
+/* ====================================================================
+   סגירת פעימה – 3 שלבים (נובמבר 2026)
+   1. בדיקה: מי מוכן ולמי חסר (פרטי בנק / סכום / תפקיד).
+   2. אישור: "אושר לתשלום" בלחיצה אחת לכל המוכנים.
+   3. שליחה למנהל החשבונות (חלון השליחה הרגיל), ואז "סגירת הפעימה".
+   פעימה סגורה = הכרטיסים נעולים לעריכה עד "פתיחה מחדש" באישור.
+   שום סכום לא משתנה כאן – רק סימון אושר / נסגר.
+   ==================================================================== */
+function scRowsOf(idx){ return (data.installments[idx] || []).filter(r => r && String(r.name || "").trim()); }
+function scCheckRow(r){
+  const miss = [];
+  let amount = 0; try{ amount = computeStaffTotal(r); }catch(e){}
+  if(!(amount > 0)) miss.push("סכום");
+  const b = acxBankFor("s", r); if(!String(b.account || "").trim()) miss.push("פרטי בנק");
+  if(!String(r.role || "").trim()) miss.push("תפקיד");
+  return { r, amount, miss, paid: acctStatusOf(r) === "שולם", sent: !!r.sentAt };
+}
+function scIsClosed(idx){ const L = scRowsOf(idx); return L.length > 0 && L.every(r => r.periodClosed); }
+let scCloseOpen = false;
+function renderStaffClose(){
+  const box = document.getElementById("staffClose");
+  if(!box) return;
+  if(currentRole !== "admin"){ box.innerHTML = ""; return; }
+  const idx = activeInstallment, rows = scRowsOf(idx).map(scCheckRow);
+  const tabSec = document.getElementById("tab-staff");
+  const closed = scIsClosed(idx);
+  if(tabSec) tabSec.classList.toggle("sc-locked", closed);
+  if(!rows.length){ box.innerHTML = ""; return; }
+  const fmt = d => { if(!d) return ""; const x = new Date(d); return isNaN(x) ? d : x.toLocaleDateString("he-IL"); };
+  if(closed){
+    const when = rows.map(x => x.r.periodClosed).sort().pop();
+    box.innerHTML = `<div class="scc scc-done"><div class="scc-h"><b>${svgIcon("lock", 16)} הפעימה סגורה</b><span>נסגרה ${escHtml(fmt(when))}</span></div>
+      <div class="scc-sub">${rows.length} עובדים · ${fmtMoney(rows.reduce((s, x) => s + x.amount, 0))} · הכרטיסים נעולים לעריכה</div>
+      <button type="button" class="scc-btn ghost" onclick="scReopen()">פתיחה מחדש</button></div>`;
+    return;
+  }
+  const ready = rows.filter(x => !x.miss.length), missing = rows.filter(x => x.miss.length);
+  const approved = rows.filter(x => x.r.approved), toApprove = ready.filter(x => !x.r.approved);
+  const unsent = approved.filter(x => !x.sent && !x.paid);
+  const step = toApprove.length || (missing.length && !approved.length) ? (approved.length ? 2 : 1) : (unsent.length ? 3 : 4);
+  const stepName = ["", "בדיקה", "אישור", "שליחה למנה״ח", "סגירה"];
+  const head = `<div class="scc-h"><b>סגירת פעימה – 3 שלבים</b><span>${step <= 3 ? "שלב " + step + " מתוך 3" : "מוכן לסגירה"}</span></div>
+    <div class="scc-steps">${[1, 2, 3].map(n => `<div class="${n === step ? "on" : n < step ? "done" : ""}">${n < step ? "✓" : n} · ${stepName[n]}</div>`).join("")}</div>`;
+  let body = "";
+  if(scCloseOpen || step >= 1){
+    body += `<div class="scc-sum"><span><b>${ready.length}</b> מוכנים</span><span class="${missing.length ? "bad" : ""}"><b>${missing.length}</b> חסרים פרטים</span><span><b>${approved.length}</b> אושרו</span><span><b>${rows.filter(x => x.sent || x.paid).length}</b> נשלחו</span></div>`;
+    if(missing.length) body += `<div class="scc-miss">${missing.slice(0, scCloseOpen ? 99 : 3).map(x => `<button type="button" onclick="scGoRow(${x.r.id})"><b>${escHtml(x.r.name)}</b><span>חסר: ${escHtml(x.miss.join(", "))}</span></button>`).join("")}${missing.length > 3 && !scCloseOpen ? `<button type="button" class="more" onclick="scCloseOpen=true;renderStaffClose()">עוד ${missing.length - 3}</button>` : ""}</div>`;
+  }
+  let act = "";
+  if(toApprove.length) act = `<button type="button" class="scc-btn" onclick="scApproveReady()">${svgIcon("check", 16)} אישור ${toApprove.length === 1 ? "העובד המוכן" : toApprove.length + " העובדים המוכנים"} · ${fmtMoney(toApprove.reduce((s, x) => s + x.amount, 0))}</button>`;
+  else if(unsent.length) act = `<button type="button" class="scc-btn" onclick="scSend()">${svgIcon("whatsapp", 16)} שליחה למנהל החשבונות · ${unsent.length === 1 ? "תשלום אחד" : unsent.length + " תשלומים"}</button>`;
+  else if(approved.length) act = `<button type="button" class="scc-btn dark" onclick="scClose()">${svgIcon("lock", 16)} סגירת הפעימה</button>`;
+  else act = `<div class="scc-sub">כדי להתחיל – משלימים את הפרטים החסרים בכרטיסי העובדים</div>`;
+  box.innerHTML = `<div class="scc">${head}${body}${act}</div>`;
+}
+/* אחרי שליחה למנהל החשבונות – לעדכן את שלבי הסגירה */
+setTimeout(() => { try{ if(typeof acxDoSend === "function" && !acxDoSend.__sc){ const orig = acxDoSend; acxDoSend = async function(){ const r = await orig.apply(this, arguments); try{ renderStaffClose(); }catch(e){} return r; }; acxDoSend.__sc = true; } }catch(e){ console.warn(e); } }, 0);
+function scGoRow(id){
+  const tr = document.querySelector(`#staffBody tr[data-row-id="${id}"]`);
+  if(tr){ tr.scrollIntoView({ behavior: "smooth", block: "center" }); if(!tr.classList.contains("open")){ const h = tr.querySelector(".sc-head"); if(h) h.click(); } tr.classList.add("flash"); setTimeout(() => tr.classList.remove("flash"), 2200); }
+}
+function scApproveReady(){
+  const idx = activeInstallment;
+  const L = scRowsOf(idx).map(scCheckRow).filter(x => !x.miss.length && !x.r.approved);
+  if(!L.length) return;
+  const sum = L.reduce((s, x) => s + x.amount, 0);
+  openConfirmModal(`לסמן "אושר לתשלום" ל-${L.length} עובדים בפעימה ${idx + 1}, סה״כ ${fmtMoney(sum)}? הסכומים עצמם לא משתנים.`, () => {
+    L.forEach(x => { x.r.approved = true; });
+    saveInstallments();
+    renderStaff(); try{ renderPayment(); }catch(e){}
+    showToast(`אושרו ${L.length} עובדים`);
+  }, { icon: "check", noLabel: "ביטול" });
+}
+function scSend(){
+  const idx = activeInstallment;
+  const ids = new Set(scRowsOf(idx).filter(r => r.approved && !r.sentAt && acctStatusOf(r) !== "שולם").map(r => r.id));
+  const keys = acctCollect().filter(it => it.k === "s" && it.instIdx === idx && ids.has(it.row.id)).map(it => it.key);
+  if(!keys.length){ jobToast("אין תשלומים לשליחה"); return; }
+  acxOpenSend(keys);
+}
+function scClose(){
+  const idx = activeInstallment, L = scRowsOf(idx);
+  const notSent = L.filter(r => r.approved && !r.sentAt && acctStatusOf(r) !== "שולם").length;
+  openConfirmModal(`לסגור את פעימה ${idx + 1}?${notSent ? ` שים לב: ${notSent} תשלומים מאושרים עוד לא נשלחו למנהל החשבונות.` : ""} אחרי הסגירה הכרטיסים נעולים לעריכה, ואפשר לפתוח מחדש בכל רגע.`, () => {
+    const now = new Date().toISOString();
+    L.forEach(r => { r.periodClosed = now; });
+    saveInstallments(); renderStaff();
+    showToast(`פעימה ${idx + 1} נסגרה`);
+  }, { icon: "lock", noLabel: "ביטול" });
+}
+function scReopen(){
+  const idx = activeInstallment;
+  openConfirmModal(`לפתוח מחדש את פעימה ${idx + 1} לעריכה? שום סכום לא ישתנה.`, () => {
+    scRowsOf(idx).forEach(r => { delete r.periodClosed; });
+    saveInstallments(); renderStaff();
+    showToast(`פעימה ${idx + 1} פתוחה לעריכה`);
+  }, { icon: "edit", noLabel: "ביטול" });
 }
 function refreshSingleStaffRow(id){
   const body = document.getElementById("staffBody");
