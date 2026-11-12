@@ -224,7 +224,7 @@
    ====================================================================== */
 @media (max-width:760px){
   /* שורות הסבר קבועות – בטלפון הן תופסות מסך שלם */
-  body.sh-on .tab-content p.hint{ display:none !important; }
+  body.sh-on .tab p.hint{ display:none !important; }
 
   /* רכש: 4 הקבוצות בשורה אחת */
   body.sh-on #sp-pills > .sp-pill{ flex:1 1 0; min-width:0; justify-content:center; padding-inline:6px; font-size:13px; gap:4px; }
@@ -249,6 +249,20 @@
   body.sh-on #lcViews{ flex:1 1 100%; margin:0; }
   body.sh-on #lcViews button{ flex:1 1 0; justify-content:center; white-space:nowrap; padding:7px 4px; font-size:12.5px; min-width:0; }
   body.sh-on #lcViews button svg{ display:none; }
+
+  /* צוות: כלים בשורה אחת, וכרטיס עובד בשורה אחת – שם ותפקיד, סטטוס קטן מתחת, הסכום בצד */
+  body.sh-on #tab-staff .toolbar{ flex-wrap:nowrap; gap:8px; align-items:center; }
+  body.sh-on #tab-staff .toolbar .sc-viewseg{ flex:1 1 auto; }
+  body.sh-on #tab-staff .toolbar .btn{ flex:0 0 auto; padding:8px 12px; font-size:13px; }
+  body.sh-on #tab-staff .sc-head{ display:grid !important; grid-template-columns:auto minmax(0,1fr) auto auto; grid-template-areas:"av who tot chev" "av pills tot chev"; column-gap:10px; row-gap:3px; align-items:center; }
+  body.sh-on #tab-staff .sc-avatar{ grid-area:av; width:38px; height:38px; font-size:14px; }
+  body.sh-on #tab-staff .sc-who{ grid-area:who; min-width:0; }
+  body.sh-on #tab-staff .sc-pills{ grid-area:pills; display:flex; gap:4px; flex-wrap:wrap; }
+  body.sh-on #tab-staff .sc-pills .pill{ font-size:10.5px; padding:1px 7px; }
+  body.sh-on #tab-staff .sc-total{ grid-area:tot; text-align:left; }
+  body.sh-on #tab-staff .sc-total b{ font-size:15px; }
+  body.sh-on #tab-staff .sc-chev{ grid-area:chev; }
+  body.sh-on #tab-staff .sc-td{ padding:10px 12px !important; }
 
   /* מפתחות: שני כרטיסים בשורה, נמוכים */
   body.sh-on .key-grid{ grid-template-columns:repeat(2, minmax(0,1fr)) !important; gap:8px !important; }

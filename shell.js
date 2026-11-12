@@ -346,7 +346,7 @@
   var FOLD = {
     licensing: ["#licRoot .lc-search", "#licYearFilter", "#licSortBy", "#lcPills"],
     tasks: ["#mtRoot .mt-chips"],
-    staff: ["#tab-staff .sc-instbar", "#staffCardsView > div:first-child"],
+    staff: ["#staffSearchInput", "#tab-staff .sc-instbar", "#staffCardsView > div:first-child"],
     accountant: ["#combinedReportAnchor"],
     keys: ["#keysSubInv .toolbar-sticky select", "#keysSubInv .toolbar-push"],
     files: ["#tab-files .fx-bar"],
