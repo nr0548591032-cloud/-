@@ -3481,7 +3481,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261125; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261126; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -21232,7 +21232,18 @@ function showLegacy(which){
   if(f) f.style.display = which === 'legacy' ? '' : 'none';
   if(v) v.style.display = which ? 'none' : '';
 }
+/* ספירה בלי קליטה (נובמבר 2026): עותק של רשימת המוצרים במעקב נשמר בטלפון, לדף count.html */
+let offSnapAt = 0, offPrompted = false;
+function offSnap(){
+  if(Date.now() - offSnapAt < 60000) return; offSnapAt = Date.now();
+  try{
+    const pm = productMap();
+    const items = cmAllKeys().map(k => { const prod = pm.get(k), p = S.par[k]; return { k, n: prod.name, u: uLbl(prod.unit) || 'יח׳', c: (catById(prod.catId) || {}).name || '', d: parDiv(p), min: +p.min || 0, cur: cmUnits(k) }; });
+    if(items.length) localStorage.setItem('offcount-snap', JSON.stringify({ at: Date.now(), items }));
+  }catch(e){ console.warn('offSnap', e); }
+}
 function render(){
+  try{ offSnap(); if(!offPrompted && !isCook() && cmPending(cmDraft()).length){ offPrompted = true; setTimeout(() => { try{ openCount(); }catch(e){} }, 600); } }catch(e){}
   if(!$('#sp-view')) return;
   if(!tabs().some(t=>t.id===tab)) tab = tabs()[0].id;
   renderTop();
@@ -25664,5 +25675,9 @@ return SPX;
 <script src="history.js"></script>
 <script src="voice.js"></script>
 <script src="prolinks.js"></script>
+<script>
+/* ספירת מלאי בלי קליטה: service worker שמציג את count.html רק כשאין רשת בכלל */
+if("serviceWorker" in navigator && location.protocol === "https:"){ window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(e => console.warn("sw:", e)); }); }
+</script>
 </body>
 </html>
