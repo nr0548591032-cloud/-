@@ -48,6 +48,7 @@
     folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
     wrench:'<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5z"/>',
     receipt:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+    wa:'<path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.6l1.2-1.1 1.8.9-.4 1.5c-3.6.3-7.6-3.7-7.3-7.3l1.5-.4.9 1.8z"/>',
     mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
     bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
     filter:'<path d="M4 5h16l-6 8v5l-4 2v-7z"/>',
@@ -499,6 +500,51 @@
     else if (k === "full") { document.body.classList.toggle("sh-dbfull"); b.querySelector("span").textContent = document.body.classList.contains("sh-dbfull") ? "הסתרת לוח הבקרה המלא" : "לוח הבקרה המלא – גרפים, תקציב וכל הנתונים"; }
     else if (k === "mt") { go("tasks"); later(function(){ var m = document.querySelector('[data-mt-mode="mine"]'); if (m && m.getAttribute("aria-selected") !== "true") m.click(); later(function(){ var i = document.querySelector("#mtQaForm input"); if (i) i.focus(); }, 200); }, 150); }
   });
+
+  /* ---------- משימות תפעול בטלפון: החלקה ימינה = בוצע, החלקה שמאלה = הודעה לאיש המקצוע (כמו במוקאפ) ---------- */
+  (function(){
+    var sw = null, block = false;
+    function card(e){ return e.target.closest && e.target.closest("#tab-tasks .tk-card[data-tk-card]"); }
+    document.addEventListener("touchstart", function(e){
+      if (window.innerWidth > 760 || e.touches.length !== 1) return;
+      var c = card(e); if (!c || e.target.closest("button,a,input,select,textarea")) return;
+      sw = { c: c, x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0, on: false, bg: null };
+    }, { passive: true });
+    document.addEventListener("touchmove", function(e){
+      if (!sw) return;
+      var dx = e.touches[0].clientX - sw.x, dy = e.touches[0].clientY - sw.y;
+      if (!sw.on) {
+        if (Math.abs(dy) > 14 && Math.abs(dy) > Math.abs(dx)) { sw = null; return; }
+        if (Math.abs(dx) < 14) return;
+        sw.on = true;
+        var p = sw.c.parentElement; if (p && getComputedStyle(p).position === "static") p.style.position = "relative";
+        var bg = document.createElement("div"); bg.className = "tk-swbg";
+        bg.style.top = sw.c.offsetTop + "px"; bg.style.height = sw.c.offsetHeight + "px";
+        p.insertBefore(bg, sw.c); sw.bg = bg;
+        sw.c.style.transition = "none"; sw.c.style.position = "relative"; sw.c.style.zIndex = "1";
+      }
+      sw.dx = Math.max(-120, Math.min(120, dx));
+      sw.c.style.transform = "translateX(" + sw.dx + "px)";
+      var done = sw.dx > 0;
+      sw.bg.className = "tk-swbg " + (done ? "done" : "msg") + (Math.abs(sw.dx) > 80 ? " go" : "");
+      sw.bg.innerHTML = done ? '<span class="r">' + ic("check", 20) + ' בוצע</span>' : '<span class="l">הודעה ' + ic("wa", 20) + '</span>';
+    }, { passive: true });
+    document.addEventListener("touchend", function(){
+      if (!sw) return;
+      var s0 = sw; sw = null;
+      if (!s0.on) return;
+      block = true; setTimeout(function(){ block = false; }, 350);
+      s0.c.style.transition = "transform .18s"; s0.c.style.transform = "";
+      setTimeout(function(){ if (s0.bg) s0.bg.remove(); s0.c.style.position = ""; s0.c.style.zIndex = ""; }, 200);
+      if (Math.abs(s0.dx) <= 80) return;
+      var id = Number(s0.c.getAttribute("data-tk-card"));
+      var t = null; try { t = data.tasks.find(function(x){ return x.id === id; }); } catch (e) {}   // eslint-disable-line no-undef
+      if (!t) return;
+      if (s0.dx > 0) { call("tkAction", "done", id); }
+      else { call("tkAction", !t.assignee ? "assign" : (t.sentAt ? "nudge" : "send"), id); }
+    });
+    document.addEventListener("click", function(e){ if (block && card(e)) { e.stopPropagation(); e.preventDefault(); } }, true);
+  })();
 
   /* ---------- בניית הסרגלים ---------- */
   var BAR = ["tasks", "procurement", "licensing", "staff"];

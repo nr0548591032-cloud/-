@@ -401,3 +401,10 @@
   .shh-full{ display:flex; align-items:center; justify-content:center; gap:8px; border:1px dashed rgba(32,30,29,.22); background:none; border-radius:14px; padding:10px; font-family:inherit; font-size:12.5px; font-weight:700; color:#645c50; cursor:pointer; }
 }
 #shBellDot{ position:absolute; top:9px; left:10px; width:9px !important; height:9px !important; min-width:0 !important; padding:0 !important; border-radius:50%; background:#d6362f; border:2px solid #fbf7f0; font-size:0; }
+
+/* החלקה על כרטיס משימה בטלפון */
+.tk-swbg{ position:absolute; right:0; left:0; border-radius:16px; display:flex; align-items:center; padding:0 18px; color:#fff; font-weight:700; font-size:14px; z-index:0; }
+.tk-swbg.done{ background:#18864c; justify-content:flex-end; } .tk-swbg.msg{ background:#2f74d0; justify-content:flex-start; }
+.tk-swbg span{ display:inline-flex; align-items:center; gap:6px; opacity:.6; transition:opacity .12s; } .tk-swbg.go span{ opacity:1; }
+@media (max-width:760px){ #tab-tasks .tk-col-body::after{ content:""; display:block; } }
+@media (max-width:760px){ body.sh-on #tkView::before{ content:"החלקה ימינה = בוצע · החלקה שמאלה = הודעה לאיש המקצוע"; display:block; text-align:center; font-size:12px; color:#7a7166; margin:2px 0 8px; } }
