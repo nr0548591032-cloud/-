@@ -3420,7 +3420,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261118; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261119; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -3574,7 +3574,7 @@ const appStorage = {
         const b = await bref.get({ source: "server" });
         if(b.exists && Array.isArray(b.data().versions)) versions = b.data().versions;
       }catch(e){ console.warn("קריאת גיבוי נכשלה", e); }
-      versions.unshift({ value: prevValue, updatedAt: prev.data().updatedAt || null, backedUpAt: Date.now() });
+      versions.unshift({ value: prevValue, updatedAt: prev.data().updatedAt || null, backedUpAt: Date.now(), by: prev.data().by || null });
       while(versions.length > BACKUP_MAX_VERSIONS) versions.pop();
       while(versions.length > 1 && JSON.stringify(versions).length > BACKUP_MAX_BYTES) versions.pop();
       if(JSON.stringify(versions).length > BACKUP_MAX_BYTES){
@@ -3583,7 +3583,8 @@ const appStorage = {
         await bref.set({ versions });                      // אם הגיבוי נכשל - לא שומרים
       }
     }
-    await ref.set({ value: value, updatedAt: Date.now(), build: APP_BUILD });
+    let by = null; try{ by = (ROLES[currentRole] && ROLES[currentRole].label) || null; }catch(e){}   // מי שמר – מוצג בהיסטוריה
+    await ref.set({ value: value, updatedAt: Date.now(), build: APP_BUILD, by: by });
     originalLoad[key] = value;   // הבסיס של המכשיר הזה מתעדכן, כדי לא להתריע שוב על השינוי של עצמו
     return { value };
   }
@@ -25357,5 +25358,6 @@ return SPX;
 <script src="shell.js"></script>
 <script src="ai.js"></script>
 <script src="users.js"></script>
+<script src="history.js"></script>
 </body>
 </html>

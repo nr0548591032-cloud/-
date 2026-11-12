@@ -48,6 +48,7 @@
     folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
     wrench:'<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5z"/>',
     receipt:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
     camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
     upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/>',
@@ -205,6 +206,7 @@
       if (el && el.style.display !== "none" && has(p[1])) links.push({ l: el.textContent.trim(), f: p[1] });
     });
     if (isAdmin() && typeof window.openUsersAdmin === "function") links.unshift({ l: "משתמשים והרשאות", f: "openUsersAdmin" });
+    if (isAdmin() && typeof window.openHistory === "function") links.unshift({ l: "היסטוריה ושחזור", f: "openHistory" });
     var ri = document.getElementById("roleIndicator");
     if (ri && has("switchUser")) links.push({ l: (ri.textContent.trim() || "החלפת משתמש"), f: "switchUser" });
     if (links.length) html += '<div class="sh-links">' + links.map(function(x, i){ return '<button class="sh-link" type="button" data-sh-link="' + i + '">' + esc(x.l) + '</button>'; }).join("") + '</div>';
@@ -369,12 +371,14 @@
   function openMore(t){
     var ctx = contextLinks(t), acts = availableActions().filter(function(a){ return a.t === t; });
     var html = head("כל הפעולות ב" + label(t), "שום פונקציה לא הוסרה – הכל כאן ובכפתור +");
+    if (isAdmin() && typeof window.openHistory === "function") html += '<button class="sh-res" type="button" data-h="1">' + icoBox("clock", t, 17) + '<span><b>היסטוריה ושחזור</b><small>מה השתנה כאן לאחרונה – ולהחזיר פריט שנמחק</small></span></button>';
     if (ctx.length) html += '<div class="sh-sgrp">' + ctx.map(function(x, i){ return '<button class="sh-res" type="button" data-c="' + i + '">' + icoBox(TAB_IC[t] || "file", t, 17) + '<span><b>' + esc(x.l) + '</b></span></button>'; }).join("") + '</div>';
     if (acts.length) html += '<div class="sh-gt">פעולות מהירות</div><div class="sh-grid">' + acts.map(function(a){ return '<button class="sh-act" type="button" data-a="' + a.id + '">' + icoBox(a.ico, a.t) + esc(a.l) + '</button>'; }).join("") + '</div>';
     if (!ctx.length && !acts.length) html += '<div class="sh-empty">אין פעולות נוספות לטאב הזה</div>';
     var sh = sheet(html);
     sh.addEventListener("click", function(e){
       var b = e.target.closest && e.target.closest("button"); if (!b) return;
+      if (b.hasAttribute("data-h")) { closeSheet(); later(function(){ window.openHistory(t); }, 200); return; }
       if (b.hasAttribute("data-c")) { var x = ctx[Number(b.getAttribute("data-c"))]; closeSheet(); if (x) later(function(){ go(t); x.run(); }, 200); }
       else if (b.hasAttribute("data-a")) { var a = ACTIONS.filter(function(z){ return z.id === b.getAttribute("data-a"); })[0]; closeSheet(); if (a) { bump(a.id); later(a.run, 200); } }
     });
