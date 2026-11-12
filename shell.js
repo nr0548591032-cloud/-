@@ -349,6 +349,7 @@
     var sig = t + "|" + list.map(function(a){ return a.title + a.n; }).join("|");
     if (el.getAttribute("data-sig") === sig) return;
     el.setAttribute("data-sig", sig);
+    el.classList.toggle("sh-calm", !list.length);
     el.innerHTML = '<div class="sh-wh"><span class="sh-wi">' + ic(TAB_IC[t] || "file", 18) + '</span><b>' + (list.length ? "מה מחכה לך כאן · " + list.length : "הכל מסודר כאן") + '</b>' +
       '<button type="button" class="sh-more" data-sh-more="' + t + '" aria-label="כל הפעולות ב' + esc(label(t)) + '">⋯</button></div>' +
       shown.map(function(a, i){
