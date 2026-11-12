@@ -329,6 +329,8 @@
     if (sig === lastSig && top && bar) { refresh(); return; }
     lastSig = sig;
 
+    if (!top) top = document.getElementById("shTop");
+    if (!bar) bar = document.getElementById("shBar");
     if (!top) { top = document.createElement("div"); top.id = "shTop"; var shell = document.querySelector(".app-shell"); (shell || document.body).insertBefore(top, shell ? shell.firstChild : null); }
     if (!bar) { bar = document.createElement("nav"); bar.id = "shBar"; bar.setAttribute("aria-label", "ניווט ראשי"); document.body.appendChild(bar); }
 
