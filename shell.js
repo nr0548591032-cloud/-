@@ -49,6 +49,7 @@
     wrench:'<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5z"/>',
     receipt:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
     wa:'<path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.6l1.2-1.1 1.8.9-.4 1.5c-3.6.3-7.6-3.7-7.3-7.3l1.5-.4.9 1.8z"/>',
+    alert:'<path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.01"/>',
     mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
     bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
     filter:'<path d="M4 5h16l-6 8v5l-4 2v-7z"/>',
@@ -140,6 +141,7 @@
     { id:"task", t:"tasks", ico:"tasks", l:"משימה חדשה", ok:function(){ return has("addTask"); }, run:function(){ go("tasks"); later(function(){ call("addTask"); }); } },
     { id:"mytask", t:"tasks", ico:"check", l:"משימה שלי", ok:function(){ return isAdmin() && has("mtSetMode"); },
       run:function(){ go("tasks"); later(function(){ call("mtSetMode", "mine"); later(function(){ var i = document.getElementById("mtQaInput"); if (i) { i.scrollIntoView({ block:"center" }); i.focus(); } }, 120); }); } },
+    { id:"defect", t:"tasks", ico:"alert", l:"דיווח ליקוי", ok:function(){ return isAdmin() && typeof window.shVoice === "function"; }, run:function(){ window.shVoice(); } },
     { id:"count", t:"procurement", ico:"box", l:"ספירת מלאי", ok:function(){ return !!(window.SP && SP.openCount); }, run:function(){ go("procurement"); later(function(){ SP.go("stock"); later(function(){ SP.openCount(); }, 120); }); } },
     { id:"order", t:"procurement", ico:"cart", l:"הזמנה לספק", ok:function(){ return !!(window.SP && SP.go) && isAdmin(); }, run:function(){ go("procurement"); later(function(){ SP.go("basket"); }); } },
     { id:"plist", t:"procurement", ico:"tag", l:"מחירון חדש", ok:function(){ return !!(window.SP && SP.openImport) && isAdmin(); }, run:function(){ go("procurement"); later(function(){ SP.go("lists"); later(function(){ SP.openImport(); }, 120); }); } },
@@ -147,6 +149,8 @@
     { id:"pay", t:"accountant", ico:"wallet", l:"תשלום חדש", ok:function(){ return has("acxOpenEdit") && isAdmin(); }, run:function(){ go("accountant"); later(function(){ call("acxOpenEdit", ""); }); } },
     { id:"loan", t:"keys", ico:"key", l:"מסירת מפתח", ok:function(){ return has("openLoanModal"); }, run:function(){ go("keys"); later(function(){ call("openLoanModal"); }); } },
     { id:"file", t:"files", ico:"file", l:"העלאת חשבונית", ok:function(){ try { return !!tabQuickLinks.files[0]; } catch (e) { return false; } }, run:function(){ go("files"); later(function(){ tabQuickLinks.files[0].action(); }); } },  // eslint-disable-line no-undef
+    { id:"promsg", t:"tasks", ico:"wa", l:"הודעה לאיש מקצוע", ok:function(){ return has("openWorkSlipModal"); }, run:function(){ go("tasks"); later(function(){ call("openWorkSlipModal"); }, 150); } },
+    { id:"staff", t:"staff", ico:"users", l:"עובד חדש", ok:function(){ return has("addStaffRow") && can("staff") && isAdmin(); }, run:function(){ go("staff"); later(function(){ call("addStaffRow"); }, 150); } },
     { id:"contact", t:"contacts", ico:"phone", l:"איש קשר חדש", ok:function(){ return has("addContact"); }, run:function(){ go("contacts"); later(function(){ call("addContact"); }); } },
     { id:"equip", t:"equipment", ico:"wrench", l:"פריט ציוד", ok:function(){ return has("eqNewEquip"); }, run:function(){ go("equipment"); later(function(){ call("eqNewEquip"); }); } }
   ];
@@ -166,7 +170,7 @@
   function openPlus(){
     var t = cur(), html = head("מה עושים?");
     if (typeof window.shAI === "function" && isAdmin()) {
-      html += '<button class="sh-ai" type="button" data-sh-ai><span class="sh-ico" style="background:#c67139;color:#fff;width:46px;height:46px">' + ic("spark", 23) + '</span><span style="flex:1"><b style="font-size:15px">צלם או העלה מסמך – הסוכן</b><small>חשבונית, אישור בודק, מחירון, הצעת מחיר – הוא יזהה ויציע, ואתה מאשר</small></span><span class="sh-ico" style="background:#ffffff1f;width:36px;height:36px">' + ic("camera", 18) + '</span></button>';
+      html += '<button class="sh-ai" type="button" data-sh-ai><span class="sh-ico" style="background:#c67139;color:#fff;width:46px;height:46px">' + ic("spark", 23) + '</span><span style="flex:1"><b style="font-size:15px">צלם או העלה מסמך – הסוכן</b><small>חשבונית, אישור בודק, מחירון, הצעת מחיר – הוא יזהה ויציע, ואתה מאשר</small></span><span style="display:flex;gap:6px"><span class="sh-ico" style="background:#ffffff1f;width:36px;height:36px">' + ic("camera", 18) + '</span><span class="sh-ico" style="background:#ffffff1f;width:36px;height:36px">' + ic("upload", 18) + '</span></span></button>';
     }
     if (typeof window.shVoice === "function" && isAdmin()) {
       html += '<button class="sh-ai sh-vc" type="button" data-sh-vc><span class="sh-ico" style="background:#6c4fd8;color:#fff;width:46px;height:46px">' + ic("mic", 23) + '</span><span style="flex:1"><b style="font-size:15px">הקלטה קולית</b><small>אמור מה צריך לעשות – משימה, משימה שלי או רכש. הסוכן מציע, אתה מאשר</small></span></button>';
@@ -239,7 +243,7 @@
         go: function(){ go("tasks"); later(function(){ call("mtSetMode", "mine"); later(function(){ call("mtOpenEdit", x.id); }, 150); }); } }; })); } catch (e) {}
     try { add("contacts", "אנשי קשר וספקים", (d.contacts || []).filter(function(x){ return x && !x.archived; }).map(function(x){
       return { k: [x.name, x.specialty, x.phone, x.email, x.notes, x.contactType, x.vatId, x.companyId].join(" "), ico: "phone", a: x.name || "איש קשר",
-        b: [x.specialty, x.phone].filter(Boolean).join(" · "), go: function(){ go("contacts"); later(function(){ call("ctOpen", x.id); }); } }; })); } catch (e) {}
+        b: [x.specialty, x.phone].filter(Boolean).join(" · "), phone: x.phone || "", cname: x.name || "", go: function(){ go("contacts"); later(function(){ call("ctOpen", x.id); }); } }; })); } catch (e) {}
     try { add("licensing", "רישוי ובטיחות", (d.licensing || []).filter(Boolean).map(function(x){
       return { k: [x.name, x.type, x.inspector, x.doc, x.item].join(" "), ico: "shield", a: x.name || x.type || "אישור",
         b: [x.inspector, x.expiry ? "תוקף " + x.expiry : ""].filter(Boolean).join(" · "),
@@ -248,7 +252,7 @@
       var rows = [];
       SP.S.lists.forEach(function(l){ (l.items || []).forEach(function(it){
         if (!it || !it.name) return;
-        rows.push({ k: [it.name, it.sku, l.supplier].join(" "), ico: "tag", a: it.name, b: l.supplier || "",
+        rows.push({ k: [it.name, it.sku, l.supplier].join(" "), ico: "tag", a: it.name, b: l.supplier || "", sup: l.supplier || "",
           side: it.price > 0 ? "₪" + (Math.round(it.price * 100) / 100) : "", go: function(){ go("procurement"); later(function(){ SP.go("analyze"); }); } });
       }); });
       add("procurement", "מוצרים במחירונים", rows);
@@ -283,7 +287,8 @@
       '<label class="sh-sbox">' + ic("search", 20) + '<input type="search" id="shQ" autocomplete="off" enterkeyhint="search" placeholder="ספק, משימה, מוצר, מפתח, אישור…" aria-label="חיפוש בכל המערכת"></label>' +
       '<div id="shRes"></div>';
     var sh = sheet(html), inp = sh.querySelector("#shQ"), box = sh.querySelector("#shRes");
-    var src = sources(), acts = availableActions(), flat = [], kb = -1;
+    var src = sources(), acts = availableActions(), flat = [], kb = -1, filt = "";
+    var waNum = function(p){ try { return formatPhoneForWhatsApp(p); } catch (e) { return String(p || "").replace(/\D/g, "").replace(/^0/, "972"); } };   // eslint-disable-line no-undef
     function render(){
       var q = norm(inp.value); flat = []; kb = -1;
       if (q.length < 2) {
@@ -298,17 +303,34 @@
           return '<button class="sh-res" type="button" data-i="' + (flat.length - 1) + '">' + icoBox(a.ico, a.t, 17) + '<span><b>' + mark(a.l, q) + '</b></span></button>';
         }).join("") + '</div>';
       }
-      var total = 0;
-      src.forEach(function(g){
-        var hits = g.rows.filter(function(r){ return norm(r.k).indexOf(q) !== -1; });
-        if (!hits.length) return;
+      var total = 0, groups = [];
+      src.forEach(function(g){ var hits = g.rows.filter(function(r){ return norm(r.k).indexOf(q) !== -1; }); if (hits.length) groups.push({ g: g, hits: hits }); });
+      if (filt && !groups.some(function(x){ return x.g.t === filt; })) filt = "";
+      var all = groups.reduce(function(n, x){ return n + x.hits.length; }, 0);
+      if (groups.length > 1) h = '<div class="sh-chips">' + ['<button type="button" data-f="" class="' + (filt ? "" : "on") + '">הכל · ' + all + '</button>'].concat(groups.map(function(x){ return '<button type="button" data-f="' + x.g.t + '" class="' + (filt === x.g.t ? "on" : "") + '">' + esc(x.g.title.split(" ")[0]) + ' · ' + x.hits.length + '</button>'; })).join("") + '</div>' + h;
+      /* פעולות מהירות לפי מה שנמצא: הודעה לאיש קשר, הזמנה מספק */
+      var quick = [];
+      groups.forEach(function(x){ x.hits.slice(0, 2).forEach(function(r){
+        if (r.phone && quick.length < 3) quick.push({ l: "שלח הודעה ל" + r.cname, ico: "wa", t: "contacts", go: function(){ window.open("https://wa.me/" + waNum(r.phone), "_blank"); } });
+        if (r.sup && isAdmin() && window.SP && SP.go && quick.length < 3 && !quick.some(function(z){ return z.sup === r.sup; })) quick.push({ sup: r.sup, l: "הזמנה חדשה מ" + r.sup, ico: "cart", t: "procurement", go: function(){ go("procurement"); later(function(){ SP.go("basket"); }); } });
+      }); });
+      groups.forEach(function(x){
+        var g = x.g, hits = x.hits;
+        if (filt && g.t !== filt) return;
         total += hits.length;
         h += '<div class="sh-sgrp"><div class="sh-sgh" style="color:' + col(g.t) + '"><i style="background:' + col(g.t) + '"></i>' + esc(g.title) + ' · ' + hits.length + '</div>' +
-          hits.slice(0, 6).map(function(r){
+          hits.slice(0, filt ? 40 : 6).map(function(r){
             flat.push(r);
-            return '<button class="sh-res" type="button" data-i="' + (flat.length - 1) + '">' + icoBox(r.ico, g.t, 17) + '<span style="min-width:0;flex:1"><b>' + mark(r.a, q) + '</b>' + (r.b ? '<small>' + esc(r.b) + '</small>' : '') + '</span>' + (r.side ? '<span class="sh-side">' + esc(r.side) + '</span>' : '') + '</button>';
-          }).join("") + (hits.length > 6 ? '<div class="sh-hint" style="margin:6px 0 10px">ועוד ' + (hits.length - 6) + ' – כדאי לדייק את החיפוש</div>' : '') + '</div>';
+            var wa = r.phone ? '<span class="sh-wa" role="button" tabindex="0" data-wa="' + esc(waNum(r.phone)) + '" aria-label="וואטסאפ ל' + esc(r.cname) + '">' + ic("wa", 17) + '</span>' : '';
+            return '<button class="sh-res" type="button" data-i="' + (flat.length - 1) + '">' + icoBox(r.ico, g.t, 17) + '<span style="min-width:0;flex:1"><b>' + mark(r.a, q) + '</b>' + (r.b ? '<small>' + esc(r.b) + '</small>' : '') + '</span>' + (r.side ? '<span class="sh-side">' + esc(r.side) + '</span>' : '') + wa + '</button>';
+          }).join("") + (!filt && hits.length > 6 ? '<button type="button" class="sh-more-g" data-f="' + g.t + '">עוד ' + (hits.length - 6) + ' – הצג הכל</button>' : '') + '</div>';
       });
+      if (quick.length) {
+        h += '<div class="sh-sgrp"><div class="sh-sgh"><i style="background:var(--sh-dark)"></i>פעולות מהירות</div>' + quick.map(function(a){
+          flat.push({ go: a.go });
+          return '<button class="sh-res" type="button" data-i="' + (flat.length - 1) + '">' + icoBox(a.ico, a.t, 17) + '<span><b>' + esc(a.l) + '</b></span></button>';
+        }).join("") + '</div>';
+      }
       box.innerHTML = h || '<div class="sh-empty">לא נמצא כלום עבור "' + esc(inp.value.trim()) + '"</div>';
     }
     function pick(i){ var r = flat[i]; if (!r) return; closeSheet(); later(r.go, 200); }
@@ -321,7 +343,11 @@
         btns.forEach(function(b, i){ b.classList.toggle("kb", i === kb); }); btns[kb].scrollIntoView({ block: "nearest" });
       } else if (e.key === "Enter") { e.preventDefault(); pick(kb >= 0 ? Number(btns[kb].getAttribute("data-i")) : 0); }
     });
-    box.addEventListener("click", function(e){ var b = e.target.closest && e.target.closest(".sh-res"); if (b) pick(Number(b.getAttribute("data-i"))); });
+    box.addEventListener("click", function(e){
+      var w = e.target.closest && e.target.closest("[data-wa]"); if (w) { e.stopPropagation(); window.open("https://wa.me/" + w.getAttribute("data-wa"), "_blank"); return; }
+      var f = e.target.closest && e.target.closest("[data-f]"); if (f) { filt = f.getAttribute("data-f"); render(); return; }
+      var b = e.target.closest && e.target.closest(".sh-res"); if (b) pick(Number(b.getAttribute("data-i")));
+    });
     if (prefill) inp.value = prefill;
     render();
     setTimeout(function(){ inp.focus(); }, 60);

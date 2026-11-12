@@ -620,6 +620,20 @@
   .key-card:nth-child(even), .holder-card:nth-child(even){ background:var(--tint-b); }
   .key-card:hover, .holder-card:hover{ transform:translateY(-3px); box-shadow:0 4px 10px rgba(16,27,36,.1), 0 12px 26px rgba(16,27,36,.12); }
   .key-card.mismatch{ border-right-color:var(--red); }
+  #prjCards{ display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+  .prj-pills{ display:flex; gap:6px; } .prj-pills button{ border:none; border-radius:999px; padding:6px 12px; font:inherit; font-size:12.5px; font-weight:700; background:#fbf7f0; color:#645c50; cursor:pointer; } .prj-pills button.on{ background:var(--m-projects, #4f5bd5); color:#fff; }
+  .prj-edt{ display:none; border:1.5px solid rgba(32,30,29,.15); background:#fff; border-radius:999px; padding:5px 11px; font:inherit; font-size:12px; font-weight:700; color:#645c50; cursor:pointer; } .prj-edt.on{ background:#2b2723; color:#fff; }
+  @media (max-width:760px){ .prj-edt{ display:inline-block; } }
+  .prj-card{ background:#fbf7f0; border-radius:18px; padding:12px 14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); display:flex; flex-direction:column; gap:8px; }
+  .prj-h{ display:flex; align-items:center; justify-content:space-between; gap:8px; } .prj-h b{ font-size:15px; }
+  .prj-st{ font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:999px; background:#e1ecfb; color:#2563c4; } .prj-st.chk{ background:#ece7fd; color:#6c4fd8; } .prj-st.ok{ background:#ddf3e5; color:#18864c; }
+  .prj-d{ font-size:13px; color:var(--ink-soft); line-height:1.45; }
+  .prj-q{ display:grid; grid-template-columns:repeat(auto-fit, minmax(96px, 1fr)); gap:6px; }
+  .prj-qc{ border-radius:14px; padding:9px; background:#fff; border:1px solid rgba(32,30,29,.12); display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .prj-qc.best{ border:2px solid #18864c; } .prj-qc b{ font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .prj-qc .v{ font-size:17px; font-weight:700; } .prj-qc small{ font-size:11px; color:var(--ink-soft); }
+  .prj-qc .tag{ align-self:flex-start; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background:#ddf3e5; color:#18864c; }
+  .prj-btn{ align-self:flex-start; border:none; border-radius:12px; background:var(--m-projects, #4f5bd5); color:#fff; font:inherit; font-size:13px; font-weight:700; padding:8px 12px; cursor:pointer; }
+  @media (max-width:760px){ #tab-projects .table-scroll{ display:none; } #tab-projects.prj-edit .table-scroll{ display:block; } }
   .fm-card{ background:#fbf7f0; border-radius:18px; padding:12px 14px; margin-bottom:14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); }
   .fm-empty{ display:flex; flex-direction:column; gap:8px; align-items:flex-start; } .fm-empty span{ font-size:13px; color:var(--ink-soft); line-height:1.5; }
   .fm-h{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; } .fm-h b{ font-size:15px; }
@@ -18175,9 +18189,36 @@ function openProjectQuotes(id){
   document.getElementById("projectQuotesTitle").textContent = "הצעות מחיר — " + (p.name || "פרויקט ללא שם");
   renderQuotes();
 }
+/* פרויקטים – כרטיס סיכום כמו במוקאפ (נובמבר 2026): פעילים / הושלמו, והשוואת הצעות מחיר. קריאה בלבד */
+let prjView = "active";
+function renderProjectCards(){
+  let box = document.getElementById("prjCards");
+  const body = document.getElementById("projectsBody");
+  if(!box){ const card = body && body.closest(".card"); if(!card) return; box = document.createElement("div"); box.id = "prjCards"; card.parentNode.insertBefore(box, card); }
+  const L = (data.projects || []).filter(p => p && (String(p.name || "").trim() || (p.quotes || []).length));
+  if(!L.length){ box.innerHTML = ""; return; }
+  const act = L.filter(p => p.status !== "הושלם"), done = L.filter(p => p.status === "הושלם");
+  const list = prjView === "done" ? done : act;
+  const pill = (k, l, n) => `<button type="button" class="${prjView === k ? "on" : ""}" onclick="prjView='${k}';renderProjectCards()">${l} · ${n}</button>`;
+  const ed = document.getElementById("tab-projects") && document.getElementById("tab-projects").classList.contains("prj-edit");
+  box.innerHTML = `<div class="prj-pills">${pill("active", "פעילים", act.length)}${pill("done", "הושלמו", done.length)}<span style="flex:1"></span><button type="button" class="prj-edt ${ed ? "on" : ""}" onclick="document.getElementById('tab-projects').classList.toggle('prj-edit');renderProjectCards()">${ed ? "סגירת העריכה" : "עריכה ומחיקה"}</button></div>` +
+    (list.length ? list.map(p => {
+      const qs = (p.quotes || []).filter(q => q && (q.vendor || parseFloat(q.price)));
+      const priced = qs.filter(q => parseFloat(q.price) > 0);
+      const min = priced.length ? Math.min(...priced.map(q => parseFloat(q.price))) : null;
+      const st = p.status || "פתוח";
+      return `<div class="prj-card">
+        <div class="prj-h"><b>${escHtml(p.name || "פרויקט ללא שם")}</b><span class="prj-st ${st === "הושלם" ? "ok" : st === "בבדיקה" ? "chk" : ""}">${escHtml(st)}</span></div>
+        ${p.desc ? `<div class="prj-d">${escHtml(p.desc)}</div>` : ""}
+        ${qs.length ? `<div class="prj-q">${qs.slice(0, 3).map(q => { const pr = parseFloat(q.price) || 0, best = min !== null && pr === min && priced.length > 1;
+            return `<div class="prj-qc ${best ? "best" : ""}"><b>${escHtml(q.vendor || "ספק")}</b><span class="v">${pr ? fmtMoney(pr) : "—"}</span>${q.notes ? `<small>${escHtml(String(q.notes).slice(0, 60))}</small>` : ""}${best ? `<span class="tag">הזולה</span>` : ""}</div>`; }).join("")}</div>` : `<div class="prj-d muted">עוד אין הצעות מחיר</div>`}
+        <button type="button" class="prj-btn" onclick="openProjectQuotes(${p.id});document.getElementById('projectQuotesCard').scrollIntoView({behavior:'smooth',block:'start'})">${qs.length > 1 ? "השוואה והוספת הצעות" : "הצעות מחיר"} (${qs.length})</button>
+      </div>`; }).join("") : `<div class="prj-d muted" style="padding:6px 2px 12px">${prjView === "done" ? "אין פרויקטים שהושלמו" : "אין פרויקטים פעילים"}</div>`);
+}
 function renderProjects(){
   const body = document.getElementById("projectsBody");
   if(!body) return;
+  try{ renderProjectCards(); }catch(e){ console.error(e); }
   body.innerHTML = "";
   data.projects.forEach(row => {
     const tr = document.createElement("tr");
