@@ -620,6 +620,23 @@
   .key-card:nth-child(even), .holder-card:nth-child(even){ background:var(--tint-b); }
   .key-card:hover, .holder-card:hover{ transform:translateY(-3px); box-shadow:0 4px 10px rgba(16,27,36,.1), 0 12px 26px rgba(16,27,36,.12); }
   .key-card.mismatch{ border-right-color:var(--red); }
+  .fm-card{ background:#fbf7f0; border-radius:18px; padding:12px 14px; margin-bottom:14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); }
+  .fm-empty{ display:flex; flex-direction:column; gap:8px; align-items:flex-start; } .fm-empty span{ font-size:13px; color:var(--ink-soft); line-height:1.5; }
+  .fm-h{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; } .fm-h b{ font-size:15px; }
+  .fm-seg{ display:inline-flex; background:#eee7db; border-radius:10px; padding:3px; } .fm-seg button{ border:none; background:none; border-radius:8px; padding:5px 10px; font:inherit; font-size:12px; font-weight:700; color:#645c50; cursor:pointer; } .fm-seg button.on{ background:#fff; color:#201e1d; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+  .fm-row{ display:grid; grid-template-columns:minmax(0,1fr) 72px 72px 84px; align-items:center; gap:6px; padding:8px 0; border-top:1px solid rgba(32,30,29,.08); font-size:13.5px; }
+  .fm-row > b:first-child{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .fm-row .m{ color:var(--ink-soft); }
+  .fm-th{ border-top:none; font-size:11.5px; font-weight:700; color:var(--ink-soft); padding-top:2px; }
+  .fm-tot{ border-top:1.5px solid rgba(32,30,29,.16); }
+  .fm-p{ justify-self:start; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:999px; border:none; font-family:inherit; white-space:nowrap; }
+  .fm-p.bad{ background:#fde3e1; color:#d6362f; cursor:pointer; } .fm-p.warn{ background:#fff0d4; color:#b86e00; } .fm-p.ok{ background:#ddf3e5; color:#18864c; } .fm-p.mute{ background:#eee7db; color:#8a7f70; }
+  .fm-bars{ display:flex; align-items:flex-end; gap:5px; height:110px; margin-top:8px; }
+  .fm-b{ flex:1; height:100%; position:relative; display:flex; align-items:flex-end; justify-content:center; }
+  .fm-b .e{ position:absolute; bottom:16px; width:100%; background:#d9d1c4; border-radius:6px 6px 0 0; max-height:calc(100% - 16px); }
+  .fm-b .a{ position:absolute; bottom:16px; width:60%; background:var(--m-finance, #1d9a5f); border-radius:5px 5px 0 0; max-height:calc(100% - 16px); }
+  .fm-b .a.over{ background:#e8a317; }
+  .fm-b small{ position:absolute; bottom:0; font-size:10px; color:var(--ink-soft); }
+  .fm-note{ font-size:12px; color:var(--ink-soft); margin-top:8px; }
   #staffClose .scc{ background:#fbf7f0; border-radius:18px; padding:12px 14px; margin:0 0 14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); display:flex; flex-direction:column; gap:10px; }
   .scc-h{ display:flex; align-items:center; justify-content:space-between; gap:8px; } .scc-h b{ font-size:15px; display:inline-flex; align-items:center; gap:6px; } .scc-h span{ font-size:12px; color:var(--ink-soft); font-weight:600; }
   .scc-steps{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; }
@@ -2963,6 +2980,7 @@ button.ct-tl:hover{background:#fbf7f0}
   </div>
 
   <section class="tab" id="tab-finance">
+    <div id="finMonth"></div>
     <div class="cards" id="financeCards"></div>
     <div class="card">
       <div class="toolbar toolbar-sticky">
@@ -15360,6 +15378,7 @@ function renderFinance(){
     });
     body.appendChild(tr);
   });
+  try{ renderFinMonth(); }catch(e){ console.error(e); }
   const cards = document.getElementById("financeCards");
   if(cards){
     cards.innerHTML = `
@@ -15367,6 +15386,59 @@ function renderFinance(){
       <div class="stat ${dueSoon>0?'warn':'good'}"><div class="label">תשלומים קרובים (14 יום)</div><div class="value">${dueSoon}</div></div>
     `;
   }
+}
+
+/* ====================================================================
+   כספים: צפוי מול בפועל (נובמבר 2026) – קריאה בלבד
+   "צפוי" = הסכום הקבוע של התשלום בחודש שהוא אמור לרדת בו.
+   "בפועל" = החיוב שנוצר לאותו חודש בדוח למנהל החשבונות (כפתור "חיוב ל…").
+   ==================================================================== */
+let finView = "month";
+function finExpectedIn(r, ym){
+  const amt = parseFloat(r.amount) || 0; if(!amt) return 0;
+  if(r.freq === "חודשי") return amt;
+  const nd = String(r.nextDue || "").slice(0, 7);
+  if(nd === ym) return amt;
+  if(acxRecBill(r, ym)) return amt;
+  return 0;
+}
+function renderFinMonth(){
+  const box = document.getElementById("finMonth");
+  if(!box) return;
+  const rec = (data.recurring || []).filter(r => r && (String(r.name || "").trim() || parseFloat(r.amount)));
+  if(!rec.length){
+    box.innerHTML = `<div class="fm-card fm-empty"><b>צפוי מול בפועל</b><span>עוד אין תשלומים קבועים. מוסיפים חשמל, מים, ניקיון, אינטרנט… ואז רואים כל חודש מה היה צפוי, כמה חויב בפועל, ומה עוד חסר.</span><button type="button" class="btn" onclick="addRecurring()">+ תשלום קבוע</button></div>`;
+    return;
+  }
+  const now = new Date(), ym = acxYM(now);
+  const seg = `<div class="fm-seg"><button type="button" class="${finView === "month" ? "on" : ""}" onclick="finView='month';renderFinMonth()">החודש</button><button type="button" class="${finView === "year" ? "on" : ""}" onclick="finView='year';renderFinMonth()">12 חודשים</button></div>`;
+  if(finView === "year"){
+    const months = []; for(let i = 11; i >= 0; i--){ const d = new Date(now.getFullYear(), now.getMonth() - i, 1); months.push(acxYM(d)); }
+    const sums = months.map(m => rec.reduce((s, r) => { const b = acxRecBill(r, m); return s + (b ? (parseFloat(b.amount) || 0) : 0); }, 0));
+    const exp = months.map(m => rec.reduce((s, r) => s + finExpectedIn(r, m), 0));
+    const max = Math.max(1, ...sums, ...exp);
+    const top = sums.indexOf(Math.max(...sums));
+    const total = sums.reduce((a, b) => a + b, 0);
+    box.innerHTML = `<div class="fm-card"><div class="fm-h"><b>12 החודשים האחרונים</b>${seg}</div>
+      <div class="fm-bars">${months.map((m, i) => `<div class="fm-b" title="${escHtml(acxPeriodLabel(m))}: ${fmtMoney(sums[i])} (צפוי ${fmtMoney(exp[i])})"><span class="e" style="height:${Math.round(exp[i] / max * 100)}%"></span><span class="a ${sums[i] > exp[i] * 1.05 && exp[i] ? "over" : ""}" style="height:${Math.round(sums[i] / max * 100)}%"></span><small>${Number(m.slice(5))}</small></div>`).join("")}</div>
+      <div class="fm-note">סה״כ חויב: <b>${fmtMoney(total)}</b>${sums[top] > 0 ? ` · הכי גבוה: ${escHtml(acxPeriodLabel(months[top]))} (${fmtMoney(sums[top])})` : ""} · העמודה הבהירה = צפוי</div></div>`;
+    return;
+  }
+  const rows = rec.map(r => {
+    const e = finExpectedIn(r, ym), b = acxRecBill(r, ym), a = b ? (parseFloat(b.amount) || 0) : null;
+    const paid = b && acctStatusOf(b) === "שולם";
+    let pill;
+    if(!e && a === null) pill = `<span class="fm-p mute">לא החודש</span>`;
+    else if(a === null) pill = `<span class="fm-p bad">חסר</span>`;
+    else if(e && a > e * 1.05) pill = `<span class="fm-p warn">+${fmtMoney(a - e)}</span>`;
+    else pill = `<span class="fm-p ok">${paid ? "✓ שולם" : "✓ חויב"}</span>`;
+    return { r, e, a, pill, miss: e && a === null };
+  }).sort((x, y) => (y.miss - x.miss) || (y.e - x.e));
+  const te = rows.reduce((s, x) => s + x.e, 0), ta = rows.reduce((s, x) => s + (x.a || 0), 0);
+  box.innerHTML = `<div class="fm-card"><div class="fm-h"><b>${escHtml(acxPeriodLabel(ym))}</b>${seg}</div>
+    <div class="fm-row fm-th"><span>עלות</span><span>צפוי</span><span>בפועל</span><span></span></div>
+    ${rows.map(x => `<div class="fm-row"><b>${escHtml(x.r.name || x.r.vendor || "תשלום")}</b><span class="m">${x.e ? fmtMoney(x.e) : "—"}</span><b>${x.a !== null ? fmtMoney(x.a) : "—"}</b>${x.miss ? `<button type="button" class="fm-p bad" onclick="acxBillRecurring(${x.r.id}, { fromFinance: true })" title="יצירת חיוב לחודש הזה">חסר · חיוב</button>` : x.pill}</div>`).join("")}
+    <div class="fm-row fm-tot"><b>סה״כ</b><span class="m">${fmtMoney(te)}</span><b>${fmtMoney(ta)}</b><span></span></div></div>`;
 }
 
 
