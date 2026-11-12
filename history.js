@@ -220,6 +220,56 @@
     }
   }
 
+  /* ---------- "בטל" מיד אחרי פעולה (כמו במוקאפ): 6 שניות להחזיר ----------
+     עוטף את השמירה הרגילה. אחרי שמירה מוצלחת שמוחקת, מוסיפה או משנה סטטוס של פריט –
+     מופיעה הודעה עם "בטל". "בטל" שומר בחזרה את מה שהיה בענן רגע לפני (בדרך הרגילה, עם גיבוי), ומרענן. */
+  var UNDO_SKIP = /^(uiPrefs-data|loginLog.*|acctInbox-data)$/;
+  var STATUS_F = { status: 1, done: 1, paid: 1, approved: 1, paymentStatus: 1, dateIn: 1, archived: 1 };
+  function undoToast(key, prev, value){
+    if (!isAdmin() || UNDO_SKIP.test(key) || prev == null || prev === value) return;
+    var ev; try { ev = diff(key, JSON.parse(prev), JSON.parse(value)); } catch (e) { return; }
+    var rel = ev.filter(function(x){ return x.kind === "del" || x.kind === "add" || (x.kind === "chg" && x.fields && x.fields.some(function(f){ return STATUS_F[f]; })); });
+    if (!rel.length || rel.length > 5) return;
+    var x = rel[0], name = itemName(x.kind === "chg" ? x.now : x.item);
+    var msg = rel.length > 1 ? rel.length + " שינויים ב" + keyLabel(key) :
+      x.kind === "del" ? x.noun + " נמחק/ה" + (name ? ": " + name : "") :
+      x.kind === "add" ? x.noun + " חדש/ה" + (name ? ": " + name : "") :
+      x.noun + (name ? " \"" + name + "\"" : "") + " עודכן/ה";
+    var t = document.getElementById("hsUndo");
+    if (!t) { t = document.createElement("div"); t.id = "hsUndo"; document.body.appendChild(t); }
+    clearInterval(t._iv);
+    var left = 6;
+    t.innerHTML = '<span class="ok">✓</span><span class="m"></span><button type="button">בטל</button><span class="c">6</span>';
+    t.querySelector(".m").textContent = msg;
+    t.classList.add("on");
+    t._iv = setInterval(function(){ left--; var c = t.querySelector(".c"); if (c) c.textContent = left; if (left <= 0) { clearInterval(t._iv); t.classList.remove("on"); } }, 1000);
+    t.querySelector("button").onclick = async function(){
+      clearInterval(t._iv); t.querySelector(".m").textContent = "מחזיר…"; this.disabled = true;
+      try {
+        await appStorage.set(key, prev, { force: true, noUndo: true });                       // eslint-disable-line no-undef
+        try { loadStatus[key] = "failed"; } catch (e) {}                                      // eslint-disable-line no-undef
+        try { sessionStorage.setItem("hsDone", "בוטל – " + msg); } catch (e) {}
+        location.reload();
+      } catch (e) { console.error(e); t.classList.remove("on"); note("הביטול לא הצליח: " + ((e && e.message) || e) + "\nאפשר להחזיר מ\"היסטוריה ושחזור\"."); }
+    };
+  }
+  try {
+    var origSet = appStorage.set;                                                              // eslint-disable-line no-undef
+    appStorage.set = async function(key, value, opts){                                         // eslint-disable-line no-undef
+      var prev = null; try { prev = originalLoad.hasOwnProperty(key) ? originalLoad[key] : null; } catch (e) {}   // eslint-disable-line no-undef
+      var r = await origSet.call(this, key, value, opts);
+      if (!(opts && opts.noUndo)) { try { if (originalLoad[key] === value) undoToast(key, prev, value); } catch (e) {} }   // eslint-disable-line no-undef
+      return r;
+    };
+  } catch (e) { console.warn("undo:", e); }
+  var ust = document.createElement("style");
+  ust.textContent = '#hsUndo{position:fixed;bottom:100px;right:16px;left:16px;max-width:460px;margin:0 auto;z-index:9998;background:#2b2723;color:#fff;border-radius:16px;padding:10px 12px 10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 26px rgba(0,0,0,.3);transform:translateY(20px);opacity:0;pointer-events:none;transition:.2s}' +
+    '#hsUndo.on{transform:none;opacity:1;pointer-events:auto}#hsUndo .ok{color:#7fd6a4;font-weight:700}#hsUndo .m{flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '#hsUndo button{background:#c67139;color:#fff;border:none;border-radius:12px;height:36px;padding:0 14px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer}' +
+    '#hsUndo .c{width:28px;height:28px;border-radius:50%;border:3px solid #c67139;border-left-color:#5a524a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:0 0 auto}' +
+    '@media (min-width:761px){#hsUndo{bottom:24px}}';
+  document.head.appendChild(ust);
+
   /* אחרי רענון – הודעה קטנה שהשחזור בוצע */
   try {
     var done = sessionStorage.getItem("hsDone");

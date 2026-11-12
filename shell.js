@@ -558,6 +558,7 @@
       else if (old) old.remove();
     });
     try { strip(t); } catch (e) { console.warn("shell:", e); }
+    try { if (isAdmin()) { alertsFor(""); var bdot = document.getElementById("shBellDot"); if (bdot) bdot.style.display = alertsCache.list.some(function(a){ return a && a.lvl === 1; }) ? "" : "none"; } } catch (e) {}
     var dot = document.getElementById("shAllDot");
     if (dot) { var other = Object.keys(c).filter(function(k){ return BAR.indexOf(k) === -1 && can(k); }); dot.style.display = other.length ? "" : "none"; if (other.length) dot.textContent = other.length; }
   }
