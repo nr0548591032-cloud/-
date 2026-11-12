@@ -307,7 +307,7 @@
       src.forEach(function(g){ var hits = g.rows.filter(function(r){ return norm(r.k).indexOf(q) !== -1; }); if (hits.length) groups.push({ g: g, hits: hits }); });
       if (filt && !groups.some(function(x){ return x.g.t === filt; })) filt = "";
       var all = groups.reduce(function(n, x){ return n + x.hits.length; }, 0);
-      if (groups.length > 1) h = '<div class="sh-chips">' + ['<button type="button" data-f="" class="' + (filt ? "" : "on") + '">הכל · ' + all + '</button>'].concat(groups.map(function(x){ return '<button type="button" data-f="' + x.g.t + '" class="' + (filt === x.g.t ? "on" : "") + '">' + esc(x.g.title.split(" ")[0]) + ' · ' + x.hits.length + '</button>'; })).join("") + '</div>' + h;
+      if (groups.length > 1) h = '<div class="sh-chips">' + ['<button type="button" data-f="" class="' + (filt ? "" : "on") + '">הכל · ' + all + '</button>'].concat(groups.map(function(x){ var tl = x.g.title.length <= 14 ? x.g.title : x.g.title.split(" ").slice(0, 2).join(" "); return '<button type="button" data-f="' + x.g.t + '" class="' + (filt === x.g.t ? "on" : "") + '">' + esc(tl) + ' · ' + x.hits.length + '</button>'; })).join("") + '</div>' + h;
       /* פעולות מהירות לפי מה שנמצא: הודעה לאיש קשר, הזמנה מספק */
       var quick = [];
       groups.forEach(function(x){ x.hits.slice(0, 2).forEach(function(r){
