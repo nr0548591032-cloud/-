@@ -400,7 +400,7 @@
     if (nav) new MutationObserver(schedule).observe(nav, { childList: true });
     var main = document.querySelector("main");
     if (main) new MutationObserver(function(ms){ for (var i = 0; i < ms.length; i++) { var t = ms[i].target; if (t && t.classList && t.classList.contains("tab")) { schedule(); return; } } }).observe(main, { attributes: true, subtree: true, attributeFilter: ["class"] });
-    setInterval(function(){ try { refresh(); } catch (e) {} }, 5000);
+    setInterval(schedule, 3000);   /* גיבוי: אם משהו פספס את הבנייה (כניסה, החלפת משתמש) – נבנה שוב */
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
