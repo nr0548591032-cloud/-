@@ -66,8 +66,9 @@
     try {
       if (Array.isArray(d.tasks)) {
         /* בדיוק כמו בלוח הבקרה: משימות השנה הנוכחית שלא בוצעו */
-        var Y = has("currentSchoolYearStart") ? call("currentSchoolYearStart") : null;
-        var st = function(t){ return has("tkStatus") ? call("tkStatus", t) : t.status; };
+        var Y = null, st = function(t){ return t.status; };
+        try { Y = currentSchoolYearStart(); } catch (e) {}                  // eslint-disable-line no-undef
+        try { if (typeof tkStatus === "function") st = tkStatus; } catch (e) {} // eslint-disable-line no-undef
         var n = d.tasks.filter(function(t){ return t && (Y == null || Number(t.schoolYear || Y) === Y) && st(t) !== "בוצע"; }).length;
         if (n) out.tasks = { n: n, c: col("tasks") };
       }
