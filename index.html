@@ -3420,7 +3420,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261113; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261114; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -21252,12 +21252,16 @@ function colSelect(rows, header, map, f, onch){
 const cell = (r, map, k) => map[k]==='' || map[k]==null ? '' : String(r[+map[k]]??'').trim();
 /* בוחר מקור: קובץ או הדבקה. st = שם המשתנה הגלובלי (IMP / INV) */
 function srcPicker(obj, st, redraw, onWb, onRows, loaded){
+  const aiOk = st==='IMP' && typeof window.aiRead==='function' && !isCook();
   return `<div class="seg" role="group" aria-label="מקור">
+      ${aiOk ? `<button aria-pressed="${obj.src==='ai'}" onclick="with(SP){${st}.src='ai';${redraw}()}">✦ קריאה חכמה</button>` : ''}
       <button aria-pressed="${obj.src==='file'}" onclick="with(SP){${st}.src='file';${redraw}()}">קובץ אקסל / PDF</button>
       <button aria-pressed="${obj.src==='paste'}" onclick="with(SP){${st}.src='paste';${redraw}()}">הדבקה מאקסל</button>
       <button aria-pressed="${obj.src==='text'}" onclick="with(SP){${st}.src='text';${redraw}()}">טקסט חופשי</button>
     </div>
-    ${obj.src==='file' ? `<label class="drop">${ic('file')}<span>${loaded?'הקובץ נטען · אפשר לבחור קובץ אחר':'בחר קובץ אקסל, CSV או PDF'}</span><input type="file" accept=".xlsx,.xls,.csv,.pdf,application/pdf" style="max-width:240px" onchange="with(SP){readTableFile(this.files[0], ${onWb}, ${onRows}, '${st}')}"></label>
+    ${obj.src==='ai' && aiOk ? `<label class="drop">${ic('file')}<span>${IMP.aiBusy ? esc(IMP.aiBusy) : (loaded ? 'נקרא ע״י הסוכן · אפשר לבחור קובץ אחר' : 'בחר PDF, צילום או סריקה של המחירון – הסוכן יקרא אותו')}</span><input type="file" accept=".pdf,application/pdf,image/*" ${IMP.aiBusy?'disabled':''} onchange="with(SP){impAiFile(this.files[0])}"></label>
+       <span class="muted">הסוכן רק קורא. בודקים כאן למטה כל פריט, ושום דבר לא נשמר עד הלחיצה על הייבוא. קובץ אקסל עדיף לטעון ב"קובץ אקסל / PDF".</span>`
+    : obj.src==='file' ? `<label class="drop">${ic('file')}<span>${loaded?'הקובץ נטען · אפשר לבחור קובץ אחר':'בחר קובץ אקסל, CSV או PDF'}</span><input type="file" accept=".xlsx,.xls,.csv,.pdf,application/pdf" style="max-width:240px" onchange="with(SP){readTableFile(this.files[0], ${onWb}, ${onRows}, '${st}')}"></label>
        ${loaded ? pdfBar(st) : ''}`
     : obj.src==='text' ? `<label class="f">הדבק כאן טקסט מה-PDF (פותחים את הקובץ, מסמנים הכל ומעתיקים) או הקלד שורה לכל פריט: שם הפריט ואחריו המחיר<textarea id="sp-textBox" style="min-height:140px" placeholder="קמח לבן 1 ק&quot;ג 4.90&#10;שמן קנולה ליטר 9.50&#10;סוכר ק&quot;ג 5.20"></textarea></label>
        <label class="radio"><input type="checkbox" id="sp-textRev"><span>העברית הודבקה הפוכה (למשל "בלח" במקום "חלב")</span></label>
@@ -21415,7 +21419,7 @@ function supDatalist(){ let extra = []; try{ extra = typeof getSupplierNames ===
 function openImport(catId, listId){
   const l = listId ? S.lists.find(x=>x.id===listId) : null;
   PDFST = null;
-  IMP = {rows:null, sheets:null, wb:null, header:0, map:{}, catId: catId || S.cats[0]?.id || '', newCat:'', supplier: l?.supplier||'', title: l?.title||'', targetList: listId||null, src:'file', mode:'merge', basis:'unit', basisSet:false, basisAuto:false, more:false, sugg:{}, sugList:[], vat:false, vatSet:false};
+  IMP = {rows:null, sheets:null, wb:null, header:0, map:{}, catId: catId || S.cats[0]?.id || '', newCat:'', supplier: l?.supplier||'', title: l?.title||'', targetList: listId||null, src:(typeof window.aiRead==='function' && !isCook()) ? 'ai' : 'file', aiNotes:[], aiBusy:'', mode:'merge', basis:'unit', basisSet:false, basisAuto:false, more:false, sugg:{}, sugList:[], vat:false, vatSet:false};
   drawImport();
 }
 const IMP_FIELDS = ['name','price','cprice','total','unit','sku','barcode','pack','cartons','qty','disc'];
@@ -21451,6 +21455,7 @@ function drawImport(){
   const skipped = r ? r.length-IMP.header-1-parsed.length : 0;
   modal(`<div class="mhead"><h2>ייבוא מחירון</h2>${closeBtn()}</div>
     ${srcPicker(IMP, 'IMP', 'drawImport', 'onImpWb', 'onImpRows', !!r)}
+    ${impAiNotesHTML()}
     ${IMP.sheets && IMP.sheets.length>1 && !(PDFST && PDFST.owner==='IMP') ? `<label class="f">גיליון<select onchange="with(SP){IMP.sheet=this.value;onImpRows(sheetRows(IMP.wb,this.value))}">${IMP.sheets.map(s=>`<option ${s===IMP.sheet?'selected':''}>${esc(s)}</option>`).join('')}</select></label>`:''}
     ${r ? `
       <h3>אילו עמודות הן מה?</h3>
@@ -21551,6 +21556,38 @@ function impFix(id, basis, nIn){
 }
 function impUndo(i){ const k = IMP.flagList && IMP.flagList[i]; if(k !== undefined && IMP.fix) delete IMP.fix[k]; drawImport(); }
 function onImpWb(wb){ IMP.wb = wb; IMP.sheets = wb.SheetNames; IMP.sheet = wb.SheetNames[0]; onImpRows(sheetRows(wb, IMP.sheet)); }
+/* קריאה חכמה (AI): הסוכן קורא את המחירון ומחזיר טבלה רגילה – משם הכל ממשיך בדיוק כמו בייבוא מקובץ */
+async function impAiFile(f){
+  if(!f || !IMP || IMP.aiBusy) return;
+  IMP.aiBusy = 'הסוכן קורא את המחירון…'; IMP.aiNotes = []; drawImport();
+  let res;
+  try{ res = await window.aiRead({task:'pricelist', file:f, hint: IMP.supplier ? 'הספק: '+IMP.supplier : '', onStep: t => { if(!IMP) return; IMP.aiBusy = t; const el = document.querySelector('#sp-modalRoot .drop span'); if(el) el.textContent = t; }}); }
+  catch(e){ res = {ok:false, error: e && e.message || 'שגיאה'}; }
+  if(!IMP) return;
+  IMP.aiBusy = '';
+  if(!res || !res.ok){ drawImport(); toast((res && res.error) || 'הקריאה נכשלה'); return; }
+  impAi(res.data, f.name, res.partial);
+}
+function impAi(d, name, partial){
+  if(!IMP) return;
+  const rows = window.aiPriceRows(d || {});
+  if(rows.length < 2){ IMP.aiNotes = ['הסוכן לא מצא שורות מוצרים בקובץ. נסה קובץ אחר או "טקסט חופשי".']; drawImport(); return; }
+  if(!IMP.supplier && d.supplier) IMP.supplier = String(d.supplier).trim();
+  if(typeof d.prices_include_vat === 'boolean'){ IMP.vat = d.prices_include_vat === false; IMP.vatSet = true; }
+  IMP.aiNotes = (d.items||[]).filter(it => it && it.confidence === 'low' && it.question).slice(0, 12).map(it => `${it.name}: ${it.question}`);
+  if(partial) IMP.aiNotes.unshift('שים לב: ' + partial + '. כדאי לבדוק שלא חסרים פריטים.');
+  IMP.aiName = name || '';
+  PDFST = null;
+  onImpRows(rows);
+}
+/* פתיחה מכפתור + (הסוכן זיהה מחירון) */
+function impAiStart(f){ if(typeof switchTab==='function') switchTab('procurement'); setTab('lists'); openImport(); IMP.src = 'ai'; impAiFile(f); }
+function impAiNotesHTML(){
+  if(!IMP || !IMP.rows || IMP.src !== 'ai') return '';
+  const n = IMP.aiNotes || [];
+  return `<div class="sp-card flat" style="gap:6px;background:var(--tint-a)"><b>✦ הסוכן קרא ${Math.max(0, IMP.rows.length-1)} שורות${IMP.aiName ? ` מתוך ${esc(IMP.aiName)}` : ''}${IMP.vatSet ? ` · ${IMP.vat ? 'המחירים לפני מע״מ' : 'המחירים כוללים מע״מ'}` : ''}</b>
+    ${n.length ? `<span class="muted">שאלות של הסוכן – כדאי לבדוק בתצוגה ובחלון הבדיקה:</span>${n.map(q => `<span class="sp-num">• ${esc(q)}</span>`).join('')}` : `<span class="muted">כל השורות נקראו ברורות. בדוק בכל זאת את התצוגה המקדימה לפני הייבוא.</span>`}</div>`;
+}
 function onImpRows(rows){ IMP.fix = {}; IMP.plStart = 0; IMP.rows = rows; IMP.header = findHeader(rows); IMP.map = guessMap(rows, IMP.header, IMP_FIELDS); IMP.basis = 'unit'; IMP.basisSet = false; IMP.basisAuto = false; drawImport(); }
 function sameSupList(){ const sup=(IMP.supplier||'').trim(); return sup && IMP.catId!=='__new' && S.lists.some(l=>l.catId===IMP.catId && l.supplier===sup); }
 function importTarget(){
@@ -24890,7 +24927,7 @@ Object.defineProperties(SPX, {
 "PDFST":{get(){return PDFST},set(v){PDFST=v},enumerable:true},
 "IMP":{get(){return IMP},set(v){IMP=v},enumerable:true},
 "supDatalist":{get(){return supDatalist},enumerable:true},
-"openImport":{get(){return openImport},enumerable:true},
+"openImport":{get(){return openImport},enumerable:true},"impAiFile":{get(){return impAiFile},enumerable:true},"impAiStart":{get(){return impAiStart},enumerable:true},
 "IMP_FIELDS":{get(){return IMP_FIELDS},enumerable:true},
 "drawImport":{get(){return drawImport},enumerable:true},
 "onImpWb":{get(){return onImpWb},enumerable:true},
@@ -25256,5 +25293,6 @@ return SPX;
 </script>
 <script src="theme.js"></script>
 <script src="shell.js"></script>
+<script src="ai.js"></script>
 </body>
 </html>
