@@ -200,14 +200,33 @@
       acts.push({ id: "saveOther", l: "שמור את הקובץ בחשבוניות וקבלות" });
       sh._lic = lic;
     } else if (t === "quote") {
-      acts.push({ id: "proj", l: "לטאב פרויקטים", main: true });
+      html += '<div class="sh-gt">הצעת מחיר</div><div style="font-size:13px">הצעה של ספק עם רשימת מוצרים ומחירים אפשר לייבא למחירונים, כמו מחירון רגיל.</div>';
+      acts.push({ id: "plist", l: "לייבא למחירונים", main: true });
+      acts.push({ id: "proj", l: "לטאב פרויקטים" });
       acts.push({ id: "saveOther", l: "שמור את הקובץ בחשבוניות וקבלות" });
     } else {
       acts.push({ id: "saveOther", l: "שמור בחשבוניות וקבלות", main: true });
     }
+    /* "למקום אחר": כל יעד באפליקציה, גם אם הסוכן חשב שזה סוג אחר */
+    var used = acts.map(function(a){ return a.id; });
+    var other = [
+      { id: "plist", l: "מחירונים (ייבוא מחירון)", ico: "🏷" },
+      { id: used.indexOf("save") !== -1 ? "save" : "saveOther", l: "חשבוניות וקבלות", ico: "🧾" },
+      { id: "lic", l: "רישוי ובטיחות", ico: "🛡" },
+      { id: "proj", l: "פרויקטים", ico: "📁" },
+      { id: "contact", l: "אנשי קשר וספקים", ico: "📇" },
+      { id: "tasks", l: "משימות", ico: "✅" }
+    ].filter(function(o){ return used.indexOf(o.id) === -1; });
+    var needSel = !document.getElementById("aiTopic") && html.indexOf('id="aiTopic"') === -1;
+    var otherHtml = '<details style="margin-top:12px;background:#fff;border-radius:14px;padding:4px 12px"><summary style="cursor:pointer;font-weight:700;font-size:13.5px;padding:9px 0">לייבא למקום אחר באפליקציה…</summary>' +
+      '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:4px 0 10px">' + other.map(function(o){
+        return '<button type="button" data-ai-act="' + o.id + '" style="min-height:44px;border:1.5px solid rgba(32,30,29,.14);background:#fbf7f0;border-radius:12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;justify-content:center"><span aria-hidden="true">' + o.ico + '</span>' + esc(o.l) + '</button>'; }).join("") + '</div>' +
+      (needSel ? '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding-bottom:10px"><label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#645c50">נושא (לחשבוניות)<select id="aiTopic" style="height:40px;border-radius:12px;border:1.5px solid rgba(32,30,29,.16);padding:0 8px;font-family:inherit;font-size:14px">' + TOPICS.map(function(x){ return '<option' + (x === (TAB_TOPIC[tab] || "אחר") ? " selected" : "") + '>' + x + '</option>'; }).join("") + '</select></label>' +
+        '<label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#645c50">סוג המסמך<select id="aiDocType" style="height:40px;border-radius:12px;border:1.5px solid rgba(32,30,29,.16);padding:0 8px;font-family:inherit;font-size:14px"><option value="אחר" selected>אחר</option><option value="חשבונית">חשבונית (דורש תשלום)</option><option value="קבלה">קבלה (כבר שולם)</option></select></label></div>' : '') +
+      '</details>';
     html += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">' + acts.map(function(a){
       return '<button type="button" data-ai-act="' + a.id + '" style="height:48px;border:none;border-radius:14px;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;' +
-        (a.main ? "background:#2b2723;color:#fff" : "background:#eee7db;color:#201e1d") + '">' + esc(a.l) + '</button>'; }).join("") + '</div>';
+        (a.main ? "background:#2b2723;color:#fff" : "background:#eee7db;color:#201e1d") + '">' + esc(a.l) + '</button>'; }).join("") + '</div>' + otherHtml;
     sh.innerHTML = '<div class="sh-grab"></div>' + html;
 
     sh.onclick = async function(e){
@@ -216,6 +235,8 @@
       var b = e.target.closest && e.target.closest("[data-ai-act]"); if (!b || b.disabled) return;
       var id = b.getAttribute("data-ai-act");
       if (id === "lic") { close(); setTimeout(function(){ try { switchTab("licensing"); } catch (er) {} }, 240); return; }    // eslint-disable-line no-undef
+      if (id === "contact") { close(); setTimeout(function(){ try { switchTab("contacts"); } catch (er) {} if (d.supplier && window.shOpenSearch) window.shOpenSearch(String(d.supplier).split(/[-–,]/)[0].trim()); }, 240); return; } // eslint-disable-line no-undef
+      if (id === "tasks") { close(); setTimeout(function(){ try { switchTab("tasks"); } catch (er) {} if (d.supplier && window.shOpenSearch) window.shOpenSearch(String(d.supplier).split(/[-–,]/)[0].trim()); }, 240); return; } // eslint-disable-line no-undef
       if (id === "proj") { close(); setTimeout(function(){ try { switchTab("projects"); } catch (er) {} }, 240); return; }    // eslint-disable-line no-undef
       if (id === "plist") { close(); setTimeout(function(){ if (window.SP && SP.impAiStart) SP.impAiStart(file); }, 240); return; }
       if (id === "save" || id === "saveOther") {

@@ -319,6 +319,66 @@
   window.shSheet = function(html){ return sheet(html); };
   window.shClose = function(){ closeSheet(); };
 
+  /* ---------- "מה מחכה לך כאן" בראש כל טאב + כפתור ⋯ ---------- */
+  /* מבוסס על אותן התראות של לוח הבקרה (dbAlerts) – קריאה בלבד */
+  var alertsCache = { t: 0, list: [] };
+  function alertsFor(t){
+    var now = Date.now();
+    if (now - alertsCache.t > 4000) {
+      alertsCache.t = now;
+      try { alertsCache.list = dbAlerts(dbCollect()) || []; } catch (e) { alertsCache.list = []; }   // eslint-disable-line no-undef
+    }
+    return alertsCache.list.filter(function(a){ return a && a.tab === t; });
+  }
+  var LVL = { 1: "#ff8a80", 2: "#ffd166", 3: "rgba(255,255,255,.75)" };
+  function strip(t){
+    var sec = document.getElementById("tab-" + t);
+    if (!sec) return;
+    if (t === "dashboard" || !isAdmin()) { var old0 = sec.querySelector(":scope > .sh-wait"); if (old0) old0.remove(); return; }
+    var el = sec.querySelector(":scope > .sh-wait");
+    if (!el) { el = document.createElement("div"); el.className = "sh-wait"; sec.insertBefore(el, sec.firstChild); }
+    var list = alertsFor(t), shown = list.slice(0, 3);
+    el.style.setProperty("--mc", col(t));
+    var sig = t + "|" + list.map(function(a){ return a.title + a.n; }).join("|");
+    if (el.getAttribute("data-sig") === sig) return;
+    el.setAttribute("data-sig", sig);
+    el.innerHTML = '<div class="sh-wh"><span class="sh-wi">' + ic(TAB_IC[t] || "file", 18) + '</span><b>' + (list.length ? "מה מחכה לך כאן · " + list.length : "הכל מסודר כאן") + '</b>' +
+      '<button type="button" class="sh-more" data-sh-more="' + t + '" aria-label="כל הפעולות ב' + esc(label(t)) + '">⋯</button></div>' +
+      shown.map(function(a, i){
+        return '<div class="sh-wr"><i style="background:' + (LVL[a.lvl] || LVL[3]) + '"></i><span><b>' + esc(a.title) + '</b>' + (a.sub ? '<small>' + esc(a.sub) + '</small>' : '') + '</span>' +
+          (typeof a.act === "function" ? '<button type="button" data-sh-wa="' + i + '">פתח</button>' : '') + '</div>';
+      }).join("") +
+      (list.length > 3 ? '<button type="button" class="sh-wall" data-sh-wall="' + t + '">ועוד ' + (list.length - 3) + '</button>' : '');
+    el._list = list;
+  }
+  function openWaitAll(t){
+    var list = alertsFor(t);
+    var sh = sheet(head("מה מחכה לך ב" + label(t), list.length + " פריטים") + '<div class="sh-sgrp">' + list.map(function(a, i){
+      return '<button class="sh-res" type="button" data-i="' + i + '"><span style="width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:' + (a.lvl === 1 ? "var(--st-red)" : a.lvl === 2 ? "#e8a317" : "#c9bfb1") + '"></span><span style="flex:1;min-width:0"><b>' + esc(a.title) + '</b>' + (a.sub ? '<small>' + esc(a.sub) + '</small>' : '') + '</span></button>';
+    }).join("") + '</div>');
+    sh.addEventListener("click", function(e){ var b = e.target.closest && e.target.closest(".sh-res"); if (!b) return; var a = list[Number(b.getAttribute("data-i"))]; closeSheet(); if (a && typeof a.act === "function") later(a.act, 200); });
+  }
+  function openMore(t){
+    var ctx = contextLinks(t), acts = availableActions().filter(function(a){ return a.t === t; });
+    var html = head("כל הפעולות ב" + label(t), "שום פונקציה לא הוסרה – הכל כאן ובכפתור +");
+    if (ctx.length) html += '<div class="sh-sgrp">' + ctx.map(function(x, i){ return '<button class="sh-res" type="button" data-c="' + i + '">' + icoBox(TAB_IC[t] || "file", t, 17) + '<span><b>' + esc(x.l) + '</b></span></button>'; }).join("") + '</div>';
+    if (acts.length) html += '<div class="sh-gt">פעולות מהירות</div><div class="sh-grid">' + acts.map(function(a){ return '<button class="sh-act" type="button" data-a="' + a.id + '">' + icoBox(a.ico, a.t) + esc(a.l) + '</button>'; }).join("") + '</div>';
+    if (!ctx.length && !acts.length) html += '<div class="sh-empty">אין פעולות נוספות לטאב הזה</div>';
+    var sh = sheet(html);
+    sh.addEventListener("click", function(e){
+      var b = e.target.closest && e.target.closest("button"); if (!b) return;
+      if (b.hasAttribute("data-c")) { var x = ctx[Number(b.getAttribute("data-c"))]; closeSheet(); if (x) later(function(){ go(t); x.run(); }, 200); }
+      else if (b.hasAttribute("data-a")) { var a = ACTIONS.filter(function(z){ return z.id === b.getAttribute("data-a"); })[0]; closeSheet(); if (a) { bump(a.id); later(a.run, 200); } }
+    });
+  }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest && e.target.closest("[data-sh-more],[data-sh-wa],[data-sh-wall]"); if (!b) return;
+    if (b.hasAttribute("data-sh-more")) { openMore(b.getAttribute("data-sh-more")); return; }
+    if (b.hasAttribute("data-sh-wall")) { openWaitAll(b.getAttribute("data-sh-wall")); return; }
+    var w = b.closest(".sh-wait"), a = w && w._list && w._list[Number(b.getAttribute("data-sh-wa"))];
+    if (a && typeof a.act === "function") { try { a.act(); } catch (er) { console.warn("shell:", er); } }
+  });
+
   /* ---------- בניית הסרגלים ---------- */
   var BAR = ["tasks", "procurement", "licensing", "staff"];
   var top, bar, lastSig = "";
@@ -377,6 +437,7 @@
       if (n && n.n) { if (!old) { old = document.createElement("span"); old.className = "sh-n"; b.appendChild(old); } old.textContent = n.n > 99 ? "99+" : n.n; }
       else if (old) old.remove();
     });
+    try { strip(t); } catch (e) { console.warn("shell:", e); }
     var dot = document.getElementById("shAllDot");
     if (dot) { var other = Object.keys(c).filter(function(k){ return BAR.indexOf(k) === -1 && can(k); }); dot.style.display = other.length ? "" : "none"; if (other.length) dot.textContent = other.length; }
   }

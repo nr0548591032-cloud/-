@@ -18272,7 +18272,7 @@ function dbCollect(){
 /* ---------- דורש טיפול: רשימה אחת לפי חומרה ---------- */
 function dbAlerts(D){
   const A = [];
-  const add = (lvl, ico, title, sub, n, act, tab) => { if(!tab || dbAllowed(tab)) A.push({ lvl, ico, title, sub, n, act }); };
+  const add = (lvl, ico, title, sub, n, act, tab) => { if(!tab || dbAllowed(tab)) A.push({ lvl, ico, title, sub, n, act, tab }); };
   D.licExpired.forEach(x => add(1, "shield", `פג תוקף: ${x.r.type || "אישור"}`, x.r.inspector ? `בודק: ${x.r.inspector}` : "רישוי ובטיחות", x.n, dbGo("licensing"), "licensing"));
   D.late.forEach(t => {
     const n = tkDaysTo(t.due);
