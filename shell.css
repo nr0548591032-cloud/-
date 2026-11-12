@@ -291,6 +291,14 @@
   body.sh-on #tab-files .job-chip{ padding:5px 10px !important; font-size:12.5px !important; }
   body.sh-on #tab-files .job-card-actions .job-btn{ padding:6px 11px !important; font-size:12.5px !important; min-height:0 !important; }
 
+  /* משימות תפעול: ארבעת המונים כצ'יפים קטנים בשורה אחת */
+  body.sh-on #tkFocus{ display:grid !important; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; }
+  body.sh-on #tkFocus .tk-tile{ padding:7px 6px !important; min-height:0 !important; border-radius:12px !important; align-items:center; text-align:center; }
+  body.sh-on #tkFocus .tk-tile .h{ display:none !important; }
+  body.sh-on #tkFocus .tk-tile .l{ font-size:11px !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+  body.sh-on #tkFocus .tk-tile .v{ font-size:18px !important; }
+  body.sh-on #tab-tasks .tk-card{ padding:11px 12px !important; }
+
   /* המשימות שלי: "היום שלי" כפס קטן למעלה, הרשימה מיד אחריו, ופעולות היום בסוף */
   body.sh-on #mtRoot .mt-grid{ display:flex !important; flex-direction:column; gap:12px; }
   body.sh-on #mtRoot .mt-side{ display:contents !important; }
