@@ -316,6 +316,8 @@
     setTimeout(function(){ inp.focus(); }, 60);
   }
   window.shOpenSearch = openSearch;
+  window.shSheet = function(html){ return sheet(html); };
+  window.shClose = function(){ closeSheet(); };
 
   /* ---------- בניית הסרגלים ---------- */
   var BAR = ["tasks", "procurement", "licensing", "staff"];
