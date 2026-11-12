@@ -262,6 +262,7 @@
       return r;
     };
   } catch (e) { console.warn("undo:", e); }
+  window.__hsUndoToast = undoToast;   // לבדיקות בלבד: מציג את ההודעה בלי לשמור כלום
   var ust = document.createElement("style");
   ust.textContent = '#hsUndo{position:fixed;bottom:100px;right:16px;left:16px;max-width:460px;margin:0 auto;z-index:9998;background:#2b2723;color:#fff;border-radius:16px;padding:10px 12px 10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 26px rgba(0,0,0,.3);transform:translateY(20px);opacity:0;pointer-events:none;transition:.2s}' +
     '#hsUndo.on{transform:none;opacity:1;pointer-events:auto}#hsUndo .ok{color:#7fd6a4;font-weight:700}#hsUndo .m{flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
