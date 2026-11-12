@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>משימה – ניהול הבניין</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Suez+One&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<!--
+  דף לאיש מקצוע (נובמבר 2026). בלי סיסמה ובלי גישה לשום דבר אחר:
+  - קורא רק את המסמך proLinks/{הקוד שבקישור} – פרטי משימה אחת שהמנהל שלח.
+  - כותב רק דיווח חדש ל-proUpdates (נפתח / התחלתי / בוצע + תמונה / הערה).
+  - המנהל רואה את הדיווח באפליקציה ומחליט אם לאשר. הדף לא משנה שום נתון של האפליקציה.
+-->
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f0ea;font-family:Rubik,system-ui,sans-serif;color:#201e1d;font-size:15px}
+.h{font-family:"Suez One",Rubik,serif;font-weight:400}
+.top{background:#2b2723;color:#fff;padding:18px 18px 22px;border-radius:0 0 26px 26px}
+.row{display:flex;align-items:center;gap:10px}
+.ico{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.mut{color:#645c50;font-size:13px}
+.card{background:#fbf7f0;border-radius:18px;box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08);margin:14px 16px 10px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.pill{display:inline-flex;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}
+.ph{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ph img{width:100%;height:130px;object-fit:cover;border-radius:12px;background:#d9d1c4}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:54px;border:none;border-radius:16px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;width:100%}
+.b-done{background:#18864c;color:#fff}.b-start{background:#2f74d0;color:#fff}.b-soft{background:#eee7db;color:#201e1d}
+.btn[disabled]{opacity:.55}
+.acts{display:flex;flex-direction:column;gap:10px;margin:0 16px 30px}
+textarea{width:100%;min-height:70px;border-radius:14px;border:1.5px solid rgba(32,30,29,.15);padding:10px 12px;font:inherit;background:#fff;resize:vertical}
+.ok{background:#ddf3e5;color:#18864c;border-radius:14px;padding:12px 14px;font-weight:600}
+.err{background:#fde3e1;color:#b3261e;border-radius:14px;padding:12px 14px;font-weight:600}
+.prev{width:100%;max-height:220px;object-fit:cover;border-radius:12px;display:none}
+.center{text-align:center;padding:60px 24px;color:#645c50}
+</style>
+</head>
+<body>
+<div id="app"><div class="center">טוען…</div></div>
+<script>
+(function(){
+  "use strict";
+  firebase.initializeApp({ apiKey: "AIzaSyAK0JwkVu7BhPhTTv8RpboK5NnGKbe_Nf4", authDomain: "naftali-menael.firebaseapp.com", projectId: "naftali-menael" });
+  var db = firebase.firestore();
+  var esc = function(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); };
+  var token = (location.hash || "").replace(/^#/, "").trim() || new URLSearchParams(location.search).get("t") || "";
+  var app = document.getElementById("app");
+  var I = {
+    bld: '<path d="M4 21V5l8-3 8 3v16"/><path d="M9 21v-4h6v4"/><path d="M8 8h2M14 8h2M8 12h2M14 12h2"/>',
+    place: '<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',
+    cam: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', play: '<path d="M8 5l11 7-11 7z"/>', msg: '<path d="M4 5h16v11H9l-5 4z"/>'
+  };
+  var ic = function(n, s){ return '<svg width="' + (s || 20) + '" height="' + (s || 20) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + I[n] + '</svg>'; };
+  var sentKey = "pro_sent_" + token;
+  var sent = {}; try { sent = JSON.parse(localStorage.getItem(sentKey) || "{}"); } catch (e) {}
+  function mark(k){ sent[k] = Date.now(); try { localStorage.setItem(sentKey, JSON.stringify(sent)); } catch (e) {} }
+
+  function send(kind, extra){
+    var d = { token: token, kind: kind, at: Date.now() };
+    if (extra && extra.note) d.note = String(extra.note).slice(0, 900);
+    if (extra && extra.photo) d.photo = extra.photo;
+    return db.collection("proUpdates").add(d);
+  }
+  function jpeg(file){
+    return new Promise(function(res, rej){
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function(){
+        var k = Math.min(1, 1280 / Math.max(img.width, img.height));
+        var cv = document.createElement("canvas"); cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+        cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url);
+        var q = 0.8, out = cv.toDataURL("image/jpeg", q);
+        while (out.length > 850000 && q > 0.3) { q -= 0.1; out = cv.toDataURL("image/jpeg", q); }
+        res(out);
+      };
+      img.onerror = function(){ rej(new Error("לא הצלחתי לקרוא את התמונה")); };
+      img.src = url;
+    });
+  }
+
+  if (!token || !/^[A-Za-z0-9]{12,40}$/.test(token)) { app.innerHTML = '<div class="center">הקישור לא תקין. בקש מהמנהל קישור חדש.</div>'; return; }
+  db.collection("proLinks").doc(token).get().then(function(snap){
+    if (!snap.exists) { app.innerHTML = '<div class="center">המשימה הזו כבר לא זמינה. אם צריך – בקש מהמנהל קישור חדש.</div>'; return; }
+    var t = snap.data() || {};
+    if (t.closed) { app.innerHTML = '<div class="center"><b>המשימה נסגרה – תודה רבה!</b></div>'; return; }
+    var first = String(t.assignee || "").split(/\s+/)[0];
+    var photos = Array.isArray(t.photos) ? t.photos.slice(0, 4) : [];
+    app.innerHTML =
+      '<div class="top"><div class="row"><span class="ico" style="background:#c67139;color:#fff">' + ic("bld") + '</span><div><div class="h" style="font-size:18px">ניהול הבניין</div><div style="font-size:12px;color:#d8cfc2">משימה מ' + esc(t.from || "המנהל") + '</div></div></div>' +
+      '<div style="margin-top:14px;font-size:16px">שלום' + (first ? " " + esc(first) : "") + ',</div><div style="font-size:13px;color:#d8cfc2">הנה פרטי העבודה. כשתסיים, לחץ "בוצע" וצרף תמונה.</div></div>' +
+      '<div class="card"><div class="row" style="justify-content:space-between"><span class="mut" style="font-weight:700">משימה ' + esc(t.code || "") + '</span>' + (t.due ? '<span class="pill" style="background:#fff0d4;color:#b86e00">עד ' + esc(t.dueHe || t.due) + '</span>' : '') + '</div>' +
+      '<div class="h" style="font-size:21px">' + esc(t.title || "") + '</div>' +
+      (t.place ? '<div class="row mut" style="gap:6px">' + ic("place", 16) + esc(t.place) + '</div>' : '') +
+      (photos.length ? '<div class="ph">' + photos.map(function(u){ return '<a href="' + esc(u) + '" target="_blank" rel="noopener"><img src="' + esc(u) + '" alt="תמונה מהמנהל" loading="lazy"></a>'; }).join("") + '</div>' : '') +
+      (t.notes ? '<div style="font-size:14.5px;line-height:1.55">' + esc(t.notes) + '</div>' : '') + '</div>' +
+      '<div class="acts" id="acts">' +
+        '<div id="msg"></div>' +
+        '<button class="btn b-start" id="bStart">' + ic("play") + 'התחלתי לעבוד</button>' +
+        '<label class="btn b-done" for="pf">' + ic("cam") + 'בוצע – לצלם תמונה</label><input type="file" id="pf" accept="image/*" capture="environment" style="display:none">' +
+        '<img class="prev" id="prev" alt="">' +
+        '<textarea id="note" placeholder="הערה למנהל (לא חובה) – למשל: הוחלף שסתום, החשבונית תגיע מחר"></textarea>' +
+        '<button class="btn b-done" id="bDone" style="display:none">' + ic("check") + 'שליחה: בוצע</button>' +
+        '<button class="btn b-soft" id="bNote">' + ic("msg") + 'שליחת הערה בלבד</button>' +
+      '</div>';
+    var msg = document.getElementById("msg"), photo = null;
+    function say(t, bad){ msg.innerHTML = '<div class="' + (bad ? "err" : "ok") + '">' + esc(t) + '</div>'; msg.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    if (!sent.open || Date.now() - sent.open > 6 * 3600e3) send("open").then(function(){ mark("open"); }).catch(function(){});
+    if (sent.done) say("כבר שלחת \"בוצע\" – תודה! אפשר לשלוח שוב אם צריך.");
+    document.getElementById("bStart").onclick = function(){
+      var b = this; b.disabled = true;
+      send("start").then(function(){ mark("start"); say("עודכן שהתחלת לעבוד. בהצלחה!"); }).catch(function(e){ b.disabled = false; say("השליחה לא הצליחה – בדוק אינטרנט ונסה שוב", true); });
+    };
+    document.getElementById("pf").onchange = function(){
+      var f = this.files && this.files[0]; if (!f) return;
+      jpeg(f).then(function(d){ photo = d; var p = document.getElementById("prev"); p.src = d; p.style.display = "block"; document.getElementById("bDone").style.display = "flex"; document.getElementById("bDone").scrollIntoView({ behavior: "smooth", block: "center" }); })
+        .catch(function(e){ say(e.message, true); });
+    };
+    document.getElementById("bDone").onclick = function(){
+      var b = this; b.disabled = true; b.textContent = "שולח…";
+      send("done", { photo: photo, note: document.getElementById("note").value.trim() }).then(function(){
+        mark("done"); b.style.display = "none"; say("תודה! המנהל קיבל את העדכון והתמונה.");
+      }).catch(function(){ b.disabled = false; b.textContent = "שליחה: בוצע"; say("השליחה לא הצליחה – בדוק אינטרנט ונסה שוב", true); });
+    };
+    document.getElementById("bNote").onclick = function(){
+      var n = document.getElementById("note").value.trim(); if (!n) { say("כתוב הערה קודם", true); return; }
+      var b = this; b.disabled = true;
+      send("note", { note: n }).then(function(){ b.disabled = false; document.getElementById("note").value = ""; say("ההערה נשלחה למנהל"); }).catch(function(){ b.disabled = false; say("השליחה לא הצליחה – נסה שוב", true); });
+    };
+  }).catch(function(e){
+    app.innerHTML = '<div class="center">לא הצלחתי לפתוח את המשימה. נסה שוב בעוד רגע.</div>';
+    console.error(e);
+  });
+})();
+</script>
+</body>
+</html>

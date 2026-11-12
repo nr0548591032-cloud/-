@@ -49,6 +49,22 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // קישור לאיש מקצוע: כל מי שיש לו את הקוד המדויק קורא את פרטי המשימה האחת הזו. אין רשימה ואין כתיבה (רק המנהל, בחוק שלמעלה).
+    match /proLinks/{token} {
+      allow get: if true;
+    }
+    // דיווח מאיש מקצוע: רק יצירה של דיווח חדש, רק עם קוד קישור קיים, ובגודל מוגבל. קריאה ושינוי – רק המנהל.
+    match /proUpdates/{id} {
+      allow create: if request.resource.data.keys().hasOnly(["token", "kind", "note", "photo", "at"])
+                    && request.resource.data.token is string
+                    && request.resource.data.token.size() >= 12 && request.resource.data.token.size() <= 40
+                    && exists(/databases/$(database)/documents/proLinks/$(request.resource.data.token))
+                    && request.resource.data.kind in ["open", "start", "done", "note"]
+                    && request.resource.data.at is number
+                    && (!("note" in request.resource.data) || (request.resource.data.note is string && request.resource.data.note.size() <= 1000))
+                    && (!("photo" in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() <= 900000));
+    }
+
     // כל משתמש קורא רק את רשומת ההרשאות של עצמו. רק המנהל כותב (בחוק שלמעלה).
     match /appUsers/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
