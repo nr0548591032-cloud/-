@@ -179,7 +179,8 @@ export default async (req) => {
             : r.status === 429 ? "יותר מדי בקשות בבת אחת. נסה שוב בעוד דקה"
             : r.status === 401 ? "מפתח ה-AI לא תקין או שפג תוקפו"
             : "שגיאה בשירות ה-AI (" + r.status + (t ? " " + t : "") + ")";
-          result = { ok: false, error: msg };
+          if (r.status === 400) console.log("anthropic 400:", j?.error?.message);
+          result = { ok: false, error: msg, detail: String(j?.error?.message || "").slice(0, 300) };
         } else {
           const use = (j.content || []).find(c => c.type === "tool_use");
           result = use ? { ok: true, task, data: use.input, truncated: j.stop_reason === "max_tokens", usage: j.usage }
