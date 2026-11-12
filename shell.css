@@ -288,6 +288,21 @@
   body.sh-on #tab-files .job-chip{ padding:5px 10px !important; font-size:12.5px !important; }
   body.sh-on #tab-files .job-card-actions .job-btn{ padding:6px 11px !important; font-size:12.5px !important; min-height:0 !important; }
 
+  /* המשימות שלי: "היום שלי" כפס קטן למעלה, הרשימה מיד אחריו, ופעולות היום בסוף */
+  body.sh-on #mtRoot .mt-grid{ display:flex !important; flex-direction:column; gap:12px; }
+  body.sh-on #mtRoot .mt-side{ display:contents !important; }
+  body.sh-on #mtRoot .mt-today{ order:0; display:flex !important; align-items:center; gap:12px; padding:10px 14px !important; border-radius:16px !important; min-height:0 !important; }
+  body.sh-on #mtRoot .mt-today .h{ display:none; }
+  body.sh-on #mtRoot .mt-today .ring{ width:54px !important; height:54px !important; flex:0 0 auto; }
+  body.sh-on #mtRoot .mt-today .ring svg{ width:54px !important; height:54px !important; }
+  body.sh-on #mtRoot .mt-today .ring .c b{ font-size:15px !important; }
+  body.sh-on #mtRoot .mt-today .ring .c span{ display:none; }
+  body.sh-on #mtRoot .mt-today .msg{ font-size:14px; margin:0 !important; }
+  body.sh-on #mtRoot .mt-main{ order:1; }
+  body.sh-on #mtRoot .mt-actions{ order:2; }
+  body.sh-on #mtRoot .mt-private{ order:3; padding:8px 12px !important; font-size:12px !important; }
+  body.sh-on #mtRoot .mt-head .tk-sub{ font-size:12.5px; }
+
   /* מפתחות: שני כרטיסים בשורה, נמוכים */
   body.sh-on .key-grid{ grid-template-columns:repeat(2, minmax(0,1fr)) !important; gap:8px !important; }
   body.sh-on .key-card{ padding:9px 10px !important; gap:3px !important; }
