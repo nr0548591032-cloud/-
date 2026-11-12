@@ -167,3 +167,32 @@
 @media print{ .sh-wait, #shTop, #shBar{ display:none !important; } }
 
 @media (prefers-reduced-motion: reduce){ .sh-sheet, .sh-scrim{ transition:none; } }
+
+/* ======================================================================
+   עיצוב אחיד לכל הטאבים (נובמבר 2026) – רק צבעים, פינות וצללים.
+   כל טאב מקבל את צבע התחום שלו לכפתורים הראשיים, וצבעי הסטטוס אמיתיים:
+   אדום = באיחור/פג, כתום = ממתין, ירוק = תקין, כחול = מידע.
+   ====================================================================== */
+:root{
+  --red:#d6362f; --red-bg:#fde3e1; --green:#18864c; --green-bg:#ddf3e5;
+  --violet:#6c4fd8; --violet-bg:#ece7fd;
+  --job-ok:#18864c; --job-ok-bg:#ddf3e5; --job-warn:#b86e00; --job-warn-bg:#fff0d4;
+}
+#tab-tasks{ --brand:var(--m-tasks); --job-accent:var(--m-tasks); }
+#tab-licensing{ --brand:var(--m-licensing); --job-accent:var(--m-licensing); }
+#tab-staff{ --brand:var(--m-staff); --job-accent:var(--m-staff); }
+#tab-accountant{ --brand:var(--m-accountant); --job-accent:var(--m-accountant); }
+#tab-finance{ --brand:var(--m-finance); --job-accent:var(--m-finance); }
+#tab-keys{ --brand:var(--m-keys); --job-accent:var(--m-keys); }
+#tab-equipment{ --brand:var(--m-equipment); --job-accent:var(--m-equipment); }
+#tab-files{ --brand:var(--m-files); --job-accent:var(--m-files); }
+#tab-projects{ --brand:var(--m-projects); --job-accent:var(--m-projects); }
+#tab-contacts{ --brand:var(--m-contacts); --job-accent:var(--m-contacts); }
+#tab-procurement, #sp-modalRoot{
+  --brand:var(--m-procurement); --job-accent:var(--m-procurement);
+}
+#tab-procurement .spx, #sp-modalRoot.spx{
+  --sp-brand:var(--m-procurement); --sp-brand-ink:#ffffff;
+  --sp-green:#18864c; --sp-green-bg:#ddf3e5; --sp-red:#d6362f; --sp-red-bg:#fde3e1; --sp-amber:#b86e00; --sp-amber-bg:#fff0d4;
+  --sp-tint-a:#e3f6f5;
+}
