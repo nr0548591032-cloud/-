@@ -1,0 +1,66 @@
+rules_version = '2';
+// חוקי האבטחה של ניהול הבניין (נובמבר 2026). העתק של מה שמפורסם בקונסול של Firebase.
+// מנהל: הכל. משה ומנהל החשבונות: רק המסמכים שלהם. משתמשים שנוספו מתוך התוכנה: לפי appUsers/{uid}.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn()     { return request.auth != null; }
+    function isAdmin()      { return signedIn() && request.auth.token.email == "nr0548591032@gmail.com"; }
+    function isAccountant() { return signedIn() && request.auth.uid == "W9hOSl2CDmN5CclHgIwE2oZl8R42"; }
+    function isMoshe()      { return signedIn() && request.auth.uid == "D4dmSNOZutgJ5ty2WCYZ1Yx0gtD2"; }
+
+    // מסמך גיבוי (X__backup) מקבל את אותה הרשאה כמו המסמך עצמו
+    function base(d) { return d.split("__backup")[0]; }
+
+    // ---- משתמשים שנוספו מתוך התוכנה ----
+    function userPath()  { return /databases/$(database)/documents/appUsers/$(request.auth.uid); }
+    function isUser()    { return signedIn() && exists(userPath()) && get(userPath()).data.active == true; }
+    function lvl(t)      { return get(userPath()).data.tabs.get(t, ""); }
+    function sees(t)     { return lvl(t) == "view" || lvl(t) == "edit"; }
+    function edits(t)    { return lvl(t) == "edit"; }
+    function ownLog(d)   { return d == "loginLog-u_" + request.auth.uid + "-data"; }
+
+    function userRead(d) {
+      return ownLog(d)
+        || (sees("tasks")       && d in ["tasks-data", "contacts-data", "equipment-data"])
+        || (sees("procurement") && d in ["supply-data", "supplyOrders-data", "supplyKitchen-data", "supplyBasket-data", "procurement-data", "contacts-data"])
+        || (sees("licensing")   && d in ["licensing-data", "ttd-data", "contacts-data"])
+        || (sees("equipment")   && d in ["equipment-data", "serviceContracts-data", "maintBudget-data", "contacts-data"])
+        || (sees("keys")        && d in ["keys-data"])
+        || (sees("contacts")    && d in ["contacts-data"])
+        || (sees("files")       && d in ["files-data", "tasks-data"])
+        || (sees("projects")    && d in ["projects-data", "contacts-data"])
+        || (sees("finance")     && d in ["recurring-data"]);
+    }
+    function userWrite(d) {
+      return ownLog(d)
+        || (edits("tasks")       && d in ["tasks-data"])
+        || (edits("procurement") && d in ["supply-data", "supplyOrders-data", "supplyKitchen-data", "supplyBasket-data", "procurement-data"])
+        || (edits("licensing")   && d in ["licensing-data", "ttd-data"])
+        || (edits("equipment")   && d in ["equipment-data", "serviceContracts-data", "maintBudget-data"])
+        || (edits("keys")        && d in ["keys-data"])
+        || (edits("contacts")    && d in ["contacts-data"])
+        || (edits("files")       && d in ["files-data"])
+        || (edits("projects")    && d in ["projects-data"])
+        || (edits("finance")     && d in ["recurring-data"]);
+    }
+
+    // מנהל: הכל
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // כל משתמש קורא רק את רשומת ההרשאות של עצמו. רק המנהל כותב (בחוק שלמעלה).
+    match /appUsers/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+    }
+
+    match /buildingApp/{docId} {
+      allow read: if (isAccountant() && base(docId) in ["loginLog-accountant-data", "acctSends-data", "acctView-data", "acctInbox-data"])
+                  || (isMoshe()      && base(docId) in ["licensing-data", "ttd-data", "loginLog-moshe-data", "mosheView-data"])
+                  || (isUser()       && userRead(base(docId)));
+      allow write: if (isAccountant() && base(docId) in ["acctInbox-data", "loginLog-accountant-data"])
+                   || (isMoshe()      && base(docId) in ["licensing-data", "ttd-data", "loginLog-moshe-data"])
+                   || (isUser()       && userWrite(base(docId)));
+    }
+  }
+}

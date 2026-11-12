@@ -3869,6 +3869,42 @@ function roleCanWrite(key){
   return !list || list.includes(key);
 }
 function loginLogKey(){ return isLimitedRole() ? "loginLog-" + currentRole + "-data" : "loginLog-data"; }
+
+/* =====================================================================
+   משתמשים שהמנהל מוסיף מתוך התוכנה (נובמבר 2026)
+   כל משתמש: רשומה ב-appUsers/{uid} עם הטאבים שלו ("view" = צפייה, "edit" = עריכה).
+   הוא טוען מהענן רק את המסמכים של הטאבים האלה, ושומר רק במה שסומן לו "עריכה".
+   חוקי Firestore בודקים את אותה רשומה – גם בדרך טכנית אי אפשר לקרוא מעבר לזה.
+   צוות ותורנים ודוח למנהל חשבונות לא ניתנים כאן (שכר ופרטי בנק).
+   ===================================================================== */
+const CUSTOM_TAB_KEYS = {
+  tasks:       { read: ["tasks-data", "contacts-data", "equipment-data"], write: ["tasks-data"] },
+  procurement: { read: ["supply-data", "supplyOrders-data", "supplyKitchen-data", "supplyBasket-data", "procurement-data", "contacts-data"],
+                 write: ["supply-data", "supplyOrders-data", "supplyKitchen-data", "supplyBasket-data", "procurement-data"] },
+  licensing:   { read: ["licensing-data", "ttd-data", "contacts-data"], write: ["licensing-data", "ttd-data"] },
+  equipment:   { read: ["equipment-data", "serviceContracts-data", "maintBudget-data", "contacts-data"], write: ["equipment-data", "serviceContracts-data", "maintBudget-data"] },
+  keys:        { read: ["keys-data"], write: ["keys-data"] },
+  contacts:    { read: ["contacts-data"], write: ["contacts-data"] },
+  files:       { read: ["files-data", "tasks-data"], write: ["files-data"] },
+  projects:    { read: ["projects-data", "contacts-data"], write: ["projects-data"] },
+  finance:     { read: ["recurring-data"], write: ["recurring-data"] }
+};
+const CUSTOM_DATA_KEY = { "tasks-data": "tasks", "contacts-data": "contacts", "equipment-data": "equipment", "licensing-data": "licensing",
+  "ttd-data": "ttd", "serviceContracts-data": "serviceContracts", "maintBudget-data": "maintBudget", "keys-data": "keys", "files-data": "files",
+  "projects-data": "projects", "recurring-data": "recurring", "procurement-data": "procurement" };
+function isCustomRole(){ return typeof currentRole === "string" && currentRole.indexOf("u_") === 0; }
+function setupCustomRole(uid, p){
+  const role = "u_" + uid;
+  const lv = p && p.tabs && typeof p.tabs === "object" ? p.tabs : {};
+  const ok = tabs.filter(t => CUSTOM_TAB_KEYS[t] && (lv[t] === "view" || lv[t] === "edit"));
+  if(!ok.length) return null;
+  const read = new Set(), write = new Set();
+  ok.forEach(t => { CUSTOM_TAB_KEYS[t].read.forEach(k => read.add(k)); if(lv[t] === "edit") CUSTOM_TAB_KEYS[t].write.forEach(k => write.add(k)); });
+  ROLES[role] = { label: String(p.name || "משתמש"), tabs: ok, custom: true, levels: lv };
+  ROLE_LOAD_KEYS[role] = [...read].filter(k => CUSTOM_DATA_KEY[k]).map(k => [CUSTOM_DATA_KEY[k], k]).concat([["loginLog", "loginLog-" + role + "-data"]]);
+  ROLE_WRITE_KEYS[role] = [...write, "loginLog-" + role + "-data"];
+  return role;
+}
 function allowedTabs(){
   const r = ROLES[currentRole];
   return r.tabs ? tabs.filter(t => r.tabs.includes(t)) : tabs;
@@ -3944,7 +3980,16 @@ function renderLoginLog(){
 }
 auth.onAuthStateChanged(async (user) => {
   if(user){
-    const role = UID_TO_ROLE[user.uid];
+    let role = UID_TO_ROLE[user.uid];
+    if(!role){
+      /* משתמש שהמנהל הוסיף מתוך התוכנה */
+      try{
+        const snap = await db.collection("appUsers").doc(user.uid).get({ source: "server" });
+        const p = snap.exists ? snap.data() : null;
+        if(p && p.active === true) role = setupCustomRole(user.uid, p);
+        else if(p && p.active !== true){ document.getElementById("loginError").textContent = "המשתמש הזה הושבת. פנה למנהל."; await auth.signOut(); return; }
+      }catch(e){ console.error("טעינת הרשאות משתמש נכשלה", e); }
+    }
     if(!role){
       document.getElementById("loginError").textContent = "משתמש זה לא מוגדר במערכת. פנה למנהל.";
       await auth.signOut();
@@ -4190,9 +4235,17 @@ async function loadLimited(){
     if(anyLoadFailed()) return;
     try{
       const res = await appStorage.get(storageKey);
-      if(res && res.value){ data[dataKey] = JSON.parse(res.value); }
+      if(res && res.value){
+        if(storageKey === "keys-data"){
+          const k = JSON.parse(res.value);
+          if(k.inventory) data.keysInventory = k.inventory; if(k.log) data.keysLog = k.log; if(k.holders) data.keysHolders = k.holders;
+          if(k.masters) data.masterKeys = k.masters; if(k.importDone) data.keysImportDone = k.importDone; if(k.codeMastersDone) data.codeMasterKeysDone = k.codeMastersDone;
+        }else data[dataKey] = JSON.parse(res.value);
+      }
     }catch(e){ /* appStorage סימן את המפתח ככושל, והאפליקציה תיחסם במסך שגיאה עם הסיבה */ }
   }
+  if(anyLoadFailed()) return;
+  if(isCustomRole() && allowedTabs().includes("procurement") && window.SP) await SP.loadFromCloud();
   if(anyLoadFailed()) return;
   if(!Array.isArray(data.loginLog)) data.loginLog = [];
   if(currentRole === "moshe") mosheApplyView();
@@ -19465,6 +19518,11 @@ function initLimitedApp(){
   buildNav();
   if(ok.includes("licensing")) renderLic();
   if(ok.includes("accountant")) renderAccountantReport();
+  if(isCustomRole()){
+    const R = { tasks: () => renderTasks(), equipment: () => renderEquipment(), procurement: () => { renderProc(); if(window.SP) SP.init(); },
+      keys: () => renderKeysTab(), contacts: () => renderContacts(), files: () => renderFiles(), projects: () => renderProjects(), finance: () => renderFinance() };
+    ok.forEach(t => { if(R[t]){ try{ R[t](); }catch(e){ console.error("טאב " + t, e); } } });
+  }
   switchTab(ok[0]);
   if(ok.includes("accountant")){ try{ acxHandleDeepLink(); }catch(e){ console.error(e); } }
 }
@@ -25298,5 +25356,6 @@ return SPX;
 <script src="theme.js"></script>
 <script src="shell.js"></script>
 <script src="ai.js"></script>
+<script src="users.js"></script>
 </body>
 </html>

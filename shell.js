@@ -204,6 +204,7 @@
       var el = document.getElementById(p[0]);
       if (el && el.style.display !== "none" && has(p[1])) links.push({ l: el.textContent.trim(), f: p[1] });
     });
+    if (isAdmin() && typeof window.openUsersAdmin === "function") links.unshift({ l: "משתמשים והרשאות", f: "openUsersAdmin" });
     var ri = document.getElementById("roleIndicator");
     if (ri && has("switchUser")) links.push({ l: (ri.textContent.trim() || "החלפת משתמש"), f: "switchUser" });
     if (links.length) html += '<div class="sh-links">' + links.map(function(x, i){ return '<button class="sh-link" type="button" data-sh-link="' + i + '">' + esc(x.l) + '</button>'; }).join("") + '</div>';
@@ -424,10 +425,12 @@
     if (sb && !sb.querySelector(".sh-side-tools")) {
       var tools = document.createElement("div"); tools.className = "sh-side-tools";
       tools.innerHTML = '<button class="sh-side-btn" type="button" data-sh="search">' + ic("search", 18) + '<span>חיפוש</span><kbd>Ctrl K</kbd></button>' +
-        '<button class="sh-side-btn sh-new" type="button" data-sh="plus">' + ic("plus", 18) + '<span>חדש</span></button>';
+        '<button class="sh-side-btn sh-new" type="button" data-sh="plus">' + ic("plus", 18) + '<span>חדש</span></button>' +
+        '<button class="sh-side-btn sh-users" type="button" data-sh="users">' + ic("users", 18) + '<span>משתמשים והרשאות</span></button>';
       sb.insertBefore(tools, nav);
     }
     var nb = sb && sb.querySelector(".sh-new"); if (nb) nb.style.display = isAdmin() ? "" : "none";
+    var ub = sb && sb.querySelector(".sh-users"); if (ub) ub.style.display = isAdmin() && typeof window.openUsersAdmin === "function" ? "" : "none";
     refresh();
   }
   function refresh(){
@@ -456,6 +459,7 @@
     if (b.hasAttribute("data-sh-go")) { go(b.getAttribute("data-sh-go")); return; }
     var k = b.getAttribute("data-sh");
     if (k === "plus") openPlus(); else if (k === "search") openSearch(); else if (k === "all") openAll();
+    else if (k === "users" && typeof window.openUsersAdmin === "function") window.openUsersAdmin();
   });
   document.addEventListener("keydown", function(e){
     if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === "k" || e.key === "K" || e.key === "ל")) {
