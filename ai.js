@@ -76,6 +76,8 @@
     try { return JSON.parse(txt); } catch (e) { return { ok: false, error: r.status === 504 ? "הקריאה לקחה יותר מדי זמן. נסה עמוד אחד בכל פעם" : "תשובה לא תקינה מהשרת (" + r.status + ")" }; }
   }
 
+  window.aiCall = callServer;   // לשימוש של ההקלטה הקולית (voice.js)
+
   /* aiRead({task:'pricelist'|'document', file, hint, onStep}) → {ok, data, error} */
   window.aiRead = async function(o){
     var step = o.onStep || function(){};

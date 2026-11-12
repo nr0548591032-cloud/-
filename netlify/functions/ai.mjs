@@ -81,6 +81,26 @@ const TOOLS = {
       },
       required: ["doc_type", "doc_type_he", "supplier", "uncertain_fields"]
     }
+  },
+  voice: {
+    name: "save_voice_note",
+    description: "Turn a spoken Hebrew note of a building manager into one structured item.",
+    input_schema: {
+      type: "object",
+      properties: {
+        kind: { type: "string", enum: ["ops_task", "my_task", "purchase"], description: "ops_task = work for a professional/maintenance person in the building (repair, leak, check). my_task = a personal to-do / reminder for the manager himself (call, email, meeting, buy something small). purchase = ordering food/supplies for the kitchen/building." },
+        title: { type: "string", description: "Short Hebrew title, max ~8 words, without the date/person/urgency words" },
+        place: { type: "string", description: "Where in the building, if said (e.g. 'שירותים קומה 2'). Empty if not said." },
+        assignee: { type: "string", description: "The professional/person to send it to, EXACTLY as one of the known contact names if it matches one. Empty if none." },
+        urgent: { type: "boolean" },
+        due: { type: "string", description: "Due date as YYYY-MM-DD if a day was said (today/tomorrow/Sunday/date). Empty if not said." },
+        remind: { type: "string", description: "Reminder date YYYY-MM-DD if the manager asked to be reminded. Empty if not." },
+        my_type: { type: "string", enum: ["phone", "mail", "buy", "meet", "doc", "field", "general"], description: "For my_task: the type of action" },
+        items: { type: "array", description: "For purchase: the products and quantities said", items: { type: "object", properties: { name: { type: "string" }, qty: { type: "number" }, unit: { type: "string" } }, required: ["name"] } },
+        notes: { type: "string", description: "Any other detail said that does not fit above. Short Hebrew." }
+      },
+      required: ["kind", "title"]
+    }
   }
 };
 
@@ -94,7 +114,11 @@ const PROMPTS = {
   document:
     "זה מסמך שהועלה למערכת ניהול של בניין / מוסד בישראל (חשבונית, קבלה, אישור עבודה, אישור בודק, דוח ליקויים, הצעת מחיר, חוזה שירות ועוד). " +
     "זהה את סוג המסמך והחזר את השדות בעזרת הכלי save_document. אל תנחש: שדה שלא כתוב – השאר ריק. " +
-    "שדה שקשה לקרוא – מלא את הקריאה הסבירה וכתוב את שמו ב-uncertain_fields."
+    "שדה שקשה לקרוא – מלא את הקריאה הסבירה וכתוב את שמו ב-uncertain_fields.",
+  voice:
+    "זו הקלטה קולית (מתומללת) של מנהל בניין / מוסד בישראל, שאומר בקצרה משהו שצריך לעשות. " +
+    "הבן מה הוא רוצה והחזר פריט אחד בעזרת הכלי save_voice_note. תאריכים יחסיים (מחר, ביום ראשון) חשב לפי התאריך של היום שמופיע במידע הנוסף. " +
+    "אם הוא מזכיר איש מקצוע – בחר את השם המדויק מרשימת אנשי הקשר שבמידע הנוסף, ואם אין התאמה ברורה השאר ריק. אל תמציא פרטים שלא נאמרו."
 };
 
 /* ---------- בדיקת המשתמש מול Firebase ---------- */
@@ -151,10 +175,10 @@ export default async (req) => {
   const blocks = toBlocks(body.parts);
   if (!blocks.length) return json({ ok: false, error: "לא נשלח תוכן לקריאה" }, 400);
 
-  const hint = body.hint ? "\n\nמידע נוסף מהמשתמש: " + String(body.hint).slice(0, 500) : "";
+  const hint = body.hint ? "\n\nמידע נוסף מהמשתמש: " + String(body.hint).slice(0, task === "voice" ? 4000 : 500) : "";
   const payload = {
     model: env("AI_MODEL", "claude-sonnet-5-5"),
-    max_tokens: task === "pricelist" ? 16000 : 4000,
+    max_tokens: task === "pricelist" ? 16000 : task === "voice" ? 1500 : 4000,
     tools: [TOOLS[task]],
     tool_choice: { type: "auto" },
     messages: [{ role: "user", content: [...blocks, { type: "text", text: PROMPTS[task] + hint + "\n\nחובה להחזיר את התשובה רק דרך קריאה לכלי " + TOOLS[task].name + ", בלי טקסט נוסף." }] }]

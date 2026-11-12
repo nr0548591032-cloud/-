@@ -48,6 +48,7 @@
     folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
     wrench:'<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 0-5-5z"/>',
     receipt:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+    mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
     bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
     filter:'<path d="M4 5h16l-6 8v5l-4 2v-7z"/>',
     clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
@@ -166,6 +167,9 @@
     if (typeof window.shAI === "function" && isAdmin()) {
       html += '<button class="sh-ai" type="button" data-sh-ai><span class="sh-ico" style="background:#c67139;color:#fff;width:46px;height:46px">' + ic("spark", 23) + '</span><span style="flex:1"><b style="font-size:15px">צלם או העלה מסמך – הסוכן</b><small>חשבונית, אישור בודק, מחירון, הצעת מחיר – הוא יזהה ויציע, ואתה מאשר</small></span><span class="sh-ico" style="background:#ffffff1f;width:36px;height:36px">' + ic("camera", 18) + '</span></button>';
     }
+    if (typeof window.shVoice === "function" && isAdmin()) {
+      html += '<button class="sh-ai sh-vc" type="button" data-sh-vc><span class="sh-ico" style="background:#6c4fd8;color:#fff;width:46px;height:46px">' + ic("mic", 23) + '</span><span style="flex:1"><b style="font-size:15px">הקלטה קולית</b><small>אמור מה צריך לעשות – משימה, משימה שלי או רכש. הסוכן מציע, אתה מאשר</small></span></button>';
+    }
     var ctx = t && t !== "dashboard" ? contextLinks(t) : [];
     if (ctx.length) {
       html += '<div class="sh-gt" style="color:' + col(t) + '">ב' + esc(label(t)) + '</div><div class="sh-grid">' +
@@ -181,6 +185,7 @@
     sh.addEventListener("click", function(e){
       var b = e.target.closest && e.target.closest("button"); if (!b) return;
       if (b.hasAttribute("data-sh-ai")) { closeSheet(); later(function(){ window.shAI(t); }, 240); return; }
+      if (b.hasAttribute("data-sh-vc")) { closeSheet(); later(function(){ window.shVoice(); }, 240); return; }
       if (b.hasAttribute("data-sh-ctx")) { var x = ctx[Number(b.getAttribute("data-sh-ctx"))]; closeSheet(); if (x) later(function(){ go(t); x.run(); }, 200); return; }
       if (b.hasAttribute("data-sh-act")) {
         var id = b.getAttribute("data-sh-act"), a = ACTIONS.filter(function(z){ return z.id === id; })[0];
@@ -455,7 +460,8 @@
     el.setAttribute("data-sig", sig);
     var tp = function(x){ try { return MT_TYPES[x.type] || MT_TYPES.general; } catch (e) { return { c: "#82796a", p: "" }; } };   // eslint-disable-line no-undef
     el.innerHTML =
-      '<button type="button" class="shh-srch" data-shh="search">' + ic("search", 19) + '<span>חיפוש בכל המערכת – ספק, משימה, מוצר, מפתח…</span></button>' +
+      '<div class="shh-sr"><button type="button" class="shh-srch" data-shh="search">' + ic("search", 19) + '<span>חיפוש בכל המערכת – ספק, משימה, מוצר, מפתח…</span></button>' +
+      (typeof window.shVoice === "function" ? '<button type="button" class="shh-mic" data-shh="voice" aria-label="הקלטה קולית">' + ic("mic", 21) + '</button>' : '') + '</div>' +
       '<section class="shh-today">' +
         '<div class="shh-th"><b>' + (alerts.length ? (alerts.length === 1 ? "דבר אחד מחכה לך היום" : alerts.length + " דברים מחכים לך היום") : "הכל מסודר היום") + '</b><span>היום</span></div>' +
         (top3.length ? top3.map(function(a, i){
@@ -489,6 +495,7 @@
     var k = b.getAttribute("data-shh");
     if (k === "search") openSearch();
     else if (k === "bell") openAllAlerts();
+    else if (k === "voice") window.shVoice();
     else if (k === "full") { document.body.classList.toggle("sh-dbfull"); b.querySelector("span").textContent = document.body.classList.contains("sh-dbfull") ? "הסתרת לוח הבקרה המלא" : "לוח הבקרה המלא – גרפים, תקציב וכל הנתונים"; }
     else if (k === "mt") { go("tasks"); later(function(){ var m = document.querySelector('[data-mt-mode="mine"]'); if (m && m.getAttribute("aria-selected") !== "true") m.click(); later(function(){ var i = document.querySelector("#mtQaForm input"); if (i) i.focus(); }, 200); }, 150); }
   });
