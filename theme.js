@@ -59,7 +59,7 @@
   function counts(){
     var out = {};
     try{
-      var d = window.data;
+      var d = (typeof data !== "undefined") ? data : window.data;   /* data מוגדר ב-let ולכן אינו window.data */
       if(!d) return out;
       if(Array.isArray(d.tasks)){
         var open = d.tasks.filter(function(t){
