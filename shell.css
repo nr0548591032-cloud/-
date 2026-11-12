@@ -306,6 +306,13 @@
   body.sh-on #mtRoot .mt-private{ order:3; padding:8px 12px !important; font-size:12px !important; }
   body.sh-on #mtRoot .mt-head .tk-sub{ font-size:12.5px; }
 
+  /* טבלאות שהופכות לכרטיסים (פרויקטים, כספים שוטפים ועוד): בלי כפתור פתיחה כפול ובלי אייקון שעולה על הכפתור */
+  body.sh-on .tab tr:has(td .mob-toggle) > .mob-toggle{ display:none !important; }
+  body.sh-on .tab tr > .card-badge{ display:none !important; }
+  /* דוח למנה"ח: סכומים בגודל סביר */
+  body.sh-on #acxStats{ padding:12px 14px !important; }
+  body.sh-on #acxStats b, body.sh-on #acxStats .v, body.sh-on #acxStats strong{ font-size:21px !important; }
+
   /* מפתחות: שני כרטיסים בשורה, נמוכים */
   body.sh-on .key-grid{ grid-template-columns:repeat(2, minmax(0,1fr)) !important; gap:8px !important; }
   body.sh-on .key-card{ padding:9px 10px !important; gap:3px !important; }
