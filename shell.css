@@ -275,6 +275,22 @@
   body.sh-on .tab .acct-subtabs{ display:flex; flex-wrap:nowrap !important; gap:4px; }
   body.sh-on .tab .acct-subtabs .pill-tab{ flex:1 1 0; min-width:0; padding:7px 4px !important; font-size:12.5px !important; white-space:nowrap; justify-content:center; text-align:center; }
 
+  /* חשבוניות וקבלות: כרטיס צפוף – כותרת קטנה יותר, מסמכים ו"סימון כשולם" באותה שורה */
+  body.sh-on #tab-files .jobs-stats{ gap:6px; }
+  body.sh-on #tab-files .jobs-stat{ padding:8px 11px !important; }
+  body.sh-on #tab-files .jobs-stat .v{ font-size:17px !important; }
+  body.sh-on #tab-files .job-card{ padding:12px 13px !important; gap:8px !important; display:flex; flex-wrap:wrap; align-items:center; }
+  body.sh-on #tab-files .job-card-top{ flex:1 1 100%; }
+  body.sh-on #tab-files .job-topic{ font-size:13px !important; }
+  body.sh-on #tab-files .job-title{ font-size:14.5px !important; line-height:1.35; }
+  body.sh-on #tab-files .job-meta{ font-size:12px !important; }
+  body.sh-on #tab-files .job-amount{ font-size:17px !important; }
+  body.sh-on #tab-files .job-status{ font-size:11px !important; padding:2px 8px !important; }
+  body.sh-on #tab-files .job-chips{ flex:1 1 auto; margin:0 !important; }
+  body.sh-on #tab-files .job-chip{ padding:5px 10px !important; font-size:12.5px !important; }
+  body.sh-on #tab-files .job-card-actions{ flex:0 0 auto; margin:0 !important; }
+  body.sh-on #tab-files .job-card-actions .job-btn{ width:auto !important; padding:6px 11px !important; font-size:12.5px !important; min-height:0 !important; }
+
   /* מפתחות: שני כרטיסים בשורה, נמוכים */
   body.sh-on .key-grid{ grid-template-columns:repeat(2, minmax(0,1fr)) !important; gap:8px !important; }
   body.sh-on .key-card{ padding:9px 10px !important; gap:3px !important; }
