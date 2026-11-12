@@ -11380,7 +11380,7 @@ function renderStaffClose(){
   const ready = rows.filter(x => !x.miss.length), missing = rows.filter(x => x.miss.length);
   const approved = rows.filter(x => x.r.approved), toApprove = ready.filter(x => !x.r.approved);
   const unsent = approved.filter(x => !x.sent && !x.paid);
-  const step = toApprove.length || (missing.length && !approved.length) ? (approved.length ? 2 : 1) : (unsent.length ? 3 : 4);
+  const step = missing.length && !approved.length ? 1 : toApprove.length ? 2 : unsent.length ? 3 : approved.length ? 4 : 1;
   const stepName = ["", "בדיקה", "אישור", "שליחה למנה״ח", "סגירה"];
   const head = `<div class="scc-h"><b>סגירת פעימה – 3 שלבים</b><span>${step <= 3 ? "שלב " + step + " מתוך 3" : "מוכן לסגירה"}</span></div>
     <div class="scc-steps">${[1, 2, 3].map(n => `<div class="${n === step ? "on" : n < step ? "done" : ""}">${n < step ? "✓" : n} · ${stepName[n]}</div>`).join("")}</div>`;
