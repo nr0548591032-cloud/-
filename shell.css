@@ -263,6 +263,9 @@
   body.sh-on #tab-staff .sc-total b{ font-size:15px; }
   body.sh-on #tab-staff .sc-chev{ grid-area:chev; }
   body.sh-on #tab-staff .sc-td{ padding:10px 12px !important; }
+  body.sh-on #tab-staff .sc-viewseg button{ white-space:nowrap; font-size:12.5px; padding:7px 10px; }
+  body.sh-on .sc-stats > * > :first-child{ font-size:11.5px !important; }
+  body.sh-on .sc-stats > * > :last-child{ font-size:16px !important; }
 
   /* מפתחות: שני כרטיסים בשורה, נמוכים */
   body.sh-on .key-grid{ grid-template-columns:repeat(2, minmax(0,1fr)) !important; gap:8px !important; }
