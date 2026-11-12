@@ -65,7 +65,10 @@
     if (!d) return out;
     try {
       if (Array.isArray(d.tasks)) {
-        var n = d.tasks.filter(function(t){ return t && !t.archived && String(t.status || "").indexOf("בוצע") === -1; }).length;
+        /* בדיוק כמו בלוח הבקרה: משימות השנה הנוכחית שלא בוצעו */
+        var Y = has("currentSchoolYearStart") ? call("currentSchoolYearStart") : null;
+        var st = function(t){ return has("tkStatus") ? call("tkStatus", t) : t.status; };
+        var n = d.tasks.filter(function(t){ return t && (Y == null || Number(t.schoolYear || Y) === Y) && st(t) !== "בוצע"; }).length;
         if (n) out.tasks = { n: n, c: col("tasks") };
       }
       if (Array.isArray(d.licensing)) {
