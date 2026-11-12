@@ -20169,6 +20169,24 @@ async function autoBackupIfDue(){
 .spx .bk-n{font-family:var(--sp-f-head);font-weight:400;font-size:1.05rem}
 .spx .bk-u{font-size:12px;color:var(--sp-soft)}
 .spx .bk-q{display:flex;flex-direction:column;align-items:center;gap:2px}
+/* סל שלי – שורה קומפקטית אחת למוצר */
+.spx .bk-c{gap:0;padding:9px 0}
+.spx .bk-line{display:flex;align-items:center;gap:8px}
+.spx .bk-name{flex:1;min-width:0;display:block;text-align:right;background:none;border:0;padding:2px 0;font:inherit;color:inherit;cursor:pointer}
+.spx .bk-c .bk-n{font-family:inherit;font-weight:700;font-size:14.5px}
+.spx .bk-sub{display:block;font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spx .bk-cheap{color:var(--green,#18864c);font-weight:700}
+.spx .bk-oth{color:#b86e00;font-weight:600}
+.spx .bk-warn{color:var(--red,#d6362f);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.spx .bk-c .bk-short{font-size:11px;font-weight:700;color:var(--red,#d6362f);background:color-mix(in srgb,var(--red,#d6362f) 12%,transparent);border-radius:999px;padding:1px 7px;margin-inline-start:4px}
+.spx .bk-step{display:flex;align-items:center;gap:3px;flex:0 0 auto}
+.spx .bk-step button{width:32px;height:32px;border-radius:11px;border:0;font-size:18px;line-height:1;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.spx .bk-m{background:var(--sp-chip,#eee7db);color:var(--sp-ink,#201e1d)}
+.spx .bk-p{background:var(--sp-brand,#0e9a9a);color:#fff}
+.spx .bk-step input{width:38px;height:32px;border:0;background:transparent;text-align:center;font-weight:700;font-size:15px;padding:0;-moz-appearance:textfield}
+.spx .bk-step input::-webkit-outer-spin-button,.spx .bk-step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.spx .bk-step .bk-u{width:38px;text-align:center;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spx .bk-more{display:flex;align-items:center;gap:8px;margin-top:6px}
 .spx .bk-short{color:var(--sp-amber);font-weight:500}
 .spx .bk-warn{color:var(--sp-amber)}
 .spx .bk-cmp{display:flex;flex-direction:column;gap:5px;background:var(--sp-bg);border-radius:var(--sp-r-sm);padding:8px}
@@ -23200,18 +23218,28 @@ function bkRowHTML(f, idx, need){
   else if(p.miss) tag = `<span class="tag r">${ic('alert','sm')}אין אצל ${esc(BK.mode)}</span>`;
   else tag = `<span class="tag ${p.other?'a':'g'} wrap sp-num">${esc(px.sup)} · ${esc(px.it.name)} · ${money(c.cost)}${p.other?` · סוג אחר${px.type?': '+esc(px.type):''}`:''}</span>`;
   const n = c ? c.n : 0;
-  return `<article class="bk-row ${q>0?'on':''}">
-    <div class="row between" style="flex-wrap:nowrap;align-items:flex-start">
-      <div class="grow"><b class="bk-n">${esc(f.name)}</b>
-        <div class="muted sp-num">${rows.length} פריטים · ${nsup} ספקים${f.pref?` · מעדיף ${esc(f.pref)}`:''}${need >= 0 ? ` · <span class="bk-short">חסר במלאי</span>` : ''}</div></div>
-      ${px ? `<div class="bk-q"><div class="stepper"><button aria-label="פחות" onclick="with(SP){bkStep('${f.id}',-1)}">−</button><input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${n||''}" placeholder="0" aria-label="כמות ב${esc(saleWord(px))}" onchange="with(SP){bkSet('${f.id}',this.value)}"><button aria-label="יותר" onclick="with(SP){bkStep('${f.id}',1)}">+</button></div><span class="bk-u">${esc(saleWord(px))}</span></div>` : ''}
+  /* שורה אחת למוצר (נובמבר 2026): שם, שני הספקים הזולים, ו־ − כמות + עם היחידה. לחיצה על השם פותחת השוואה ועריכה */
+  const best = [], seenSup = new Set();
+  [...rows].sort((a, b) => a.ppu - b.ppu).forEach(x => { if(best.length < 2 && !seenSup.has(x.sup)){ seenSup.add(x.sup); best.push(x); } });
+  let sub;
+  if(!rows.length) sub = `<span class="bk-warn">${ic('alert','sm')}אין פריטים עם מחיר – לחץ להוספה</span>`;
+  else if(q > 0 && p.miss) sub = `<span class="bk-warn">${ic('alert','sm')}אין אצל ${esc(BK.mode)}</span>`;
+  else if(q > 0 && c) sub = `<span class="sp-num">${esc(px.sup)} · <b>${money(c.cost)}</b>${px.ppu <= minPpu + 1e-9 ? ' <span class="bk-cheap">הזול</span>' : ''}${p.other ? ` · <span class="bk-oth">סוג אחר${px.type?': '+esc(px.type):''}</span>` : ''}</span>`;
+  else sub = `<span class="sp-num">${best.map((x, i) => `${esc(x.sup)} ${money(salePrice(x))}${i === 0 && best.length > 1 ? ' <span class="bk-cheap">הזול</span>' : ''}`).join(' · ')}</span>`;
+  return `<article class="bk-row bk-c ${q>0?'on':''} ${open?'open':''}">
+    <div class="bk-line">
+      <button class="bk-name" type="button" aria-expanded="${open}" title="השוואה ועריכה" onclick="with(SP){BK.open=BK.open==='${f.id}'?null:'${f.id}';renderBasket()}">
+        <b class="bk-n">${esc(f.name)}</b>${need >= 0 ? ` <span class="bk-short">חסר</span>` : ''}
+        <span class="bk-sub muted">${sub}</span>
+      </button>
+      ${px ? `<div class="bk-step"><button type="button" class="bk-m" aria-label="פחות" onclick="with(SP){bkStep('${f.id}',-1)}">−</button><input class="sp-num" type="number" min="0" step="any" inputmode="decimal" value="${n||''}" placeholder="0" aria-label="כמות ב${esc(saleWord(px))}" onchange="with(SP){bkSet('${f.id}',this.value)}"><button type="button" class="bk-p" aria-label="יותר" onclick="with(SP){bkStep('${f.id}',1)}">+</button><span class="bk-u">${esc(saleWord(px))}</span></div>`
+         : `<button class="sb icon sb-ghost" aria-label="עריכת המוצר" onclick="with(SP){openFam('${f.id}')}">${ic('edit','sm')}</button>`}
     </div>
-    <div class="row between" style="flex-wrap:nowrap">
-      <div class="grow">${tag}</div>
-      <button class="sb icon sb-ghost" aria-label="עריכת המוצר" title="עריכה: שם, סוגים, גדלים ופריטים" onclick="with(SP){openFam('${f.id}')}">${ic('edit','sm')}</button>
-      ${rows.length ? `<button class="sb sb-soft sm" aria-expanded="${open}" onclick="with(SP){BK.open=BK.open==='${f.id}'?null:'${f.id}';renderBasket()}">${open?'סגירה':'השוואה'}</button>` : ''}
-    </div>
-    ${open && rows.length ? bkCmpHTML(f, rows, q, px) : ''}
+    ${open ? `<div class="bk-more">
+      <div class="muted sp-num">${rows.length} פריטים · ${nsup} ספקים${f.pref?` · מעדיף ${esc(f.pref)}`:''}</div>
+      <span class="grow"></span>
+      <button class="sb sb-ghost sm" onclick="with(SP){openFam('${f.id}')}">${ic('edit','sm')}עריכת המוצר</button>
+    </div>${rows.length ? bkCmpHTML(f, rows, q, px) : ''}` : ''}
   </article>`;
 }
 /* השוואה: כל הפריטים לפי סוג, מהזול לק״ג / לליטר. הכמות בכל שורה כמו שאותו ספק מביא */
