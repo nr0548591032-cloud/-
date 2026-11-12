@@ -395,7 +395,8 @@
   }, true);
 
   var pend = null;
-  function schedule(){ if (pend) return; pend = requestAnimationFrame(function(){ pend = null; try { build(); } catch (err) { console.warn("shell:", err); } }); }
+  /* setTimeout ולא requestAnimationFrame: גם כשהלשונית ברקע (rAF לא רץ ברקע) */
+  function schedule(){ if (pend) return; pend = setTimeout(function(){ pend = null; try { build(); } catch (err) { console.warn("shell:", err); } }, 40); }
   function start(){
     build();
     var nav = document.getElementById("navBar");
