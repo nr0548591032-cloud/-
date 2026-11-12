@@ -156,8 +156,8 @@ export default async (req) => {
     model: env("AI_MODEL", "claude-sonnet-5-5"),
     max_tokens: task === "pricelist" ? 16000 : 4000,
     tools: [TOOLS[task]],
-    tool_choice: { type: "tool", name: TOOLS[task].name },
-    messages: [{ role: "user", content: [...blocks, { type: "text", text: PROMPTS[task] + hint }] }]
+    tool_choice: { type: "auto" },
+    messages: [{ role: "user", content: [...blocks, { type: "text", text: PROMPTS[task] + hint + "\n\nחובה להחזיר את התשובה רק דרך קריאה לכלי " + TOOLS[task].name + ", בלי טקסט נוסף." }] }]
   };
 
   /* תשובה זורמת: רווחים כל כמה שניות כדי שהחיבור לא ייסגר, ובסוף ה-JSON. */
@@ -182,7 +182,12 @@ export default async (req) => {
           if (r.status === 400) console.log("anthropic 400:", j?.error?.message);
           result = { ok: false, error: msg, detail: String(j?.error?.message || "").slice(0, 300) };
         } else {
-          const use = (j.content || []).find(c => c.type === "tool_use");
+          let use = (j.content || []).find(c => c.type === "tool_use");
+          if (!use) {   /* גיבוי: אם הוחזר JSON כטקסט */
+            const txt = (j.content || []).filter(c => c.type === "text").map(c => c.text).join("");
+            const m = txt.match(/\{[\s\S]*\}/);
+            if (m) { try { use = { input: JSON.parse(m[0]) }; } catch (e) {} }
+          }
           result = use ? { ok: true, task, data: use.input, truncated: j.stop_reason === "max_tokens", usage: j.usage }
                        : { ok: false, error: "הסוכן לא החזיר תשובה מסודרת. נסה שוב" };
         }
