@@ -1697,6 +1697,14 @@ button.acx-ck{ border:none; font-family:inherit; cursor:pointer; }
 .acx-m-note{ margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
 .acx-m-warn{ display:flex; gap:8px; align-items:flex-start; padding:10px 12px; border-radius:14px; background:#ffe1d0; color:#643312; font-size:12.5px; line-height:1.5; }
 .acx-m-a{ display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; }
+/* בחירת סוג ההודעה: מתג בהיר, שלא ייראה ככפתור שליחה */
+.acx-seg{ display:flex; gap:4px; padding:4px; background:#f3ece1; border-radius:14px; }
+.acx-seg button{ flex:1 1 0; display:flex; align-items:center; justify-content:center; gap:5px; min-height:36px; padding:0 8px; border:0; border-radius:10px; background:transparent; color:var(--ink-soft); font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.acx-seg button.on{ background:#fff; color:var(--ink); box-shadow:0 1px 3px rgba(43,39,35,.15); }
+.acx-seg button:disabled{ opacity:.45; cursor:default; }
+.acx-send-h{ font-size:14px; font-weight:700; color:var(--ink); margin-top:4px; }
+.acx-m-a.nudge .acx-btn{ animation:acxNudge .7s ease 2; }
+@keyframes acxNudge{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.05); box-shadow:0 0 0 4px rgba(63,74,44,.18); } }
 .acx-m-a .acx-btn{ flex:1 1 140px; }
 .acx-m-list{ display:flex; flex-direction:column; gap:6px; }
 .acx-m-item{ display:flex; justify-content:space-between; gap:8px; padding:9px 12px; background:var(--job-tint-a, #fff2eb); border-radius:12px; font-size:13.5px; align-items:center; }
@@ -3575,7 +3583,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261134; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261135; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -13204,7 +13212,7 @@ function acxRenderSend(){
   const again = items.filter(it => it.stage === "sent");
   const linkOk = acctLink.ready;
   const opt = (k, label) => `<button type="button" class="acx-pill ${st[k] ? "active" : ""}" data-acx="sOpt" data-v="${k}" aria-pressed="${!!st[k]}" ${st.mode === "short" && k !== "inv" && k !== "rec" ? "" : ""}>${label}</button>`;
-  const modeBtn = (k, label) => `<button type="button" class="acx-pill ${st.mode === k ? "active" : ""}" data-acx="sMode" data-v="${k}" aria-pressed="${st.mode === k}" ${!linkOk && k === "short" ? "disabled" : ""} style="flex:1 1 0;justify-content:center">${label}</button>`;
+  const modeBtn = (k, label) => `<button type="button" class="${st.mode === k ? "on" : ""}" data-acx="sMode" data-v="${k}" aria-pressed="${st.mode === k}" ${!linkOk && k === "short" ? "disabled" : ""}>${st.mode === k ? acxIco("check", 14) : ""}${label}</button>`;
   const preview = acxBuildText(items, linkOk ? "xxxxxx" : "", st).replace(acxLinkFor("xxxxxx"), acxLinkFor("…"));
   body.innerHTML = `
     <div class="acx-m-list">${items.map(it => `<div class="acx-m-item"><span style="min-width:0;overflow-wrap:anywhere"><b>${escHtml(it.name)}</b> · ${escHtml(it.title)}</span>
@@ -13215,10 +13223,11 @@ function acxRenderSend(){
     ${miss.length ? `<div class="acx-m-warn">${acxIco("alert", 16)}<span>חסרים פרטים (סכום או בנק) ב: ${miss.map(it => escHtml(it.name)).join(", ")}. אפשר לשלוח בכל זאת, אבל מומלץ להשלים קודם.</span></div>` : ""}
     ${again.length ? `<div class="acx-m-note">${again.length === 1 ? "תשלום אחד כבר נשלח" : again.length + " תשלומים כבר נשלחו"} בעבר — הם יישלחו שוב במשלוח חדש.</div>` : ""}
     ${linkOk ? "" : `<div class="acx-m-warn">${acxIco("alert", 16)}<span>יומן השליחות לא נטען, ולכן ההודעה תצא בלי קישור (עם פירוט מלא).</span></div>`}
-    <div style="display:flex;flex-direction:column;gap:6px"><span class="acx-lbl">סוג ההודעה</span><div class="acx-row">${modeBtn("short", "קצרה + קישור (מומלץ)")}${modeBtn("full", "פירוט מלא + קישור")}</div></div>
+    <div style="display:flex;flex-direction:column;gap:6px"><span class="acx-lbl">סוג ההודעה</span><div class="acx-seg" role="radiogroup">${modeBtn("short", "קצרה + קישור (מומלץ)")}${modeBtn("full", "פירוט מלא + קישור")}</div></div>
     ${st.mode === "full" ? `<div style="display:flex;flex-direction:column;gap:6px"><span class="acx-lbl">מה לצרף להודעה</span><div class="acx-row">${opt("inv", "קישורי חשבוניות")}${opt("rec", "קישורי קבלות")}${opt("bank", "פרטי בנק")}</div></div>` : ""}
     <div style="display:flex;flex-direction:column;gap:6px"><span class="acx-lbl">תצוגה מקדימה</span><div class="acx-preview">${escHtml(preview)}</div></div>
-    <div class="acx-m-a">
+    <span class="acx-send-h">שליחה למנהל החשבונות ב:</span>
+    <div class="acx-m-a" id="acxSendBtns">
       <button type="button" class="acx-btn ok" data-acx="doSend" data-ch="whatsapp">${svgIcon("whatsapp", 17)}וואטסאפ</button>
       <button type="button" class="acx-btn dark" data-acx="doSend" data-ch="email">${svgIcon("mail", 17)}Gmail</button>
     </div>
@@ -13622,7 +13631,17 @@ document.addEventListener("click", e => {
     (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => jobToast("הקישור הועתק")).catch(() => jobToast(link, 6000));
     return;
   }
-  if(a === "sMode"){ if(acxSendState){ acxSendState.mode = el.dataset.v; acxRenderSend(); } return; }
+  if(a === "sMode"){
+    if(!acxSendState) return;
+    if(acxSendState.mode === el.dataset.v){
+      /* לחיצה על הסוג שכבר נבחר: מכוונים לכפתורי השליחה */
+      const b = document.getElementById("acxSendBtns");
+      if(b){ b.classList.remove("nudge"); void b.offsetWidth; b.classList.add("nudge"); try{ b.scrollIntoView({ block: "nearest", behavior: "smooth" }); }catch(e){} }
+      jobToast("הסוג כבר נבחר ✓ · לשליחה לוחצים על וואטסאפ או Gmail למטה", 3500);
+      return;
+    }
+    acxSendState.mode = el.dataset.v; acxRenderSend(); return;
+  }
   if(a === "sOpt"){ if(acxSendState){ acxSendState[el.dataset.v] = !acxSendState[el.dataset.v]; acxRenderSend(); } return; }
   if(a === "sRemove"){ if(acxSendState){ acxSendState.keys = acxSendState.keys.filter(k => k !== key); acxRenderSend(); } return; }
   if(a === "doSend") return acxDoSend(el.dataset.ch);
