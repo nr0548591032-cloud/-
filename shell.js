@@ -359,6 +359,7 @@
   /* ---------- "מה מחכה לך כאן" בראש כל טאב + כפתור ⋯ ---------- */
   /* מבוסס על אותן התראות של לוח הבקרה (dbAlerts) – קריאה בלבד */
   var alertsCache = { t: 0, list: [] };
+  window.shAlertsReset = function(){ alertsCache.t = 0; try { schedule(); } catch (e) {} };
   function alertsFor(t){
     var now = Date.now();
     if (now - alertsCache.t > 4000) {
@@ -582,6 +583,10 @@
     function arm(){ try { if (!history.state || !history.state.shGuard) history.pushState({ shGuard: 1 }, ""); armed = true; } catch (e) {} }
     window.addEventListener("popstate", function(){
       if (!armed || !mobile()) return;
+      /* חלון צפייה בקובץ (חשבונית/קבלה) נסגר דרך ההיסטוריה – נשארים באותו טאב */
+      var fv = document.getElementById("fileViewer");
+      if (fv && fv.style.display !== "none") { try { if (typeof closeFileViewer === "function") { window.__fvPopAt = Date.now(); if (window.fvState) window.fvState.pushed = false; closeFileViewer(true); } } catch (e) {} return; }   // eslint-disable-line no-undef
+      if (window.__fvPopAt && Date.now() - window.__fvPopAt < 1500) { window.__fvPopAt = 0; return; }
       if (openSheet) { closeSheet(); arm(); return; }
       var ov = [].slice.call(document.querySelectorAll(".modal-overlay, .modal")).filter(function(m){ return m.offsetParent !== null || getComputedStyle(m).display === "flex"; });
       if (ov.length) { var m = ov[ov.length - 1]; var x = m.querySelector("[data-close],.sh-x,.icon-btn,.close,.modal-close"); if (x) x.click(); else m.style.display = "none"; arm(); return; }
