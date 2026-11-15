@@ -3575,7 +3575,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261133; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261134; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -4830,14 +4830,14 @@ function sendTaskWhatsApp(taskId){
   const contact = findContactByName(row.assignee);
   if(!contact || !contact.phone){ alert("לא נמצא מספר טלפון לאיש המקצוע שנבחר כאחראי ביצוע. אפשר להוסיף טלפון בטאב אנשי קשר וספקים."); return; }
   const text = encodeURIComponent(buildTaskMessageText(row));
-  window.open(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${text}`, "_blank");
+  openOutLink(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${text}`);
 }
 function sendTaskEmail(taskId){
   const row = data.tasks.find(r => r.id === taskId);
   if(!row) return;
   const contact = findContactByName(row.assignee);
   if(!contact || !contact.email){ alert("לא נמצאה כתובת אימייל לאיש המקצוע שנבחר כאחראי ביצוע."); return; }
-  window.open(tkGmailUrl(contact.email, "משימה: " + (row.desc||""), buildTaskMessageText(row)), "_blank");
+  openOutLink(tkGmailUrl(contact.email, "משימה: " + (row.desc||""), buildTaskMessageText(row)));
 }
 function isInvoiceDocType(t){ return t === "חשבונית" || t === "חשבונית/קבלה" || !t; }
 function isReceiptDocType(t){ return t === "קבלה"; }
@@ -5848,7 +5848,7 @@ function tkWhatsApp(t, text, logText){
     if(tkUi.openId !== t.id) tkOpen(t.id, "assignee");
     return false;
   }
-  window.open(`https://wa.me/${formatPhoneForWhatsApp(c.phone)}?text=${encodeURIComponent(text)}`, "_blank");
+  openOutLink(`https://wa.me/${formatPhoneForWhatsApp(c.phone)}?text=${encodeURIComponent(text)}`);
   tkLog(t, logText);
   tkSave();
   return true;
@@ -5870,7 +5870,7 @@ function tkAction(act, id){
   if(act === "gotupdate") return tkGotUpdate(t);
   if(act === "mail"){
     const c = tkContact(t);
-    window.open(tkGmailUrl(c && c.email ? c.email : "", "משימה: " + (t.desc || ""), buildTaskMessageText(t) + proPhotoLinksText(tkPhotos(t).map(p => p.fileUrl))), "_blank");
+    openOutLink(tkGmailUrl(c && c.email ? c.email : "", "משימה: " + (t.desc || ""), buildTaskMessageText(t) + proPhotoLinksText(tkPhotos(t).map(p => p.fileUrl))));
     tkLog(t, `נפתח מייל ל${t.assignee || "איש המקצוע"}`);
     tkSave(); if(tkUi.openId === id) tkRenderDrawer();
     return;
@@ -6136,7 +6136,7 @@ function sendWorkSlip(channel){
   if(channel !== "whatsapp"){
     if(!contact || !contact.email){ jobToast(`לא נמצאה כתובת אימייל ל${who}. אפשר להוסיף אימייל בטאב אנשי קשר וספקים.`, 4500); return; }
     const subject = list.length === 1 ? `משימה: ${list[0].desc || ""}` : `${list.length} משימות בשבילך`;
-    window.open(tkGmailUrl(contact.email, subject, text + proPhotoLinksText(urls)), "_blank");
+    openOutLink(tkGmailUrl(contact.email, subject, text + proPhotoLinksText(urls)));
     markWorkSlipSent(list, { channel: "email", photos: urls.length });
     jobToast("נפתח מייל ב-Gmail · המשימות סומנו כנשלחו");
     return;
@@ -6144,7 +6144,7 @@ function sendWorkSlip(channel){
   if(!contact || !contact.phone){ jobToast(`לא נמצא מספר טלפון ל${who}. אפשר להוסיף טלפון בטאב אנשי קשר וספקים.`, 4500); return; }
   const phone = formatPhoneForWhatsApp(contact.phone);
   if(!urls.length){
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, "_blank");
+    openOutLink(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`);
     markWorkSlipSent(list, { channel: "whatsapp" });
     jobToast("נפתח וואטסאפ · המשימות סומנו כנשלחו");
     return;
@@ -6176,7 +6176,7 @@ function sendWorkSlip(channel){
   }
   if(!files.length){
     // לא הצלחנו להוריד אף תמונה: שולחים את ההודעה עם קישור לתמונה
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(fullText)}`, "_blank");
+    openOutLink(`https://wa.me/${phone}?text=${encodeURIComponent(fullText)}`);
     markWorkSlipSent(list, { channel: "whatsapp", photos: urls.length });
     jobToast("התמונה צורפה כקישור בתוך ההודעה", 4200);
     return;
@@ -6214,7 +6214,7 @@ function wsCopyImage(i){
 }
 function wsOpenWhatsApp(){
   if(!wsSend) return;
-  window.open(`https://wa.me/${wsSend.phone}?text=${encodeURIComponent(wsSend.text)}`, "_blank");
+  openOutLink(`https://wa.me/${wsSend.phone}?text=${encodeURIComponent(wsSend.text)}`);
   if(!wsSend.opened){
     wsSend.opened = true;
     markWorkSlipSent(wsSend.list, { channel: "whatsapp", photos: wsSend.files.length, keepPanel: true });
@@ -6576,8 +6576,8 @@ function tkOpenWeekly(){
       </div>
     </div>`, box => {
     const ta = box.querySelector("#tkWeeklyText");
-    box.querySelector("#tkWkWa").addEventListener("click", () => window.open(`https://wa.me/?text=${encodeURIComponent(ta.value)}`, "_blank"));
-    box.querySelector("#tkWkMail").addEventListener("click", () => window.open(tkGmailUrl("", "סיכום משימות שבועי · " + fmtDateHe(tkToday()), ta.value.replace(/\*/g, "")), "_blank"));
+    box.querySelector("#tkWkWa").addEventListener("click", () => openOutLink(`https://wa.me/?text=${encodeURIComponent(ta.value)}`));
+    box.querySelector("#tkWkMail").addEventListener("click", () => openOutLink(tkGmailUrl("", "סיכום משימות שבועי · " + fmtDateHe(tkToday()), ta.value.replace(/\*/g, ""))));
     box.querySelector("#tkWkCopy").addEventListener("click", () => {
       const done = () => jobToast("הסיכום הועתק");
       if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, () => { ta.select(); document.execCommand("copy"); done(); });
@@ -11944,12 +11944,13 @@ function buildCategorySummaryText(categoryLabel, items){
 function sendToAccountant(text, channel){
   const contact = getAccountantContact();
   if(channel === "whatsapp"){
-    if(!contact.phone){ alert("לא הוזן מספר טלפון למנהל החשבונות. אפשר להזין אותו בראש טאב \"דוח למנהל חשבונות\"."); return; }
-    window.open(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${encodeURIComponent(text)}`, "_blank");
+    if(!contact.phone){ jobToast("לא הוזן מספר טלפון למנהל החשבונות. אפשר להזין אותו בטאב \"דוח למנהל חשבונות\".", 4500); return false; }
+    openOutLink(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${encodeURIComponent(text)}`);
   }else{
-    if(!contact.email){ alert("לא הוזנה כתובת אימייל למנהל החשבונות. אפשר להזין אותה בראש טאב \"דוח למנהל חשבונות\"."); return; }
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email)}&su=${encodeURIComponent("תשלומים לטיפול")}&body=${encodeURIComponent(text)}`, "_blank");
+    if(!contact.email){ jobToast("לא הוזנה כתובת אימייל למנהל החשבונות. אפשר להזין אותה בטאב \"דוח למנהל חשבונות\".", 4500); return false; }
+    openOutLink(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email)}&su=${encodeURIComponent("תשלומים לטיפול")}&body=${encodeURIComponent(text)}`);
   }
+  return true;
 }
 function sendPaymentReminder(kind, id, channel){
   let name, desc, amount, status, docUrl, bankInfo;
@@ -13224,7 +13225,12 @@ function acxRenderSend(){
     <button type="button" class="acx-btn ghost" data-acx="doSend" data-ch="copy">${acxIco("copy", 16)}העתקת ההודעה בלבד</button>
     <p class="acx-m-note" style="text-align:center">אחרי השליחה התשלומים מסומנים "נשלח", נרשמים ביומן, ומנהל החשבונות רואה אותם בכניסה שלו.</p>`;
 }
+/* שליחה: אם משהו נכשל – מציגים הודעה ולא "כלום לא קורה" */
 async function acxDoSend(channel, overrideState){
+  try{ return await acxDoSendRun(channel, overrideState); }
+  catch(e){ console.error("acxDoSend", e); jobToast("השליחה לא הצליחה: " + ((e && e.message) || e), 7000); }
+}
+async function acxDoSendRun(channel, overrideState){
   const st = overrideState || acxSendState; if(!st) return;
   const prevState = acxSendState; acxSendState = st;
   const items = acxSendItems();
@@ -13242,9 +13248,10 @@ async function acxDoSend(channel, overrideState){
     try{ await navigator.clipboard.writeText(text); }
     catch(e){ jobToast("ההעתקה נכשלה בדפדפן הזה — נסה וואטסאפ או Gmail"); return; }
   }else{
-    sendToAccountant(text, channel);
+    if(sendToAccountant(text, channel) === false) return;
   }
   if(linkOk){
+    if(!Array.isArray(data.acctSends)) data.acctSends = [];
     data.acctSends.unshift({
       id: sendId, at: now, channel, mode: st.mode,
       items: items.map(it => ({ k: it.k, id: it.row.id, i: it.k === "s" ? it.instIdx : null, name: it.name, desc: it.title, amount: it.amount || 0 })),
@@ -15079,9 +15086,36 @@ function addContact(){
 }
 function removeContact(id){ ctOpenEdit(id); }
 function formatPhoneForWhatsApp(phone){
-  let digits = (phone||"").replace(/[^0-9]/g,"");
+  let digits = String(phone == null ? "" : phone).replace(/[^0-9]/g,"");
   if(digits.startsWith("0")) digits = "972" + digits.slice(1);
   return digits;
+}
+/* פתיחת וואטסאפ / Gmail (נובמבר 2026).
+   אם הדפדפן חסם את פתיחת החלון (קורה באפליקציה מותקנת בטלפון/טאבלט) – לא "כלום לא קורה":
+   מופיע חלון קטן עם כפתור שפותח את הקישור בלחיצה ישירה. */
+function openOutLink(url, label){
+  let w = null;
+  try{ w = window.open(url, "_blank"); }catch(e){ console.warn("window.open", e); w = null; }
+  if(w) return true;
+  try{
+    let m = document.getElementById("outLinkModal");
+    if(!m){
+      m = document.createElement("div");
+      m.id = "outLinkModal"; m.className = "modal-overlay"; m.style.cssText = "display:none;z-index:4000";
+      m.innerHTML = `<div class="modal-box" style="max-width:380px;text-align:center">
+        <div style="font-weight:700;font-size:16px;margin-bottom:6px">עוד לחיצה אחת</div>
+        <div style="font-size:13px;color:var(--ink-soft);margin-bottom:14px">הדפדפן לא איפשר לפתוח את החלון לבד. לחץ על הכפתור כדי לפתוח.</div>
+        <a id="outLinkGo" class="btn" target="_blank" rel="noopener" style="display:flex;justify-content:center;align-items:center;gap:6px;text-decoration:none"></a>
+        <button type="button" class="btn ghost" style="margin-top:8px;width:100%" id="outLinkClose">סגירה</button></div>`;
+      document.body.appendChild(m);
+      m.addEventListener("click", e => { if(e.target === m || e.target.closest("#outLinkClose") || e.target.closest("#outLinkGo")) setTimeout(() => { m.style.display = "none"; }, 50); });
+    }
+    const a = m.querySelector("#outLinkGo");
+    a.href = url;
+    a.textContent = label || (/wa\.me/.test(url) ? "פתיחת וואטסאפ" : /mail\.google/.test(url) ? "פתיחת Gmail" : "פתיחה");
+    m.style.display = "flex";
+  }catch(e){ console.error(e); jobToast("לא הצלחתי לפתוח את הקישור", 4000); }
+  return false;
 }
 function sendContactWhatsApp(id){ ctWa(id); }
 function sendContactEmail(id){ ctMail(id); }
@@ -15201,7 +15235,7 @@ function sendOrderWhatsApp(){
   const contact = findContactByName(vendor);
   if(!contact || !contact.phone){ alert(`לא נמצא מספר טלפון לספק "${vendor}". אפשר להוסיף אותו בטאב אנשי קשר וספקים (עם שם זהה לשם הספק במחירון).`); return; }
   const text = encodeURIComponent(buildOrderText(vendor));
-  window.open(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${text}`, "_blank");
+  openOutLink(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${text}`);
 }
 function sendOrderEmail(){
   const vendor = document.getElementById("orderVendorSelect").value;
@@ -15390,7 +15424,7 @@ function sendMsgTemplate(channel){
   const contact = findContactByName(msgModalVendor);
   if(channel === "whatsapp"){
     if(!contact || !contact.phone){ alert(`לא נמצא מספר טלפון לספק "${msgModalVendor}". אפשר להוסיף אותו בטאב אנשי קשר וספקים.`); return; }
-    window.open(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${encodeURIComponent(text)}`, "_blank");
+    openOutLink(`https://wa.me/${formatPhoneForWhatsApp(contact.phone)}?text=${encodeURIComponent(text)}`);
   }else{
     if(!contact || !contact.email){ alert(`לא נמצאה כתובת אימייל לספק "${msgModalVendor}". אפשר להוסיף אותה בטאב אנשי קשר וספקים.`); return; }
     window.location.href = `mailto:${contact.email}?subject=${encodeURIComponent("לגבי הזמנה — "+msgModalVendor)}&body=${encodeURIComponent(text)}`;
@@ -16086,7 +16120,7 @@ function sendHolderReturnReminder(name){
   if(!h || !h.phone){ alert("אין מספר טלפון שמור לאיש הזה. אפשר להוסיף בעריכת פרטי איש המפתח."); return; }
   const myKeys = data.keysLog.filter(l=>l.holder===name && !l.dateIn).map(l => { const k=keyById(l.keyId); return k?keyDisplayId(k):(l.keyDesc||""); }).filter(Boolean);
   const text = `שלום ${name}, יש ברשותך עדיין מפתחות שטרם הוחזרו (${myKeys.join(", ")||"—"}). נשמח לתאם החזרה, תודה.`;
-  window.open(`https://wa.me/${formatPhoneForWhatsApp(h.phone)}?text=${encodeURIComponent(text)}`, "_blank");
+  openOutLink(`https://wa.me/${formatPhoneForWhatsApp(h.phone)}?text=${encodeURIComponent(text)}`);
 }
 
 /* ---- מפתחות אב (הגדרות) ---- */
@@ -19345,7 +19379,7 @@ function mtSummaryText(){
   if(!st.done.length && !st.open.length) lines.push("", "אין משימות להיום.");
   return lines.join("\n");
 }
-function mtWhatsApp(){ window.open("https://wa.me/?text=" + encodeURIComponent(mtSummaryText()), "_blank"); }
+function mtWhatsApp(){ openOutLink("https://wa.me/?text=" + encodeURIComponent(mtSummaryText())); }
 async function mtAddToCalendar(x, btn){
   if(!x || !x.due){ showToast("כדי להוסיף ליומן צריך תאריך"); return; }
   if(x.calEventId){ showToast("המשימה כבר נמצאת ביומן"); return; }
