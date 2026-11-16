@@ -3583,7 +3583,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261137; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261138; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -10309,66 +10309,48 @@ function lcSniff(buf){
   if(s.slice(4, 8) === "ftyp") return "img";
   return "other";
 }
-function lcSepHtml(list){
-  return list.map((x, i) => `<div style="width:728px;padding:46px 30px;box-sizing:border-box;font-family:Rubik,'Segoe UI',Arial,sans-serif;direction:rtl;color:#201e1d;background:#fff">
-    <div style="font-size:13px;color:#c67139;font-weight:700;letter-spacing:.04em">נספח ${i + 1}</div>
-    <div style="font-size:27px;font-weight:700;margin-top:6px;border-bottom:3px solid #c67139;padding-bottom:12px">${escHtml(x.r.type || "")}</div>
-    <div style="margin-top:14px;font-size:13.5px;color:#645c50">${escHtml([x.r.processStatus || "", x.r.expiry ? "בתוקף עד " + fmtDateHe(x.r.expiry) : "", lcInspectorName(x.r) ? "בודק: " + lcInspectorName(x.r) : ""].filter(Boolean).join(" · "))}</div>
-    <div style="margin-top:20px;font-size:14px"><b>המסמכים המצורפים בעמודים הבאים:</b><ol style="margin:8px 0 0;padding-inline-start:22px">${x.docs.map(d => `<li style="margin:5px 0">${escHtml(d.name || "מסמך")}</li>`).join("")}</ol></div>
-  </div>${i < list.length - 1 ? '<div class="html2pdf__page-break"></div>' : ""}`).join("");
-}
 async function lcBuildPack(rows, title, onStep){
-  await lcLoadH2P();
-  try{ await document.fonts.ready; }catch(e){}
+  /* רק המסמכים עצמם, בלי עמוד סיכום, בלי עמודי כותרת ובלי מספרי עמודים על האישורים.
+     עמוד סיכום נוצר רק כגיבוי כשאין אף קובץ שנכנס, כדי שלא יירד קובץ ריק */
   await ttdLoadPdfLib();
-  const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
-  const cfg = () => ({ margin: [8, 8, 8, 8], image: { type: "jpeg", quality: 0.95 }, html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS:true, scrollX:0, scrollY:0 },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"] } });
-  const mainBuf = await html2pdf().set(cfg()).from(lcPdfHtml(rows, title, { history: false, phones: true }), "string").outputPdf("arraybuffer");
+  const { PDFDocument } = window.PDFLib;
   const out = await PDFDocument.create();
-  const main = await PDFDocument.load(mainBuf);
-  (await out.copyPages(main, main.getPageIndices())).forEach(pg => out.addPage(pg));
   const notes = [];
   const withFiles = rows.map(r => ({ r, docs: lcRowDocList(r).filter(d => d.fileUrl) })).filter(x => x.docs.length);
-  if(withFiles.length){
-    const sepBuf = await html2pdf().set(cfg()).from(lcSepHtml(withFiles), "string").outputPdf("arraybuffer");
-    const sep = await PDFDocument.load(sepBuf);
-    const sepN = sep.getPageCount();
-    const A4 = [595.28, 841.89], M = 28;
-    const tot = withFiles.reduce((s, x) => s + x.docs.length, 0);
-    let n = 0;
-    for(let i = 0; i < withFiles.length; i++){
-      const x = withFiles[i];
-      const [sp] = await out.copyPages(sep, [Math.min(i, sepN - 1)]); out.addPage(sp);
-      for(const d of x.docs){
-        n++; if(onStep) onStep(n, tot);
-        const label = `${x.r.type || ""} · ${d.name || "מסמך"}`;
-        const buf = await ttdFetchUrl(d.fileUrl);
-        if(!buf){ notes.push(label); continue; }
-        try{
-          const kind = lcSniff(buf);
-          if(kind === "pdf"){
-            const src = await PDFDocument.load(buf, { ignoreEncryption: true });
-            (await out.copyPages(src, src.getPageIndices())).forEach(pg => out.addPage(pg));
-          }else if(kind === "img"){
-            const j = await ttdImgToJpeg(buf, 2000);
-            const im = await out.embedJpg(j.buf);
-            const pg = out.addPage(A4);
-            const k = Math.min((A4[0] - 2 * M) / j.w, (A4[1] - 2 * M) / j.h);
-            const w = j.w * k, h = j.h * k;
-            pg.drawImage(im, { x: (A4[0] - w) / 2, y: (A4[1] - h) / 2, width: w, height: h });
-          }else notes.push(label);
-        }catch(e){ console.error("שילוב הקובץ נכשל", label, e); notes.push(label); }
-      }
+  const A4 = [595.28, 841.89], M = 28;
+  const tot = withFiles.reduce((s, x) => s + x.docs.length, 0);
+  let n = 0;
+  for(const x of withFiles){
+    for(const d of x.docs){
+      n++; if(onStep) onStep(n, tot);
+      const label = `${x.r.type || ""} · ${d.name || "מסמך"}`;
+      const buf = await ttdFetchUrl(d.fileUrl);
+      if(!buf){ notes.push(label); continue; }
+      try{
+        const kind = lcSniff(buf);
+        if(kind === "pdf"){
+          const src = await PDFDocument.load(buf, { ignoreEncryption: true });
+          (await out.copyPages(src, src.getPageIndices())).forEach(pg => out.addPage(pg));
+        }else if(kind === "img"){
+          const j = await ttdImgToJpeg(buf, 2000);
+          const im = await out.embedJpg(j.buf);
+          const pg = out.addPage(A4);
+          const k = Math.min((A4[0] - 2 * M) / j.w, (A4[1] - 2 * M) / j.h);
+          const w = j.w * k, h = j.h * k;
+          pg.drawImage(im, { x: (A4[0] - w) / 2, y: (A4[1] - h) / 2, width: w, height: h });
+        }else notes.push(label);
+      }catch(e){ console.error("שילוב הקובץ נכשל", label, e); notes.push(label); }
     }
   }
-  const font = await out.embedFont(StandardFonts.Helvetica);
-  const pages = out.getPages(), total = pages.length;
-  pages.forEach((pg, i) => {
-    if(!i) return;
-    const txt = `${i + 1} / ${total}`, w = font.widthOfTextAtSize(txt, 8), { width } = pg.getSize();
-    pg.drawText(txt, { x: (width - w) / 2, y: 7, size: 8, font, color: rgb(0.54, 0.5, 0.45) });
-  });
+  if(!out.getPageCount()){
+    await lcLoadH2P();
+    try{ await document.fonts.ready; }catch(e){}
+    const cfg = { margin: [8, 8, 8, 8], image: { type: "jpeg", quality: 0.95 }, html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS:true, scrollX:0, scrollY:0 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"] } };
+    const mainBuf = await html2pdf().set(cfg).from(lcPdfHtml(rows, title, { history: false, phones: true }), "string").outputPdf("arraybuffer");
+    const main = await PDFDocument.load(mainBuf);
+    (await out.copyPages(main, main.getPageIndices())).forEach(pg => out.addPage(pg));
+  }
   return { blob: new Blob([await out.save()], { type: "application/pdf" }), notes };
 }
 function lcSafeName(s){ return String(s || "מסמך").replace(/[\\/:*?"<>|]+/g, "-").trim().slice(0, 80) || "מסמך"; }
@@ -10394,7 +10376,7 @@ function lcOpenBundle(p){
   const have = allDocs.filter(d => d.fileUrl).length;
   const m = lcModal(`${lcModalHead("folder", escHtml(p.type || "תיק הגשה"))}
     <div class="lc-modal-b">
-      <div class="lc-note">${lcIco("info")}<div>${have} מתוך ${allDocs.length} מסמכים קיימים · ${s.ready} מתוך ${s.total} חלקים מוכנים. ב־PDF כל המסמכים מצורפים בפועל אחרי עמוד הסיכום, כל אישור עם עמוד כותרת משלו.</div></div>
+      <div class="lc-note">${lcIco("info")}<div>${have} מתוך ${allDocs.length} מסמכים קיימים · ${s.ready} מתוך ${s.total} חלקים מוכנים. ב־PDF נכנסים רק המסמכים עצמם, בלי עמודי סיכום או כותרת.</div></div>
       ${rows.map(r => { const ds = lcRowDocList(r); const n = ds.filter(d => d.fileUrl).length; return `<div class="lc-bdl-row">
         <div style="flex:1;min-width:0"><b style="font-size:13.5px">${escHtml(r.type || "")}</b> <span class="lc-sub">${escHtml(lcChip(r)[1])}${r.expiry ? " · עד " + fmtDateHe(r.expiry) : ""}</span>
           <div class="lc-docs" style="margin-top:5px">${ds.map(d => d.fileUrl ? `<span class="lc-doc have"><button type="button" data-fv-url="${escHtml(d.fileUrl)}" data-fv-title="${escHtml(d.name)}">${lcIco("check")}${escHtml(d.name)}</button></span>` : `<span class="lc-doc miss" style="padding-inline-end:10px">${lcIco("upload")}${escHtml(d.name)}</span>`).join("") || `<span class="lc-sub">אין מסמכים</span>`}</div></div>
