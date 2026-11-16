@@ -772,7 +772,7 @@
   .sc-open .sc-body{ display:block; }
   .sc-fields{ display:grid; grid-template-columns:repeat(auto-fit, minmax(118px, 1fr)); gap:10px 12px; padding-top:12px; }
   .sc-fields label, .sc-mini-fields label{ display:flex; flex-direction:column; gap:3px; font-size:11px; font-weight:700; color:var(--ink-soft); min-width:0; }
-  .sc-fields label input, .sc-mini-fields label input{ width:100%; min-width:0; }
+  .sc-fields label input, .sc-mini-fields label input, .sc-fields label select, .sc-mini-fields label select{ width:100%; min-width:0; }
   .sc-fields .sc-wide{ grid-column:1 / -1; }
   .sc-check{ flex-direction:row !important; align-items:center; gap:8px !important; font-size:13px !important; color:var(--ink) !important; cursor:pointer; padding-top:16px; }
   .sc-section{ margin-top:14px; padding-top:12px; border-top:1px dashed var(--line); }
@@ -3583,7 +3583,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261136; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261137; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -11064,6 +11064,16 @@ function roleMonthCount(r){
   const months = parseFloat(r.months) || 0;
   return months > 0 ? months : 1;
 }
+/* החודש בפעימה שממנו התפקיד מתחיל (1 = החודש הראשון של הפעימה). שדה רשות — בלעדיו הכל כמו קודם */
+function roleStartMonth(r){
+  const st = parseInt(r && r.startMonth, 10);
+  return st >= 1 ? st : 1;
+}
+/* תווית "מכסלו" כשהתפקיד לא מתחיל בחודש הראשון של הפעימה */
+function roleStartLabel(instIdx, r){
+  const st = roleStartMonth(r);
+  return st > 1 ? "מ" + instMonthLabel(instIdx, st) : "";
+}
 /* מספר החודשים שהפעימה אמורה לכסות: לפי "הגדרת חודשים" של הפעימה, ואם לא הוגדרו — לפי התפקיד הארוך ביותר של העובד */
 function staffExpectedMonths(row, instIdx){
   const meta = instMeta(instIdx);
@@ -11078,7 +11088,7 @@ function staffShortRoles(row, instIdx){
   if(!exp) return [];
   const out = [];
   [row].concat(row.extraRoles || []).forEach((r, i) => {
-    if(r && roleMonthCount(r) < exp) out.push({roleIdx: i - 1, months: parseFloat(r.months) || 0});
+    if(r && roleMonthCount(r) < exp - roleStartMonth(r) + 1) out.push({roleIdx: i - 1, months: parseFloat(r.months) || 0});
   });
   return out;
 }
@@ -11094,11 +11104,13 @@ function roleRateForMonth(r, m){
 }
 function roleMonthBreakdown(r){
   const M = roleMonthCount(r);
+  const st = roleStartMonth(r);
   const out = [];
   for(let i = 1; i <= Math.ceil(M); i++){
     const weight = Math.min(1, M - (i - 1));
-    const rate = roleRateForMonth(r, i);
-    out.push({m:i, rate, weight, amount: rate * weight, raised: rate !== (parseFloat(r.monthly) || 0)});
+    const m = st + i - 1;
+    const rate = roleRateForMonth(r, m);
+    out.push({m, rate, weight, amount: rate * weight, raised: rate !== (parseFloat(r.monthly) || 0)});
   }
   return out;
 }
@@ -11231,9 +11243,9 @@ function staffRoleCalcInner(row, r, roleIdx, instIdx){
   const chips = [`<span class="sc-chip">תעריף בסיס ${fmtMoney(monthly)}</span>`]
     .concat(raises.map(x => `<span style="color:var(--ink-soft)">←</span><span class="sc-chip up">מ${escHtml(instMonthLabel(instIdx, x.fromMonth))} ${fmtMoney(x.monthly)}${frozen ? "" : `<button type="button" title="הסרת ההעלאה" onclick="removeStaffRaise(${row.id},${roleIdx},${x.fromMonth})">✕</button>`}</span>`))
     .join("");
-  const expMonths = staffExpectedMonths(row, instIdx);
-  const shortNote = (!frozen && expMonths && roleMonthCount(r) < expMonths)
-    ? `<div class="sc-deduct" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--red)">${svgIcon('alert',12)} בתפקיד הזה מחושב ${(parseFloat(r.months)||0) > 0 ? (parseFloat(r.months)) + " חודשים" : "חודש אחד בלבד (שדה החודשים ריק)"} מתוך ${expMonths} חודשי הפעימה
+  const expMonths = staffExpectedMonths(row, instIdx) - roleStartMonth(r) + 1;
+  const shortNote = (!frozen && expMonths > 0 && roleMonthCount(r) < expMonths)
+    ? `<div class="sc-deduct" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--red)">${svgIcon('alert',12)} בתפקיד הזה מחושב ${(parseFloat(r.months)||0) > 0 ? (parseFloat(r.months)) + " חודשים" : "חודש אחד בלבד (שדה החודשים ריק)"} מתוך ${expMonths} חודשי הפעימה${roleStartMonth(r) > 1 ? " (" + escHtml(roleStartLabel(instIdx, r)) + ")" : ""}
         <button type="button" class="sc-link-btn" onclick="fillStaffRoleMonths(${row.id},${roleIdx},${expMonths})">השלמה ל-${expMonths} חודשים</button></div>`
     : "";
   const addBtn = frozen
@@ -11272,6 +11284,14 @@ function staffGrandInner(row){
   }
   return `<span>סה"כ לתשלום (כל התפקידים והתשלומים)</span><b>${fmtMoney(live)}</b>`;
 }
+function staffStartSelectHtml(r, instIdx, attrs){
+  const cnt = Math.max(staffExpectedMonths(null, instIdx), roleStartMonth(r));
+  if(cnt < 2) return "";
+  const st = roleStartMonth(r);
+  let o = "";
+  for(let m = 1; m <= cnt; m++) o += `<option value="${m}" ${m === st ? "selected" : ""}>${escHtml(instMonthLabel(instIdx, m))}${m === 1 ? " (תחילת הפעימה)" : ""}</option>`;
+  return `<label>מתחיל מחודש<select ${attrs}>${o}</select></label>`;
+}
 function buildStaffRowElement(row){
   const instIdx = staffRowInstallmentIndex(row.id);
   migrateSingleDocToArray(row, "link", "docs", "פירוט תפקיד");
@@ -11290,6 +11310,7 @@ function buildStaffRowElement(row){
         <label>תעריף בסיס חודשי<input type="number" data-erf="monthly" data-eridx="${i}" value="${num(er.monthly)}"></label>
         <label>ימי חיסור<input type="number" data-erf="missing" data-eridx="${i}" value="${num(er.missing)}"></label>
         <label>חודשים בפעימה<input type="number" data-erf="months" data-eridx="${i}" value="${num(er.months)}"></label>
+        ${staffStartSelectHtml(er, instIdx, `data-erstart="${i}"`)}
       </div>
       <div class="sc-calc" data-role="${i}">${staffRoleCalcInner(row, er, i, instIdx)}</div>
     </div>`).join("");
@@ -11320,6 +11341,7 @@ function buildStaffRowElement(row){
         <label>תעריף בסיס חודשי (₪)<input type="number" data-f="monthly" value="${num(row.monthly)}"></label>
         <label>ימי חיסור<input type="number" data-f="missing" value="${num(row.missing)}"></label>
         <label>חודשים בפעימה<input type="number" data-f="months" value="${num(row.months)}"></label>
+        ${staffStartSelectHtml(row, instIdx, `data-start="1"`)}
         <label class="sc-check"><input type="checkbox" data-approved="1" ${row.approved ? "checked" : ""} style="width:auto"> אושר לתשלום</label>
         <label class="sc-wide">הערות<input type="text" data-f="notes" value="${escHtml(row.notes||"")}"></label>
       </div>
@@ -11367,6 +11389,18 @@ function buildStaffRowElement(row){
     saveInstallments();
     patchStaffCard(tr, row);
     renderAccountantReport();
+  });
+  tr.querySelectorAll("[data-start],[data-erstart]").forEach(sel => {
+    sel.addEventListener("change", () => {
+      const r = sel.hasAttribute("data-erstart") ? (row.extraRoles || [])[parseInt(sel.dataset.erstart, 10)] : row;
+      if(!r) return;
+      const v = parseInt(sel.value, 10);
+      if(v >= 2) r.startMonth = v; else delete r.startMonth;
+      saveInstallments();
+      refreshSingleStaffRow(row.id);
+      renderPayment();
+      renderAccountantReport();
+    });
   });
   tr.querySelectorAll("[data-erf]").forEach(inp => {
     inp.addEventListener("input", () => {
@@ -11641,13 +11675,14 @@ function openStaffRaiseModal(id, roleIdx){
   staffRaiseCtx = {id, roleIdx, instIdx};
   document.getElementById("staffRaiseTitle").textContent = `העלאת שכר — ${row.name || "עובד"}${r.role ? " · " + r.role : ""}`;
   const sel = document.getElementById("staffRaiseFrom");
-  const M = Math.ceil(roleMonthCount(r));
+  const st = roleStartMonth(r);
+  const last = st + Math.ceil(roleMonthCount(r)) - 1;
   let opts = "";
-  for(let m = 2; m <= M; m++) opts += `<option value="${m}">${escHtml(instMonthLabel(instIdx, m))} (חודש ${m} בפעימה)</option>`;
+  for(let m = st + 1; m <= last; m++) opts += `<option value="${m}">${escHtml(instMonthLabel(instIdx, m))} (חודש ${m} בפעימה)</option>`;
   opts += `<option value="next">מהפעימה הבאה (לא משנה את הפעימה הזו)</option>`;
   sel.innerHTML = opts;
-  sel.value = M >= 2 ? "2" : "next";
-  document.getElementById("staffRaiseRate").value = roleRateForMonth(r, M) || "";
+  sel.value = last > st ? String(st + 1) : "next";
+  document.getElementById("staffRaiseRate").value = roleRateForMonth(r, last) || "";
   document.getElementById("staffRaiseFuture").checked = true;
   document.getElementById("staffRaiseError").style.display = "none";
   sel.onchange = updateStaffRaisePreview;
@@ -13760,8 +13795,8 @@ function printStaffEmployeeReport(){
 
   const reportInst = staffRowInstallmentIndex(row.id);
   const raiseNote = (r) => roleRaises(r).map(x => `<div style="font-size:11.5px;color:#159C82">מ${escHtml(instMonthLabel(reportInst, x.fromMonth))}: ${fmtMoney(x.monthly)}</div>`).join("");
-  const roles = [{role: row.role || "תפקיד ראשי", monthly: row.monthly, missing: row.missing, months: row.months, total: computeBaseRoleTotal(row), raises: raiseNote(row)}]
-    .concat((row.extraRoles||[]).map(er => ({role: er.role || "תפקיד נוסף", monthly: er.monthly, missing: er.missing, months: er.months, total: computeExtraRoleTotal(er), raises: raiseNote(er)})));
+  const roles = [{role: row.role || "תפקיד ראשי", monthly: row.monthly, missing: row.missing, months: row.months, startLbl: roleStartLabel(reportInst, row), total: computeBaseRoleTotal(row), raises: raiseNote(row)}]
+    .concat((row.extraRoles||[]).map(er => ({role: er.role || "תפקיד נוסף", monthly: er.monthly, missing: er.missing, months: er.months, startLbl: roleStartLabel(reportInst, er), total: computeExtraRoleTotal(er), raises: raiseNote(er)})));
   const rolesRows = roles.map(r => `
     <tr>
       <td style="padding:9px 10px;border-bottom:1px solid #eee5d6;font-weight:600">${escHtml(r.role)}</td>
@@ -13769,7 +13804,7 @@ function printStaffEmployeeReport(){
       <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${fmtMoney(r.monthly)}${r.raises}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${fmtMoney((parseFloat(r.monthly)||0)/30)}</td>
       <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${r.missing||0}</td>
-      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${r.months||0}</td>` : ""}
+      <td style="padding:9px 10px;border-bottom:1px solid #eee5d6">${r.months||0}${r.startLbl ? " (" + escHtml(r.startLbl) + ")" : ""}</td>` : ""}
       <td style="padding:9px 10px;border-bottom:1px solid #eee5d6;font-weight:700">${fmtMoney(r.total)}</td>
     </tr>`).join("");
   const rolesTotal = roles.reduce((s,r)=>s+r.total, 0);
@@ -13841,7 +13876,7 @@ function renderPayment(){
     const bankRow = staffBankRowFor(row) || {};
     const roles = [row].concat(row.extraRoles || []);
     const roleParts = roles.map(r => r.role).filter(Boolean);
-    const monthsList = roles.map(r => roleMonthCount(r));
+    const monthsList = roles.map(r => roleMonthCount(r) + (roleStartMonth(r) > 1 ? " (" + roleStartLabel(activeInstallment, r) + ")" : ""));
     const monthsText = monthsList.every(m => m === monthsList[0]) ? String(monthsList[0]) : monthsList.join(" / ");
     const status = row.paymentStatus || (row.paid ? "שולם" : "ממתין");
     const payCls = status === "שולם" ? "done" : status === "חסר פרטים" ? "late" : "open";
