@@ -55,6 +55,35 @@ const TOOLS = {
       required: ["items", "prices_include_vat"]
     }
   },
+  delivery: {
+    name: "save_delivery_note",
+    description: "Return the rows of a supplier delivery note (תעודת משלוח), each matched to the order line it belongs to.",
+    input_schema: {
+      type: "object",
+      properties: {
+        supplier: { type: "string", description: "Supplier name as printed, or empty" },
+        doc_number: { type: "string", description: "Delivery note number, or empty" },
+        date: { type: "string", description: "Date as printed, or empty" },
+        rows: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string", description: "Product description exactly as printed (Hebrew, correct reading order)" },
+              sku: { type: "string", description: "Item code (מק\"ט) or empty" },
+              qty_printed: { type: "string", description: "Quantity exactly as printed, with its unit if printed (e.g. '3 קרטון', '24')" },
+              line: { type: "integer", description: "Index of the matching order line from the list in the user info, or -1 if this product is not in the order" },
+              qty: { type: ["number", "null"], description: "The delivered quantity converted to the entry unit of the matched order line (as given in the list). null if it cannot be determined" },
+              confidence: { type: "string", enum: ["high", "low"], description: "low if the match or the quantity is uncertain" },
+              note: { type: "string", description: "Short Hebrew note if something is unclear (e.g. 'כתוב בקרטונים, לא ברור כמה בקרטון'), else empty" }
+            },
+            required: ["name", "line", "confidence"]
+          }
+        }
+      },
+      required: ["rows"]
+    }
+  },
   document: {
     name: "save_document",
     description: "Return what this business document is and the key fields in it.",
@@ -133,6 +162,11 @@ const PROMPTS = {
     "מחיר: המספר שמופיע לכל יחידת מכירה (קרטון/מארז/שק/יחידה). אל תמציא מחירים ואל תחשב מע\"מ בעצמך – רק דווח אם המחירים כוללים מע\"מ. " +
     "אם לא ברור כמה יחידות בקרטון או שהמחיר לא מתאים לגודל – סמן confidence=low ונסח שאלה אחת קצרה ופשוטה בעברית. " +
     "דלג על כותרות, סיכומים ושורות שאינן מוצר.",
+  delivery:
+    "זו תעודת משלוח (או חשבונית משלוח) של ספק מזון / ציוד למוסד בישראל. במידע הנוסף יש רשימה ממוספרת של שורות ההזמנה שנשלחה לספק, ולכל שורה יחידת ההזנה. " +
+    "החזר כל שורת מוצר שמופיעה בתעודה בעזרת הכלי save_delivery_note. לכל שורה: התאם אותה לשורת ההזמנה המתאימה (line = המספר מהרשימה), לפי מק\"ט אם יש ואחרת לפי שם המוצר, גם אם השם כתוב קצת אחרת. " +
+    "qty = הכמות שסופקה, ביחידת ההזנה של אותה שורה (אם השורה בקרטונים – בקרטונים). אם בתעודה כתוב ביחידות ושורת ההזמנה בקרטונים, המר לפי מה שכתוב בשם המוצר; אם אי אפשר לדעת – החזר null וסמן confidence=low. " +
+    "מוצר שלא מופיע בהזמנה – line=-1. אל תמציא שורות ואל תנחש כמויות שלא כתובות. דלג על כותרות, סיכומים ומע\"מ.",
   document:
     "זה מסמך שהועלה למערכת ניהול של בניין / מוסד בישראל (חשבונית, קבלה, אישור עבודה, אישור בודק, דוח ליקויים, הצעת מחיר, חוזה שירות ועוד). " +
     "זהה את סוג המסמך והחזר את השדות בעזרת הכלי save_document. אל תנחש: שדה שלא כתוב – השאר ריק. " +
@@ -203,10 +237,10 @@ export default async (req) => {
   const blocks = toBlocks(body.parts);
   if (!blocks.length) return json({ ok: false, error: "לא נשלח תוכן לקריאה" }, 400);
 
-  const hint = body.hint ? "\n\nמידע נוסף מהמשתמש: " + String(body.hint).slice(0, task === "voice" ? 4000 : 500) : "";
+  const hint = body.hint ? "\n\nמידע נוסף מהמשתמש: " + String(body.hint).slice(0, task === "voice" ? 4000 : task === "delivery" ? 6000 : 500) : "";
   const payload = {
     model: env("AI_MODEL", "claude-sonnet-5-5"),
-    max_tokens: task === "pricelist" ? 16000 : task === "voice" ? 1500 : task === "quotes" ? 3500 : 4000,
+    max_tokens: task === "pricelist" ? 16000 : task === "voice" ? 1500 : task === "quotes" ? 3500 : task === "delivery" ? 6000 : 4000,
     tools: [TOOLS[task]],
     tool_choice: { type: "auto" },
     messages: [{ role: "user", content: [...blocks, { type: "text", text: PROMPTS[task] + hint + "\n\nחובה להחזיר את התשובה רק דרך קריאה לכלי " + TOOLS[task].name + ", בלי טקסט נוסף." }] }]

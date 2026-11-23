@@ -78,13 +78,14 @@
 
   window.aiCall = callServer;   // לשימוש של ההקלטה הקולית (voice.js)
 
-  /* aiRead({task:'pricelist'|'document', file, hint, onStep}) → {ok, data, error} */
+  /* aiRead({task:'pricelist'|'document'|'delivery', file, hint, onStep}) → {ok, data, error}
+     delivery = תעודת משלוח: נקראת כמו מסמך (עד 4 עמודים בבקשה אחת) */
   window.aiRead = async function(o){
     var step = o.onStep || function(){};
-    var task = o.task === "document" ? "document" : "pricelist";
+    var task = o.task === "document" ? "document" : o.task === "delivery" ? "delivery" : "pricelist";
     var list;
-    try { list = await chunks(o.file, task, step); } catch (e) { return { ok: false, error: e.message || "לא הצלחתי להכין את הקובץ" }; }
-    if (task === "document") { step("הסוכן קורא את המסמך…"); return callServer(task, list[0], o.hint); }
+    try { list = await chunks(o.file, task === "delivery" ? "document" : task, step); } catch (e) { return { ok: false, error: e.message || "לא הצלחתי להכין את הקובץ" }; }
+    if (task === "document" || task === "delivery") { step(task === "delivery" ? "הסוכן קורא את תעודת המשלוח…" : "הסוכן קורא את המסמך…"); return callServer(task, list[0], o.hint); }
     var results = new Array(list.length), done = 0, next = 0;
     step(list.length > 1 ? "הסוכן קורא " + list.length + " חלקים במקביל…" : "הסוכן קורא את המחירון…");
     async function worker(){
