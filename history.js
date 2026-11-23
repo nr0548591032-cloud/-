@@ -24,7 +24,7 @@
   /* איזה מסמך שייך לאיזה טאב */
   var KEY_TAB = {
     "tasks-data": "tasks", "myTasks-data": "tasks",
-    "procurement-data": "procurement", "supply-data": "procurement", "supplyOrders-data": "procurement", "supplyKitchen-data": "procurement", "supplyBasket-data": "procurement", "food-data": "procurement",
+    "procurement-data": "procurement", "supply-data": "procurement", "supplyOrders-data": "procurement", "supplyKitchen-data": "procurement", "supplyBasket-data": "procurement", "supplyCart-data": "procurement", "food-data": "procurement",
     "licensing-data": "licensing", "ttd-data": "licensing",
     "staff-data": "staff",
     "vendorPayments-data": "accountant", "acctSends-data": "accountant", "acctInbox-data": "accountant", "accountantContact-data": "accountant",
@@ -223,7 +223,7 @@
   /* ---------- "בטל" מיד אחרי פעולה (כמו במוקאפ): 6 שניות להחזיר ----------
      עוטף את השמירה הרגילה. אחרי שמירה מוצלחת שמוחקת, מוסיפה או משנה סטטוס של פריט –
      מופיעה הודעה עם "בטל". "בטל" שומר בחזרה את מה שהיה בענן רגע לפני (בדרך הרגילה, עם גיבוי), ומרענן. */
-  var UNDO_SKIP = /^(uiPrefs-data|loginLog.*|acctInbox-data)$/;
+  var UNDO_SKIP = /^(uiPrefs-data|loginLog.*|acctInbox-data|supplyCart-data)$/;   // העגלה נשמרת בכל לחיצה על + / −, אין טעם בהודעת "בטל" על כל אחת
   var STATUS_F = { status: 1, done: 1, paid: 1, approved: 1, paymentStatus: 1, dateIn: 1, archived: 1 };
   function undoToast(key, prev, value){
     if (!isAdmin() || UNDO_SKIP.test(key) || prev == null || prev === value) return;

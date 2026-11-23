@@ -349,12 +349,25 @@
       <button type="button" class="ct-hit" data-pj="open" data-id="${p.id}" aria-label="פתיחת ${esc(p.name || "פרויקט")}"></button>
       <div class="ct-card-top"><span class="pj-ic">${ic(catIco(p.category), 22)}</span>
         <div class="ct-card-t"><div class="nm">${esc(p.name || "פרויקט ללא שם")}</div><div class="sp">${esc([p.category, p.location].filter(Boolean).join(" · ") || "ללא קטגוריה")}</div></div>
-        ${stPill(p)}</div>
+        ${stPill(p)}${cardMenu(p)}</div>
       ${steps(p)}
       ${barsHtml(p, c, 3)}
       ${flags ? `<div class="pj-flags">${flags}</div>` : ""}
       <div class="ct-mets"><div><b>${num(p.budget) ? money(p.budget) : "—"}</b><span>תקציב</span></div><div><b>${c.chosen ? money(qGross(c.chosen)) : c.min ? money(c.min) : "—"}</b><span>${c.chosen ? "ההצעה שנבחרה" : "ההצעה הזולה"}</span></div>${m3}</div>
     </article>`;
+  }
+
+  /* תפריט ⋮ אחיד (umMenu מהאפליקציה): אותן פעולות כמו במגירה */
+  function cardMenu(p){
+    if (typeof window.umMenu !== "function" && typeof umMenu !== "function") return "";   // eslint-disable-line no-undef
+    const ed = canEdit(), A = (a, label, icon, danger) => ({ label, icon, danger, attrs: `data-pj="${a}" data-id="${p.id}"` });
+    return umMenu([   // eslint-disable-line no-undef
+      A("open", "פתיחת הפרויקט", "open"),
+      ed ? A("request", "בקשת הצעות מחיר", "whatsapp") : null,
+      ed ? A("q-new", "הוספת הצעה", "plus") : null,
+      ed ? A("edit", "עריכת הפרויקט", "edit") : null,
+      ed ? A("p-del", "מחיקת הפרויקט", "trash", true) : null
+    ], { cls: "um-inrow" });
   }
 
   /* =====================================================================
