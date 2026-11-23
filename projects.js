@@ -240,12 +240,14 @@
     L.sort(by[U.sort] || by.recent);
     return L;
   }
+  /* אותו מרווח מעקב כמו בהודעות לאנשי מקצוע (נוסח קבוע → "לא חזרו אליך") */
+  function followDays(){ try { return proMsgCfg().followDays || 3; } catch (e) { return 3; } } // eslint-disable-line no-undef
   function alerts(){
     const A = [];
     visible().forEach(p => {
       if (isArch(p)) return;
       const c = calc(p);
-      c.pending.forEach(q => { const n = daysSince(q.requestedAt); if (n !== null && n >= 4) A.push({ lvl: 2, tone: "w", ico: "clock", t: `${q.vendor || "ספק"} עוד לא שלח הצעה`, s: `${p.name || "פרויקט"} · נשלחה בקשה לפני ${n} ימים`, act: "nudge", id: p.id, q: q.id, btn: "תזכורת" }); });
+      c.pending.forEach(q => { const n = daysSince(q.requestedAt); if (n !== null && n >= followDays()) A.push({ lvl: 2, tone: "w", ico: "clock", t: `${q.vendor || "ספק"} עוד לא שלח הצעה`, s: `${p.name || "פרויקט"} · נשלחה בקשה לפני ${n} ימים`, act: "nudge", id: p.id, q: q.id, btn: "תזכורת" }); });
       c.expiring.forEach(q => { const n = daysTo(q.validUntil); A.push({ lvl: n < 0 ? 2 : 3, tone: n < 0 ? "d" : "w", ico: "cal", t: `הצעה של ${q.vendor || "ספק"} ${n < 0 ? "פגה" : n === 0 ? "פגה היום" : "פגה בעוד " + n + " ימים"}`, s: p.name || "פרויקט", act: "open", id: p.id, tab: "quotes", btn: "פתיחה" }); });
       const due = daysTo(p.dueDate);
       if (due !== null && due < 0) A.push({ lvl: 2, tone: "d", ico: "cal", t: `${p.name || "פרויקט"} – היעד עבר`, s: `יעד: ${fdate(p.dueDate)} · ${stage(p).l}`, act: "open", id: p.id, btn: "פתיחה" });
@@ -838,7 +840,7 @@
         const em = c.email || ((c.people || []).find(z => z && z.email) || {}).email;
         return `<div class="pj-sendrow ${sent ? "sent" : ""}"><span class="t">${sent ? "✓ " : ""}${esc(c.name)}<small>${esc(c.phone || "אין טלפון")}${em ? " · " + esc(em) : ""}</small></span>
           <span class="ct-acts" style="flex:0 0 auto"><button type="button" class="ab w" data-pj="req-wa" data-v="${c.id}" ${c.phone ? "" : "disabled"} style="padding:0 12px">${ic("wa", 15)}וואטסאפ</button><button type="button" class="ab m" data-pj="req-mail" data-v="${c.id}" ${em ? "" : "disabled"} style="padding:0 12px">${ic("mail", 15)}Gmail</button></span></div>`; }).join("")}</div>
-      <div class="pj-hint">כל ספק שנשלחה אליו בקשה נכנס להשוואה כ"ממתין", ותקבל התראה אם לא חזר אליך תוך 4 ימים.</div>
+      <div class="pj-hint">כל ספק שנשלחה אליו בקשה נכנס להשוואה כ"ממתין", ותקבל התראה אם לא חזר אליך תוך ${followDays()} ימים (כמו בהודעות המשימות).</div>
     </div><div class="ct-modal-f"><button type="button" class="ct-btn pri" data-pj="req-done">סיום (${MD.sent.size} נשלחו)</button><button type="button" class="ct-btn" data-pj="req-back">חזרה לבחירה</button></div>`, "sm");
   }
   function reqSend(cid, channel){
