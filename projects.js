@@ -81,6 +81,7 @@
   const qPrice = q => num(q && q.price);
   const qGross = q => { const p = qPrice(q); return q && q.vat === "ex" ? Math.round(p * (1 + VAT()) * 100) / 100 : p; };
   const qWaiting = q => !!(q && q.requestedAt && !(qPrice(q) > 0) && !q.fileUrl && !q.declined);
+  const qLast = q => [String((q && q.requestedAt) || ""), String((q && q.nudgedAt) || "")].sort().pop();
   const qReal = q => q && (q.vendor || qPrice(q) > 0 || q.fileUrl || q.requestedAt || q.notes);
   function calc(p){
     const quotes = (p.quotes || []).filter(qReal);
@@ -247,7 +248,7 @@
     visible().forEach(p => {
       if (isArch(p)) return;
       const c = calc(p);
-      c.pending.forEach(q => { const n = daysSince(q.requestedAt); if (n !== null && n >= followDays()) A.push({ lvl: 2, tone: "w", ico: "clock", t: `${q.vendor || "ספק"} עוד לא שלח הצעה`, s: `${p.name || "פרויקט"} · נשלחה בקשה לפני ${n} ימים`, act: "nudge", id: p.id, q: q.id, btn: "תזכורת" }); });
+      c.pending.forEach(q => { const n = daysSince(qLast(q)); if (n !== null && n >= followDays()) A.push({ lvl: 2, tone: "w", ico: "clock", t: `${q.vendor || "ספק"} עוד לא שלח הצעה`, s: `${p.name || "פרויקט"} · ${n} ימים בלי תשובה`, act: "nudge", id: p.id, q: q.id, btn: "תזכורת" }); });
       c.expiring.forEach(q => { const n = daysTo(q.validUntil); A.push({ lvl: n < 0 ? 2 : 3, tone: n < 0 ? "d" : "w", ico: "cal", t: `הצעה של ${q.vendor || "ספק"} ${n < 0 ? "פגה" : n === 0 ? "פגה היום" : "פגה בעוד " + n + " ימים"}`, s: p.name || "פרויקט", act: "open", id: p.id, tab: "quotes", btn: "פתיחה" }); });
       const due = daysTo(p.dueDate);
       if (due !== null && due < 0) A.push({ lvl: 2, tone: "d", ico: "cal", t: `${p.name || "פרויקט"} – היעד עבר`, s: `יעד: ${fdate(p.dueDate)} · ${stage(p).l}`, act: "open", id: p.id, btn: "פתיחה" });
@@ -328,7 +329,7 @@
     return `<div class="pj-bars">${items.map(q => {
       const best = c.recv.length > 1 && qGross(q) === c.min, pick = c.chosen && c.chosen.id === q.id;
       return `<div class="pj-bar ${pick ? "pick" : best ? "best" : ""}"><span class="n">${pick ? "✓ " : ""}${esc(q.vendor || "ספק")}</span><span class="t"><span style="width:${Math.max(6, Math.round(qGross(q) / max * 100))}%"></span></span><span class="v">${money(qGross(q))}</span></div>`; }).join("")}
-      ${waits.map(q => `<div class="pj-bar wait"><span class="n">${esc(q.vendor || "ספק")}</span><span class="t"></span><span class="v">ממתין${daysSince(q.requestedAt) ? " · " + daysSince(q.requestedAt) + " ימ׳" : ""}</span></div>`).join("")}
+      ${waits.map(q => `<div class="pj-bar wait"><span class="n">${esc(q.vendor || "ספק")}</span><span class="t"></span><span class="v">ממתין${daysSince(qLast(q)) ? " · " + daysSince(qLast(q)) + " ימ׳" : ""}</span></div>`).join("")}
       ${c.recv.length + c.waiting.length > items.length + waits.length ? `<div class="ct-soft" style="font-size:12px">ועוד ${c.recv.length + c.waiting.length - items.length - waits.length}</div>` : ""}</div>`;
   }
   function cardHtml(p, i){
@@ -490,8 +491,10 @@
     ].filter(Boolean).join("");
     const items = Array.isArray(q.items) && q.items.length ? `<details class="pj-items"><summary>${q.items.length} סעיפים בהצעה</summary>${q.items.map(x => `<div><span>${esc(x.text || "")}</span><b>${num(x.amount) ? money(x.amount) : ""}</b></div>`).join("")}</details>` : "";
     const acts = [];
+    const strip = wait && window.wtStrip ? window.wtStrip("q" + p.id + "_" + q.id) : "";
+    const hasStrip = strip.indexOf('class="wt-strip') !== -1;
     if (q.fileUrl) acts.push(`<button type="button" class="ab m" data-pj="q-file" data-id="${p.id}" data-q="${q.id}">${ic("doc", 15)}הקובץ</button>`);
-    if (ed && wait) acts.push(`<button type="button" class="ab pri" data-pj="q-edit" data-id="${p.id}" data-q="${q.id}">${ic("coin", 15)}הזנת המחיר</button>`, `<button type="button" class="ab w" data-pj="nudge" data-id="${p.id}" data-q="${q.id}">${ic("wa", 15)}תזכורת</button>`);
+    if (ed && wait && !hasStrip) acts.push(`<button type="button" class="ab pri" data-pj="q-edit" data-id="${p.id}" data-q="${q.id}">${ic("coin", 15)}הזנת המחיר</button>`, `<button type="button" class="ab w" data-pj="nudge" data-id="${p.id}" data-q="${q.id}">${ic("wa", 15)}תזכורת</button>`);
     if (ed && !wait && !q.declined && !pick && p.status !== "בוטל") acts.push(`<button type="button" class="ab pri" data-pj="choose" data-id="${p.id}" data-q="${q.id}">${ic("trophy", 15)}בחירה בהצעה</button>`);
     if (ed && pick) acts.push(`<button type="button" class="ab x" style="flex:0 1 auto;padding:0 12px" data-pj="unchoose" data-id="${p.id}">ביטול הבחירה</button>`);
     if (ct && !wait) acts.push(`<button type="button" class="ab w" data-pj="wa" data-id="${p.id}" data-q="${q.id}" aria-label="וואטסאפ ל${esc(q.vendor)}">${ic("wa", 15)}</button>`);
@@ -509,6 +512,7 @@
       ${q.subject ? `<div class="ct-soft">${esc(q.subject)}</div>` : ""}
       ${q.notes ? `<div class="ct-note-fixed">${esc(q.notes)}</div>` : ""}
       ${items}
+      ${hasStrip ? strip : ""}
       ${acts.length ? `<div class="pj-qa ct-acts">${acts.join("")}</div>` : ""}
     </div>`;
   }
@@ -871,6 +875,8 @@
   }
   function nudge(pid, qid){
     const p = getP(pid); const q = p && (p.quotes || []).find(x => String(x.id) === String(qid)); if (!q) return;
+    /* אותה תזכורת כמו בכל האפליקציה (נוסח קבוע, נרשם במעקב "ממתינים לתשובה") */
+    if (window.wtRemind && window.wtRemind("q" + p.id + "_" + q.id)) return;
     const c = contactOf(q.vendor);
     const ph = c && (c.phone || ((c.people || []).find(z => z && z.phone) || {}).phone);
     if (!ph) { toast(`אין טלפון ל${q.vendor || "ספק"} באנשי הקשר`); return; }
@@ -1114,6 +1120,8 @@
     }
     const p = getP(r.value); if (p) go(p);
   }
+  /* "חזרו אליי" מהמנגנון המרכזי: פותח את ההצעה להזנת המחיר / הקובץ */
+  window.pjAnswer = function(pid, qid){ if (!canTab("projects")) return; try { switchTab("projects"); } catch (e) {} render(); setTimeout(() => { open(pid, "quotes"); editQuote(pid, qid); }, 80); }; // eslint-disable-line no-undef
   window.pjFromAgent = function(file, d){
     if (!file || !canEdit()) return;
     hosts();

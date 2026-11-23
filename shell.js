@@ -486,7 +486,8 @@
       { t: "licensing", v: D.licValid.length + "/" + D.licWithExp.length, l: "אישורים בתוקף" }
     ] : [];
     var mtDone = mt ? mt.filter(function(x){ return x.done; }).length : 0;
-    var sig = JSON.stringify([top3.map(function(a){ return a.title + a.lvl; }), kpis.map(function(k){ return k.v; }), mt ? mt.map(function(x){ return x.id + ":" + !!x.done + ":" + x.title; }) : 0, alerts.length]);
+    var wt = ""; try { wt = window.wtHomeHtml ? window.wtHomeHtml() : ""; } catch (e) { console.warn("shell:", e); }
+    var sig = JSON.stringify([top3.map(function(a){ return a.title + a.lvl; }), kpis.map(function(k){ return k.v; }), mt ? mt.map(function(x){ return x.id + ":" + !!x.done + ":" + x.title; }) : 0, alerts.length, wt.length, wt.slice(0, 400)]);
     if (el.getAttribute("data-sig") === sig) return;
     el.setAttribute("data-sig", sig);
     var tp = function(x){ try { return MT_TYPES[x.type] || MT_TYPES.general; } catch (e) { return { c: "#82796a", p: "" }; } };   // eslint-disable-line no-undef
@@ -501,7 +502,7 @@
             (typeof a.act === "function" ? '<button type="button" data-shh-a="' + i + '" style="background:' + (LVLBG[a.lvl] || "#eee") + ';color:' + (LVLC[a.lvl] || "#333") + '">' + esc(HOME_BTN[a.tab] || "פתח") + '</button>' : '') + '</div>';
         }).join("") : '<div class="shh-ok">' + ic("check", 20) + '<span>אין אישורים שפגו, משימות באיחור או תשלומים תקועים</span></div>') +
         (alerts.length > 3 ? '<button type="button" class="shh-all" data-shh="bell">ועוד ' + (alerts.length - 3) + ' – הצג הכל</button>' : '') +
-      '</section>' +
+      '</section>' + wt +
       (kpis.length ? '<div class="shh-kpis">' + kpis.map(function(k){
         return '<button type="button" class="shh-kpi" data-shh-go="' + k.t + '"><span class="shh-ki" style="background:color-mix(in srgb,' + col(k.t) + ' 12%, transparent);color:' + col(k.t) + '">' + ic(TAB_IC[k.t], 17) + '</span><b>' + esc(k.v) + '</b><small>' + esc(k.l) + '</small></button>';
       }).join("") + '</div>' : '') +
@@ -516,6 +517,7 @@
       '<button type="button" class="shh-full" data-shh="full">' + ic("grid", 16) + '<span>לוח הבקרה המלא – גרפים, תקציב וכל הנתונים</span></button>';
     el._alerts = top3;
   }
+  window.shHomeRefresh = function(){ try { home(); } catch (e) { console.warn("shell:", e); } };
   document.addEventListener("click", function(e){
     var b = e.target.closest && e.target.closest("#shHome button"); if (!b) return;
     var el = document.getElementById("shHome");

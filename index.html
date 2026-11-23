@@ -2693,7 +2693,7 @@ button.ct-tl:hover{background:#fbf7f0}
           <label>שורת פתיחה <small>({שם} יוחלף בשם איש המקצוע)</small><input type="text" id="wsTplOpen" maxlength="200"></label>
           <label>שורת בקשת עדכון<input type="text" id="wsTplUpdate" maxlength="200"></label>
           <label>ברכת סיום<input type="text" id="wsTplBye" maxlength="200"></label>
-          <label class="ws-tpl-days">להציג בלוח הבקרה "לא חזרו אליך" אחרי<input type="number" id="wsTplDays" min="1" max="30" inputmode="numeric">ימים</label>
+          <label class="ws-tpl-days">"ממתינים לתשובה" – להזכיר אחרי<input type="number" id="wsTplDays" min="1" max="30" inputmode="numeric">ימים</label>
           <div class="ws-tpl-acts"><button type="button" class="btn ghost" onclick="wsTplReset()">חזרה לנוסח המקורי</button><button type="button" class="btn" onclick="wsTplSave()">שמירת הנוסח</button></div>
         </div>
       </details>
@@ -3543,7 +3543,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261140; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261141; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -9721,7 +9721,7 @@ function lcBodyHtml(row, inBundle){
   const histOpen = licUi.hist.has(row.id);
   const last = log[0];
   const lastTxt = last ? String(last.note || last.status || "") : "";
-  const histSec = `<div class="lc-sec">
+  const histSec = `${window.wtStrip && row.processStatus === "ממתין לביקור/בדיקה" ? wtStrip("l" + row.id) : ""}<div class="lc-sec">
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <button type="button" class="lc-histbtn" data-lc-act="hist" data-id="${row.id}" aria-expanded="${histOpen}">${lcIco("clock", 15)}<span>היסטוריה · ${log.length} עדכונים${last ? ` · אחרון: ${escHtml(lastTxt.length > 46 ? lastTxt.slice(0, 45) + "…" : lastTxt)}, ${escHtml(fmtDateHe(last.date))}` : ""}</span><span class="lc-chev" ${histOpen ? 'style="transform:rotate(180deg)"' : ""}>${lcIco("chev", 14)}</span></button>
       <span style="flex:1"></span>
@@ -14220,6 +14220,7 @@ function ctAlerts(stats){
       A.push({ lvl: 1, ico: "nophone", tone: "d", t: `ל${c.name || "איש קשר"} אין טלפון`, s: s.open.length ? `משובץ ב-${s.open.length === 1 ? "משימה פתוחה" : s.open.length + " משימות פתוחות"} — הודעת וואטסאפ לא תישלח` : "מסומן לחיוג מהיר / חירום", act: "edit", id: c.id, btn: "הוספה" });
     ctDocs(c).forEach((d, i) => {
       const st = ctDocState(d);
+      if(window.wtStrip && d.requestedAt && !(d.answeredAt && d.answeredAt >= d.requestedAt)) return;   // כבר ביקשת – במעקב "ממתינים לתשובה"
       if(st.k === "bad") A.push({ lvl: 1, ico: "shield", tone: "d", t: `${d.name || "מסמך"} של ${c.name} פג תוקף`, s: `פג ב-${ctFmtDate(d.expiry)}`, act: "docreq", id: c.id, i, btn: "בקשת מסמך" });
       else if(st.k === "warn") A.push({ lvl: 2, ico: "shield", tone: "w", t: `${d.name || "מסמך"} של ${c.name} פג ${st.n === 0 ? "היום" : "בעוד " + st.n + " יום"}`, s: ctFmtDate(d.expiry), act: "docreq", id: c.id, i, btn: "בקשת מסמך" });
     });
@@ -14258,7 +14259,7 @@ function renderContacts(){
   ctUi._alerts = alerts;
   const paidAll = active.reduce((a, c) => a + ((C.stats.get(c.id) || {}).paidYear || 0), 0);
   const openAll = active.reduce((a, c) => a + (((C.stats.get(c.id) || {}).open || []).length), 0);
-  let noReply = 0; try{ noReply = proNoReply(data.tasks).length; }catch(e){}
+  let noReply = 0; try{ noReply = window.wtOverdue ? wtOverdue().length : proNoReply(data.tasks).length; }catch(e){}
   const dial = active.filter(c => c.pinned || c.sos).sort((a, b) => (b.sos ? 1 : 0) - (a.sos ? 1 : 0) || String(a.name).localeCompare(String(b.name), "he"));
   const inType = (c, t) => t === "all" ? !c.archived : t === "arch" ? !!c.archived : c.archived ? false : t === "pro" ? ctIsPro(c) : t === "sup" ? ctIsSup(c) : t === "sos" ? !!c.sos : true;
   if(ctUi.type === "arch" && !archivedN) ctUi.type = "all";
@@ -14493,7 +14494,7 @@ function ctRenderDrawer(){
           ${st.k === "bad" || st.k === "warn" ? `<button type="button" class="ct-x" data-ct="al-docreq" data-id="${c.id}" data-i="${i}" aria-label="בקשת מסמך מעודכן בוואטסאפ" title="בקשת מסמך מעודכן">${ctIco("wa", 15)}</button>` : ""}
           <button type="button" class="ct-x" data-ct="docedit" data-id="${c.id}" data-i="${i}" aria-label="עריכה">${ctIco("edit", 15)}</button>
           <button type="button" class="ct-x" data-ct="docdel" data-id="${c.id}" data-i="${i}" aria-label="מחיקה">${ctIco("trash", 15)}</button>
-        </div>`; }).join("") : `<div class="ct-soft">אין מסמכים. כדאי לשמור כאן ביטוח, רישיון ואישור ניכוי מס — עם תאריך תוקף.</div>`}
+        </div>${window.wtStrip && d.requestedAt ? wtStrip("d" + c.id + "_" + (d.id || i)) : ""}`; }).join("") : `<div class="ct-soft">אין מסמכים. כדאי לשמור כאן ביטוח, רישיון ואישור ניכוי מס — עם תאריך תוקף.</div>`}
         ${ctUi.docForm ? ctDocFormHtml(c) : `<button type="button" class="ct-btn" data-ct="docnew" data-id="${c.id}" style="align-self:flex-start">${ctIco("plus", 16)}מסמך עם תאריך תוקף</button>`}
       </div>
       <div class="ct-soft">מסמך שתוקפו מתקרב קופץ בלוח הבקרה 30 יום מראש, עם כפתור לבקשת מסמך מעודכן בוואטסאפ.</div>`;
@@ -14721,7 +14722,10 @@ function ctDocRequest(id, i){
   const text = `שלום ${tkFirstName(c.name) || c.name}, ${ctDocState(d).k === "bad" ? "פג התוקף של" : "בקרוב יפוג התוקף של"} ${d.name || "המסמך"} שיש לנו אצלכם${d.expiry ? ` (${ctFmtDate(d.expiry)})` : ""}. אשמח לקבל עותק מעודכן. תודה!`;
   if(!ctDigits(phone)){ jobToast(`אין מספר טלפון ל${c.name}`, 3200); return; }
   ctTouch(c);
+  d.requestedAt = tkToday();   // נכנס למעקב "ממתינים לתשובה" עד שהמסמך מתעדכן
+  ctSave();
   window.open(`https://wa.me/${formatPhoneForWhatsApp(phone)}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  try{ if(window.wtRefresh) wtRefresh(); }catch(e){}
 }
 
 /* ---------- מסמכים ---------- */
@@ -14752,6 +14756,7 @@ async function ctSaveDoc(id){
   if(i !== undefined && i !== null && c.docs[i]){
     c.docs[i].name = name.trim(); c.docs[i].expiry = expiry;
     if(url) c.docs[i].url = url;
+    if(c.docs[i].requestedAt) c.docs[i].answeredAt = tkToday();   // המסמך עודכן – יוצא ממעקב "ממתינים לתשובה"
   }else{
     c.docs.push({ id: nextId(), name: name.trim(), expiry, url, addedAt: tkToday() });
   }
@@ -18602,6 +18607,7 @@ function dbAlerts(D){
       if(!c || c.archived) return;
       (Array.isArray(c.docs) ? c.docs : []).forEach(d => {
         if(!d || !d.expiry) return;
+        if(window.wtStrip && d.requestedAt && !(d.answeredAt && d.answeredAt >= d.requestedAt)) return;   // כבר ביקשת – מופיע ב"ממתינים לתשובה"
         const n = tkDaysTo(d.expiry); if(n === null || n > 30) return;
         add(n < 0 ? 2 : 3, "doc", `${n < 0 ? "פג תוקף" : "מסמך מתקרב לתפוגה"}: ${d.name || "מסמך"} — ${c.name || ""}`, "אנשי קשר וספקים · אפשר לבקש עותק מעודכן בוואטסאפ", n, dbGo("contacts", () => ctOpen(c.id, "docs")), "contacts");
       });
@@ -18618,13 +18624,13 @@ function dbAlerts(D){
       }
     });
     const seenMap = (data.acctInbox && data.acctInbox.seen) || {};
-    (data.acctSends || []).forEach(s => {
+    if(!window.wtDashHtml) (data.acctSends || []).forEach(s => {
       const st = acxSendStats(s);
       if(!seenMap[s.id] && st.paid < st.total && acxDaysSince(s.at) >= 2)
         add(3, "wallet", "משלוח למנהל החשבונות עוד לא נצפה", `נשלח לפני ${acxDaysSince(s.at)} ימים · ${fmtMoney(s.total || 0)}`, null, dbGo("accountant", () => acxHandleDeepLink(s.id)), "accountant");
     });
   }catch(e){ console.error(e); }
-  (D.proj.alerts || []).forEach(x => add(3, "projects", x.t, "פרויקטים · " + x.s, null, dbGo("projects", () => window.pjOpen && pjOpen(x.id, x.tab || (x.q ? "quotes" : "over"))), "projects"));
+  (D.proj.alerts || []).filter(x => !(window.wtDashHtml && x.act === "nudge")).forEach(x => add(3, "projects", x.t, "פרויקטים · " + x.s, null, dbGo("projects", () => window.pjOpen && pjOpen(x.id, x.tab || (x.q ? "quotes" : "over"))), "projects"));
   if(D.noAmount.length) add(3, "receipt", `${D.noAmount.length} חשבוניות בלי סכום`, "צריך להשלים סכום כדי שייכנסו לדוח", null, () => dbNoAmountOpen(D.noAmount), "accountant");
   if(D.sp && D.sp.soon.length) add(3, "box", `${D.sp.soon.length} מוצרים יפוגו השבוע`, D.sp.soon.slice(0, 3).map(s => s.name).join(", "), null, dbGo("procurement", () => dbSpOpen("stock")), "procurement");
   if(D.sp && D.sp.below) add(3, "box", `${D.sp.below} מוצרים מתחת למינימום במלאי`, "רכש ואספקה", null, dbGo("procurement", () => dbSpOpen("stock")), "procurement");
@@ -18930,7 +18936,7 @@ function renderDashboard(opts){
   root.innerHTML = [
     dbSafe(() => dbHeroHtml(D, H, alerts), ""),
     D.my ? `<div class="db-row2">${dbSafe(() => dbAlertsHtml(alerts), "")}${dbSafe(() => dbMyHtml(D), "")}</div>` : dbSafe(() => dbAlertsHtml(alerts), ""),
-    dbSafe(() => dbNoReplyHtml(D), ""),
+    dbSafe(() => window.wtDashHtml ? wtDashHtml() : dbNoReplyHtml(D), ""),
     dbSafe(() => dbKpisHtml(D), ""),
     dbSafe(() => dbWeekHtml(D), ""),
     dbSafe(() => dbChartsHtml(D), ""),
@@ -23947,6 +23953,7 @@ function renderOrders(){
         <div class="grow"><h3>${esc(o.supplier)}</h3><span class="muted">${heDate(o.date)} · ${esc(c?.name||'')} · <span class="sp-num">${o.lines.length}</span> פריטים${o.receivedBy?' · התקבל ע״י '+esc(o.receivedBy):''}</span></div>
         <div class="row">${st}${invTag}${cook?'':`<b class="sp-num">${money(o.total)}</b>`}</div>
       </div>
+      ${!cook && o.status==='sent' && window.wtStrip ? wtStrip('o'+o.id) : ''}
       <div class="row">
         ${o.status==='sent'?`<button class="sb sm" onclick="with(SP){openReceipt('${o.id}')}">${ic('truck','sm')}קבלת סחורה</button>`:''}
         ${!cook && o.status!=='sent' ? `<button class="sb ${o.invoice?'sb-ghost':''} sm" onclick="with(SP){openInvoice('${o.id}')}">${ic('receipt','sm')}${o.invoice?'החשבונית':'בדיקת חשבונית'}</button>`:''}
@@ -25679,7 +25686,8 @@ return SPX;
 <script src="history.js"></script>
 <script src="voice.js"></script>
 <script src="prolinks.js"></script>
-<script src="projects.js?v=20261140"></script>
+<script src="projects.js?v=20261141"></script>
+<script src="waiting.js?v=20261141"></script>
 <script>
 /* ספירת מלאי בלי קליטה: service worker שמציג את count.html רק כשאין רשת בכלל */
 if("serviceWorker" in navigator && location.protocol === "https:"){ window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(e => console.warn("sw:", e)); }); }
