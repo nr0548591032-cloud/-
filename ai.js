@@ -155,7 +155,8 @@
     var sh = sheet('<div class="sh-head"><h3>הסוכן קורא…</h3>' + X + '</div><div class="sh-empty" id="aiStep">מכין את הקובץ…</div>');
     var setStep = function(t){ var e = document.getElementById("aiStep"); if (e) e.textContent = t; };
     var hint = tab === "licensing" ? "המשתמש נמצא בטאב רישוי ובטיחות – סביר שזה אישור בודק או דוח ליקויים"
-      : tab === "procurement" ? "המשתמש נמצא בטאב רכש ואספקה – סביר שזה מחירון או חשבונית של ספק" : "";
+      : tab === "procurement" ? "המשתמש נמצא בטאב רכש ואספקה – סביר שזה מחירון או חשבונית של ספק"
+      : tab === "projects" ? "המשתמש נמצא בטאב פרויקטים – סביר שזו הצעת מחיר של ספק או בעל מקצוע לעבודה בבניין" : "";
     var res = await window.aiRead({ task: "document", file: file, hint: hint, onStep: setStep });
     if (!sh || !document.body.contains(sh)) return;          // המשתמש סגר בינתיים
     if (!res || !res.ok) { sh.innerHTML = '<div class="sh-head"><h3>הקריאה לא הצליחה</h3>' + X + '</div><div class="sh-note"><p>' + esc((res && res.error) || "שגיאה") + '</p></div>'; return; }
@@ -202,9 +203,12 @@
       acts.push({ id: "saveOther", l: "שמור את הקובץ בחשבוניות וקבלות" });
       sh._lic = lic;
     } else if (t === "quote") {
-      html += '<div class="sh-gt">הצעת מחיר</div><div style="font-size:13px">הצעה של ספק עם רשימת מוצרים ומחירים אפשר לייבא למחירונים, כמו מחירון רגיל.</div>';
-      acts.push({ id: "plist", l: "לייבא למחירונים", main: true });
-      acts.push({ id: "proj", l: "לטאב פרויקטים" });
+      var projFirst = tab !== "procurement";
+      html += '<div class="sh-gt">הצעת מחיר</div><div style="font-size:13px">' + (projFirst
+        ? 'הצעה לעבודה או רכישה – מוסיפים אותה לפרויקט, והיא נכנסת להשוואה מול שאר ההצעות. הצעה של ספק מזון עם רשימת מוצרים – לייבוא למחירונים.'
+        : 'הצעה של ספק עם רשימת מוצרים ומחירים אפשר לייבא למחירונים, כמו מחירון רגיל.') + '</div>';
+      if (projFirst) { acts.push({ id: "proj", l: "להוסיף לפרויקט (השוואת הצעות)", main: true }); acts.push({ id: "plist", l: "לייבא למחירונים" }); }
+      else { acts.push({ id: "plist", l: "לייבא למחירונים", main: true }); acts.push({ id: "proj", l: "להוסיף לפרויקט (השוואת הצעות)" }); }
       acts.push({ id: "saveOther", l: "שמור את הקובץ בחשבוניות וקבלות" });
     } else {
       acts.push({ id: "saveOther", l: "שמור בחשבוניות וקבלות", main: true });
@@ -239,7 +243,7 @@
       if (id === "lic") { close(); setTimeout(function(){ try { switchTab("licensing"); } catch (er) {} }, 240); return; }    // eslint-disable-line no-undef
       if (id === "contact") { close(); setTimeout(function(){ try { switchTab("contacts"); } catch (er) {} if (d.supplier && window.shOpenSearch) window.shOpenSearch(String(d.supplier).split(/[-–,]/)[0].trim()); }, 240); return; } // eslint-disable-line no-undef
       if (id === "tasks") { close(); setTimeout(function(){ try { switchTab("tasks"); } catch (er) {} if (d.supplier && window.shOpenSearch) window.shOpenSearch(String(d.supplier).split(/[-–,]/)[0].trim()); }, 240); return; } // eslint-disable-line no-undef
-      if (id === "proj") { close(); setTimeout(function(){ try { switchTab("projects"); } catch (er) {} }, 240); return; }    // eslint-disable-line no-undef
+      if (id === "proj") { close(); setTimeout(function(){ try { switchTab("projects"); } catch (er) {} if (window.pjFromAgent) window.pjFromAgent(file, d); }, 240); return; }    // eslint-disable-line no-undef
       if (id === "plist") { close(); setTimeout(function(){ if (window.SP && SP.impAiStart) SP.impAiStart(file); }, 240); return; }
       if (id === "save" || id === "saveOther") {
         var topicEl = document.getElementById("aiTopic"), typeEl = document.getElementById("aiDocType");

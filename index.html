@@ -620,20 +620,6 @@
   .key-card:nth-child(even), .holder-card:nth-child(even){ background:var(--tint-b); }
   .key-card:hover, .holder-card:hover{ transform:translateY(-3px); box-shadow:0 4px 10px rgba(16,27,36,.1), 0 12px 26px rgba(16,27,36,.12); }
   .key-card.mismatch{ border-right-color:var(--red); }
-  #prjCards{ display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
-  .prj-pills{ display:flex; gap:6px; } .prj-pills button{ border:none; border-radius:999px; padding:6px 12px; font:inherit; font-size:12.5px; font-weight:700; background:#fbf7f0; color:#645c50; cursor:pointer; } .prj-pills button.on{ background:var(--m-projects, #4f5bd5); color:#fff; }
-  .prj-edt{ display:none; border:1.5px solid rgba(32,30,29,.15); background:#fff; border-radius:999px; padding:5px 11px; font:inherit; font-size:12px; font-weight:700; color:#645c50; cursor:pointer; } .prj-edt.on{ background:#2b2723; color:#fff; }
-  @media (max-width:760px){ .prj-edt{ display:inline-block; } }
-  .prj-card{ background:#fbf7f0; border-radius:18px; padding:12px 14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); display:flex; flex-direction:column; gap:8px; }
-  .prj-h{ display:flex; align-items:center; justify-content:space-between; gap:8px; } .prj-h b{ font-size:15px; }
-  .prj-st{ font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:999px; background:#e1ecfb; color:#2563c4; } .prj-st.chk{ background:#ece7fd; color:#6c4fd8; } .prj-st.ok{ background:#ddf3e5; color:#18864c; }
-  .prj-d{ font-size:13px; color:var(--ink-soft); line-height:1.45; }
-  .prj-q{ display:grid; grid-template-columns:repeat(auto-fit, minmax(96px, 1fr)); gap:6px; }
-  .prj-qc{ border-radius:14px; padding:9px; background:#fff; border:1px solid rgba(32,30,29,.12); display:flex; flex-direction:column; gap:3px; min-width:0; }
-  .prj-qc.best{ border:2px solid #18864c; } .prj-qc b{ font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .prj-qc .v{ font-size:17px; font-weight:700; } .prj-qc small{ font-size:11px; color:var(--ink-soft); }
-  .prj-qc .tag{ align-self:flex-start; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background:#ddf3e5; color:#18864c; }
-  .prj-btn{ align-self:flex-start; border:none; border-radius:12px; background:var(--m-projects, #4f5bd5); color:#fff; font:inherit; font-size:13px; font-weight:700; padding:8px 12px; cursor:pointer; }
-  @media (max-width:760px){ #tab-projects .table-scroll{ display:none; } #tab-projects.prj-edit .table-scroll{ display:block; } }
   .fm-card{ background:#fbf7f0; border-radius:18px; padding:12px 14px; margin-bottom:14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); }
   .fm-empty{ display:flex; flex-direction:column; gap:8px; align-items:flex-start; } .fm-empty span{ font-size:13px; color:var(--ink-soft); line-height:1.5; }
   .fm-h{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; } .fm-h b{ font-size:15px; }
@@ -2318,7 +2304,7 @@ body.ct-lock{overflow:hidden}
 .ct-tl{display:flex;gap:11px;align-items:flex-start;text-align:right;border:0;background:transparent;padding:6px 4px;border-radius:12px;width:100%;color:inherit}
 button.ct-tl:hover{background:#fbf7f0}
 .ct-tl .dot,.ct-doc .dot{flex:0 0 32px;height:32px;border-radius:10px;display:grid;place-items:center}
-.dot.t{background:#ffe1d0;color:#8c491a}.dot.f{background:#e1eecc;color:#3f4a2c}.dot.l{background:#eee7db;color:#4d463c}.dot.m{background:#dff3e4;color:#1f6a3a}
+.dot.t{background:#ffe1d0;color:#8c491a}.dot.f{background:#e1eecc;color:#3f4a2c}.dot.l{background:#eee7db;color:#4d463c}.dot.m{background:#dff3e4;color:#1f6a3a}.dot.q{background:#ece7fd;color:#5a3fc0}
 .ct-tl .tx{flex:1;font-size:13.5px;line-height:1.4;min-width:0;overflow-wrap:anywhere}
 .ct-tl .tx small{display:block;color:#645c50;font-size:12px}
 .ct-doc{display:flex;align-items:center;gap:8px;font-size:14px;flex-wrap:wrap}
@@ -3354,35 +3340,8 @@ button.ct-tl:hover{background:#fbf7f0}
   </section>
 
   <section class="tab" id="tab-projects">
-    <div class="card">
-      <div class="toolbar toolbar-sticky">
-        <div><span class="saved-flag" id="projectsSaved">נשמר</span></div>
-        <button class="btn" onclick="addProject()">+ הוספת פרויקט</button>
-      </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>שם הפרויקט</th><th>קטגוריה</th><th>תיאור</th><th>סטטוס</th><th></th></tr></thead>
-          <tbody id="projectsBody"></tbody>
-        </table>
-      </div>
-      </div>
-
-    <div class="section-title" id="projectQuotesTitle">הצעות מחיר</div>
-    <div class="card" id="projectQuotesCard" style="display:none">
-      <div class="toolbar toolbar-sticky">
-        <div><span class="saved-flag" id="quotesSaved">נשמר</span></div>
-        <div style="display:flex;gap:8px">
-          <button class="btn ghost" onclick="printQuoteSummary()">הפקת סיכום מעוצב להדפסה</button>
-          <button class="btn" onclick="addQuote()">+ הוספת הצעת מחיר</button>
-        </div>
-      </div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>ספק</th><th>מחיר (₪)</th><th>הערות</th><th>קובץ הצעה</th><th></th></tr></thead>
-          <tbody id="quotesBody"></tbody>
-        </table>
-      </div>
-    </div>
+    <div id="pjRoot" class="ct"></div>
+    <div class="ct-saved"><span class="saved-flag" id="projectsSaved">נשמר</span></div>
   </section>
 
   <section class="tab" id="tab-contacts">
@@ -3508,6 +3467,7 @@ button.ct-tl:hover{background:#fbf7f0}
         <label class="ja-f"><span>נושא</span><select id="jaTopic"></select></label>
         <label class="ja-f"><span>סכום (₪)</span><input type="number" id="jaAmount" inputmode="decimal" min="0" step="any" placeholder="0"></label>
       </div>
+      <label class="ja-f" id="jaProjWrap" style="display:none"><span>שייך לפרויקט (לא חובה)</span><select id="jaProject"></select></label>
       <label class="ja-check"><input type="checkbox" id="jaPaid"> כבר שולם</label>
       <label class="ja-check"><input type="checkbox" id="jaNoCharge"> ללא תשלום (כלול בחוזה / באחריות)</label>
     </div>
@@ -3583,7 +3543,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261138; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261139; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -4203,7 +4163,7 @@ function styleActionButtons(root){
 }
 const selectColorMaps = {
   task: {"בוצע":["var(--green)","#fff"], "בביצוע":["var(--amber)","#fff"], "טרם התחיל":["var(--red-bg)","var(--red)"]},
-  project: {"פתוח":["var(--amber-bg)","var(--amber)"], "בבדיקה":["var(--violet-bg)","var(--violet)"], "הושלם":["var(--green)","#fff"]},
+  project: {"פתוח":["var(--amber-bg)","var(--amber)"], "בבדיקה":["var(--violet-bg)","var(--violet)"], "בביצוע":["#e1ecfb","#2563c4"], "הושלם":["var(--green)","#fff"], "בוטל":["#eee7db","#4d463c"]},
   recurring: {"שוטף":["var(--green-bg)","var(--green)"], 'בלתי"ם':["var(--violet-bg)","var(--violet)"]},
   licProcess: {
     "לא התחיל":["var(--red-bg)","var(--red)"],
@@ -4568,9 +4528,11 @@ const tabQuickLinks = {
   files: [
     {label:"➕ העלאת קובץ", action: () => { toggleFilesUpload(true); const i=document.getElementById("fileInput"); if(i) i.scrollIntoView({behavior:"smooth", block:"center"}); }}
   ],
-  projects: [
-    {label:"➕ הוספת פרויקט", action: () => addProject()}
-  ],
+  get projects(){
+    const L = [{label:"➕ פרויקט חדש", action: () => addProject()}];
+    if(currentRole === "admin" && window.aiRead && window.pjFromFile) L.push({label:"✨ הצעת מחיר מקובץ (AI)", action: () => pjFromFile()});
+    return L;
+  },
   contacts: [
     {label:"➕ הוספת איש קשר", action: () => addContact()}
   ]
@@ -4636,6 +4598,7 @@ function switchTab(t){
   if(t==="finance") renderFinance();
   if(t==="procurement" && window.SP) SP.onShow();
   if(t==="equipment") renderEquipment();
+  if(t==="projects" && typeof renderProjects === "function") renderProjects();
 }
 
 /* ---------- CONTACT-DRIVEN DROPDOWNS ---------- */
@@ -5491,7 +5454,8 @@ function tkCardHtml(t, i){
     tkIsRecurring(t) && t.recurArmed ? `<span class="tk-chip ok">${tkIcon("repeat", 13)}${tkRecurLabel(t)}</span>` : "",
     lic ? `<span class="tk-chip info">${tkIcon("shield", 13)}רישוי</span>` : "",
     (() => { const cov = eqCoverage(t); if(!cov || !cov.covered) return ""; const j2 = tkJob(t); if(j2 && j2.paid) return ""; return `<span class="tk-chip warn">${tkIcon("shield", 13)}${cov.w.k === "ok" || cov.w.k === "soon" ? "באחריות" : "בחוזה שירות"}</span>`; })(),
-    photos ? `<span class="tk-chip">${svgIcon("camera", 13)}${photos}</span>` : ""
+    photos ? `<span class="tk-chip">${svgIcon("camera", 13)}${photos}</span>` : "",
+    t.projectId && window.pjName && pjName(t.projectId) ? `<span class="tk-chip info">${svgIcon("projects", 13)}${escHtml(pjName(t.projectId))}</span>` : ""
   ].filter(Boolean).join("");
   const who = t.assignee
     ? `<span class="tk-ava" style="background:${tkAvaColor(t.assignee)}">${escHtml(tkInitials(t.assignee))}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(t.assignee)}</span>`
@@ -5673,6 +5637,7 @@ function tkRenderDrawer(){
       <div class="tk-sec"><div class="tk-sec-h">${tkIcon("person", 16)}מי מבצע</div>${person}
         <label class="tk-sync"><input type="checkbox" id="tkSyncCb" ${t.synced ? "checked" : ""} ${t.syncing ? "disabled" : ""}>${svgIcon("calendar", 15)}סנכרון ליומן Google</label>
         <div class="sync-status ${t.synced ? "ok" : ""}" id="sync-task-${t.id}">${t.syncing ? "מסנכרן…" : (t.synced ? "✓ מסונכרן ליומן" : "")}</div>
+        ${t.projectId && window.pjName && pjName(t.projectId) ? `<div style="font-size:13px">${svgIcon("projects", 14)} חלק מפרויקט: <button type="button" class="tk-linkbtn" onclick="tkClose();pjGoto(${Number(t.projectId)},'exec')">${escHtml(pjName(t.projectId))}</button> · החשבונית של המשימה נספרת בעלויות הפרויקט.</div>` : ""}
         ${lic ? `<div style="font-size:13px">${tkIcon("shield", 14)} קשור לרישוי: <button type="button" class="tk-linkbtn" data-tk-lic="${lic.id}">${escHtml(lic.type || "רישוי ובטיחות")}</button> · כשהמשימה תסומן כבוצעה, יירשם עדכון בכרטיס הרישוי.</div>` : ""}
       </div>
       <div class="tk-sec"><div class="tk-sec-h">${tkIcon("check", 16)}שלבי העבודה<span class="r">${ck.length ? `${ck.filter(x => x.done).length} מתוך ${ck.length}` : ""}</span></div>${ckHtml}</div>
@@ -14466,6 +14431,7 @@ function ctTimeline(c, s){
   s.tasks.forEach(t => { const j = (() => { try{ return tkJob(t); }catch(e){ return null; } })(); if(j && (j.amount || j.noCharge)){ const last = T.find(x => x.act === "task" && x.id === t.id); if(last) last.s += j.noCharge ? " · ללא תשלום" : ` · ${fmtMoney(j.amount)}${j.paid ? " שולם" : ""}`; } });
   s.lic.forEach(r => T.push({ k: "l", d: String(r.lastDate || r.date || r.updatedAt || "").slice(0, 10), t: r.type || "אישור", s: ["רישוי ובטיחות", r.processStatus || r.status].filter(Boolean).join(" · "), act: "lic" }));
   s.orders.forEach(o => T.push({ k: "m", d: String(o.date || "").slice(0, 10), t: "הזמנת מזון", s: ["רכש ואספקה", o.total ? fmtMoney(parseFloat(o.total) || 0) : ""].filter(Boolean).join(" · "), act: "proc" }));
+  try{ if(window.pjQuotesFor) pjQuotesFor([c.name].concat(Array.isArray(c.aliases) ? c.aliases : [])).forEach(x => T.push({ k: "q", d: x.d, t: x.t, s: x.s, act: "proj", id: x.p.id })); }catch(e){ console.error(e); }
   s.proc.forEach(p => T.push({ k: "m", d: String(p.date || p.month || "").slice(0, 10), t: p.item || "פריט רכש", s: ["רכש כללי", (parseFloat(p.qty) || 0) && (parseFloat(p.price) || 0) ? fmtMoney((parseFloat(p.qty) || 0) * (parseFloat(p.price) || 0)) : ""].filter(Boolean).join(" · "), act: "proc" }));
   T.sort((a, b) => String(b.d).localeCompare(String(a.d)));
   return T;
@@ -14512,7 +14478,7 @@ function ctRenderDrawer(){
         <div class="ct-kpi idle"><span class="l">ממוצע לעבודה</span><span class="v sm">${s.avg ? fmtMoney(Math.round(s.avg)) : "—"}</span></div>
       </div>
       <div class="ct-box"><h4>כל מה שקשור אליו באפליקציה</h4>
-        ${T.length ? T.slice(0, 40).map(e => `<${e.act ? `button type="button" data-ct="tl-${e.act}" data-id="${e.id || ""}"` : "div"} class="ct-tl"><span class="dot ${e.k}">${ctIco(e.k === "t" ? "task" : e.k === "f" ? "coin" : e.k === "l" ? "shield" : "box", 15)}</span><span class="tx">${escHtml(e.t)}<small>${escHtml([e.s, e.d ? ctFmtDate(e.d) : ""].filter(Boolean).join(" · "))}</small></span></${e.act ? "button" : "div"}>`).join("") : `<div class="ct-soft">עוד אין משימות, תשלומים, בדיקות או הזמנות שקשורים אליו.</div>`}
+        ${T.length ? T.slice(0, 40).map(e => `<${e.act ? `button type="button" data-ct="tl-${e.act}" data-id="${e.id || ""}"` : "div"} class="ct-tl"><span class="dot ${e.k}">${ctIco(e.k === "t" ? "task" : e.k === "f" ? "coin" : e.k === "l" ? "shield" : e.k === "q" ? "doc" : "box", 15)}</span><span class="tx">${escHtml(e.t)}<small>${escHtml([e.s, e.d ? ctFmtDate(e.d) : ""].filter(Boolean).join(" · "))}</small></span></${e.act ? "button" : "div"}>`).join("") : `<div class="ct-soft">עוד אין משימות, תשלומים, בדיקות או הזמנות שקשורים אליו.</div>`}
       </div>
       ${s.jobs.length && typeof openProSheet === "function" ? `<button type="button" class="ct-btn" data-ct="prosheet" data-id="${c.id}">${ctIco("coin", 17)}כרטיס עבודות ותשלומים מלא</button>` : ""}`;
   }else if(ctUi.tab === "docs"){
@@ -15039,6 +15005,7 @@ function ctHandleClick(e){
       case "tl-task": if(id && canOpenTab("tasks")){ ctCloseDrawer(); switchTab("tasks"); renderTasks(); tkOpen(id); } break;
       case "tl-lic": if(canOpenTab("licensing")){ ctCloseDrawer(); switchTab("licensing"); } break;
       case "tl-proc": if(canOpenTab("procurement")){ ctCloseDrawer(); switchTab("procurement"); } break;
+      case "tl-proj": if(id && canOpenTab("projects") && window.pjGoto){ ctCloseDrawer(); pjGoto(id, "quotes"); } break;
       case "prosheet": { const c = ctGet(id); if(c){ ctCloseDrawer(); openProSheet(c.name); } break; }
       case "vcf": ctDownloadVcf(id); break;
       case "e-close": ctCloseEdit(); break;
@@ -17374,6 +17341,7 @@ function renderFiles(){
     const meta = [
       j.pro ? `<button type="button" class="job-pro-link" data-pro="${escHtml(j.pro)}">${escHtml(j.pro)}</button>` : "",
       j.code ? `משימה ${escHtml(j.code)}` : (j.proc ? "רכש" : (!j.task ? (j.vp && (j.vp.recurringId || j.vp.sourceType === "קבוע") ? "הוצאה קבועה" : "רכישה / ספק") : "")),
+      (() => { const pid = (j.task && j.task.projectId) || (j.vp && j.vp.projectId) || (j.proc && j.proc.projectId); const nm = pid && window.pjName ? pjName(pid) : ""; return nm ? `<button type="button" class="job-pro-link" onclick="pjGoto(${Number(pid)},'exec')">📁 ${escHtml(nm)}</button>` : ""; })(),
       j.date ? fmtDateHe(j.date) : ""
     ].filter(Boolean).join(" · ");
     const amt = j.amount > 0 ? fmtMoney(j.amount) : (j.noCharge ? "ללא תשלום" : "ללא סכום");
@@ -17657,6 +17625,11 @@ function openJobAssignModal(fileId, mode){
   document.getElementById("jaDesc").value = clean.replace(/\.[a-z0-9]{2,5}$/i, "");
   document.getElementById("jaTopic").innerHTML = jobTopicOptionsHtml(f.category || "");
   document.getElementById("jaAmount").value = "";
+  try{
+    const hasProj = window.pjOptionsHtml && (data.projects || []).some(p => p && p.name && p.status !== "הושלם" && p.status !== "בוטל");
+    document.getElementById("jaProjWrap").style.display = hasProj ? "" : "none";
+    document.getElementById("jaProject").innerHTML = hasProj ? pjOptionsHtml("") : "";
+  }catch(e){ console.error(e); }
   const isRec = isReceiptDocType(f.docType);
   document.getElementById("jobAssignType").value = isRec ? "קבלה" : "חשבונית";
   document.getElementById("jaPaid").checked = isRec;
@@ -17730,6 +17703,7 @@ function confirmJobAssignModal(){
     notes: "מקור: חשבוניות וקבלות", jobTopic: topic
   };
   if(noCharge){ vp.noCharge = true; vp.noChargeNote = "ללא חיוב"; }
+  { const pj = Number((document.getElementById("jaProject") || {}).value) || 0; if(pj && (data.projects || []).some(p => p && p.id === pj)) vp.projectId = pj; }
   if(paid){ vp.paymentStatus = "שולם"; vp.paid = true; vp.approved = true; vp.paidAt = new Date().toISOString(); }
   data.vendorPayments.push(vp);
   scheduleSave("vendorPayments", "vendorPaySaved");
@@ -18322,231 +18296,9 @@ document.addEventListener("keydown", e => {
 });
 fillJobIcons();
 
-/* ---------- PROJECTS & QUOTES ---------- */
-let activeProjectId = null;
-function addProject(){
-  const p = {id: nextId()+14000, name:"", category:"שיפוץ", desc:"", status:"פתוח", quotes:[]};
-  data.projects.push(p);
-  renderProjects(); scheduleSave("projects","projectsSaved");
-}
-function removeProject(id){
-  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
-    data.projects = data.projects.filter(r=>r.id!==id);
-    if(activeProjectId===id){ activeProjectId=null; document.getElementById("projectQuotesCard").style.display="none"; }
-    renderProjects(); scheduleSave("projects","projectsSaved");
-  });
-}
-function openProjectQuotes(id){
-  activeProjectId = id;
-  document.getElementById("projectQuotesCard").style.display = "";
-  const p = data.projects.find(r=>r.id===id);
-  document.getElementById("projectQuotesTitle").textContent = "הצעות מחיר — " + (p.name || "פרויקט ללא שם");
-  renderQuotes();
-}
-/* פרויקטים – כרטיס סיכום כמו במוקאפ (נובמבר 2026): פעילים / הושלמו, והשוואת הצעות מחיר. קריאה בלבד */
-let prjView = "active";
-function renderProjectCards(){
-  let box = document.getElementById("prjCards");
-  const body = document.getElementById("projectsBody");
-  if(!box){ const card = body && body.closest(".card"); if(!card) return; box = document.createElement("div"); box.id = "prjCards"; card.parentNode.insertBefore(box, card); }
-  const L = (data.projects || []).filter(p => p && (String(p.name || "").trim() || (p.quotes || []).length));
-  if(!L.length){ box.innerHTML = ""; return; }
-  const act = L.filter(p => p.status !== "הושלם"), done = L.filter(p => p.status === "הושלם");
-  const list = prjView === "done" ? done : act;
-  const pill = (k, l, n) => `<button type="button" class="${prjView === k ? "on" : ""}" onclick="prjView='${k}';renderProjectCards()">${l} · ${n}</button>`;
-  const ed = document.getElementById("tab-projects") && document.getElementById("tab-projects").classList.contains("prj-edit");
-  box.innerHTML = `<div class="prj-pills">${pill("active", "פעילים", act.length)}${pill("done", "הושלמו", done.length)}<span style="flex:1"></span><button type="button" class="prj-edt ${ed ? "on" : ""}" onclick="document.getElementById('tab-projects').classList.toggle('prj-edit');renderProjectCards()">${ed ? "סגירת העריכה" : "עריכה ומחיקה"}</button></div>` +
-    (list.length ? list.map(p => {
-      const qs = (p.quotes || []).filter(q => q && (q.vendor || parseFloat(q.price)));
-      const priced = qs.filter(q => parseFloat(q.price) > 0);
-      const min = priced.length ? Math.min(...priced.map(q => parseFloat(q.price))) : null;
-      const st = p.status || "פתוח";
-      return `<div class="prj-card">
-        <div class="prj-h"><b>${escHtml(p.name || "פרויקט ללא שם")}</b><span class="prj-st ${st === "הושלם" ? "ok" : st === "בבדיקה" ? "chk" : ""}">${escHtml(st)}</span></div>
-        ${p.desc ? `<div class="prj-d">${escHtml(p.desc)}</div>` : ""}
-        ${qs.length ? `<div class="prj-q">${qs.slice(0, 3).map(q => { const pr = parseFloat(q.price) || 0, best = min !== null && pr === min && priced.length > 1;
-            return `<div class="prj-qc ${best ? "best" : ""}"><b>${escHtml(q.vendor || "ספק")}</b><span class="v">${pr ? fmtMoney(pr) : "—"}</span>${q.notes ? `<small>${escHtml(String(q.notes).slice(0, 60))}</small>` : ""}${best ? `<span class="tag">הזולה</span>` : ""}</div>`; }).join("")}</div>` : `<div class="prj-d muted">עוד אין הצעות מחיר</div>`}
-        <button type="button" class="prj-btn" onclick="openProjectQuotes(${p.id});document.getElementById('projectQuotesCard').scrollIntoView({behavior:'smooth',block:'start'})">${qs.length > 1 ? "השוואה והוספת הצעות" : "הצעות מחיר"} (${qs.length})</button>
-      </div>`; }).join("") : `<div class="prj-d muted" style="padding:6px 2px 12px">${prjView === "done" ? "אין פרויקטים שהושלמו" : "אין פרויקטים פעילים"}</div>`);
-}
-function renderProjects(){
-  const body = document.getElementById("projectsBody");
-  if(!body) return;
-  try{ renderProjectCards(); }catch(e){ console.error(e); }
-  body.innerHTML = "";
-  data.projects.forEach(row => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${escHtml(row.name)}" data-f="name" style="min-width:140px"></td>
-      <td><select data-f="category">
-            <option ${row.category==="שיפוץ"?"selected":""}>שיפוץ</option>
-            <option ${row.category==="רכש חדש"?"selected":""}>רכש חדש</option>
-            <option ${row.category==="מוצר חשמלי חדש"?"selected":""}>מוצר חשמלי חדש</option>
-            <option ${row.category==="אחר"?"selected":""}>אחר</option>
-          </select></td>
-      <td><input type="text" value="${escHtml(row.desc)}" data-f="desc" style="min-width:160px"></td>
-      <td><select data-f="status" data-status-style="project">
-            <option ${row.status==="פתוח"?"selected":""}>פתוח</option>
-            <option ${row.status==="בבדיקה"?"selected":""}>בבדיקה</option>
-            <option ${row.status==="הושלם"?"selected":""}>הושלם</option>
-          </select></td>
-      <td class="row-actions">
-        <button class="btn ghost" style="padding:5px 8px;font-size:11px" onclick="openProjectQuotes(${row.id})">הצעות מחיר (${row.quotes.length})</button>
-        <button class="card-delete-btn" title="מחיקה" onclick="removeProject(${row.id})">${svgIcon('trash',13)}</button>
-      </td>
-    `;
-    tr.querySelectorAll("[data-f]").forEach(inp => {
-      inp.addEventListener("input", () => { row[inp.dataset.f] = inp.value; scheduleSave("projects","projectsSaved"); });
-      inp.addEventListener("change", () => { row[inp.dataset.f] = inp.value; scheduleSave("projects","projectsSaved"); });
-    });
-    body.appendChild(tr);
-  });
-}
-function addQuote(){
-  const p = data.projects.find(r=>r.id===activeProjectId);
-  if(!p) return;
-  p.quotes.push({id: nextId()+15000, vendor:"", price:0, notes:"", fileUrl:""});
-  renderQuotes(); scheduleSave("projects","projectsSaved");
-}
-function removeQuote(id){
-  openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
-    const p = data.projects.find(r=>r.id===activeProjectId);
-    if(!p) return;
-    p.quotes = p.quotes.filter(q=>q.id!==id);
-    renderQuotes(); renderProjects(); scheduleSave("projects","projectsSaved");
-  });
-}
-/* ---------- AI QUOTE ANALYSIS ---------- */
-function fileToBase64(file){
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result.split(",")[1]);
-    r.onerror = () => reject(new Error("שגיאה בקריאת הקובץ"));
-    r.readAsDataURL(file);
-  });
-}
-async function analyzeQuoteWithAI(file){
-  /* נובמבר 2026: דרך השרת של הסוכן (/api/ai). קודם הפנייה הייתה ישירות מהדפדפן בלי מפתח ולכן תמיד נכשלה */
-  if(typeof window.aiRead !== "function") return null;
-  const isImage = file.type.startsWith("image/");
-  const isPdf = file.type === "application/pdf";
-  if(!isImage && !isPdf) return null;
-  const res = await window.aiRead({ task: "document", file, hint: "זו הצעת מחיר מספק לפרויקט" });
-  if(!res || !res.ok || !res.data) throw new Error((res && res.error) || "הניתוח נכשל");
-  const d = res.data;
-  const items = (d.line_items || []).slice(0, 4).map(x => x && x.text).filter(Boolean).join(", ");
-  const notes = [d.subject, items, d.valid_until ? "בתוקף עד " + d.valid_until : ""].filter(Boolean).join(" · ").slice(0, 300);
-  return { vendor: d.supplier || "", price: Number(d.total) || 0, notes };
-}
-
-function renderQuotes(){
-  const p = data.projects.find(r=>r.id===activeProjectId);
-  const body = document.getElementById("quotesBody");
-  if(!p || !body) return;
-  body.innerHTML = "";
-  p.quotes.forEach(q => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="primary-field"><input type="text" value="${escHtml(q.vendor)}" data-f="vendor" style="min-width:120px"></td>
-      <td><input type="number" value="${escHtml(q.price)}" data-f="price" style="width:90px"></td>
-      <td><input type="text" value="${escHtml(q.notes)}" data-f="notes" style="min-width:140px"></td>
-      <td class="file-cell"></td>
-      <td class="row-actions" style="flex:0 0 0;padding:0;overflow:visible"><button class="card-delete-btn" title="מחיקה" onclick="removeQuote(${q.id})">${svgIcon('trash',13)}</button></td>
-    `;
-    const fileTd = tr.querySelector(".file-cell");
-    if(q.fileUrl){
-      fileTd.innerHTML = `<div style="display:flex;gap:6px;align-items:center;white-space:nowrap">
-        <a href="${q.fileUrl}" target="_blank" rel="noopener">📄 פתיחה</a>
-        <button type="button" class="icon-btn" data-file-remove title="הסרה">✕</button>
-      </div>`;
-      fileTd.querySelector("[data-file-remove]").addEventListener("click", () => {
-        q.fileUrl = ""; scheduleSave("projects","projectsSaved"); renderQuotes();
-      });
-    }else{
-      fileTd.innerHTML = `<div style="display:flex;flex-direction:column;gap:4px">
-        <input type="file" data-file-input style="width:110px;font-size:11px">
-        <button type="button" class="btn ghost" data-file-upload style="padding:4px 8px;font-size:11px">העלאה + ניתוח AI</button>
-        <div class="hint" data-analyze-status></div>
-      </div>`;
-      fileTd.querySelector("[data-file-upload]").addEventListener("click", async () => {
-        const input = fileTd.querySelector("[data-file-input]");
-        const status = fileTd.querySelector("[data-analyze-status]");
-        if(!input.files || !input.files[0]){ alert("יש לבחור קובץ קודם"); return; }
-        const file = input.files[0];
-        status.textContent = "מעלה...";
-        try{
-          const path = `uploads/project-quotes/${Date.now()}_${file.name}`;
-          const ref = storage.ref().child(path);
-          await ref.put(file);
-          q.fileUrl = await ref.getDownloadURL();
-          status.textContent = "מנתח עם AI…";
-          try{
-            const result = await analyzeQuoteWithAI(file);
-            if(result){
-              if(!q.vendor && result.vendor) q.vendor = result.vendor;
-              if((!q.price || q.price===0) && result.price) q.price = parseFloat(result.price)||0;
-              if(result.notes) q.notes = (q.notes ? q.notes+" | " : "") + "ניתוח AI: " + result.notes;
-            }
-          }catch(e){ console.error("שגיאת ניתוח AI", e); }
-          scheduleSave("projects","projectsSaved");
-          renderQuotes();
-        }catch(e){
-          console.error(e);
-          alert("שגיאת העלאה: " + e.message);
-          renderQuotes();
-        }
-      });
-    }
-    tr.querySelectorAll("[data-f]").forEach(inp => {
-      inp.addEventListener("input", () => {
-        q[inp.dataset.f] = (inp.type==="number") ? parseFloat(inp.value)||0 : inp.value;
-        scheduleSave("projects","projectsSaved");
-      });
-    });
-    body.appendChild(tr);
-  });
-  renderProjects();
-}
-function printQuoteSummary(){
-  const p = data.projects.find(r=>r.id===activeProjectId);
-  if(!p) return;
-  if(p.quotes.length===0){ alert("אין עדיין הצעות מחיר לפרויקט זה"); return; }
-  const sorted = [...p.quotes].sort((a,b) => (parseFloat(a.price)||0) - (parseFloat(b.price)||0));
-  const cheapest = sorted[0];
-  let rows = sorted.map(q => `
-    <tr style="${q.id===cheapest.id ? 'background:#E9F3E5;font-weight:700' : ''}">
-      <td style="padding:10px;border-bottom:1px solid #ddd">${q.vendor||"—"}${q.id===cheapest.id ? ' ⭐ הזול ביותר' : ''}</td>
-      <td style="padding:10px;border-bottom:1px solid #ddd">${fmtMoney(q.price)}</td>
-      <td style="padding:10px;border-bottom:1px solid #ddd">${q.notes||""}</td>
-      <td style="padding:10px;border-bottom:1px solid #ddd">${q.fileUrl ? `<a href="${q.fileUrl}">קובץ הצעה</a>` : "—"}</td>
-    </tr>`).join("");
-  const html = `
-    <!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
-    <title>השוואת הצעות מחיר — ${p.name}</title>
-    <style>
-      body{ font-family:"Segoe UI",Arial,sans-serif; padding:30px; color:#232323; }
-      h1{ color:#1A333F; margin-bottom:4px; }
-      .meta{ color:#6B6B65; margin-bottom:20px; }
-      table{ width:100%; border-collapse:collapse; margin-top:10px; }
-      th{ text-align:right; padding:10px; background:#1A333F; color:#fff; }
-    </style></head><body>
-    <h1>השוואת הצעות מחיר</h1>
-    <div class="meta">
-      <div><b>פרויקט:</b> ${p.name||"—"}</div>
-      <div><b>קטגוריה:</b> ${p.category}</div>
-      <div><b>תיאור:</b> ${p.desc||"—"}</div>
-      <div><b>תאריך הפקה:</b> ${new Date().toLocaleDateString("he-IL")}</div>
-    </div>
-    <table>
-      <thead><tr><th>ספק</th><th>מחיר</th><th>הערות</th><th>קובץ</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    </body></html>`;
-  const w = window.open("", "_blank");
-  w.document.write(html);
-  w.document.close();
-  setTimeout(()=>w.print(), 400);
-}
+/* ---------- PROJECTS & QUOTES ----------
+   נובמבר 2026: הטאב נבנה מחדש בקובץ projects.js (פרויקטים והצעות מחיר).
+   renderProjects / addProject מוגדרים שם. מבנה הנתונים הישן נשמר כמו שהוא. */
 
 /* ---------- DASHBOARD ---------- */
 /* ---------- DASHBOARD CHARTS ---------- */
@@ -18819,7 +18571,7 @@ function dbCollect(){
   }, null);
 
   const procYear = (data.procurement || []).filter(r => Number(r.schoolYear || Y) === Y).reduce((s, r) => s + (parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0), 0);
-  const proj = { open: (data.projects || []).filter(p => p.status === "פתוח").length, review: (data.projects || []).filter(p => p.status === "בבדיקה").length, done: (data.projects || []).filter(p => p.status === "הושלם").length };
+  const proj = dbSafe(() => window.pjDash ? window.pjDash() : null, null) || { open: (data.projects || []).filter(p => p.status === "פתוח").length, review: (data.projects || []).filter(p => p.status === "בבדיקה").length, exec: (data.projects || []).filter(p => p.status === "בביצוע").length, done: (data.projects || []).filter(p => p.status === "הושלם").length, waiting: 0, alerts: [] };
 
   return { Y, today, yearTasks, open, done, late, dueToday, week, urgent, byStatus, maint, spark, jobs, waiting, waitingSum, noReceipt, noAmount,
     costItems, costTotal, budget, months, curMonth, lic, licWithExp, licExpired, licSoon, licValid, licProc, licMissing,
@@ -18872,6 +18624,7 @@ function dbAlerts(D){
         add(3, "wallet", "משלוח למנהל החשבונות עוד לא נצפה", `נשלח לפני ${acxDaysSince(s.at)} ימים · ${fmtMoney(s.total || 0)}`, null, dbGo("accountant", () => acxHandleDeepLink(s.id)), "accountant");
     });
   }catch(e){ console.error(e); }
+  (D.proj.alerts || []).forEach(x => add(3, "projects", x.t, "פרויקטים · " + x.s, null, dbGo("projects", () => window.pjOpen && pjOpen(x.id, x.tab || (x.q ? "quotes" : "over"))), "projects"));
   if(D.noAmount.length) add(3, "receipt", `${D.noAmount.length} חשבוניות בלי סכום`, "צריך להשלים סכום כדי שייכנסו לדוח", null, () => dbNoAmountOpen(D.noAmount), "accountant");
   if(D.sp && D.sp.soon.length) add(3, "box", `${D.sp.soon.length} מוצרים יפוגו השבוע`, D.sp.soon.slice(0, 3).map(s => s.name).join(", "), null, dbGo("procurement", () => dbSpOpen("stock")), "procurement");
   if(D.sp && D.sp.below) add(3, "box", `${D.sp.below} מוצרים מתחת למינימום במלאי`, "רכש ואספקה", null, dbGo("procurement", () => dbSpOpen("stock")), "procurement");
@@ -19070,8 +18823,8 @@ function dbModulesHtml(D){
     rows: [row(`פעימה ${D.staff.idx + 1}`, fmtMoney(Math.round(D.staff.total))), row("אושרו", `${D.staff.approved}/${D.staff.count}`), row("שולמו", `${D.staff.paid}/${D.staff.count}`)] });
   if(dbAllowed("keys")) M.push({ tab: "keys", ico: "keys", t: "מפתחות", tone: D.keysStale.length ? "warn" : "ok",
     rows: [row("מפתחות במערכת", (data.keysInventory || []).length), row("בהשאלה", D.keysLoaned.length), row("אצל לא פעילים", D.keysStale.length, D.keysStale.length ? "warn" : "")] });
-  if(dbAllowed("projects")) M.push({ tab: "projects", ico: "projects", t: "פרויקטים", tone: "info",
-    rows: [row("פתוחים", D.proj.open), row("בבדיקה", D.proj.review), row("הושלמו", D.proj.done)] });
+  if(dbAllowed("projects")) M.push({ tab: "projects", ico: "projects", t: "פרויקטים", tone: D.proj.waiting ? "warn" : "info",
+    rows: [row("באיסוף הצעות", D.proj.open), row("בהחלטה", D.proj.review), row("בביצוע", D.proj.exec || 0), row("ממתינים להצעה", D.proj.waiting || 0, D.proj.waiting ? "warn" : "")] });
   if(!M.length) return "";
   return `<section class="db-sec db-in" style="--i:6"><div class="db-sec-h">${dbIco("dashboard", 18)}מבט על המערכות</div>
     <div class="db-mods">${M.map((m, i) => `<button type="button" class="db-mod ${m.tone} db-in" style="--i:${6.3 + i * .15}" ${dbAct(dbGo(m.tab))}>
@@ -25926,6 +25679,7 @@ return SPX;
 <script src="history.js"></script>
 <script src="voice.js"></script>
 <script src="prolinks.js"></script>
+<script src="projects.js?v=20261139"></script>
 <script>
 /* ספירת מלאי בלי קליטה: service worker שמציג את count.html רק כשאין רשת בכלל */
 if("serviceWorker" in navigator && location.protocol === "https:"){ window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(e => console.warn("sw:", e)); }); }

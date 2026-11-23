@@ -152,7 +152,8 @@
     { id:"promsg", t:"tasks", ico:"wa", l:"הודעה לאיש מקצוע", ok:function(){ return has("openWorkSlipModal"); }, run:function(){ go("tasks"); later(function(){ call("openWorkSlipModal"); }, 150); } },
     { id:"staff", t:"staff", ico:"users", l:"עובד חדש", ok:function(){ return has("addStaffRow") && can("staff") && isAdmin(); }, run:function(){ go("staff"); later(function(){ call("addStaffRow"); }, 150); } },
     { id:"contact", t:"contacts", ico:"phone", l:"איש קשר חדש", ok:function(){ return has("addContact"); }, run:function(){ go("contacts"); later(function(){ call("addContact"); }); } },
-    { id:"equip", t:"equipment", ico:"wrench", l:"פריט ציוד", ok:function(){ return has("eqNewEquip"); }, run:function(){ go("equipment"); later(function(){ call("eqNewEquip"); }); } }
+    { id:"equip", t:"equipment", ico:"wrench", l:"פריט ציוד", ok:function(){ return has("eqNewEquip"); }, run:function(){ go("equipment"); later(function(){ call("eqNewEquip"); }); } },
+    { id:"proj", t:"projects", ico:"folder", l:"פרויקט / הצעות מחיר", ok:function(){ return has("pjNew"); }, run:function(){ go("projects"); later(function(){ call("pjNew"); }); } }
   ];
   function availableActions(){
     var u = usage();
@@ -270,7 +271,9 @@
       return { k: [x.name, x.topic, x.desc, x.supplier, x.vendor].join(" "), ico: "file", a: x.name || "מסמך", b: [x.topic, x.supplier || x.vendor].filter(Boolean).join(" · "),
         go: function(){ go("files"); } }; })); } catch (e) {}
     try { add("projects", "פרויקטים", (d.projects || []).filter(Boolean).map(function(x){
-      return { k: [x.name, x.category, x.desc].join(" "), ico: "folder", a: x.name || "פרויקט", b: x.status || "", go: function(){ go("projects"); } }; })); } catch (e) {}
+      var PST = { "פתוח": "איסוף הצעות", "בבדיקה": "השוואה והחלטה", "בביצוע": "בביצוע", "הושלם": "הושלם", "בוטל": "בוטל" };
+      return { k: [x.name, x.category, x.desc, x.location].concat((x.quotes || []).map(function(q){ return q && q.vendor; })).join(" "), ico: "folder", a: x.name || "פרויקט",
+        b: [PST[x.status] || x.status || "", x.category].filter(Boolean).join(" · "), go: function(){ go("projects"); later(function(){ call("pjOpen", x.id); }); } }; })); } catch (e) {}
     try { var staffRows = [], seen = {};
       (d.installments || []).forEach(function(arr){ (arr || []).forEach(function(r){ if (r && r.name && !seen[r.name]) { seen[r.name] = 1; staffRows.push({ k: [r.name, r.role, r.duty].join(" "), ico: "users", a: r.name, b: r.role || r.duty || "",
         go: function(){ go("staff"); later(function(){ var i = document.getElementById("staffSearchInput"); if (i) { i.value = r.name; i.dispatchEvent(new Event("input", { bubbles: true })); } }); } }); } }); });

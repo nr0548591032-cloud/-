@@ -7,7 +7,8 @@
    - השרת רק קורא ומחזיר הצעה. הוא לא כותב, לא מוחק ולא משנה שום נתון.
      השמירה נעשית באפליקציה, ורק אחרי אישור של המשתמש.
    כתובת: /api/ai   (POST)
-   גוף הבקשה: { task: "pricelist" | "document", parts: [...], hint?: "..." }
+   גוף הבקשה: { task: "pricelist" | "document" | "voice" | "quotes", parts: [...], hint?: "..." }
+     quotes = השוואת הצעות מחיר של פרויקט (טקסט JSON בלבד, בלי קבצים)
      parts: { type:"text", text } | { type:"image", mediaType, data } | { type:"pdf", data }
      (data = base64, בלי הקידומת data:...)
    ===================================================================== */
@@ -82,6 +83,27 @@ const TOOLS = {
       required: ["doc_type", "doc_type_he", "supplier", "uncertain_fields"]
     }
   },
+  quotes: {
+    name: "save_quote_analysis",
+    description: "Compare supplier quotes for one building project and give a short, practical Hebrew analysis.",
+    input_schema: {
+      type: "object",
+      properties: {
+        summary: { type: "string", description: "2-3 short Hebrew sentences: the main picture (price spread, what differs between the quotes)" },
+        recommendation: { type: "object", properties: { vendor: { type: "string", description: "Exact vendor name from the input, or empty if it is too early to recommend" }, reason: { type: "string", description: "One or two Hebrew sentences why" } }, required: ["vendor", "reason"] },
+        quotes: { type: "array", items: { type: "object", properties: {
+          vendor: { type: "string" }, price_with_vat: { type: ["number", "null"] },
+          includes: { type: "array", items: { type: "string" }, description: "What the quote clearly includes (short Hebrew)" },
+          missing_or_unclear: { type: "array", items: { type: "string" }, description: "Scope items other quotes include but this one does not mention, or unclear points" },
+          pros: { type: "array", items: { type: "string" } }, cons: { type: "array", items: { type: "string" } }
+        }, required: ["vendor"] } },
+        questions: { type: "array", description: "Up to 5 concrete questions worth sending to a specific vendor before deciding", items: { type: "object", properties: { vendor: { type: "string" }, question: { type: "string", description: "Polite, short Hebrew question addressed to the vendor" } }, required: ["vendor", "question"] } },
+        warnings: { type: "array", items: { type: "string" }, description: "Short Hebrew warnings: VAT not stated, expired quote, over budget, quotes not comparable, suspiciously low price" },
+        next_step: { type: "string", description: "One short Hebrew sentence – the next practical step" }
+      },
+      required: ["summary", "recommendation", "quotes", "questions", "warnings"]
+    }
+  },
   voice: {
     name: "save_voice_note",
     description: "Turn a spoken Hebrew note of a building manager into one structured item.",
@@ -115,6 +137,12 @@ const PROMPTS = {
     "זה מסמך שהועלה למערכת ניהול של בניין / מוסד בישראל (חשבונית, קבלה, אישור עבודה, אישור בודק, דוח ליקויים, הצעת מחיר, חוזה שירות ועוד). " +
     "זהה את סוג המסמך והחזר את השדות בעזרת הכלי save_document. אל תנחש: שדה שלא כתוב – השאר ריק. " +
     "שדה שקשה לקרוא – מלא את הקריאה הסבירה וכתוב את שמו ב-uncertain_fields.",
+  quotes:
+    "אתה עוזר למנהל בניין / מוסד בישראל להשוות הצעות מחיר לפרויקט אחד. הנתונים מגיעים כ-JSON (פרטי הפרויקט, ההצעות והיסטוריית הספק אצל המנהל). " +
+    "השווה מחיר כולל מע\"מ (price_with_vat_calculated), מה כלול בכל הצעה ומה חסר לעומת האחרות, תוקף ההצעה מול התאריך של היום, ותקציב אם הוגדר. " +
+    "הזולה לא תמיד הנכונה: אם הזולה לא כוללת דברים שהאחרות כוללות – כתוב את זה. היסטוריה טובה עם הספק (דירוג, עבודות קודמות) היא יתרון. " +
+    "אל תמציא פרטים שלא כתובים. אם יש רק הצעה אחת או שההצעות לא ניתנות להשוואה – אמור זאת, והשאר recommendation.vendor ריק אם מוקדם להמליץ. " +
+    "כתוב בעברית פשוטה וקצרה. השתמש בשמות הספקים בדיוק כפי שהופיעו. החזר רק דרך הכלי save_quote_analysis.",
   voice:
     "זו הקלטה קולית (מתומללת) של מנהל בניין / מוסד בישראל, שאומר בקצרה משהו שצריך לעשות. " +
     "הבן מה הוא רוצה והחזר פריט אחד בעזרת הכלי save_voice_note. תאריכים יחסיים (מחר, ביום ראשון) חשב לפי התאריך של היום שמופיע במידע הנוסף. " +
@@ -178,7 +206,7 @@ export default async (req) => {
   const hint = body.hint ? "\n\nמידע נוסף מהמשתמש: " + String(body.hint).slice(0, task === "voice" ? 4000 : 500) : "";
   const payload = {
     model: env("AI_MODEL", "claude-sonnet-5-5"),
-    max_tokens: task === "pricelist" ? 16000 : task === "voice" ? 1500 : 4000,
+    max_tokens: task === "pricelist" ? 16000 : task === "voice" ? 1500 : task === "quotes" ? 3500 : 4000,
     tools: [TOOLS[task]],
     tool_choice: { type: "auto" },
     messages: [{ role: "user", content: [...blocks, { type: "text", text: PROMPTS[task] + hint + "\n\nחובה להחזיר את התשובה רק דרך קריאה לכלי " + TOOLS[task].name + ", בלי טקסט נוסף." }] }]
