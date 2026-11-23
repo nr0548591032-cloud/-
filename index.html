@@ -3568,7 +3568,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261143; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261144; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -21601,7 +21601,9 @@ let PK = null;
 function openPack(lid, iid){
   const l = S.lists.find(x=>x.id===lid), it = l && l.items.find(x=>x.id===iid); if(!it) return;
   const basis = it.basis==='pack' && packOf(it) > 1 ? 'pack' : 'unit';
-  PK = {lid, iid, basis, amount: basis==='pack' ? packPriceOf(it) : (it.price||0), pack: packOf(it), packOnly: packOf(it) > 1 ? !!it.packOnly : true};
+  const su = String(it.sizeUnit||'').trim(), known = SIZE_UNITS.includes(su);
+  PK = {lid, iid, basis, amount: basis==='pack' ? packPriceOf(it) : (it.price||0), pack: packOf(it), packOnly: packOf(it) > 1 ? !!it.packOnly : true,
+    size: +it.size > 0 ? +it.size : '', su: su ? (known ? su : 'אחר') : (sizeIn(it.name, it.unit, 'ליטר') > 0 && !(sizeIn(it.name, it.unit, 'ק״ג') > 0) ? 'ליטר' : 'ק״ג'), suOther: su && !known ? su : ''};
   drawPack();
 }
 function pkCalc(){
@@ -21624,6 +21626,14 @@ function drawPack(){
         <div class="stepper" style="align-self:flex-start"><button aria-label="פחות" onclick="with(SP){pkStep(-1)}">−</button><input id="sp-pkN" class="sp-num" type="number" min="1" step="1" inputmode="numeric" value="${PK.pack}" aria-label="כמות בקרטון" onchange="with(SP){pkSet(this.value)}"><button aria-label="יותר" onclick="with(SP){pkStep(1)}">+</button></div>
       </label>
     </div>
+    <div class="f">כמה יש ביחידה אחת
+      <div class="row" style="flex-wrap:nowrap;gap:6px">
+        <input id="sp-pkSz" class="sp-num" style="max-width:160px" type="number" min="0" step="any" inputmode="decimal" value="${PK.size}" placeholder="${(() => { const a = sizeIn(it.name, it.unit, 'ק״ג'), b = sizeIn(it.name, it.unit, 'ליטר'); return a > 0 ? qn(a) + ' ק״ג (מהשם)' : b > 0 ? qn(b) + ' ליטר (מהשם)' : 'לא כתוב'; })()}" aria-label="כמה יש ביחידה אחת" oninput="with(SP){PK.size=this.value}">
+        <select aria-label="יחידת המידה" style="width:auto" onchange="with(SP){PK.su=this.value;drawPack()}">${[...SIZE_UNITS, 'אחר'].map(u => `<option ${PK.su===u?'selected':''}>${u}</option>`).join('')}</select>
+        ${PK.su === 'אחר' ? `<input id="sp-pkSuO" style="max-width:120px" value="${esc(PK.suOther)}" placeholder="למשל: מטר" aria-label="יחידה אחרת" oninput="with(SP){PK.suOther=this.value}">` : ''}
+      </div>
+      <span class="muted">למשל שק של 25 ק״ג, פח של 18 ליטר, או מארז של 12 יחידות. לפי זה משווים מחיר בין ספקים. ריק = לפי מה שכתוב בשם הפריט.</span>
+    </div>
     <div class="f">המחיר שהספק נתן הוא ל:
       <div class="seg" role="group" aria-label="המחיר הוא ל">
         <button aria-pressed="${PK.basis==='unit'}" onclick="with(SP){pkBasis('unit')}">יחידה אחת</button>
@@ -21635,7 +21645,7 @@ function drawPack(){
     <p class="muted">מנתח המחירים משווה תמיד לפי מחיר ליחידה. מחיר ישן נשמר בהיסטוריה.</p>
     <div class="row"><button class="sb" onclick="with(SP){savePack()}">${ic('check','sm')}שמירה</button><button class="sb sb-ghost" onclick="with(SP){pkCancel()}">ביטול</button></div>`);
 }
-function pkKeepAmt(){ const v = $('#sp-pkAmt'); if(v) PK.amount = v.value; }
+function pkKeepAmt(){ const v = $('#sp-pkAmt'); if(v) PK.amount = v.value; const z = $('#sp-pkSz'); if(z) PK.size = z.value; const o = $('#sp-pkSuO'); if(o) PK.suOther = o.value; }
 function pkStep(d){ pkKeepAmt(); pkSet(PK.pack + d); }
 function pkSet(v){
   pkKeepAmt();
@@ -21666,6 +21676,9 @@ function savePack(){
   if(Math.abs(unit - (it.price||0)) > 0.0001){ it.history = it.history||[]; it.history.push({date:today(), price:it.price}); it.price = unit; l.updated = today(); }
   if(PK.pack > 1){ it.pack = PK.pack; it.packOnly = !!PK.packOnly; } else { delete it.pack; delete it.packOnly; }
   if(PK.basis==='pack' && PK.pack > 1){ it.basis = 'pack'; it.packPrice = r2(a); } else { delete it.basis; delete it.packPrice; }
+  /* כמה יש ביחידה אחת – נשמר על הפריט במחירון, ומשמש בכל השוואה בכל האפליקציה */
+  const sz = num(PK.size), su = PK.su === 'אחר' ? String(PK.suOther||'').trim() : PK.su;
+  if(sz > 0 && su){ it.size = sz; it.sizeUnit = su; } else { delete it.size; delete it.sizeUnit; }
   const back = PK.back; PK = null; save(); closeModal();
   if(back && famById(back)){ openFam(back); if(tab === 'basket') renderBasket(); } else renderLists();
   renderTop();
@@ -23516,6 +23529,18 @@ function detectSale(name){
   const m = String(name||'').match(/(?:^|[^\p{L}])(שקית|שק|פחית|פח|מארז|קרטון|ארגז|חבילה|בקבוק|דלי|גליל|מגש|צנצנת)(?=$|[^\p{L}])/u);
   return m ? m[1] : '';
 }
+/* כמה ק״ג / ליטר / יחידות יש ביחידה אחת – מה שכתבת בחלון "כמות באריזה" קודם, ואם לא כתבת: לפי שם הפריט */
+const SIZE_UNITS = ['ק״ג','גרם','ליטר','מ״ל','יחידות'];
+function itemSize(it, fu){
+  const n = +(it && it.size), u = String((it && it.sizeUnit) || '').trim();
+  if(n > 0 && u){
+    const conv = {'ק״ג':['ק״ג',1], 'גרם':['ק״ג',0.001], 'ליטר':['ליטר',1], 'מ״ל':['ליטר',0.001], 'יחידות':['יח׳',1]}[u];
+    if(conv && conv[0] === fu) return n * conv[1];
+    if(!conv && u === fu) return n;
+    if(fu !== 'יח׳') return 0;                 // נכתב במפורש ביחידה אחרת – לא מנחשים מהשם
+  }
+  return sizeIn(it && it.name, it && it.unit, fu);
+}
 /* כמה ק״ג / ליטר / יחידות יש ביחידה אחת שהספק מוכר, לפי שם הפריט. 0 = לא ידוע */
 const nmb = s => +String(s).replace(',', '.');
 const WUNIT = u => { u = String(u||'').replace(/["'״׳.]/g,'').trim(); return /^(קג|קילו|קילוגרם|kg)$/i.test(u) ? 'ק״ג' : /^(ליטר|ל|lit|l)$/i.test(u) ? 'ליטר' : ''; };
@@ -23539,7 +23564,7 @@ function sizeIn(name, unit, fu){
 }
 function famUnitOf(rows){
   let kg = 0, lt = 0;
-  rows.forEach(x => { if(sizeIn(x.it.name, x.it.unit, 'ק״ג') > 0) kg++; else if(sizeIn(x.it.name, x.it.unit, 'ליטר') > 0) lt++; });
+  rows.forEach(x => { if(itemSize(x.it, 'ק״ג') > 0) kg++; else if(itemSize(x.it, 'ליטר') > 0) lt++; });
   if(!rows.length) return 'יח׳';
   return kg >= lt && kg * 2 >= rows.length ? 'ק״ג' : lt * 2 >= rows.length && lt > 0 ? 'ליטר' : 'יח׳';
 }
@@ -23555,7 +23580,7 @@ function itemIndex(){
 function famRows(f, idx){
   idx = idx || itemIndex(); const meta = f.meta || {};
   return (f.items||[]).map(r => idx.get(r)).filter(Boolean).map(x => {
-    const md = meta[x.ref] || {}; const auto = sizeIn(x.it.name, x.it.unit, f.unit);
+    const md = meta[x.ref] || {}; const auto = itemSize(x.it, f.unit);
     const size = +md.size > 0 ? +md.size : (auto || 1);
     return {...x, size, auto, known: +md.size > 0 || auto > 0, msunit: md.sunit || '', sunit: md.sunit || detectSale(x.it.name), type: md.type || '',
       byW: !!WUNIT(x.it.unit), ppu: x.it.price / size};
@@ -24208,8 +24233,8 @@ function qmSuspects(idx){
       if(((f.meta||{})[x.ref]||{}).ok) return;
       const it = qmToks(x.it.name), why = [];
       if(ft.length && !it.some(w => ft.some(t => qmHit(w, t)))) why.push('אין אף מילה משותפת עם שם המוצר');
-      if(f.unit === 'ק״ג' && !(sizeIn(x.it.name, x.it.unit, 'ק״ג') > 0) && sizeIn(x.it.name, x.it.unit, 'ליטר') > 0) why.push('הפריט נמדד בליטר, והמוצר בק״ג');
-      if(f.unit === 'ליטר' && !(sizeIn(x.it.name, x.it.unit, 'ליטר') > 0) && sizeIn(x.it.name, x.it.unit, 'ק״ג') > 0) why.push('הפריט נמדד בק״ג, והמוצר בליטר');
+      if(f.unit === 'ק״ג' && !(itemSize(x.it, 'ק״ג') > 0) && itemSize(x.it, 'ליטר') > 0) why.push('הפריט נמדד בליטר, והמוצר בק״ג');
+      if(f.unit === 'ליטר' && !(itemSize(x.it, 'ליטר') > 0) && itemSize(x.it, 'ק״ג') > 0) why.push('הפריט נמדד בק״ג, והמוצר בליטר');
       if(med && x.known && (x.ppu > med * 2.5 || x.ppu < med / 2.5)) why.push(`המחיר ל${f.unit === 'יח׳' ? 'יחידה' : f.unit} (${money(x.ppu)}) רחוק מאוד משאר הפריטים (${money(med)})`);
       if(why.length) out.push({f, x, why, sugg: qmSuggest(x, f.id)[0] || null});
     });
@@ -26351,13 +26376,13 @@ return SPX;
 </script>
 <script src="theme.js"></script>
 <script src="shell.js"></script>
-<script src="ai.js?v=20261143"></script>
+<script src="ai.js?v=20261144"></script>
 <script src="users.js"></script>
-<script src="history.js?v=20261143"></script>
+<script src="history.js?v=20261144"></script>
 <script src="voice.js"></script>
 <script src="prolinks.js"></script>
-<script src="projects.js?v=20261143"></script>
-<script src="waiting.js?v=20261143"></script>
+<script src="projects.js?v=20261144"></script>
+<script src="waiting.js?v=20261144"></script>
 <script>
 /* ספירת מלאי בלי קליטה: service worker שמציג את count.html רק כשאין רשת בכלל */
 if("serviceWorker" in navigator && location.protocol === "https:"){ window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(e => console.warn("sw:", e)); }); }
