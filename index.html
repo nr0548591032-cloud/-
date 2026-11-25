@@ -620,6 +620,28 @@
   .key-card:nth-child(even), .holder-card:nth-child(even){ background:var(--tint-b); }
   .key-card:hover, .holder-card:hover{ transform:translateY(-3px); box-shadow:0 4px 10px rgba(16,27,36,.1), 0 12px 26px rgba(16,27,36,.12); }
   .key-card.mismatch{ border-right-color:var(--red); }
+  .key-card.ks-partial{ border-right-color:#e8a317; } .key-card.ks-out, .key-card.ks-none{ border-right-color:var(--red); } .key-card.ks-available{ border-right-color:#2fbf71; }
+  .key-card .kc-foot{ align-items:center; gap:8px; }
+  .kq-lbl{ font-size:12px; color:var(--ink-soft); font-weight:600; } .kq-lbl .kq-out{ color:#b86e00; font-weight:700; }
+  .kq-step{ display:inline-flex; align-items:center; background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; flex:0 0 auto; }
+  .kq-step button{ width:34px; height:32px; border:none; background:transparent; color:var(--ink); font:inherit; font-size:19px; font-weight:700; cursor:pointer; line-height:1; display:flex; align-items:center; justify-content:center; }
+  .kq-step button:hover{ background:#d991001c; } .kq-step button:disabled{ opacity:.3; cursor:default; background:transparent; }
+  .kq-step input{ width:40px; height:32px; border:none !important; border-inline:1px solid var(--line) !important; border-radius:0 !important; text-align:center; font-weight:800; font-size:15px; padding:0 !important; background:transparent !important; -moz-appearance:textfield; box-shadow:none !important; }
+  .kq-step input::-webkit-outer-spin-button, .kq-step input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .kq-step.big button{ width:44px; height:42px; font-size:22px; } .kq-step.big input{ width:50px; height:42px; font-size:17px; }
+  .kq-modebtn{ display:inline-flex; align-items:center; gap:6px; } .kq-modebtn.on{ background:var(--m-keys, #d99100) !important; color:#fff !important; border-color:var(--m-keys, #d99100) !important; }
+  #keysCountHead{ margin:8px 0 10px; }
+  .kq-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:#fff5df; border-radius:16px; padding:10px 14px; }
+  .kq-head > div{ flex:1 1 220px; min-width:0; } .kq-head b{ display:block; font-size:15px; } .kq-head span{ font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
+  .kq-head .kq-cnt{ font-weight:700; color:#b86e00; white-space:nowrap; font-size:12.5px; }
+  .key-grid.kq-countmode{ display:flex !important; flex-direction:column; gap:6px !important; }
+  .kq-row{ display:flex; align-items:center; gap:10px; background:#fbf7f0; border-radius:14px; padding:8px 10px; box-shadow:0 1px 2px rgba(46,43,37,.08); border-right:4px solid #d9d0c2; }
+  .kq-row.done{ border-right-color:#2fbf71; background:#f3faf5; }
+  .kq-fl{ width:32px; height:32px; border-radius:10px; background:#d991001c; color:#b86e00; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .kq-t{ flex:1; min-width:0; } .kq-t b{ display:block; font-size:14px; } .kq-t span{ display:block; font-size:12px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .kq-t em{ font-style:normal; color:#b86e00; font-weight:700; }
+  .kq-ok{ width:30px; height:30px; border-radius:50%; background:#2fbf71; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; flex:0 0 auto; }
+  .kq-same{ border:1px solid var(--line); background:#fff; color:var(--ink-soft); border-radius:10px; height:32px; padding:0 9px; font:inherit; font-size:12px; font-weight:700; cursor:pointer; flex:0 0 auto; }
+  @media (max-width:760px){ .key-card .kc-foot{ flex-wrap:wrap; } .kq-row{ gap:7px; padding:7px 8px; } .kq-same{ padding:0 7px; } }
   .fm-card{ background:#fbf7f0; border-radius:18px; padding:12px 14px; margin-bottom:14px; box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.08); }
   .fm-empty{ display:flex; flex-direction:column; gap:8px; align-items:flex-start; } .fm-empty span{ font-size:13px; color:var(--ink-soft); line-height:1.5; }
   .fm-h{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; } .fm-h b{ font-size:15px; }
@@ -798,6 +820,79 @@
   .sc-cat-chip{ display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:3px 10px; font-size:12px; font-weight:700; }
   .sc-cat-chip.same{ background:var(--green-bg); color:#4f5c3a; }
   .sc-cat-chip.diff{ background:var(--violet-bg); color:var(--ink); }
+  /* ===== מודעה לתמימים + טופס פרטי בנק ===== */
+  .sn-open-btn{ display:inline-flex; align-items:center; gap:5px; border-style:solid !important; background:var(--m-staff, #2f74d0) !important; color:#fff !important; border-color:var(--m-staff, #2f74d0) !important; }
+  .sn-box{ max-width:1040px !important; width:100%; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; padding:0 !important; }
+  .sn-h{ display:flex; align-items:flex-start; gap:12px; padding:16px 18px 12px; border-bottom:1px solid var(--line); }
+  .sn-h > div{ flex:1; min-width:0; } .sn-h b{ display:block; font-size:17px; } .sn-h span{ font-size:12.5px; color:var(--ink-soft); }
+  .sn-x{ width:38px; height:38px; border-radius:12px; border:none; background:#eee7db; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .sn-grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:16px; padding:14px 18px; overflow-y:auto; flex:1 1 auto; }
+  .sn-form{ display:flex; flex-direction:column; gap:9px; min-width:0; }
+  .sn-form label{ display:flex; flex-direction:column; gap:3px; font-size:12px; font-weight:700; color:var(--ink-soft); min-width:0; }
+  .sn-form label small{ font-weight:400; }
+  .sn-form input, .sn-form textarea, .sn-form select{ width:100%; min-width:0; box-sizing:border-box; font-family:inherit; font-size:14px; }
+  .sn-form textarea{ border:1px solid var(--line); border-radius:9px; padding:8px; resize:vertical; background:#FBFAF7; color:var(--ink); line-height:1.5; }
+  .sn-row2{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:9px; }
+  .sn-opts{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:var(--tint-a); border-radius:12px; padding:10px 12px; }
+  .sn-form .sn-chk{ flex-direction:row; align-items:center; gap:8px; color:var(--ink); font-size:13px; cursor:pointer; flex:1 1 220px; }
+  .sn-chk input{ width:auto !important; margin:0; }
+  .sn-form .sn-per{ flex-direction:row; align-items:center; gap:6px; } .sn-per select{ width:auto !important; }
+  .sn-prev{ min-width:0; display:flex; flex-direction:column; gap:8px; }
+  .sn-prev-tabs{ display:inline-flex; align-self:flex-start; background:var(--violet-bg, #eee7db); border-radius:999px; padding:4px; gap:4px; }
+  .sn-prev-tabs button{ border:none; background:transparent; border-radius:999px; padding:6px 14px; font:inherit; font-size:13px; cursor:pointer; color:var(--ink-soft); }
+  .sn-prev-tabs button.on{ background:var(--card); color:var(--ink); font-weight:700; box-shadow:0 1px 3px rgba(46,43,37,.18); }
+  .sn-frame-wrap{ position:relative; width:100%; aspect-ratio:210/297; background:#e9e3d8; border-radius:12px; overflow:hidden; box-shadow:inset 0 0 0 1px var(--line); }
+  .sn-frame-wrap iframe{ position:absolute; top:0; right:0; width:794px; height:1123px; border:none; background:#fff; transform-origin:top right; }
+  .sn-foot{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:12px 18px 16px; border-top:1px solid var(--line); }
+  .sn-foot .btn{ display:inline-flex; align-items:center; gap:7px; } .sn-sp{ flex:1; }
+  @media (max-width:820px){ .sn-grid{ grid-template-columns:minmax(0,1fr); } .sn-prev{ order:-1; } .sn-box{ max-height:96vh; } }
+  /* ===== צוות ותורנים: כרטיסים ברשת + כרטסת בחלון צד (נובמבר 2026) ===== */
+  table.staff-cards.sc-list{ display:block; width:100%; border:none; background:none; box-shadow:none; }
+  #tab-staff #staffBody{ display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:12px; }
+  #tab-staff #staffBody tr.sc-tr{ margin:0 !important; border-radius:18px; background:#fbf7f0; border:none; border-right:5px solid #d9d0c2;
+    box-shadow:0 1px 2px rgba(46,43,37,.10),0 8px 22px rgba(46,43,37,.07); transition:transform .16s ease, box-shadow .16s ease; }
+  #tab-staff #staffBody tr.sc-tr:hover{ transform:translateY(-2px); box-shadow:0 3px 8px rgba(46,43,37,.12),0 14px 28px rgba(46,43,37,.10); }
+  #tab-staff #staffBody tr.sc-tr.card-warn{ border-right-color:#e8a317; }
+  #tab-staff #staffBody tr.sc-tr.card-ok{ border-right-color:#2fbf71; }
+  #tab-staff #staffBody tr.sc-tr.sc-cur{ box-shadow:0 0 0 2px var(--m-staff, #2f74d0),0 8px 22px rgba(46,43,37,.10); }
+  #tab-staff #staffBody tr.sc-tr .sc-body{ display:none !important; }
+  #tab-staff #staffBody .sc-head{ display:grid !important; grid-template-columns:auto minmax(0,1fr); grid-template-areas:"av who" "pills pills" "tot tot";
+    column-gap:10px; row-gap:8px; align-items:center; padding:13px 14px 12px; }
+  #tab-staff #staffBody .sc-avatar{ grid-area:av; background:var(--m-staff, #2f74d0); color:#fff; }
+  #tab-staff #staffBody .sc-who{ grid-area:who; }
+  #tab-staff #staffBody .sc-pills{ grid-area:pills; min-height:0; }
+  #tab-staff #staffBody .sc-pills:empty{ display:none; }
+  #tab-staff #staffBody .sc-total{ grid-area:tot; display:flex; align-items:baseline; justify-content:space-between; gap:8px; text-align:right; border-top:1px dashed rgba(32,30,29,.16); padding-top:8px; min-width:0; }
+  #tab-staff #staffBody .sc-total small{ display:inline; font-size:12px; }
+  #tab-staff #staffBody .sc-total b{ font-size:17px; }
+  #tab-staff #staffBody .sc-chev{ display:none !important; }
+  @media (max-width:760px){
+    #tab-staff #staffBody{ grid-template-columns:minmax(0,1fr); gap:8px; }
+    #tab-staff #staffBody .sc-head{ grid-template-columns:auto minmax(0,1fr) auto !important; grid-template-areas:"av who tot" "av pills tot" !important; row-gap:3px; padding:10px 12px; }
+    #tab-staff #staffBody .sc-total{ display:block; border-top:none; padding-top:0; text-align:left; }
+    #tab-staff #staffBody .sc-total small{ display:block; font-size:11px; }
+    #tab-staff #staffBody .sc-total b{ font-size:15px; }
+    #tab-staff #staffBody .sc-pills .pill{ font-size:10.5px; padding:1px 7px; }
+    body #tab-staff #staffBody td.sc-td{ padding:0 !important; }
+  }
+  .sc-drawer{ --brand:var(--m-staff, #2f74d0); --job-accent:var(--m-staff, #2f74d0); }
+  .sc-drawer .tk-dr-head{ align-items:center; }
+  .sc-drawer .tk-dr-head .sc-avatar{ background:var(--m-staff, #2f74d0); color:#fff; width:44px; height:44px; font-size:15px; }
+  .sc-drawer .sc-dr-pills{ display:flex; gap:5px; flex-wrap:wrap; margin-top:6px; }
+  .sc-drawer .sc-dr-pills:empty{ display:none; }
+  .sc-drawer .sc-dr-pills .pill{ font-size:11px; padding:2px 8px; }
+  .sc-drawer .sc-dr-tot{ text-align:left; flex:0 0 auto; } .sc-drawer .sc-dr-tot small{ display:block; font-size:11px; opacity:.8; } .sc-drawer .sc-dr-tot b{ font-size:19px; font-weight:800; white-space:nowrap; }
+  table.staff-cards.sc-dr-table{ display:block; width:100%; border:none; background:none; box-shadow:none; }
+  table.staff-cards.sc-dr-table tbody{ display:block; }
+  table.staff-cards.sc-dr-table tr.sc-tr{ background:none !important; border:none !important; box-shadow:none !important; margin:0 !important; transform:none !important; overflow:visible; }
+  table.staff-cards.sc-dr-table .sc-head{ display:none !important; }
+  table.staff-cards.sc-dr-table .sc-body{ display:flex !important; flex-direction:column; gap:12px; padding:0; border-top:none; background:none; }
+  table.staff-cards.sc-dr-table .sc-fields, table.staff-cards.sc-dr-table .sc-section, table.staff-cards.sc-dr-table .sc-extra{ background:var(--card); border:none; border-radius:18px; padding:13px; margin:0; box-shadow:0 1px 2px rgba(46,43,37,.08); }
+  table.staff-cards.sc-dr-table .sc-grand, table.staff-cards.sc-dr-table .sc-actions{ margin:0; }
+  table.staff-cards.sc-dr-table .sc-actions{ background:var(--card); border-radius:18px; padding:12px 13px; box-shadow:0 1px 2px rgba(46,43,37,.08); }
+  .sc-drawer.sc-locked #staffDrawerBody input, .sc-drawer.sc-locked #staffDrawerBody select, .sc-drawer.sc-locked #staffDrawerBody textarea{ pointer-events:none; background:#f3eee6 !important; color:#645c50 !important; }
+  .sc-drawer.sc-locked #staffDrawerBody button:not(.mob-toggle){ pointer-events:none; opacity:.5; }
+  .sc-drawer.sc-locked .tk-dr-body::before{ content:"הפעימה סגורה – הכרטסת לקריאה בלבד"; display:block; background:#ddf3e5; color:#18864c; font-weight:700; font-size:13px; border-radius:12px; padding:8px 12px; }
   .rc-row{ display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) 40px; gap:8px; align-items:center; border-radius:12px; padding:6px; }
   .rc-row:nth-child(3n+1){ background:var(--tint-a); } .rc-row:nth-child(3n+2){ background:var(--tint-b); } .rc-row:nth-child(3n){ background:var(--violet-bg); }
   .rc-head{ display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) 40px; gap:8px; font-size:12px; color:var(--ink-soft); padding:0 6px 4px; }
@@ -2855,6 +2950,45 @@ button.ct-tl:hover{background:#fbf7f0}
     </div>
   </div>
 
+  <div id="staffNoticeModal" class="modal-overlay" style="display:none" onclick="if(event.target===this) snClose()">
+    <div class="modal-box sn-box" role="dialog" aria-modal="true" aria-labelledby="snTitleH">
+      <div class="sn-h"><div><b id="snTitleH">מודעה לתמימים + טופס פרטי בנק</b><span>עורכים כאן, רואים מיד בתצוגה, ומפיקים PDF להדפסה או קובץ Word לעריכה חופשית.</span></div>
+        <button type="button" class="sn-x" onclick="snClose()" aria-label="סגירה"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="sn-grid">
+        <div class="sn-form" oninput="snPreviewSoon()" onchange="snPreviewSoon()">
+          <div class="sn-row2">
+            <label>פנייה<input type="text" id="snGreet"></label>
+            <label>תאריך פרסום<input type="date" id="snDate"></label>
+          </div>
+          <label>כותרת<input type="text" id="snTitle"></label>
+          <label>שורת משנה <small>({פעימה} = מספר הפעימה וחודשיה)</small><input type="text" id="snSub"></label>
+          <label>תוכן המודעה<textarea id="snBody" rows="4"></textarea></label>
+          <label>מה צריך למסור <small>(שורה לכל פריט · ריק = בלי רשימה)</small><textarea id="snItems" rows="5"></textarea></label>
+          <label>הנחיה מודגשת<input type="text" id="snNote"></label>
+          <div class="sn-row2">
+            <label>למסור ל…<input type="text" id="snHand"></label>
+            <label>עד תאריך <small>(לא חובה)</small><input type="date" id="snDue"></label>
+          </div>
+          <label>הערה קטנה בתחתית<input type="text" id="snFoot"></label>
+          <label>חתימה<input type="text" id="snSign"></label>
+          <div class="sn-opts">
+            <label class="sn-chk"><input type="checkbox" id="snSlips"> לצרף דף טפסים קטנים למילוי פרטי בנק</label>
+            <label class="sn-per">טפסים בדף<select id="snPer"><option value="4">4 (רבע דף)</option><option value="2">2 (חצי דף)</option></select></label>
+          </div>
+        </div>
+        <div class="sn-prev"><div class="sn-prev-tabs" role="group" aria-label="תצוגה מקדימה"><button type="button" class="on" id="snPvA" onclick="snPv('a')">המודעה</button><button type="button" id="snPvB" onclick="snPv('b')">דף הטפסים</button></div>
+          <div class="sn-frame-wrap" id="snFrameWrap"><iframe id="snFrame" title="תצוגה מקדימה" tabindex="-1"></iframe></div></div>
+      </div>
+      <div class="sn-foot">
+        <button type="button" class="btn" onclick="snPrint()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>הדפסה / PDF</button>
+        <button type="button" class="btn ghost" onclick="snWord()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6"/><path d="m8 13 1.5 5L12 14l2.5 4L16 13"/></svg>הורדת Word</button>
+        <span class="sn-sp"></span>
+        <button type="button" class="sc-link-btn" onclick="snSave()">שמירת הנוסח לפעם הבאה</button>
+        <button type="button" class="sc-link-btn" onclick="snReset()">חזרה לנוסח המקורי</button>
+      </div>
+    </div>
+  </div>
+
   <div id="staffEmployeeReportModal" class="modal-overlay" style="display:none">
     <div class="modal-box" style="max-width:520px">
       <div style="font-weight:700;font-size:16px;margin-bottom:4px" id="staffEmpReportTitle">דוח תשלומים</div>
@@ -2983,6 +3117,7 @@ button.ct-tl:hover{background:#fbf7f0}
         <button type="button" class="sc-link-btn" onclick="openRoleCatalogModal()">תעריפון תפקידים</button>
         <button type="button" class="sc-link-btn" onclick="openBankModal()">כל פרטי הבנק</button>
         <button type="button" class="sc-link-btn" onclick="openRosterExportModal()">דוח שמות וסכומים</button>
+        <button type="button" class="sc-link-btn sn-open-btn" onclick="snOpen()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v2a2 2 0 0 0 2 2h1l4 4V5L6 9H5a2 2 0 0 0-2 2Z"/><path d="M15 9a4 4 0 0 1 0 6"/><path d="M18 6a8 8 0 0 1 0 12"/></svg>מודעה + טופס פרטי בנק</button>
       </div>
       <div id="staffClose"></div>
       <div class="sc-stats">
@@ -2990,13 +3125,9 @@ button.ct-tl:hover{background:#fbf7f0}
         <div class="sc-stat"><small>אושרו לתשלום</small><b id="staffApprovedCount"></b></div>
         <div class="sc-stat"><small>שולמו</small><b id="staffPaidCount"></b></div>
       </div>
-      <p class="hint">לחיצה על כרטיס עובד פותחת את כל הפרטים שלו. העלאת שכר נרשמת מחודש מסוים בתוך הפעימה ולא משנה את החודשים שלפניה. ברגע שתשלום מסומן "שולם" (בדוח למנהל חשבונות) הסכום ננעל ולא ישתנה גם אם יעודכן תעריף. סימון "אושר לתשלום" קובע אם העובד יופיע בדוח למנהל חשבונות.</p>
+      <p class="hint">לחיצה על כרטיס עובד פותחת את הכרטסת שלו בחלון צד. העלאת שכר נרשמת מחודש מסוים בתוך הפעימה ולא משנה את החודשים שלפניה. ברגע שתשלום מסומן "שולם" (בדוח למנהל חשבונות) הסכום ננעל ולא ישתנה גם אם יעודכן תעריף. סימון "אושר לתשלום" קובע אם העובד יופיע בדוח למנהל חשבונות.</p>
       <div id="staffCardsView">
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px">
-          <button type="button" class="sc-link-btn" onclick="setAllStaffCardsOpen(true)">פתיחת כל הכרטיסים</button>
-          <button type="button" class="sc-link-btn" onclick="setAllStaffCardsOpen(false)">סגירת הכל</button>
-        </div>
-        <table class="staff-cards">
+        <table class="staff-cards sc-list">
           <tbody id="staffBody"></tbody>
         </table>
       </div>
@@ -3015,6 +3146,18 @@ button.ct-tl:hover{background:#fbf7f0}
       </div>
     </div>
   </section>
+  <div class="tk-scrim" id="scScrim" onclick="scDrawerClose()"></div>
+  <aside class="tk-drawer sc-drawer" id="scDrawer" role="dialog" aria-modal="true" aria-label="כרטסת עובד" aria-hidden="true">
+    <div class="tk-dr-head">
+      <div class="sc-avatar" id="scDrAv"></div>
+      <div class="t"><div class="k" id="scDrK">כרטסת עובד</div><div class="h" id="scDrName"></div><div class="sc-dr-pills" id="scDrPills"></div></div>
+      <div class="sc-dr-tot"><small>לתשלום</small><b id="scDrTot"></b></div>
+      <button type="button" class="tk-x" onclick="scDrawerClose()" aria-label="סגירת הכרטסת"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="tk-dr-body" id="scDrBody">
+      <table class="staff-cards sc-dr-table"><tbody id="staffDrawerBody"></tbody></table>
+    </div>
+  </aside>
 
   <section class="tab" id="tab-accountant">
     <div id="acxAdmin" class="acx">
@@ -3139,17 +3282,19 @@ button.ct-tl:hover{background:#fbf7f0}
           <select id="keysRawFilter" onchange="renderKeyCards()"><option value="">כל הגלמים</option></select>
           <select id="keysStatusFilter" onchange="renderKeyCards()">
             <option value="">כל הסטטוסים</option>
-            <option value="available">זמין</option>
-            <option value="partial">בהשאלה חלקית</option>
-            <option value="out">אזל במלאי</option>
-            <option value="mismatch">לבדוק ספירה</option>
+            <option value="available">זמין בארון</option>
+            <option value="partial">חלק בהשאלה</option>
+            <option value="out">כולם בהשאלה</option>
+            <option value="none">אין בארון</option>
           </select>
           <div class="toolbar-push" style="display:flex;gap:8px">
             <span class="saved-flag" id="keysInvSaved">נשמר</span>
+            <button type="button" class="btn ghost kq-modebtn" id="keysCountBtn" aria-pressed="false" onclick="toggleKeysCountMode()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>מצב ספירה</button>
             <button class="btn ghost" onclick="openMasterKeysModal()">ניהול מפתחות אב</button>
             <button class="btn" onclick="openKeyFormModal()">+ מפתח חדש</button>
           </div>
         </div>
+        <div id="keysCountHead" hidden></div>
         <div class="key-grid" id="keysGrid"></div>
       </div>
     </div>
@@ -3194,7 +3339,7 @@ button.ct-tl:hover{background:#fbf7f0}
       <div style="font-weight:700;font-size:13px;color:var(--brand-dark);margin-bottom:6px">נפתח גם באמצעות מפתחות אב</div>
       <div class="master-badges" id="kdMasters" style="margin-bottom:6px"></div>
       <div class="toolbar" style="margin-top:16px">
-        <button class="btn ghost" onclick="openStockCountModal()">עדכון ספירת מלאי</button>
+        <span></span>
         <div style="display:flex;gap:8px">
           <button class="btn ghost" onclick="editKeyFromDetail()">עריכת פרטים</button>
           <button class="btn" onclick="openLoanModalFor()">מסירת מפתח</button>
@@ -3216,7 +3361,7 @@ button.ct-tl:hover{background:#fbf7f0}
         <label>גודל<input type="text" id="kfSize"></label>
       </div>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:10px">מיקום<input type="text" id="kfLoc" placeholder="לדוגמה: מחסן ציוד ניקיון"></label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:10px">כמות בארון כרגע (לפי ספירה ידנית)<input type="number" id="kfQty" value="1"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:10px">כמה יש בארון עכשיו (בלי מה שבהשאלה)<input type="number" id="kfQty" value="1" min="0" inputmode="numeric"></label>
       <label style="display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:10px">מפתחות אב שפותחים דלת זו
         <div class="checkgroup" id="kfMasters"></div>
       </label>
@@ -3568,7 +3713,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const APP_COLLECTION = "buildingApp";
-const APP_BUILD = 20261144; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
+const APP_BUILD = 20261145; // לעדכן (להגדיל) בכל העלאת גרסה חדשה
 
 const UID_TO_ROLE = {
   "UxdEfuUl6dhBaH3GBrPXtosn1Iv2": "admin",
@@ -11299,9 +11444,9 @@ function removeOnePayment(id, idx){
 function addStaffRow(){
   const newId = nextId()+4000;
   data.installments[activeInstallment].push({id: newId, name:"", role:"", monthly:0, daily:0, missing:0, months: ((instMeta(activeInstallment) || {}).count || 0), link:"", notes:"", approved:false});
-  staffOpenCards.add(newId);
   withScrollPreserved(() => renderStaff());
   saveInstallments();
+  scDrawerOpen(newId, "name");
 }
 function removeStaffRow(id){
   openConfirmModal("למחוק? לא ניתן לשחזר את הפעולה.", () => {
@@ -11407,7 +11552,6 @@ function buildStaffRowElement(row){
   const tr = document.createElement("tr");
   tr.dataset.rowId = row.id;
   tr.className = "sc-tr";
-  if(staffOpenCards.has(row.id)) tr.classList.add("sc-open");
   if(row.paid) tr.classList.add("card-ok");
   else if(row.approved) tr.classList.add("card-warn");
   const num = (v) => (v === undefined || v === null) ? "" : escHtml(v);
@@ -11569,6 +11713,13 @@ function patchStaffCard(tr, row){
   if(q(".sc-grand")) q(".sc-grand").innerHTML = staffGrandInner(row);
   tr.classList.toggle("card-ok", !!row.paid);
   tr.classList.toggle("card-warn", !row.paid && !!row.approved);
+  /* כרטסת פתוחה בחלון הצד: מעדכנים גם את הכותרת שלה ואת הכרטיס ברשימה */
+  if(tr.closest && tr.closest("#staffDrawerBody")){
+    scDrawerHead(row);
+    const listTr = document.querySelector(`#staffBody tr[data-row-id="${row.id}"]`);
+    if(listTr) patchStaffCard(listTr, row); else updateStaffSummary();
+    return;
+  }
   updateStaffSummary();
 }
 function updateStaffSummary(){
@@ -11594,6 +11745,7 @@ function renderStaff(){
   renderRoleCatalogDatalist();
   applyStaffView();
   try{ renderStaffClose(); }catch(e){ console.error(e); }
+  try{ scDrawerRefresh(); }catch(e){ console.error(e); }
 }
 
 /* ====================================================================
@@ -11623,6 +11775,7 @@ function renderStaffClose(){
   const tabSec = document.getElementById("tab-staff");
   const closed = scIsClosed(idx);
   if(tabSec) tabSec.classList.toggle("sc-locked", closed);
+  const scDr = document.getElementById("scDrawer"); if(scDr) scDr.classList.toggle("sc-locked", closed);
   if(!rows.length){ box.innerHTML = ""; return; }
   const fmt = d => { if(!d) return ""; const x = new Date(d); return isNaN(x) ? d : x.toLocaleDateString("he-IL"); };
   if(closed){
@@ -11654,8 +11807,7 @@ function renderStaffClose(){
 /* אחרי שליחה למנהל החשבונות – לעדכן את שלבי הסגירה */
 setTimeout(() => { try{ if(typeof acxDoSend === "function" && !acxDoSend.__sc){ const orig = acxDoSend; acxDoSend = async function(){ const r = await orig.apply(this, arguments); try{ renderStaffClose(); }catch(e){} return r; }; acxDoSend.__sc = true; } }catch(e){ console.warn(e); } }, 0);
 function scGoRow(id){
-  const tr = document.querySelector(`#staffBody tr[data-row-id="${id}"]`);
-  if(tr){ tr.scrollIntoView({ behavior: "smooth", block: "center" }); if(!tr.classList.contains("open")){ const h = tr.querySelector(".sc-head"); if(h) h.click(); } tr.classList.add("flash"); setTimeout(() => tr.classList.remove("flash"), 2200); }
+  scDrawerOpen(id);
 }
 function scApproveReady(){
   const idx = activeInstallment;
@@ -11707,16 +11859,106 @@ function refreshSingleStaffRow(id){
     else body.appendChild(newTr);
   }
   updateStaffSummary();
+  if(scDrawerId === id){ try{ scDrawerRefresh(); }catch(e){ console.error(e); } }
 }
-function toggleStaffCard(id){
-  if(staffOpenCards.has(id)) staffOpenCards.delete(id); else staffOpenCards.add(id);
-  const tr = document.querySelector(`#staffBody tr[data-row-id="${id}"]`);
-  if(tr) tr.classList.toggle("sc-open", staffOpenCards.has(id));
+/* לחיצה על כרטיס עובד: פותחת את הכרטסת שלו בחלון צד (כמו בטאבים האחרים) */
+function toggleStaffCard(id){ scDrawerOpen(id); }
+function setAllStaffCardsOpen(){ /* הוחלף בכרטסת בחלון צד */ }
+
+/* ====================================================================
+   כרטסת עובד בחלון צד (נובמבר 2026)
+   הכרטסת בונה את אותו כרטיס עובד בדיוק (אותם שדות, אותם חישובים ואותה שמירה),
+   רק מציגה אותו בחלון צד. אין כאן שום שינוי בנתונים או בחישובים.
+   ==================================================================== */
+let scDrawerId = null;
+function scDrawerRow(){ return scDrawerId === null ? null : (data.installments[activeInstallment] || []).find(r => r.id === scDrawerId) || null; }
+function scDrawerHead(row){
+  const set = (id, v, html) => { const el = document.getElementById(id); if(el){ if(html) el.innerHTML = v; else el.textContent = v; } };
+  set("scDrAv", staffInitials(row.name));
+  set("scDrName", row.name || "עובד חדש");
+  const roles = [row.role].concat((row.extraRoles || []).map(e => e.role)).filter(Boolean).join(" · ");
+  set("scDrK", "כרטסת עובד · פעימה " + (activeInstallment + 1) + (roles ? " · " + roles : ""));
+  set("scDrPills", staffHeadPillsHtml(row), true);
+  set("scDrTot", fmtMoney(computeStaffTotal(row)));
 }
-function setAllStaffCardsOpen(open){
-  (data.installments[activeInstallment] || []).forEach(r => { if(open) staffOpenCards.add(r.id); else staffOpenCards.delete(r.id); });
-  document.querySelectorAll("#staffBody tr.sc-tr").forEach(tr => tr.classList.toggle("sc-open", open));
+function scDrawerBuild(focusField){
+  const row = scDrawerRow();
+  const body = document.getElementById("staffDrawerBody");
+  if(!row || !body){ scDrawerClose(); return; }
+  /* שומרים איפה היה הסמן, כדי שעדכון מהענן לא יעיף אותך מהשדה */
+  const scroller = document.getElementById("scDrBody");
+  const top = scroller ? scroller.scrollTop : 0;
+  const ae = document.activeElement;
+  let restore = null;
+  if(ae && body.contains(ae)){
+    const keys = ["f", "erf", "eridx", "opf", "opidx", "bf", "start", "erstart"];
+    const sel = keys.filter(k => ae.dataset && ae.dataset[k] !== undefined).map(k => `[data-${k.replace(/[A-Z]/g, c => "-" + c.toLowerCase())}="${ae.dataset[k]}"]`).join("");
+    restore = { sel, start: ae.selectionStart, end: ae.selectionEnd };
+  }
+  const tr = buildStaffRowElement(row);
+  tr.classList.add("sc-open");
+  body.innerHTML = "";
+  body.appendChild(tr);
+  scDrawerHead(row);
+  const dr = document.getElementById("scDrawer");
+  if(dr){
+    const closed = scIsClosed(activeInstallment);
+    dr.classList.toggle("sc-locked", closed);
+    dr.classList.toggle("card-ok", !!row.paid);
+  }
+  if(scroller) scroller.scrollTop = top;
+  if(restore && restore.sel){
+    const el = body.querySelector(restore.sel);
+    if(el){ el.focus({ preventScroll: true }); try{ if(restore.start !== null && restore.start !== undefined) el.setSelectionRange(restore.start, restore.end); }catch(e){} }
+  }else if(focusField){
+    setTimeout(() => { const el = body.querySelector(`[data-f="${focusField}"]`); if(el) el.focus(); }, 260);
+  }
 }
+function scDrawerRefresh(){
+  if(scDrawerId === null) return;
+  if(!scDrawerRow()){ scDrawerClose(); return; }
+  scDrawerBuild();
+}
+function scDrawerOpen(id, focusField){
+  if(!(data.installments[activeInstallment] || []).some(r => r.id === id)) return;
+  if(staffView === "table") setStaffView("cards");
+  scDrawerId = id;
+  const sc = document.getElementById("scDrBody"); if(sc) sc.scrollTop = 0;
+  scDrawerBuild(focusField);
+  const dr = document.getElementById("scDrawer");
+  if(!dr) return;
+  dr.classList.add("open");
+  dr.setAttribute("aria-hidden", "false");
+  document.getElementById("scScrim").classList.add("open");
+  document.body.style.overflow = "hidden";
+  document.querySelectorAll("#staffBody tr.sc-tr").forEach(t => t.classList.toggle("sc-cur", Number(t.dataset.rowId) === id));
+  if(!focusField) setTimeout(() => { const x = dr.querySelector(".tk-x"); if(x) x.focus({ preventScroll: true }); }, 260);
+}
+function scDrawerClose(){
+  const id = scDrawerId;
+  scDrawerId = null;
+  const dr = document.getElementById("scDrawer");
+  if(dr){ dr.classList.remove("open"); dr.setAttribute("aria-hidden", "true"); }
+  const sc = document.getElementById("scScrim"); if(sc) sc.classList.remove("open");
+  document.body.style.overflow = "";
+  /* מנקים את התוכן אחרי האנימציה (רק אם לא נפתחה בינתיים כרטסת אחרת) */
+  setTimeout(() => { if(scDrawerId === null){ const b = document.getElementById("staffDrawerBody"); if(b) b.innerHTML = ""; } }, 300);
+  if(id !== null){
+    document.querySelectorAll("#staffBody tr.sc-cur").forEach(t => t.classList.remove("sc-cur"));
+    const listTr = document.querySelector(`#staffBody tr[data-row-id="${id}"]`);
+    if(listTr){
+      const row = (data.installments[activeInstallment] || []).find(r => r.id === id);
+      if(row){ const fresh = buildStaffRowElement(row); listTr.replaceWith(fresh); const q = document.getElementById("staffSearchInput"); if(q && q.value) filterRows("staffBody", q.value); }
+    }
+    try{ renderPayment(); }catch(e){}
+    try{ renderStaffClose(); }catch(e){}
+  }
+}
+document.addEventListener("keydown", e => {
+  if(e.key !== "Escape" || scDrawerId === null) return;
+  const blocking = Array.from(document.querySelectorAll(".modal-overlay, .fv-overlay")).some(el => el.style.display && el.style.display !== "none");
+  if(!blocking) scDrawerClose();
+});
 /* השלמת חודשים לתפקיד — רק בלחיצה ואחרי אישור, ולא בשורה ששולמה (נעולה) */
 function fillStaffRoleMonths(id, roleIdx, n){
   const row = DOC_TABLES.staff.find(id);
@@ -14047,11 +14289,258 @@ function setStaffView(v){
   if(q && q.value) filterRows(staffView === "table" ? "paymentBody" : "staffBody", q.value);
 }
 function openStaffCardFromTable(id){
-  staffOpenCards.add(id);
   setStaffView("cards");
-  const tr = document.querySelector(`#staffBody tr[data-row-id="${id}"]`);
-  if(tr){ tr.classList.add("sc-open"); tr.scrollIntoView({behavior:"smooth", block:"start"}); }
+  scDrawerOpen(id);
 }
+/* ====================================================================
+   מודעה לתמימים + טופס פרטי בנק (נובמבר 2026)
+   עורכים את הנוסח, רואים תצוגה מקדימה, מפיקים PDF (הדפסה) או Word.
+   הנוסח נשמר בענן ב-uiPrefs.staffNotice בלבד – לא נוגע בשום נתון של העובדים.
+   ==================================================================== */
+const SN_DEFAULT = {
+  greet: "לכבוד התמימים היקרים שיחיו",
+  title: "העברת תשלומים לצוות ולתורנים",
+  sub: "{פעימה}",
+  body: "לקראת העברת התשלומים הקרובה, אנו מבקשים מכל אחד מהתמימים העוסקים בצוות ובתורנויות למסור את פרטי חשבון הבנק שלו.\nהכספים יועברו ישירות לחשבון הבנק, ולכן חשוב מאוד שהפרטים יהיו מלאים ומדויקים.",
+  items: "שם מלא\nשם הבנק ומספר הבנק\nמספר הסניף\nמספר החשבון\nשם בעל החשבון (אם החשבון אינו על שמך)\nמספר טלפון",
+  note: "נא למלא את הטופס בכתב ברור וקריא – ספרה אחת לא ברורה עלולה לעכב את ההעברה.",
+  hand: "לנפתלי רוזנברג",
+  foot: "מי שכבר מסר פרטי בנק ולא חל בהם שינוי – אינו צריך למסור שוב.",
+  sign: "נפתלי רוזנברג",
+  slips: true,
+  per: "4"
+};
+const SN_FIELDS = ["greet", "title", "sub", "body", "items", "note", "hand", "foot", "sign"];
+let snPage = "a", snTimer = null;
+function snHebNum(n){
+  const ones = ["", "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט"], tens = ["", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ"];
+  const hund = ["", "ק", "ר", "ש", "ת", "תק", "תר", "תש", "תת", "תתק"];
+  n = n % 1000;
+  const r = n % 100;
+  let s = hund[Math.floor(n / 100)] + (r === 15 ? "טו" : r === 16 ? "טז" : tens[Math.floor(r / 10)] + ones[r % 10]);
+  return s.length > 1 ? s.slice(0, -1) + "״" + s.slice(-1) : s + "׳";
+}
+function snDateInfo(iso){
+  const d = iso ? new Date(iso + "T12:00:00") : new Date();
+  if(isNaN(d)) return { wd: "", heb: "", greg: "" };
+  let wd = "", heb = "";
+  try{
+    const parts = new Intl.DateTimeFormat("he-u-ca-hebrew-nu-latn", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).formatToParts(d);
+    const g = t => (parts.find(p => p.type === t) || {}).value || "";
+    const day = parseInt(g("day"), 10), yr = parseInt(g("year"), 10);
+    wd = g("weekday");
+    heb = (isNaN(day) ? g("day") : snHebNum(day)) + " ב" + g("month").replace(/^ב/, "") + " " + (isNaN(yr) ? g("year") : snHebNum(yr));
+  }catch(e){}
+  return { wd, heb, greg: d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear() };
+}
+function snCfgFromForm(){
+  const c = {};
+  SN_FIELDS.forEach(f => { const el = document.getElementById("sn" + f[0].toUpperCase() + f.slice(1)); c[f] = el ? el.value : ""; });
+  c.date = (document.getElementById("snDate") || {}).value || "";
+  c.due = (document.getElementById("snDue") || {}).value || "";
+  c.slips = !!(document.getElementById("snSlips") || {}).checked;
+  c.per = (document.getElementById("snPer") || {}).value || "4";
+  return c;
+}
+function snFillForm(c){
+  SN_FIELDS.forEach(f => { const el = document.getElementById("sn" + f[0].toUpperCase() + f.slice(1)); if(el) el.value = c[f] || ""; });
+  document.getElementById("snSlips").checked = c.slips !== false;
+  document.getElementById("snPer").value = String(c.per || "4");
+}
+function snOpen(){
+  const saved = (data.uiPrefs && data.uiPrefs.staffNotice && typeof data.uiPrefs.staffNotice === "object") ? data.uiPrefs.staffNotice : null;
+  snFillForm(Object.assign({}, SN_DEFAULT, saved || {}));
+  document.getElementById("snDate").value = keyTodayIso();
+  document.getElementById("snDue").value = "";
+  snPage = "a"; snPv("a", true);
+  openModalOverlay("staffNoticeModal");
+  setTimeout(snPreview, 30);
+}
+function snClose(){ closeModalOverlay("staffNoticeModal"); }
+function snSave(){
+  const c = snCfgFromForm();
+  delete c.date; delete c.due;   // התאריכים משתנים בכל פעם
+  data.uiPrefs = data.uiPrefs || {};
+  data.uiPrefs.staffNotice = c;
+  saveUiPrefs();
+  showToast("הנוסח נשמר – בפעם הבאה הוא ייפתח כך");
+}
+function snReset(){
+  snFillForm(SN_DEFAULT);
+  snPreview();
+  showToast("הנוסח המקורי חזר. כדי שיישאר כך – לוחצים ״שמירת הנוסח״");
+}
+function snPv(p, silent){
+  snPage = p === "b" ? "b" : "a";
+  const a = document.getElementById("snPvA"), b = document.getElementById("snPvB");
+  if(a) a.classList.toggle("on", snPage === "a");
+  if(b) b.classList.toggle("on", snPage === "b");
+  if(!silent) snPreview();
+}
+function snPreviewSoon(){ clearTimeout(snTimer); snTimer = setTimeout(snPreview, 220); }
+function snPreview(){
+  const fr = document.getElementById("snFrame"), wrap = document.getElementById("snFrameWrap");
+  if(!fr || !wrap) return;
+  const c = snCfgFromForm();
+  const b = document.getElementById("snPvB");
+  if(b) b.style.display = c.slips ? "" : "none";
+  if(!c.slips && snPage === "b") snPv("a", true);
+  fr.srcdoc = snDocHtml(c, { only: snPage, preview: true });
+  const sc = wrap.clientWidth / 794;
+  fr.style.transform = "scale(" + (sc > 0 ? sc : 0.5) + ")";
+}
+window.addEventListener("resize", () => { const m = document.getElementById("staffNoticeModal"); if(m && m.style.display !== "none") snPreviewSoon(); });
+function snSubText(c){
+  const n = activeInstallment + 1, range = (typeof instRangeLabel === "function") ? instRangeLabel(activeInstallment) : "";
+  return String(c.sub || "").replace(/\{פעימה\}/g, "פעימה " + n + (range ? " · " + range : ""));
+}
+/* בונה את המסמך: עמוד המודעה ועמוד הטפסים. אותו מבנה משמש להדפסה ול-Word (טבלאות פשוטות) */
+function snDocHtml(c, opt){
+  opt = opt || {};
+  const E = v => escHtml(v == null ? "" : String(v));
+  const word = !!opt.word;
+  const pub = snDateInfo(c.date);
+  const due = c.due ? snDateInfo(c.due) : null;
+  const items = String(c.items || "").split("\n").map(x => x.trim()).filter(Boolean);
+  const paras = String(c.body || "").split("\n").map(x => x.trim()).filter(Boolean);
+  const NAVY = "#1d3557", GOLD = "#c08a2b", CREAM = "#fbf6ec";
+  const handLine = c.hand ? `את הטופס ממלאים ומוסרים <b>${E(c.hand)}</b>${due ? ` עד <b>${E(due.wd)}, ${E(due.heb)}</b> (${E(due.greg)})` : ""}.` : (due ? `נא למסור עד <b>${E(due.wd)}, ${E(due.heb)}</b> (${E(due.greg)}).` : "");
+  // רשימת "מה צריך למסור" בשני טורים
+  let itemsHtml = "";
+  if(items.length){
+    const half = Math.ceil(items.length / 2), rows = [];
+    for(let i = 0; i < half; i++){
+      const cell = it => it === undefined ? `<td class="it"></td>` : `<td class="it"><span class="ck">✔</span> ${E(it)}</td>`;
+      rows.push(`<tr>${cell(items[i])}${cell(items[i + half])}</tr>`);
+    }
+    itemsHtml = `<table class="box" dir="rtl" width="100%" cellspacing="0" cellpadding="0"><tr><td class="box-in">
+      <div class="box-h">מה צריך למסור?</div>
+      <table class="items" dir="rtl" width="100%" cellspacing="0" cellpadding="0">${rows.join("")}</table>
+    </td></tr></table>`;
+  }
+  const pageA = `<div class="page pa">
+    <table class="top" dir="rtl" width="100%" cellspacing="0" cellpadding="0"><tr><td class="bsd">בס״ד</td><td class="pub">פורסם: ${E(pub.wd)}, ${E(pub.heb)} · ${E(pub.greg)}</td></tr></table>
+    <table class="band" dir="rtl" width="100%" cellspacing="0" cellpadding="0"><tr><td class="band-in">
+      ${c.greet ? `<div class="greet">${E(c.greet)}</div>` : ""}
+      <div class="title">${E(c.title)}</div>
+      ${c.sub ? `<div class="sub">${E(snSubText(c))}</div>` : ""}
+    </td></tr></table>
+    <div class="orn">◆ ◆ ◆</div>
+    ${paras.map(p => `<p class="body">${E(p)}</p>`).join("")}
+    ${itemsHtml}
+    ${c.note ? `<table class="note" dir="rtl" width="100%" cellspacing="0" cellpadding="0"><tr><td class="note-in">✍ ${E(c.note)}</td></tr></table>` : ""}
+    ${handLine ? `<p class="hand">${handLine}</p>` : ""}
+    ${c.sign ? `<div class="sign">בברכה,<br><b>${E(c.sign)}</b></div>` : ""}
+    ${c.foot ? `<div class="small">${E(c.foot)}</div>` : ""}
+  </div>`;
+  const per = String(c.per) === "2" ? 2 : 4;
+  /* ב-Word סגנונות של מחלקות לא תמיד נקלטים בתאי טבלה – לכן הקווים והמסגרות כתובים גם ישירות על התאים */
+  const W = css => word ? ` style="${css}"` : "";
+  const box = n => `<table class="digits" dir="ltr" cellspacing="0" cellpadding="0"><tr>${`<td${word ? ' width="22" height="24"' : ""}${W("width:16pt;height:18pt;border:1pt solid #59606e;")}>${word ? "&nbsp;&nbsp;&nbsp;" : ""}</td>`.repeat(n)}</tr></table>`;
+  const rowH = per === 2 ? "40pt" : "25pt";
+  const ln = `<td class="ln"${W("border-bottom:1pt solid #59606e;vertical-align:bottom;")}>&nbsp;</td>`;
+  const th = t => `<th${W("height:" + rowH + ";text-align:right;vertical-align:bottom;color:#1d3557;font-size:11pt;padding-left:6pt;white-space:nowrap;width:1%;")}>${t}</th>`;
+  const slip = `<div class="slip-in">
+      <table width="100%" cellspacing="0" cellpadding="0"><tr><td class="s-h"${W("background:#1d3557;color:#ffffff;text-align:center;font-weight:bold;font-size:13pt;padding:5pt;")}>טופס פרטי בנק להעברת תשלום</td></tr></table>
+      <div class="s-sub">נא למלא בכתב ברור וקריא</div>
+      <table class="s-f" dir="rtl" width="100%" cellspacing="0" cellpadding="0">
+        <tr>${th("שם מלא")}${ln}</tr>
+        <tr>${th("טלפון")}${ln}</tr>
+        <tr>${th("שם הבנק")}${ln}</tr>
+        <tr>${th("מס׳ בנק")}<td class="dg"${W("vertical-align:bottom;")}><table dir="rtl" cellspacing="0" cellpadding="0"><tr><td>${box(2)}</td><td class="lbl2"${W("padding:0 8pt;color:#1d3557;font-weight:bold;font-size:11pt;vertical-align:bottom;white-space:nowrap;")}>מס׳ סניף</td><td>${box(3)}</td></tr></table></td></tr>
+        <tr>${th("מס׳ חשבון")}${ln}</tr>
+        <tr>${th("שם בעל החשבון")}<td class="ln"${W("border-bottom:1pt solid #59606e;vertical-align:bottom;")}><span class="hint">אם החשבון אינו על שמך</span></td></tr>
+        <tr>${th("חתימה")}${ln}</tr>
+      </table>
+      ${c.hand || due ? `<div class="s-ft">${c.hand ? "למסור " + E(c.hand) : "למסור"}${due ? " עד " + E(due.heb) : ""}</div>` : ""}
+    </div>`;
+  const slipTd = `<td class="slip"${W("width:50%;border:1pt dashed #9aa0ab;padding:6pt;vertical-align:top;height:" + (per === 2 ? "23.5cm" : "11.6cm") + ";")}>${slip}</td>`;
+  const rowsB = [];
+  for(let r = 0; r < per / 2; r++) rowsB.push(`<tr>${slipTd}${slipTd}</tr>`);
+  const pageB = `<div class="page pb">
+    <div class="cut">✂ גוזרים לאורך הקווים המקווקווים · כל תמים ממלא טופס אחד</div>
+    <table class="slips per${per}" dir="rtl" width="100%" cellspacing="0" cellpadding="0">${rowsB.join("")}</table>
+  </div>`;
+  const showA = opt.only !== "b", showB = c.slips && opt.only !== "a";
+  const pages = [showA ? pageA : "", showB ? pageB : ""].filter(Boolean);
+  const brk = word ? `<br clear="all" style="page-break-before:always">` : "";
+  const fontHead = word ? `"David","Frank Ruhl Libre",serif` : `"Frank Ruhl Libre","David",serif`;
+  const fontBody = word ? `"Arial","Heebo",sans-serif` : `"Heebo","Arial",sans-serif`;
+  const css = `
+    @page{ size:A4; margin:${word ? "1.4cm" : "0"}; }
+    ${word ? "@page Section1{ size:21cm 29.7cm; margin:1.4cm; } div.Section1{ page:Section1; }" : ""}
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; padding:0; background:${opt.preview ? "#fff" : "#fff"}; }
+    body{ direction:rtl; font-family:${fontBody}; color:#1f2430; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    table{ border-collapse:collapse; }
+    .page{ ${word ? "" : "width:210mm; min-height:297mm; padding:14mm 16mm 12mm; position:relative; overflow:hidden; page-break-after:always; break-after:page;"} }
+    .page:last-child{ page-break-after:auto; break-after:auto; }
+    ${word ? "" : `.pa{ background:${CREAM}; border:0; } .pa::before{ content:""; position:absolute; inset:7mm; border:1.5px solid ${GOLD}; border-radius:6mm; pointer-events:none; } .pa::after{ content:""; position:absolute; inset:8.6mm; border:0.6px solid ${GOLD}; border-radius:5mm; opacity:.6; pointer-events:none; }`}
+    .top td{ font-size:12px; color:#5b5f6b; padding:0 2mm 4mm; }
+    .top .bsd{ text-align:right; font-weight:700; color:${NAVY}; font-size:13px; }
+    .top .pub{ text-align:left; }
+    .band-in{ background:${NAVY}; color:#fff; text-align:center; padding:${word ? "16pt 12pt" : "10mm 8mm 9mm"}; ${word ? "" : "border-radius:5mm;"} }
+    .greet{ font-family:${fontHead}; font-size:${word ? "15pt" : "22px"}; color:#f1d9a6; margin-bottom:${word ? "4pt" : "3mm"}; }
+    .title{ font-family:${fontHead}; font-weight:900; font-size:${word ? "28pt" : "44px"}; line-height:1.15; color:#fff; }
+    .sub{ display:inline-block; margin-top:${word ? "6pt" : "4mm"}; font-size:${word ? "12pt" : "16px"}; font-weight:700; color:${NAVY}; background:#f1d9a6; padding:${word ? "2pt 10pt" : "1.5mm 6mm"}; border-radius:99px; }
+    .orn{ text-align:center; color:${GOLD}; letter-spacing:6px; font-size:12px; margin:${word ? "10pt 0 6pt" : "6mm 0 5mm"}; }
+    .body{ font-size:${word ? "14pt" : "19px"}; line-height:1.75; margin:0 0 ${word ? "8pt" : "3.5mm"}; text-align:justify; }
+    .box{ margin:${word ? "8pt 0" : "6mm 0"}; }
+    .box-in{ background:#fff; border:1.5px solid ${GOLD}; padding:${word ? "10pt 12pt" : "5mm 6mm"}; ${word ? "" : "border-radius:4mm;"} }
+    .box-h{ font-family:${fontHead}; font-weight:900; font-size:${word ? "16pt" : "22px"}; color:${NAVY}; margin-bottom:${word ? "6pt" : "3mm"}; }
+    .items .it{ font-size:${word ? "13pt" : "17px"}; padding:${word ? "3pt 0" : "1.8mm 0"}; vertical-align:top; width:50%; }
+    .ck{ color:${GOLD}; font-weight:900; }
+    .note-in{ background:#fff3d6; border-right:${word ? "4pt" : "5px"} solid ${GOLD}; padding:${word ? "8pt 10pt" : "4mm 5mm"}; font-size:${word ? "13.5pt" : "17.5px"}; font-weight:700; color:#6b4a0e; ${word ? "" : "border-radius:3mm;"} }
+    .hand{ font-size:${word ? "14pt" : "19px"}; line-height:1.7; margin:${word ? "10pt 0 4pt" : "6mm 0 2mm"}; }
+    .sign{ text-align:left; font-size:${word ? "13pt" : "18px"}; line-height:1.6; margin-top:${word ? "12pt" : "6mm"}; padding-left:${word ? "0" : "6mm"}; }
+    .sign b{ font-family:${fontHead}; font-size:${word ? "16pt" : "23px"}; color:${NAVY}; }
+    .small{ ${word ? "" : "position:absolute; right:16mm; left:16mm; bottom:14mm;"} text-align:center; font-size:${word ? "11pt" : "14px"}; color:#5b5f6b; border-top:1px solid #e3d6bb; padding-top:${word ? "5pt" : "3mm"}; margin-top:${word ? "16pt" : "0"}; }
+    .pb{ ${word ? "" : "padding:9mm 9mm 8mm;"} }
+    .cut{ text-align:center; font-size:12px; color:#7a7f8c; margin-bottom:${word ? "6pt" : "3mm"}; }
+    .slips td.slip{ width:50%; border:1.2px dashed #9aa0ab; padding:${word ? "6pt" : "4mm"}; vertical-align:top; }
+    .slips.per4 td.slip{ height:${word ? "11.6cm" : "134mm"}; }
+    .slips.per2 td.slip{ height:${word ? "23.5cm" : "272mm"}; }
+    .s-h{ background:${NAVY}; color:#fff; text-align:center; font-family:${fontHead}; font-weight:900; font-size:${word ? "13pt" : "18px"}; padding:${word ? "5pt" : "3mm"}; ${word ? "" : "border-radius:2.5mm;"} }
+    .s-sub{ text-align:center; font-size:${word ? "10.5pt" : "13.5px"}; font-weight:700; color:#8a5c12; margin:${word ? "4pt 0 2pt" : "2mm 0 1mm"}; }
+    .s-f th{ text-align:right; font-size:${word ? "11pt" : "14.5px"}; color:${NAVY}; font-weight:700; white-space:nowrap; padding:${word ? "9pt 0 2pt 6pt" : (String(c.per) === "2" ? "11mm" : "6.4mm") + " 0 1mm 3mm"}; vertical-align:bottom; width:1%; }
+    .s-f td.ln{ border-bottom:1.2px solid #59606e; vertical-align:bottom; padding-bottom:1mm; }
+    .s-f td.dg{ vertical-align:bottom; padding-bottom:0.5mm; }
+    .hint{ font-size:${word ? "8.5pt" : "10px"}; color:#9aa0ab; }
+    .digits td{ width:${word ? "16pt" : "7mm"}; height:${word ? "18pt" : "8mm"}; border:1.2px solid #59606e; background:#fff; }
+    .lbl2{ font-size:${word ? "11pt" : "13.5px"}; color:${NAVY}; font-weight:700; padding:0 ${word ? "8pt" : "4mm"}; white-space:nowrap; vertical-align:bottom; }
+    .s-ft{ margin-top:${word ? "8pt" : "6mm"}; text-align:center; font-size:${word ? "10pt" : "12px"}; color:#5b5f6b; background:${CREAM}; padding:${word ? "3pt" : "1.6mm"}; ${word ? "" : "border-radius:2mm;"} }
+  `;
+  const fonts = word ? "" : `<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">`;
+  const head = word
+    ? `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40" dir="rtl" lang="he"><head><meta charset="utf-8"><title>${E(c.title)}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]--><style>${css}</style></head><body dir="rtl" lang="he"><div class="Section1" dir="rtl">`
+    : `<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="utf-8"><title>${E(c.title)}</title>${fonts}<style>${css}</style></head><body>`;
+  const tail = word ? `</div></body></html>` : `</body></html>`;
+  return head + pages.join(brk) + tail;
+}
+function snPrint(){
+  const c = snCfgFromForm();
+  const w = window.open("", "_blank");
+  if(!w){ alert("הדפדפן חסם את פתיחת החלון. יש לאפשר חלונות קופצים לאתר הזה ולנסות שוב."); return; }
+  w.document.write(snDocHtml(c));
+  w.document.close();
+  let done = false;
+  const go = () => { if(done) return; done = true; try{ w.focus(); w.print(); }catch(e){} };
+  try{ w.document.fonts.ready.then(() => setTimeout(go, 200)); }catch(e){}
+  setTimeout(go, 2500);
+}
+function snWord(){
+  const c = snCfgFromForm();
+  const html = snDocHtml(c, { word: true });
+  const blob = new Blob(["﻿" + html], { type: "application/msword" });
+  const a = document.createElement("a");
+  const d = snDateInfo(c.date);
+  a.href = URL.createObjectURL(blob);
+  a.download = (String(c.title || "מודעה").replace(/[\\/:*?"<>|]/g, "").trim() || "מודעה") + " - " + d.greg.replace(/\./g, "-") + ".doc";
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  showToast("קובץ Word ירד – אפשר לפתוח ולערוך בו כל דבר");
+}
+
 
 /* ---------- חלון כל פרטי הבנק ---------- */
 function openBankModal(){
@@ -15842,13 +16331,56 @@ function holderById(id){ return data.keysHolders.find(h => h.id === id); }
 function holderByName(name){ return data.keysHolders.find(h => h.name === name); }
 function openLoansFor(keyId){ return data.keysLog.filter(l => l.keyId === keyId && !l.dateIn); }
 function keyLoanedCount(keyId){ return openLoansFor(keyId).length; }
+/* נובמבר 2026: "כמות" (qty) = כמה יש בארון עכשיו, בלי מה שבהשאלה – בדיוק מה שסופרים בארון.
+   (קודם האפליקציה הורידה ממנה שוב את ההשאלות, ולכן אחרי ספירה המלאי נראה לא נכון.)
+   מסירת מפתח מורידה 1 מהארון, והחזרה מוסיפה 1. */
+function keyInCab(k){ return Math.max(0, parseFloat(k && k.qty) || 0); }
 function keyStatus(k){
   const loaned = keyLoanedCount(k.id);
-  const qty = parseFloat(k.qty) || 0;
-  if(qty - loaned < 0) return "mismatch";
-  if(loaned === 0) return "available";
-  if(loaned < qty) return "partial";
-  return "out";
+  const cab = keyInCab(k);
+  if(cab <= 0) return loaned > 0 ? "out" : "none";
+  return loaned > 0 ? "partial" : "available";
+}
+const KEY_STATUS_TAG = { available:["done","זמין בארון"], partial:["open","חלק בהשאלה"], out:["late","כולם בהשאלה"], none:["late","אין בארון"] };
+function keyTodayIso(){ const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+/* שינוי כמות בארון ישירות מהכרטיס – בלי לפתוח חלונות */
+function keySetCab(id, val){
+  const k = keyById(id);
+  if(!k) return;
+  const v = Math.max(0, Math.round(parseFloat(val) || 0));
+  if(v === keyInCab(k) && k.lastCounted === keyTodayIso()) return;
+  k.qty = v;
+  k.lastCounted = keyTodayIso();
+  saveKeys();
+  keyRefreshOne(id);
+}
+function keyStep(ev, id, delta){
+  if(ev){ ev.stopPropagation(); ev.preventDefault(); }
+  const k = keyById(id);
+  if(!k) return;
+  keySetCab(id, keyInCab(k) + delta);
+}
+function keyQtyInput(ev, id){ if(ev) ev.stopPropagation(); keySetCab(id, ev.target.value); }
+function keyStepperHtml(k, big){
+  return `<span class="kq-step${big ? " big" : ""}" onclick="event.stopPropagation()">
+    <button type="button" aria-label="פחות אחד" onclick="keyStep(event, ${k.id}, -1)" ${keyInCab(k) <= 0 ? "disabled" : ""}>−</button>
+    <input type="number" inputmode="numeric" min="0" value="${keyInCab(k)}" aria-label="כמה בארון" onclick="event.stopPropagation()" onfocus="this.select()" onchange="keyQtyInput(event, ${k.id})" onkeydown="if(event.key==='Enter'){this.blur();}">
+    <button type="button" aria-label="עוד אחד" onclick="keyStep(event, ${k.id}, 1)">+</button>
+  </span>`;
+}
+/* מעדכן רק את הכרטיס/השורה של המפתח ואת המספרים למעלה (בלי לצייר הכל מחדש) */
+function keyRefreshOne(id){
+  const k = keyById(id);
+  const el = document.querySelector(`#keysGrid [data-key-id="${id}"]`);
+  if(k && el){
+    const tmp = document.createElement("div");
+    tmp.innerHTML = keysCountMode ? keyCountRowHtml(k) : keyCardHtml(k);
+    if(tmp.firstElementChild) el.replaceWith(tmp.firstElementChild);
+  }
+  try{ renderKeyStats(); }catch(e){}
+  if(keysCountMode) try{ renderKeyCountHead(); }catch(e){}
+  const dm = document.getElementById("keyDetailModal");
+  if(k && dm && dm.style.display !== "none" && currentKeyDetailId === id) openKeyDetailModal(id);
 }
 function activeHolderNames(){ return data.keysHolders.filter(h => h.active !== false).map(h => h.name); }
 
@@ -15868,12 +16400,12 @@ function renderKeyStats(){
   if(!cards) return;
   const total = data.keysInventory.length;
   const loanedNow = data.keysLog.filter(l => !l.dateIn).length;
-  const available = data.keysInventory.reduce((s,k) => s + Math.max(0, (parseFloat(k.qty)||0) - keyLoanedCount(k.id)), 0);
+  const available = data.keysInventory.reduce((s,k) => s + keyInCab(k), 0);
   const stale = data.keysLog.filter(l => { if(l.dateIn) return false; const h = holderByName(l.holder); return h && h.active === false; }).length;
   cards.innerHTML = `
     <div class="stat"><div class="label">מפתחות מתועדים במערכת</div><div class="value">${total}</div></div>
     <div class="stat warn"><div class="label">בהשאלה כרגע</div><div class="value">${loanedNow}</div></div>
-    <div class="stat good"><div class="label">זמינים בארון (לפי ספירה)</div><div class="value">${available}</div></div>
+    <div class="stat good"><div class="label">בארון עכשיו (לפי ספירה)</div><div class="value">${available}</div></div>
     <div class="stat ${stale>0?'bad':'good'}"><div class="label">בהשאלה אצל מי שאינו פעיל</div><div class="value">${stale}</div></div>
   `;
   const badge = document.getElementById("keysAlertCount");
@@ -15910,25 +16442,58 @@ function renderKeyCards(){
     if(statusF && keyStatus(k)!==statusF) return false;
     return true;
   });
+  grid.classList.toggle("kq-countmode", keysCountMode);
+  const btn = document.getElementById("keysCountBtn");
+  if(btn){ btn.classList.toggle("on", keysCountMode); btn.setAttribute("aria-pressed", keysCountMode ? "true" : "false"); }
+  if(keysCountMode){
+    list.sort((a, b) => String(a.floor || "").localeCompare(String(b.floor || ""), undefined, { numeric: true }) || keyDisplayId(a).localeCompare(keyDisplayId(b), undefined, { numeric: true }));
+  }
+  try{ renderKeyCountHead(); }catch(e){}
   if(list.length===0){ grid.innerHTML = `<div class="empty-hint">אין מפתחות התואמים לסינון</div>`; return; }
-  grid.innerHTML = list.map(k => {
-    const loaned = keyLoanedCount(k.id);
-    const qty = parseFloat(k.qty)||0;
-    const status = keyStatus(k);
-    const tagMap = {available:["green","זמין"], partial:["warn","בהשאלה חלקית"], out:["bad","אזל במלאי"], mismatch:["bad","לבדוק ספירה"]};
-    const [cls,label] = tagMap[status];
-    return `
-    <div class="key-card ${status==='mismatch'?'mismatch':''}" onclick="openKeyDetailModal(${k.id})">
-      <div class="kc-top"><span class="kc-code">${keyDisplayId(k)}</span><span style="display:inline-flex;align-items:center;gap:4px"><span class="pill ${cls==='green'?'done':cls==='warn'?'open':'late'}">${label}</span>${umMenu([
+  grid.innerHTML = list.map(k => keysCountMode ? keyCountRowHtml(k) : keyCardHtml(k)).join("");
+}
+function keyCardHtml(k){
+  const loaned = keyLoanedCount(k.id);
+  const status = keyStatus(k);
+  const [cls, label] = KEY_STATUS_TAG[status];
+  return `
+    <div class="key-card ks-${status}" data-key-id="${k.id}" onclick="openKeyDetailModal(${k.id})">
+      <div class="kc-top"><span class="kc-code">${escHtml(keyDisplayId(k))}</span><span style="display:inline-flex;align-items:center;gap:4px"><span class="pill ${cls}">${label}</span>${umMenu([
         { label: "פרטי המפתח", icon: "open", attrs: `onclick="openKeyDetailModal(${k.id})"` },
         { label: "השאלת המפתח", icon: "keys", attrs: `onclick="openLoanModal(${k.id})"` },
         { label: "עריכה", icon: "edit", attrs: `onclick="openKeyFormModal(${k.id})"` }
       ], { iso: true, cls: "um-inrow" })}</span></div>
-      <div class="kc-loc">${k.location || "—"}</div>
-      <div class="kc-meta"><span>קומה ${k.floor||"—"}</span><span>${k.type||""} ${k.size||""}</span></div>
-      <div class="kc-foot"><span>${status==='mismatch' ? `יצא ${loaned} מתוך ${qty} רשומים` : `${Math.max(0,qty-loaned)} זמינים מתוך ${qty}`}</span></div>
+      <div class="kc-loc">${escHtml(k.location || "—")}</div>
+      <div class="kc-meta"><span>קומה ${escHtml(k.floor||"—")}</span><span>${escHtml(k.type||"")} ${escHtml(k.size||"")}</span></div>
+      <div class="kc-foot"><span class="kq-lbl">בארון${loaned ? ` · <b class="kq-out">${loaned} בהשאלה</b>` : ""}</span>${keyStepperHtml(k)}</div>
     </div>`;
-  }).join("");
+}
+/* ---- מצב ספירה: רשימה קומפקטית לפי קומות, סופרים ולוחצים +/− ---- */
+let keysCountMode = false;
+function toggleKeysCountMode(){
+  keysCountMode = !keysCountMode;
+  if(keysCountMode){ const st = document.getElementById("keysStatusFilter"); if(st) st.value = ""; }
+  renderKeyCards();
+  const g = document.getElementById("keysGrid"); if(g && keysCountMode) g.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function keyCountRowHtml(k){
+  const loaned = keyLoanedCount(k.id);
+  const done = k.lastCounted === keyTodayIso();
+  return `<div class="kq-row${done ? " done" : ""}" data-key-id="${k.id}">
+    <span class="kq-fl">${escHtml(k.floor === "" || k.floor == null ? "—" : String(k.floor))}</span>
+    <div class="kq-t"><b>${escHtml(keyDisplayId(k))}</b><span>${escHtml(k.location || "—")}${loaned ? ` · <em>${loaned} בהשאלה</em>` : ""}</span></div>
+    ${done ? `<span class="kq-ok" title="נספר היום">✓</span>` : `<button type="button" class="kq-same" title="הכמות נכונה – סימון כנספר" onclick="keySetCab(${k.id}, ${keyInCab(k)})">נכון</button>`}
+    ${keyStepperHtml(k, true)}
+  </div>`;
+}
+function renderKeyCountHead(){
+  const box = document.getElementById("keysCountHead");
+  if(!box) return;
+  if(!keysCountMode){ box.innerHTML = ""; box.hidden = true; return; }
+  const today = keyTodayIso();
+  const n = data.keysInventory.filter(k => k.lastCounted === today).length;
+  box.hidden = false;
+  box.innerHTML = `<div class="kq-head"><div><b>מצב ספירה</b><span>סופרים כמה יש בארון בפועל (בלי מה שבהשאלה). כל לחיצה נשמרת מיד. "נכון" = הכמות לא השתנתה.</span></div><span class="kq-cnt">${n} נספרו היום מתוך ${data.keysInventory.length}</span><button type="button" class="btn" onclick="toggleKeysCountMode()">סיום ספירה</button></div>`;
 }
 
 function openKeyDetailModal(id){
@@ -15941,8 +16506,8 @@ function openKeyDetailModal(id){
     <div><div style="font-size:11px;color:var(--ink-soft)">מיקום</div><div style="font-weight:600;font-size:13.5px">${k.location||"—"}</div></div>
     <div><div style="font-size:11px;color:var(--ink-soft)">קומה</div><div style="font-weight:600;font-size:13.5px">${k.floor||"—"}</div></div>
     <div><div style="font-size:11px;color:var(--ink-soft)">סוג נעילה / גודל</div><div style="font-weight:600;font-size:13.5px">${k.type||"—"} ${k.size||""}</div></div>
-    <div><div style="font-size:11px;color:var(--ink-soft)">כמות בארון (ספירה ידנית)</div><div style="font-weight:600;font-size:13.5px">${k.qty ?? 0}${k.lastCounted? ' <span style="font-weight:400;color:var(--ink-soft);font-size:11px">(נספר '+k.lastCounted+')</span>':''}</div></div>
-    <div><div style="font-size:11px;color:var(--ink-soft)">בהשאלה כרגע (מהיומן)</div><div style="font-weight:600;font-size:13.5px">${loaned}</div></div>
+    <div><div style="font-size:11px;color:var(--ink-soft)">בארון עכשיו${k.lastCounted? ' · נספר '+escHtml(k.lastCounted.split("-").reverse().join(".")):''}</div><div style="margin-top:3px">${keyStepperHtml(k, true)}</div></div>
+    <div><div style="font-size:11px;color:var(--ink-soft)">בהשאלה כרגע · סה״כ</div><div style="font-weight:600;font-size:13.5px">${loaned} בהשאלה · ${keyInCab(k) + loaned} בסך הכל</div></div>
     <div><div style="font-size:11px;color:var(--ink-soft)">הערות</div><div style="font-weight:600;font-size:13.5px">${k.notes||"—"}</div></div>
   `;
   const holders = openLoansFor(id);
@@ -16017,10 +16582,13 @@ function submitKeyForm(){
     notes: document.getElementById("kfNotes").value.trim(),
     masters
   };
+  fields.qty = Math.max(0, fields.qty);
   if(editingKeyId){
     const row = keyById(editingKeyId);
+    if(keyInCab(row) !== fields.qty) fields.lastCounted = keyTodayIso();
     Object.assign(row, fields);
   }else{
+    fields.lastCounted = keyTodayIso();
     data.keysInventory.push(Object.assign({id: nextId()+11000}, fields));
   }
   saveKeys();
@@ -16046,8 +16614,8 @@ function openStockCountModal(){
 function submitStockCount(){
   const k = keyById(currentKeyDetailId);
   if(!k) return;
-  k.qty = parseFloat(document.getElementById("scQty").value)||0;
-  k.lastCounted = new Date().toISOString().slice(0,10);
+  k.qty = Math.max(0, parseFloat(document.getElementById("scQty").value)||0);
+  k.lastCounted = keyTodayIso();
   saveKeys();
   renderKeysTab();
   closeModalOverlay("stockCountModal");
@@ -16135,7 +16703,9 @@ function submitHolderForm(){
   }
   hfSelectedKeyIds.forEach(keyId => {
     const k = keyById(keyId);
-    data.keysLog.push({id: nextId()+12000, keyId, keyDesc: k?keyDisplayId(k):"", holder:name, dateOut: today, dateIn:"", notes:""});
+    const entry = {id: nextId()+12000, keyId, keyDesc: k?keyDisplayId(k):"", holder:name, dateOut: today, dateIn:"", notes:""};
+    keyTakeFromCab(k, entry);
+    data.keysLog.push(entry);
   });
   saveKeys();
   renderKeysTab();
@@ -16203,8 +16773,7 @@ function populateLoanSelectors(preselectKeyId){
   const keySel = document.getElementById("lnKey");
   holderSel.innerHTML = `<option value="">בחירת שם...</option>` + activeHolderNames().map(n=>`<option>${n}</option>`).join("");
   keySel.innerHTML = `<option value="">בחירת מפתח...</option>` + data.keysInventory.map(k => {
-    const avail = Math.max(0,(parseFloat(k.qty)||0) - keyLoanedCount(k.id));
-    return `<option value="${k.id}">${keyDisplayId(k)} — ${k.location||""} (זמין: ${avail})</option>`;
+    return `<option value="${k.id}">${keyDisplayId(k)} — ${k.location||""} (בארון: ${keyInCab(k)})</option>`;
   }).join("");
   document.getElementById("lnDate").value = new Date().toISOString().slice(0,10);
   document.getElementById("lnNotes").value = "";
@@ -16223,15 +16792,23 @@ function submitLoan(){
   const k = keyById(keyId);
   const entry = {id: nextId()+12000, keyId, keyDesc: k?keyDisplayId(k):"", holder, dateOut: date||new Date().toISOString().slice(0,10), dateIn:"", notes};
   if(dueBack) entry.dueBack = dueBack;
+  keyTakeFromCab(k, entry);
   data.keysLog.push(entry);
   saveKeys();
   renderKeysTab();
   closeModalOverlay("loanModal");
 }
+/* מסירה: יוצא מפתח אחד מהארון (אם רשום שיש). מסמנים ברשומה, כדי שמחיקת רשומה בטעות תחזיר אותו */
+function keyTakeFromCab(k, entry){
+  if(!k || !entry) return;
+  if(keyInCab(k) > 0){ k.qty = keyInCab(k) - 1; entry.qtyAdj = true; }
+}
 function markReturned(logId){
   const row = data.keysLog.find(r=>r.id===logId);
-  if(!row) return;
+  if(!row || row.dateIn) return;
   row.dateIn = new Date().toISOString().slice(0,10);
+  const rk = row.keyId ? keyById(row.keyId) : null;
+  if(rk) rk.qty = keyInCab(rk) + 1;   // המפתח חזר לארון
   saveKeys();
   renderKeysTab();
   if(currentKeyDetailId) openKeyDetailModal(currentKeyDetailId);
@@ -16239,6 +16816,8 @@ function markReturned(logId){
 }
 function removeKeyLog(id){
   openConfirmModal("למחוק רשומה מהיומן? לא ניתן לשחזר את הפעולה.", () => {
+    const lr = data.keysLog.find(r => r.id === id);
+    if(lr && !lr.dateIn && lr.qtyAdj){ const lk = keyById(lr.keyId); if(lk) lk.qty = keyInCab(lk) + 1; }   // מסירה שנמחקה – המפתח לא באמת יצא
     data.keysLog = data.keysLog.filter(r=>r.id!==id);
     saveKeys(); renderKeysTab();
   });
@@ -26376,13 +26955,13 @@ return SPX;
 </script>
 <script src="theme.js"></script>
 <script src="shell.js"></script>
-<script src="ai.js?v=20261144"></script>
+<script src="ai.js?v=20261145"></script>
 <script src="users.js"></script>
-<script src="history.js?v=20261144"></script>
+<script src="history.js?v=20261145"></script>
 <script src="voice.js"></script>
 <script src="prolinks.js"></script>
-<script src="projects.js?v=20261144"></script>
-<script src="waiting.js?v=20261144"></script>
+<script src="projects.js?v=20261145"></script>
+<script src="waiting.js?v=20261145"></script>
 <script>
 /* ספירת מלאי בלי קליטה: service worker שמציג את count.html רק כשאין רשת בכלל */
 if("serviceWorker" in navigator && location.protocol === "https:"){ window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(e => console.warn("sw:", e)); }); }
